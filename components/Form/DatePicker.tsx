@@ -1,10 +1,12 @@
-import { ErrorMessage } from "formik";
-import { Input, Form } from "antd";
+import React, { ReactElement } from "react";
+import { DatePicker as DatePickers, Typography, Form } from "antd";
+const { RangePicker } = DatePickers;
 import { FormikProps } from "./props";
-import { Typography } from "antd";
+import moment from "moment";
 const { Text } = Typography;
+import { ErrorMessage } from "formik";
 
-interface InputProps extends FormikProps {
+interface Props extends FormikProps {
   id: string | undefined;
   type: string;
   className: string | undefined;
@@ -16,26 +18,39 @@ interface InputProps extends FormikProps {
   };
 }
 
-const CustomInput = ({ label, field, ...props }: InputProps) => {
+export default function DatePicker({
+  label,
+  field,
+  ...props
+}: Props): ReactElement {
+  if (field.value) {
+    field.value = moment(field.value);
+  }
+
   const handleChange = (e: any) => {
-    let value = e?.target?.value;
+    let value: string = "";
+    if (e) {
+      value = e.format();
+    }
     props.form.setFieldValue(field.name, value);
   };
 
   return (
     <div className="ant-form ant-form-vertical">
       <Form.Item label={label?.text}>
-        <Input
-          id={props.id}
-          type={props.type}
+        {/* {label?.text != undefined &&
+                <label htmlFor={field.name} className={label.className}>{label.text}</label>
+            } */}
+        <DatePickers
+          style={{ width: "100%" }}
+          {...field}
+          {...props}
           name={field.name}
-          className={props.className}
-          placeholder={props.placeholder}
           onChange={handleChange}
-          autoComplete={props.autoComplete}
         />
+
         <Text type="danger">
-          <div>
+          <div style={{ minHeight: "25px" }}>
             <ErrorMessage
               name={field.name}
               component="div"
@@ -46,6 +61,4 @@ const CustomInput = ({ label, field, ...props }: InputProps) => {
       </Form.Item>
     </div>
   );
-};
-
-export default CustomInput;
+}

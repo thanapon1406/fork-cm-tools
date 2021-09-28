@@ -1,33 +1,48 @@
-import type { NextPage } from 'next'
-import { Formik, Form, Field } from 'formik'
-import Input from '@/components/Form/Input'
-import Link from 'next/link'
-import * as Yup from 'yup';
-import Layout from '@/components/AuthLayout'
-import { Row, Col, Button, Typography, Card } from 'antd';
-import Image from 'next/image'
-import logoImg from '../public/logo-kittchenhub.png'
-
+import React, { useEffect } from "react";
+import type { NextPage } from "next";
+import { Formik, Form, Field } from "formik";
+import Input from "@/components/Form/Input";
+import Link from "next/link";
+import * as Yup from "yup";
+import Layout from "@/components/AuthLayout";
+import { Row, Col, Button, Typography, Card } from "antd";
+import Image from "next/image";
+import logoImg from "../public/logo-kittchenhub.png";
+import { useRouter } from "next/router";
 const { Title } = Typography;
 
 const Login: NextPage = () => {
   const initialValues = {
     username: "",
-    password: ""
-  }
+    password: "",
+  };
 
-  const handleSubmit = (values: object) => {
-    console.log('values', values)
-  }
+  const router  = useRouter()
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.clear();
+    }
+  }, []);
+
+  const handleSubmit = (values: any) => {
+    console.log("values", values);
+    localStorage.setItem("token",values.username)
+    router.push("/")
+
+  };
 
   const Schema = Yup.object().shape({
-    username: Yup.string().trim().email('กรุณากรอกอีเมลให้ถูกต้อง').required('กรุณากรอกอีเมล'),
-    password: Yup.string().trim().required('กรุณากรอกรหัสผ่าน'),
-  })
+    username: Yup.string()
+      .trim()
+      .email("กรุณากรอกอีเมลให้ถูกต้อง")
+      .required("กรุณากรอกอีเมล"),
+    password: Yup.string().trim().required("กรุณากรอกรหัสผ่าน"),
+  });
 
   return (
     <Layout>
-      <Row justify="center" >
+      <Row justify="center">
         <Col span={24} xs={24} sm={12} md={6} style={{ textAlign: "left" }}>
           <Card bordered={false}>
             <Formik
@@ -37,9 +52,11 @@ const Login: NextPage = () => {
             >
               {(values) => (
                 <Form>
-                  <div style={{ textAlign: "center", marginBottom: "20px" }} >
-                      <Image src={logoImg} width={60} height={60}/>
-                    <Title level={5} style={{color:"#dc1e24"}}>KITCHEN HUB ADMIN</Title>
+                  <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                    <Image src={logoImg} width={60} height={60} />
+                    <Title level={5} style={{ color: "#dc1e24" }}>
+                      KITCHEN HUB ADMIN
+                    </Title>
                   </div>
                   <Field
                     name="username"
@@ -65,16 +82,15 @@ const Login: NextPage = () => {
                     htmlType="submit"
                     type="primary"
                     shape="round"
-                    style={{marginTop: "5px"}}
+                    style={{ marginTop: "5px" }}
                     block
                   >
                     ลงชื่อเข้าใช้
                   </Button>
 
-                  <div style={{marginTop: "10px"}}>
+                  <div style={{ marginTop: "10px" }}>
                     <Link href="/forgotpassword">ลืมรหัสผ่าน</Link>
                   </div>
-
                 </Form>
               )}
             </Formik>
@@ -82,7 +98,7 @@ const Login: NextPage = () => {
         </Col>
       </Row>
     </Layout>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

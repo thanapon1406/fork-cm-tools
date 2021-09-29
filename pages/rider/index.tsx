@@ -3,6 +3,7 @@ import { Formik, Form, Field } from "formik";
 import { Row, Col } from "antd";
 import * as Yup from "yup";
 
+
 import MainLayout from "@/layout/MainLayout";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
@@ -11,14 +12,43 @@ import Select from "@/components/Form/Select";
 import DateRangePicker from "@/components/Form/DateRangePicker";
 import Table from "@/components/Table";
 
-interface Props { }
+import { getRider } from '../api/rider'
+import lodash from "lodash";
 
+interface Props { }
+interface SearchValue {
+  keyword: string,
+  approve_status: string,
+  status: string,
+  ekyc_status: string,
+  created_at: object,
+  updated_at: object,
+}
+
+const StatusConstants = {
+  UPLOADED: {
+    TH: "รอตรวจสอบ",
+    EN: "uploaded"
+  },
+  APPROVED: {
+    TH: "อนุมัติ",
+    EN: "approved",
+  },
+  REJECTED: {
+    TH: "ไม่ผ่าน",
+    EN: "rejected",
+  },
+  RE_APPROVED: {
+    TH: "ขอเอกสารเพิ่ม",
+    EN: "re-approved",
+  }
+}
 export default function Rider({ }: Props): ReactElement {
   const initialValues = {
     keyword: "",
-    verify: "",
-    verifyRider: "",
-    ekycRider: "",
+    verify: "all",
+    verifyRider: "all",
+    ekycRider: "all",
     registerDate: {
       start: "",
       end: "",
@@ -31,143 +61,51 @@ export default function Rider({ }: Props): ReactElement {
   const Schema = Yup.object().shape({
   });
   let [mockData, setMockData] = useState([]);
+  let [pagination, setPagination] = useState({current: 1, pageSize: 10, total: 0});
   let [isLoading, setIsLoading] = useState(true);
 
   const handleSubmit = (values: any) => {
-    console.log("values : ", values)
+    const filter = {
+      keyword: values.keyword,
+      approve_status: values.verify,
+      status: values.verifyRider,
+      ekyc_status: values.ekycRider,
+      created_at: values.registerDate.start && values.registerDate.end != "" ? values.registerDate : {},
+      updated_at: values.updateDate.start && values.updateDate.end != "" ? values.updateDate: {} ,
+    }
+    
     setIsLoading(true);
+    genData(filter)
   }
 
-  const mapStatus = (status:any, ekyc:any) => {
+  const mapStatus = (status: any, ekyc: any) => {
     let result = "-"
-    if(status == "uploaded" || ekyc =="uploaded"){
-      result = "รอการตรวจสอบ"
-    }else if(status == "re-approved" || ekyc =="re-approved"){
-      result = "ขอเอกสารเพิ่มเติม"
-    }else if(status == "rejected" || ekyc =="rejected"){
-      result = "ไม่อนุมัติ"
-    }else if(status == "approved" || ekyc =="approved"){
-      result = "อนุมัติ"
+    if (status == StatusConstants.UPLOADED.EN || ekyc == StatusConstants.UPLOADED.EN) {
+      result = StatusConstants.UPLOADED.TH
+    } else if (status == StatusConstants.RE_APPROVED.EN || ekyc == StatusConstants.RE_APPROVED.EN) {
+      result = StatusConstants.RE_APPROVED.TH
+    } else if (status == StatusConstants.REJECTED.EN || ekyc == StatusConstants.REJECTED.EN) {
+      result = StatusConstants.REJECTED.TH
+    } else if (status == StatusConstants.APPROVED.EN || ekyc == StatusConstants.APPROVED.EN) {
+      result = StatusConstants.APPROVED.TH
     }
     return result
   }
-  const genData = (value: number) => {
-    let tempData: any = [];
-    tempData.push({
-      first_name: "abc",
-      last_name: "นามสกุลใคร",
-      pdpa: {
-        nation_id: "1103701092603"
-      },
-      phone: "87-3612521",
-      status: "uploaded",
-      ekyc_status: "uploaded",
-      created_at: "2021-09-08T06:10:13Z",
-      updated_at: "2021-09-23T04:13:47Z"
-    },
-    {
-      first_name: "abc",
-      last_name: "นามสกุลใคร",
-      pdpa: {
-        nation_id: "1103701092603"
-      },
-      phone: "87-3612521",
-      status: "uploaded",
-      ekyc_status: "approved",
-      created_at: "2021-09-08T06:10:13Z",
-      updated_at: "2021-09-23T04:13:47Z"
-    },
-    {
-      first_name: "abc",
-      last_name: "นามสกุลใคร",
-      pdpa: {
-        nation_id: "1103701092603"
-      },
-      phone: "87-3612521",
-      status: "approved",
-      ekyc_status: "uploaded",
-      created_at: "2021-09-08T06:10:13Z",
-      updated_at: "2021-09-23T04:13:47Z"
-    },
-    {
-      first_name: "abc",
-      last_name: "นามสกุลใคร",
-      pdpa: {
-        nation_id: "1103701092603"
-      },
-      phone: "87-3612521",
-      status: "approved",
-      ekyc_status: "approved",
-      created_at: "2021-09-08T06:10:13Z",
-      updated_at: "2021-09-23T04:13:47Z"
-    },
-    {
-      first_name: "abc",
-      last_name: "นามสกุลใคร",
-      pdpa: {
-        nation_id: "1103701092603"
-      },
-      phone: "87-3612521",
-      status: "re-approved",
-      ekyc_status: "re-approved",
-      created_at: "2021-09-08T06:10:13Z",
-      updated_at: "2021-09-23T04:13:47Z"
-    },
-    {
-      first_name: "abc",
-      last_name: "นามสกุลใคร",
-      pdpa: {
-        nation_id: "1103701092603"
-      },
-      phone: "87-3612521",
-      status: "re-approved",
-      ekyc_status: "uploaded",
-      created_at: "2021-09-08T06:10:13Z",
-      updated_at: "2021-09-23T04:13:47Z"
-    },
-    {
-      first_name: "abc",
-      last_name: "นามสกุลใคร",
-      pdpa: {
-        nation_id: "1103701092603"
-      },
-      phone: "87-3612521",
-      status: "rejected",
-      ekyc_status: "rejected",
-      created_at: "2021-09-08T06:10:13Z",
-      updated_at: "2021-09-23T04:13:47Z"
-    },
-    {
-      first_name: "abc",
-      last_name: "นามสกุลใคร",
-      pdpa: {
-        nation_id: "1103701092603"
-      },
-      phone: "87-3612521",
-      status: "re-approved",
-      ekyc_status: "approved",
-      created_at: "2021-09-08T06:10:13Z",
-      updated_at: "2021-09-23T04:13:47Z"
-    },
-    {
-      first_name: "abc",
-      last_name: "นามสกุลใคร",
-      pdpa: {
-        nation_id: "1103701092603"
-      },
-      phone: "87-3612521",
-      status: "rejected",
-      ekyc_status: "approved",
-      created_at: "2021-09-08T06:10:13Z",
-      updated_at: "2021-09-23T04:13:47Z"
-    })
-    setTimeout(() => {
-      setMockData(tempData);
+  const genData = async (value?: SearchValue) => {
+    // let tempData: any = [];
+    const tempData = await getRider(value)
+    if (tempData.status) {
+      console.log('abcd : ',lodash.get(tempData, 'data.meta'))
+      setMockData(lodash.get(tempData, 'data.data'));
+      setPagination({...pagination, total:lodash.get(tempData, 'data.meta.total_count') })
       setIsLoading(false);
-    }, 4000);
+    }
+  }
+  const handelDataTableLoad = (pagination?:any, filters?:any, sorter?:any) =>{
+    console.log("handelDataTableLoad : ", JSON.stringify(pagination,filters,sorter))
   }
   useEffect(() => {
-    genData(40)
+    genData()
   }, [])
 
   const column = [
@@ -181,21 +119,16 @@ export default function Rider({ }: Props): ReactElement {
       align: "center"
     },
     {
-      title: "เลขบบัตรประชาชน",
-      dataIndex: "nationId",
-      render: (text: any, record: any) => {
-        console.log("record : ", record)
-        let nationId = record.pdpa && record.pdpa.nation_id ? record.pdpa.nation_id : "-"
-        return nationId
-      },
-      align: "center"
-    },
-    {
       title: "เบอร์โทรศัพท์",
       dataIndex: "phoneNumber",
       render: (text: any, record: any) => {
-        console.log("record : ", record)
-        let phone = record.phone ? record.phone.slice(0,7) + "xxx" : "-"
+        
+        let phone = "-" //record.phone ? record.phone.slice(0, 7) + "xxx" : "-"
+        let countryCode
+        if (record.phone) {
+          phone = record.country_code+'-'+record.phone.replace('-','').slice(2, 7)+"000"
+
+        }
         return phone
       },
       align: "center"
@@ -203,29 +136,29 @@ export default function Rider({ }: Props): ReactElement {
     {
       title: "ข้อมูลลงทะเบียน",
       dataIndex: "status",
-      render: (row: any) => {
-        const nameMapping: any = {
-          uploaded: "uploaded",
-          're-approved': "re-approved",
-          approved: "approved",
-          rejected: "reject",
-        };
-        return nameMapping[row];
-      },
+      // render: (row: any) => {
+      //   const nameMapping: any = {
+      //     uploaded: "uploaded",
+      //     're-approved': "re-approved",
+      //     approved: "approved",
+      //     rejected: "reject",
+      //   };
+      //   return nameMapping[row];
+      // },
       align: "center"
     },
     {
       title: "e-kyc",
       dataIndex: "ekyc_status",
-      render: (row: any) => {
-        const nameMapping: any = {
-          uploaded: "uploaded",
-          're-approved': "re-approved",
-          approved: "approved",
-          rejected: "reject",
-        };
-        return nameMapping[row];
-      },
+      // render: (row: any) => {
+      //   const nameMapping: any = {
+      //     uploaded: "uploaded",
+      //     're-approved': "re-approved",
+      //     approved: "approved",
+      //     rejected: "reject",
+      //   };
+      //   return nameMapping[row];
+      // },
       align: "center"
     },
     {
@@ -234,9 +167,7 @@ export default function Rider({ }: Props): ReactElement {
       className: "column-typverifye",
       align: "center",
       render: (text: any, record: any) => {
-        console.log("record : ", record)
         let verify = mapStatus(record.status, record.ekyc_status)
-        // let phone = record.phone ? record.phone.slice(0,7) + "xxx" : "-"
         return verify
       },
     },
@@ -249,12 +180,7 @@ export default function Rider({ }: Props): ReactElement {
       title: "วันที่อัพเดตข้อมูล",
       dataIndex: "updated_at",
       align: "center"
-    },
-    // {
-    //   title: "จัดการ",
-    //   dataIndex: "button",
-    //   align:"center"
-    // },
+    }
   ];
 
   return (
@@ -276,7 +202,7 @@ export default function Rider({ }: Props): ReactElement {
                     component={Input}
                     className="form-control round"
                     id="keyword"
-                    placeholder="ค้นหา"
+                    placeholder="ชื่อ-สกุล, เบอร์โทรศัพท์"
                     isRange={true}
                   />
                   <div className="ant-form ant-form-vertical">
@@ -410,8 +336,12 @@ export default function Rider({ }: Props): ReactElement {
             tableName: "rider",
             tableColumns: column,
             action: ["view"],
-            dataSource: mockData
+            dataSource: mockData,
+            pagination: pagination,
+            // handelDataTableLoad: handelDataTableLoad()
           }}
+         
+          
         />
       </Card>
     </MainLayout>

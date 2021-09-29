@@ -12,7 +12,7 @@ import Select from "@/components/Form/Select";
 import DateRangePicker from "@/components/Form/DateRangePicker";
 import Table from "@/components/Table";
 
-import { getRider } from '../api/rider'
+import { getRider } from '@/services/rider'
 import lodash from "lodash";
 
 interface Props { }
@@ -337,7 +337,7 @@ export default function Rider({ }: Props): ReactElement {
             tableColumns: column,
             action: ["view"],
             dataSource: mockData,
-            pagination: pagination,
+            // pagination: pagination,
             // handelDataTableLoad: handelDataTableLoad()
           }}
          

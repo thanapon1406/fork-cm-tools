@@ -2,10 +2,9 @@ import React, { ReactElement, useState, useEffect } from "react";
 import MainLayout from "@/layout/MainLayout";
 import Button from "@/components/Button";
 import Table from "@/components/Table";
-import Tag from "@/components/Tag";
 import Card from "@/components/Card";
 import DateRangePicker from "@/components/Form/DateRangePicker";
-import { Row, Col } from "antd";
+import { Row, Col, Typography, Breadcrumb } from "antd";
 
 import Select from "@/components/Form/Select";
 import { Formik, Form, Field } from "formik";
@@ -14,6 +13,9 @@ import Input from "@/components/Form/Input";
 import { useRecoilState } from "recoil";
 import { personState } from "@/store";
 import { uniqueId } from "@/utils/helpers";
+import useFetch from "@/hooks/useFetch";
+import axios from "axios";
+const { Title } = Typography;
 
 interface Props {}
 
@@ -32,22 +34,32 @@ export default function Merchant({}: Props): ReactElement {
       end: "",
     },
   };
-
+  // const getOutlet = () => axios.get("/outlet");
+  // // const { result, isSuccess, isLoading } = useFetch(getOutlet);
+  // console.log(` { result, isSuccess, isLoading }`, {
+  //   result,
+  //   isSuccess,
+  //   isLoading,
+  // });
   let [mockData, setMockData] = useState([]);
-  let [isLoading, setIsLoading] = useState(true);
+  let [_isLoading, setIsLoading] = useState(true);
 
   const genData = (value: number) => {
     let tempData: any = [];
     for (let i = 0; i < value; i++) {
       const name = uniqueId();
       const userData = {
-        register: ["register", "E-KYC"][
+        outlet_type: ["สาขาเดี่ยว", "หลายสาขา"][
           (Math.floor(Math.random() * 2) + 1) % 2
         ],
-        id: uniqueId(),
+        ekyc: ["upload", "approve", "reject"][
+          (Math.floor(Math.random() * 2) + 1) % 2
+        ],
+        outlet_name: `${name.toLocaleLowerCase()}  ${name}`,
+        id: name,
         name: `${name.toLocaleLowerCase()}  ${name}`,
         phoneNumber: "081111111" + i,
-        type: ["merchant", "raider", "consumer"][
+        outlet_info: ["upload", "approve", "reject"][
           (Math.floor(Math.random() * 3) + 1) % 3
         ],
         verify: ["waiting", "document", "reject", "approve"][
@@ -76,35 +88,35 @@ export default function Merchant({}: Props): ReactElement {
     genData(rand);
   };
 
-  const Schema = Yup.object().shape({
-  });
+  const Schema = Yup.object().shape({});
 
   const column = [
     {
-      title: "ประเภทการลงทะเบียน",
-      dataIndex: "register",
+      title: "ชื่อร้านค้า",
+      dataIndex: "outlet_name",
     },
     {
-      title: "ชื่อ-นามสกุล",
+      title: "ประเภทร้านค้า",
+      dataIndex: "outlet_type",
+    },
+    {
+      title: "ชื่อและนามสกุล",
       dataIndex: "name",
     },
     {
       title: "เบอร์โทรศัพท์",
       dataIndex: "phoneNumber",
-      align:"center"
+      align: "center",
     },
     {
-      title: "ช่องทางการลงทะเบียน",
-      dataIndex: "type",
-      className: "column-type",
-      render: (row: any) => {
-        const colorMapping: any = {
-          merchant: "success",
-          raider: "gold",
-          consumer: "blue",
-        };
-        return <Tag type={colorMapping[row]}>{row}</Tag>;
-      },
+      title: "ข้อมูลร้านค้า",
+      dataIndex: "outlet_info",
+      align: "center",
+    },
+    {
+      title: "E-KYC",
+      dataIndex: "ekyc",
+      align: "center",
     },
     {
       title: "สถาณะการตรวจสอบ",
@@ -132,6 +144,11 @@ export default function Merchant({}: Props): ReactElement {
 
   return (
     <MainLayout>
+      <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+      <Breadcrumb style={{ margin: "16px 0" }}>
+        <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
+        <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
+      </Breadcrumb>
       <Card>
         <Formik
           initialValues={initialValues}
@@ -140,7 +157,7 @@ export default function Merchant({}: Props): ReactElement {
         >
           {(values) => (
             <Form>
-              <Row gutter={16} >
+              <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "ค้นหา" }}
@@ -154,7 +171,7 @@ export default function Merchant({}: Props): ReactElement {
                   />
                   <div className="ant-form ant-form-vertical">
                     <Button
-                      style={{ width: "120px" , marginTop: "31px"}}
+                      style={{ width: "120px", marginTop: "31px" }}
                       type="primary"
                       size="middle"
                       htmlType="submit"
@@ -281,7 +298,7 @@ export default function Merchant({}: Props): ReactElement {
         <Table
           config={{
             dataTableTitle: "รายการรอตรวจสอบ",
-            loading: isLoading,
+            loading: _isLoading,
             tableName: "merchant",
             tableColumns: column,
             action: ["view"],

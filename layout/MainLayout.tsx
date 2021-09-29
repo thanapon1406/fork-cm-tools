@@ -31,10 +31,6 @@ export default function MainLayout({ children }: Props) {
       <Layout className="site-layout">
         <HeaderContent />
         <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
-          <Breadcrumb style={{ margin: "16px 0" }}>
-            {/* <Breadcrumb.Item>User</Breadcrumb.Item>
-                        <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
-          </Breadcrumb>
           {children}
         </Content>
         <Footer style={{ textAlign: "center" }}>Footer Layout</Footer>

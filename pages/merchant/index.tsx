@@ -16,6 +16,7 @@ import { uniqueId } from "@/utils/helpers";
 import useFetch from "@/hooks/useFetch";
 import axios from "axios";
 const { Title } = Typography;
+import { fetchData } from '@/services/merchant'
 
 interface Props {}
 
@@ -79,7 +80,13 @@ export default function Merchant({}: Props): ReactElement {
 
   useEffect(() => {
     genData(40);
+    testFetch()
   }, []);
+
+  const  testFetch = async()=>{
+    const test = await fetchData("62")
+    console.log(`merchantService`, test)
+  }
 
   const handleSubmit = (values: any) => {
     console.log("values", values);

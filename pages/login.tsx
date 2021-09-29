@@ -10,6 +10,7 @@ import Image from "next/image";
 import logoImg from "../public/logo-kittchenhub.png";
 import { useRouter } from "next/router";
 const { Title } = Typography;
+import { login } from "@/services/login";
 
 const Login: NextPage = () => {
   const initialValues = {
@@ -17,7 +18,7 @@ const Login: NextPage = () => {
     password: "",
   };
 
-  const router  = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -25,12 +26,17 @@ const Login: NextPage = () => {
     }
   }, []);
 
-  const handleSubmit = (values: any) => {
-    console.log("values", values);
-    localStorage.setItem("token",values.username)
-    router.push("/")
-
+  const handleSubmit = async (values: any) => {
+    const response = await login(
+      values
+    );
+    const { result, success } = response
+    if(success){
+      
+    }
+    
   };
+
 
   const Schema = Yup.object().shape({
     username: Yup.string()

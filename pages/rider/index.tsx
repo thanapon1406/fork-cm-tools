@@ -36,7 +36,7 @@ const StatusConstants = {
   },
   REJECTED: {
     TH: "ไม่ผ่าน",
-    EN: "rejected",
+    EN: "reject",
   },
   RE_APPROVED: {
     TH: "ขอเอกสารเพิ่ม",
@@ -94,10 +94,11 @@ export default function Rider({ }: Props): ReactElement {
   const genData = async (value?: SearchValue) => {
     // let tempData: any = [];
     const tempData = await getRider(value)
-    if (tempData.status) {
-      console.log('abcd : ',lodash.get(tempData, 'data.meta'))
-      setMockData(lodash.get(tempData, 'data.data'));
-      setPagination({...pagination, total:lodash.get(tempData, 'data.meta.total_count') })
+    console.log("tempData tempData : ", tempData)
+    if (tempData.status === 200) {
+      console.log('abcd : ',lodash.get(tempData, 'result.data'))
+      setMockData(lodash.get(tempData, 'result.data'));
+      setPagination({...pagination, total:lodash.get(tempData, 'result.meta.total_count') })
       setIsLoading(false);
     }
   }
@@ -167,7 +168,8 @@ export default function Rider({ }: Props): ReactElement {
       className: "column-typverifye",
       align: "center",
       render: (text: any, record: any) => {
-        let verify = mapStatus(record.status, record.ekyc_status)
+        // let verify = mapStatus(record.status, record.ekyc_status)
+        let verify = record.approve_status
         return verify
       },
     },
@@ -242,7 +244,7 @@ export default function Rider({ }: Props): ReactElement {
                       },
                       {
                         name: "ไม่ผ่านการอนุมัติ",
-                        value: "rejected",
+                        value: "reject",
                       },
                     ]}
                   />
@@ -271,7 +273,7 @@ export default function Rider({ }: Props): ReactElement {
                       },
                       {
                         name: "reject",
-                        value: "rejected",
+                        value: "reject",
                       },
                     ]}
                   />
@@ -309,7 +311,7 @@ export default function Rider({ }: Props): ReactElement {
                       },
                       {
                         name: "reject",
-                        value: "rejected",
+                        value: "reject",
                       },
                     ]}
                   />

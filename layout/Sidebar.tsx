@@ -9,18 +9,20 @@ import {
   SettingOutlined,
   PieChartOutlined,
   DesktopOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
+
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 import Link from "next/link";
 import { useRouter } from "next/router";
-interface Props {}
+interface Props { }
 
-export default function Sidebar({}: Props): ReactElement {
+export default function Sidebar({ }: Props): ReactElement {
   const Router = useRouter();
   const { asPath, pathname } = Router
   let activePath = pathname.split("/")[1] || "dashboard";
-  const logout= ()=>{
+  const logout = () => {
     console.log(`logout`)
     Router.replace("/login")
   }
@@ -30,7 +32,7 @@ export default function Sidebar({}: Props): ReactElement {
         <UserOutlined />
         Profile
       </Menu.Item>
-      <Menu.Item onClick={()=>logout()}>
+      <Menu.Item onClick={() => logout()}>
         <LogoutOutlined />
         logout
       </Menu.Item>
@@ -71,6 +73,12 @@ export default function Sidebar({}: Props): ReactElement {
           <Menu.Item key="3">option3</Menu.Item>
           <Menu.Item key="4">option4</Menu.Item>
         </SubMenu> */}
+
+        <Menu.Item key="rider" icon={<CarOutlined />}>
+          <Link href="/rider">
+            <a> Rider</a>
+          </Link>
+        </Menu.Item>
       </Menu>
     </Sider>
   );

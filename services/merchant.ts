@@ -6,7 +6,7 @@ import errorHandler from './handler/errorHandler'
 interface queryList {
   page: number;
   per_page: number;
-  keyword?: number;
+  keyword?: string;
   sort_by?: string;
   sort_type?: string;
   verify_status?: string;
@@ -16,7 +16,6 @@ interface queryList {
   start_date_verify?: string;
   end_date_verify?: string;
   approve_status?: string;
-  outlet_structure?: string;
 }
 
 const outletList = async (option: queryList) => {

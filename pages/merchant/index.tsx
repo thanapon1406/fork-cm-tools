@@ -4,7 +4,7 @@ import Button from "@/components/Button";
 import Table from "@/components/Table";
 import Card from "@/components/Card";
 import DateRangePicker from "@/components/Form/DateRangePicker";
-import { Row, Col, Typography, Breadcrumb } from "antd";
+import { Row, Col, Typography, Breadcrumb, Space } from "antd";
 
 import Select from "@/components/Form/Select";
 import { Formik, Form, Field } from "formik";
@@ -27,6 +27,7 @@ interface Pagination {
 }
 
 interface filterObject {
+  keyword?: string;
   verify_status?: string;
   ekyc_status?: string;
   start_date_create?: string;
@@ -34,15 +35,15 @@ interface filterObject {
   start_date_verify?: string;
   end_date_verify?: string;
   approve_status?: string;
-  outlet_structure?: string;
+  branch_type?: string;
   id?: string;
 }
 
 export default function Merchant({}: Props): ReactElement {
   const [userObj, setUserObj] = useRecoilState(personState);
   const initialValues = {
-    name: "",
-    outlet_structure: "",
+    keyword: "",
+    branch_type: "",
     verify_status: "",
     ekyc_status: "",
     approve_status: "",
@@ -64,6 +65,7 @@ export default function Merchant({}: Props): ReactElement {
     pageSize: 10,
   });
   let [filter, setFilter] = useState<filterObject>({
+    keyword: "",
     verify_status: "",
     ekyc_status: "",
     start_date_create: "",
@@ -71,7 +73,7 @@ export default function Merchant({}: Props): ReactElement {
     start_date_verify: "",
     end_date_verify: "",
     approve_status: "",
-    outlet_structure: "",
+    branch_type: "",
     id: "",
   });
 
@@ -90,7 +92,7 @@ export default function Merchant({}: Props): ReactElement {
       per_page: paging.pageSize,
       ...filterObj,
     };
-    console.log(`reqBody`, reqBody)
+    console.log(`reqBody`, reqBody);
     setIsLoading(true);
     const { result, success } = await outletList(reqBody);
     if (success) {
@@ -102,23 +104,24 @@ export default function Merchant({}: Props): ReactElement {
       });
       setDataTable(data);
       setIsLoading(false);
-      setFilter(filterObj)
+      setFilter(filterObj);
     }
   };
 
   const handleSubmit = (values: any) => {
     console.log(`values`, values);
     let reqFilter: filterObject = {
+      keyword: values.keyword,
       verify_status: values.verify_status,
       ekyc_status: values.ekyc_status,
       approve_status: values.approve_status,
-      outlet_structure: values.outlet_structure,
+      branch_type: values.branch_type,
       start_date_create: values.date_create.start || "",
       end_date_create: values.date_create.end || "",
       start_date_verify: values.date_verify.start || "",
       end_date_verify: values.date_verify.end || "",
     };
-    fetchData(reqFilter);
+    fetchData(reqFilter, { current: 1, total: 0, pageSize: 10 });
   };
 
   const handelDataTableLoad = (pagination: any) => {
@@ -126,17 +129,26 @@ export default function Merchant({}: Props): ReactElement {
     fetchData(filter, pagination);
   };
 
+  const statusMapping:any = {
+    uploaded: "รอการตรวจสอบ",
+    approve: "อนุมัติ",
+    "re-approve": "ขอเอกสารเพิ่มเติม",
+    reject: "ไม่อนุมัติ",
+  };
+
   const column = [
     {
       title: "ชื่อร้านค้า",
       dataIndex: "name",
+      align: "center",
       render: (row: any) => {
         return row["th"];
       },
     },
     {
       title: "ประเภทร้านค้า",
-      dataIndex: "outlet_structure",
+      dataIndex: "branch_type",
+      align: "center",
     },
     {
       title: "ชื่อและนามสกุล",
@@ -158,13 +170,19 @@ export default function Merchant({}: Props): ReactElement {
       align: "center",
     },
     {
-      title: "สถาณะการตรวจสอบ",
+      title: "สถานะการตรวจสอบ",
       dataIndex: "approve_status",
-      className: "column-typverifye",
+      align: "center",
+      className:"column-typeverifyr",
+      render: (row: string) => {
+        return statusMapping[row]
+      },
+      
     },
     {
       title: "วันที่ลงทะเบียน",
       dataIndex: "created_at",
+      align: "center",
       render: (row: any) => {
         return moment(row).format("YYYY-MM-DD HH:MM");
       },
@@ -172,6 +190,7 @@ export default function Merchant({}: Props): ReactElement {
     {
       title: "วันที่อัพเดตข้อมูล",
       dataIndex: "verify_date",
+      align: "center",
       render: (row: any) => {
         return moment(row).format("YYYY-MM-DD HH:MM");
       },
@@ -197,49 +216,53 @@ export default function Merchant({}: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "ค้นหา" }}
-                    name="name"
+                    name="keyword"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="name"
-                    placeholder="name"
-                    isRange={true}
+                    id="keyword"
+                    placeholder="ค้นหา"
                   />
                   <div className="ant-form ant-form-vertical">
-                    <Button
-                      style={{ width: "120px", marginTop: "31px" }}
-                      type="primary"
-                      size="middle"
-                      htmlType="submit"
-                    >
-                      ค้นหา
-                    </Button>
+                    <Space>
+                      <Button
+                        style={{ width: "120px", marginTop: "31px" }}
+                        type="primary"
+                        size="middle"
+                        htmlType="submit"
+                      >
+                        ค้นหา
+                      </Button>
+                      {/* <Button
+                        style={{ width: "120px", marginTop: "31px" }}
+                        type="ghost"
+                        size="middle"
+                      >
+                        Clear
+                      </Button> */}
+                    </Space>
                   </div>
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "ประเภทร้านค้า" }}
-                    name="outlet_structure"
+                    name="branch_type"
                     component={Select}
-                    id="outlet_structure"
-                    placeholder="outlet_structure"
+                    id="branch_type"
+                    placeholder="branch_type"
                     defaultValue={{ value: "all" }}
                     selectOption={[
                       {
-                        name: "ประเภททั้งหมด",
-                        value: "all",
+                        name: "ทุกประเภท",
+                        value: "",
                       },
                       {
-                        name: "merchant",
-                        value: "merchant",
+                        name: "สาขาเดี่ยว",
+                        value: "single",
                       },
                       {
-                        name: "raider",
-                        value: "raider",
-                      },
-                      {
-                        name: "consumer",
-                        value: "consumer",
+                        name: "หลายสาขา",
+                        value: "multiple",
                       },
                     ]}
                   />
@@ -253,20 +276,24 @@ export default function Merchant({}: Props): ReactElement {
                     defaultValue={{ value: "all" }}
                     selectOption={[
                       {
-                        name: "ประเภททั้งหมด",
-                        value: "all",
+                        name: "ทุกประเภท",
+                        value: "",
                       },
                       {
-                        name: "merchant",
-                        value: "merchant",
+                        name: "uploaded",
+                        value: "uploaded",
                       },
                       {
-                        name: "raider",
-                        value: "raider",
+                        name: "approve",
+                        value: "approve",
                       },
                       {
-                        name: "consumer",
-                        value: "consumer",
+                        name: "reject",
+                        value: "reject",
+                      },
+                      {
+                        name: "re-approve",
+                        value: "re-approve",
                       },
                     ]}
                   />
@@ -281,32 +308,54 @@ export default function Merchant({}: Props): ReactElement {
                     selectOption={[
                       {
                         name: "ทุกสถานะ",
-                        value: "all",
+                        value: "",
                       },
                       {
-                        name: "รอการตรวจสอบ",
-                        value: "waiting",
+                        name: "uploaded",
+                        value: "uploaded",
                       },
                       {
-                        name: "รอเอกสารเพิ่มเติม",
-                        value: "document",
+                        name: "approve",
+                        value: "approve",
                       },
                       {
-                        name: "ไม่ผ่านการอนุมัติ",
+                        name: "reject",
                         value: "reject",
                       },
                       {
-                        name: "อนุมัติแล้ว",
-                        value: "approve",
+                        name: "re-approve",
+                        value: "re-approve",
                       },
                     ]}
                   />
                   <Field
                     label={{ text: "E-KYC" }}
                     name="ekyc_status"
-                    component={Input}
+                    component={Select}
                     id="ekyc_status"
                     placeholder="ekyc_status"
+                    selectOption={[
+                      {
+                        name: "ทุกสถานะ",
+                        value: "",
+                      },
+                      {
+                        name: "รอการตรวจสอบ",
+                        value: "uploaded",
+                      },
+                      {
+                        name: "อนุมัติ",
+                        value: "approve",
+                      },
+                      {
+                        name: "ขอเอกสารเพิ่มเติม",
+                        value: "re-approve",
+                      },
+                      {
+                        name: "ไม่อนุมัติ",
+                        value: "reject",
+                      },
+                    ]}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>

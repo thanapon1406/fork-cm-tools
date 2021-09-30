@@ -27,6 +27,8 @@ export default function DateRangePicker({
 
   if (field.value?.start && field.value?.end) {
     defaultValue = [moment(field.value.start), moment(field.value.end)];
+  }else {
+    defaultValue = null
   }
 
   const handleChange = (e: any) => {
@@ -49,10 +51,10 @@ export default function DateRangePicker({
                 <label htmlFor={field.name} className={label.className}>{label.text}</label>
             } */}
         <RangePicker
-          defaultValue={defaultValue}
           style={{ width: "100%" }}
           name={field.name}
           onChange={handleChange}
+          value={defaultValue}
         />
 
         <Text type="danger">

@@ -10,7 +10,8 @@ interface Props {
     icon?: ReactElement;
     size?: sizeType;
     block?:any;
-    style?:any
+    style?:any;
+    onClick?:any;
 }
 
 

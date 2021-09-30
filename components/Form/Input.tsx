@@ -30,6 +30,7 @@ const CustomInput = ({ label, field, ...props }: InputProps) => {
           type={props.type}
           name={field.name}
           className={props.className}
+          value={field.value}
           placeholder={props.placeholder}
           onChange={handleChange}
           autoComplete={props.autoComplete}

@@ -2,7 +2,7 @@ import React, { ReactElement, useState, useEffect } from "react";
 import { Formik, Form, Field } from "formik";
 import { Row, Col } from "antd";
 import * as Yup from "yup";
-
+import Moment from 'moment';
 
 import MainLayout from "@/layout/MainLayout";
 import Card from "@/components/Card";
@@ -73,20 +73,19 @@ export default function Rider({ }: Props): ReactElement {
       created_at: values.registerDate.start && values.registerDate.end != "" ? values.registerDate : {},
       updated_at: values.updateDate.start && values.updateDate.end != "" ? values.updateDate: {} ,
     }
-    
     setIsLoading(true);
     genData(filter)
   }
 
-  const mapStatus = (status: any, ekyc: any) => {
+  const mapStatus = (status: any) => {
     let result = "-"
-    if (status == StatusConstants.UPLOADED.EN || ekyc == StatusConstants.UPLOADED.EN) {
+    if (status == StatusConstants.UPLOADED.EN) {
       result = StatusConstants.UPLOADED.TH
-    } else if (status == StatusConstants.RE_APPROVED.EN || ekyc == StatusConstants.RE_APPROVED.EN) {
+    } else if (status == StatusConstants.RE_APPROVED.EN) {
       result = StatusConstants.RE_APPROVED.TH
-    } else if (status == StatusConstants.REJECTED.EN || ekyc == StatusConstants.REJECTED.EN) {
+    } else if (status == StatusConstants.REJECTED.EN) {
       result = StatusConstants.REJECTED.TH
-    } else if (status == StatusConstants.APPROVED.EN || ekyc == StatusConstants.APPROVED.EN) {
+    } else if (status == StatusConstants.APPROVED.EN) {
       result = StatusConstants.APPROVED.TH
     }
     return result
@@ -94,9 +93,8 @@ export default function Rider({ }: Props): ReactElement {
   const genData = async (value?: SearchValue) => {
     // let tempData: any = [];
     const tempData = await getRider(value)
-    console.log("tempData tempData : ", tempData)
+    
     if (tempData.status === 200) {
-      console.log('abcd : ',lodash.get(tempData, 'result.data'))
       setMockData(lodash.get(tempData, 'result.data'));
       setPagination({...pagination, total:lodash.get(tempData, 'result.meta.total_count') })
       setIsLoading(false);
@@ -117,7 +115,7 @@ export default function Rider({ }: Props): ReactElement {
         let fullName = record.first_name + ' ' + record.last_name
         return (fullName)
       },
-      align: "center"
+      // align: "center"
     },
     {
       title: "เบอร์โทรศัพท์",
@@ -168,20 +166,27 @@ export default function Rider({ }: Props): ReactElement {
       className: "column-typverifye",
       align: "center",
       render: (text: any, record: any) => {
+        let verify = mapStatus(record.approve_status)
         // let verify = mapStatus(record.status, record.ekyc_status)
-        let verify = record.approve_status
+        // let verify = record.approve_status
         return verify
       },
     },
     {
       title: "วันและเวลาที่ลงทะเบียน",
       dataIndex: "created_at",
-      align: "center"
+      align: "center",
+      render: (text: any, record: any) => {
+        return Moment(text).format('YYYY-MM-DD HH:MM')
+      }
     },
     {
       title: "วันที่อัพเดตข้อมูล",
       dataIndex: "updated_at",
-      align: "center"
+      align: "center",
+      render: (text: any, record: any) => {
+        return Moment(text).format('YYYY-MM-DD HH:MM')
+      }
     }
   ];
 
@@ -193,7 +198,7 @@ export default function Rider({ }: Props): ReactElement {
           onSubmit={handleSubmit}
           validationSchema={Schema}
         >
-          {(values) => (
+          {({values,resetForm}) => (
             <Form>
               <Row gutter={16} >
                 <Col className="gutter-row" span={6}>
@@ -215,6 +220,26 @@ export default function Rider({ }: Props): ReactElement {
                       htmlType="submit"
                     >
                       ค้นหา
+                    </Button>
+                    {/* <Button
+                      style={{ width: "120px", marginTop: "31px", marginLeft: "10px" }}
+                      type="default"
+                      size="middle"
+                      htmlType="button"
+                      
+                    >
+                      
+                    </Button> */}
+                    <Button
+                      style={{ width: "120px", marginTop: "31px", marginLeft: "10px" }}
+                      type="default"
+                      size="middle"
+                      htmlType="reset"
+                      // onClick={}
+                      // type="reset" 
+                      onClick={()=> resetForm()}
+                    >
+เคลียร์
                     </Button>
                   </div>
                 </Col>

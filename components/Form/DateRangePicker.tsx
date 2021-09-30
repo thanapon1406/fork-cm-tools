@@ -31,7 +31,7 @@ export default function DateRangePicker({
     defaultValue=null
   }
 
-  const handleChange = (e: Array<moment.Moment>) => {
+  const handleChange = (e:any):void => {
     let value: any = {
       start: "",
       end: "",

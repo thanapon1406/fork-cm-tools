@@ -90,12 +90,11 @@ export default function Merchant({}: Props): ReactElement {
       per_page: paging.pageSize,
       ...filterObj,
     };
-
+    console.log(`reqBody`, reqBody)
     setIsLoading(true);
     const { result, success } = await outletList(reqBody);
     if (success) {
       const { meta, data } = result;
-      console.log(`meta`, meta);
       setPagination({
         pageSize: paging.pageSize,
         current: meta.page,
@@ -103,7 +102,7 @@ export default function Merchant({}: Props): ReactElement {
       });
       setDataTable(data);
       setIsLoading(false);
-      setFilter(filter)
+      setFilter(filterObj)
     }
   };
 

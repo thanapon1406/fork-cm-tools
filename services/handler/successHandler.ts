@@ -16,7 +16,7 @@ const successHandler = (result: any, typeNotification = {}) => {
     response.result = data;
     return response;
   } else {
-    const message = data.detail;
+    const message = data.detail ;
     const errorText = message || codeMessage[response.status];
     response.status = status;
     notification.config({

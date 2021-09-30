@@ -12,99 +12,132 @@ import * as Yup from "yup";
 import Input from "@/components/Form/Input";
 import { useRecoilState } from "recoil";
 import { personState } from "@/store";
-import { uniqueId } from "@/utils/helpers";
 import useFetch from "@/hooks/useFetch";
-import axios from "axios";
 const { Title } = Typography;
-import { fetchData } from '@/services/merchant'
+import { outletList } from "@/services/merchant";
+import moment from "moment";
+import { convertJsonToParam } from "@/utils/helpers";
 
 interface Props {}
+
+interface Pagination {
+  total: number;
+  current: number;
+  pageSize: number;
+}
+
+interface filterObject {
+  verify_status?: string;
+  ekyc_status?: string;
+  start_date_create?: string;
+  end_date_create?: string;
+  start_date_verify?: string;
+  end_date_verify?: string;
+  approve_status?: string;
+  outlet_structure?: string;
+  id?: string;
+}
 
 export default function Merchant({}: Props): ReactElement {
   const [userObj, setUserObj] = useRecoilState(personState);
   const initialValues = {
     name: "",
-    chanel: "",
-    verify: "",
-    registerDate: {
-      start: "",
-      end: "",
+    outlet_structure: "",
+    verify_status: "",
+    ekyc_status: "",
+    approve_status: "",
+    date_create: {
+      start: null,
+      end: null,
     },
-    updateDate: {
-      start: "",
-      end: "",
+    date_verify: {
+      start: null,
+      end: null,
     },
   };
-  // const getOutlet = () => axios.get("/outlet");
-  // // const { result, isSuccess, isLoading } = useFetch(getOutlet);
-  // console.log(` { result, isSuccess, isLoading }`, {
-  //   result,
-  //   isSuccess,
-  //   isLoading,
-  // });
-  let [mockData, setMockData] = useState([]);
+
+  let [dataTable, setDataTable] = useState([]);
   let [_isLoading, setIsLoading] = useState(true);
-
-  const genData = (value: number) => {
-    let tempData: any = [];
-    for (let i = 0; i < value; i++) {
-      const name = uniqueId();
-      const userData = {
-        outlet_type: ["สาขาเดี่ยว", "หลายสาขา"][
-          (Math.floor(Math.random() * 2) + 1) % 2
-        ],
-        ekyc: ["upload", "approve", "reject"][
-          (Math.floor(Math.random() * 2) + 1) % 2
-        ],
-        outlet_name: `${name.toLocaleLowerCase()}  ${name}`,
-        id: name,
-        name: `${name.toLocaleLowerCase()}  ${name}`,
-        phoneNumber: "081111111" + i,
-        outlet_info: ["upload", "approve", "reject"][
-          (Math.floor(Math.random() * 3) + 1) % 3
-        ],
-        verify: ["waiting", "document", "reject", "approve"][
-          (Math.floor(Math.random() * 4) + 1) % 4
-        ],
-        create_at: "2021-09-01 14:08",
-        update_at: "2021-09-01 14:08",
-      };
-      tempData.push(userData);
-    }
-
-    setTimeout(() => {
-      setMockData(tempData);
-      setIsLoading(false);
-    }, 1300);
-  };
+  let [pagination, setPagination] = useState<Pagination>({
+    total: 0,
+    current: 1,
+    pageSize: 10,
+  });
+  let [filter, setFilter] = useState<filterObject>({
+    verify_status: "",
+    ekyc_status: "",
+    start_date_create: "",
+    end_date_create: "",
+    start_date_verify: "",
+    end_date_verify: "",
+    approve_status: "",
+    outlet_structure: "",
+    id: "",
+  });
 
   useEffect(() => {
-    genData(40);
-    testFetch()
+    fetchData();
   }, []);
 
-  const  testFetch = async()=>{
-    const test = await fetchData("62")
-    console.log(`merchantService`, test)
-  }
+  const Schema = Yup.object().shape({});
 
-  const handleSubmit = (values: any) => {
-    console.log("values", values);
-    const rand = Math.floor(Math.random() * 10) + 1;
+  const fetchData = async (
+    filterObj: filterObject = filter,
+    paging: Pagination = pagination
+  ) => {
+    const reqBody = {
+      page: paging.current,
+      per_page: paging.pageSize,
+      ...filterObj,
+    };
+
     setIsLoading(true);
-    genData(rand);
+    const { result, success } = await outletList(reqBody);
+    if (success) {
+      const { meta, data } = result;
+      console.log(`meta`, meta);
+      setPagination({
+        pageSize: paging.pageSize,
+        current: meta.page,
+        total: meta.total_count,
+      });
+      setDataTable(data);
+      setIsLoading(false);
+      setFilter(filter)
+    }
   };
 
-  const Schema = Yup.object().shape({});
+  const handleSubmit = (values: any) => {
+    console.log(`values`, values);
+    let reqFilter: filterObject = {
+      verify_status: values.verify_status,
+      ekyc_status: values.ekyc_status,
+      approve_status: values.approve_status,
+      outlet_structure: values.outlet_structure,
+      start_date_create: values.date_create.start || "",
+      end_date_create: values.date_create.end || "",
+      start_date_verify: values.date_verify.start || "",
+      end_date_verify: values.date_verify.end || "",
+    };
+    fetchData(reqFilter);
+  };
+
+  const handelDataTableLoad = (pagination: any) => {
+    console.log(`pagination`, pagination);
+    fetchData(filter, pagination);
+  };
 
   const column = [
     {
       title: "ชื่อร้านค้า",
-      dataIndex: "outlet_name",
+      dataIndex: "name",
+      render: (row: any) => {
+        return row["th"];
+      },
     },
     {
       title: "ประเภทร้านค้า",
-      dataIndex: "outlet_type",
+      dataIndex: "outlet_structure",
     },
     {
       title: "ชื่อและนามสกุล",
@@ -112,40 +145,37 @@ export default function Merchant({}: Props): ReactElement {
     },
     {
       title: "เบอร์โทรศัพท์",
-      dataIndex: "phoneNumber",
+      dataIndex: "tel",
       align: "center",
     },
     {
       title: "ข้อมูลร้านค้า",
-      dataIndex: "outlet_info",
+      dataIndex: "approve_status",
       align: "center",
     },
     {
       title: "E-KYC",
-      dataIndex: "ekyc",
+      dataIndex: "ekyc_status",
       align: "center",
     },
     {
       title: "สถาณะการตรวจสอบ",
-      dataIndex: "verify",
+      dataIndex: "approve_status",
       className: "column-typverifye",
-      render: (row: any) => {
-        const nameMapping: any = {
-          waiting: "รอการตรวจสอบ",
-          document: "รอเอกสารเพิ่มเติม",
-          reject: "ไม่ผ่านการอนุมัติ",
-          approve: "อนุมัติแล้ว",
-        };
-        return nameMapping[row];
-      },
     },
     {
       title: "วันที่ลงทะเบียน",
-      dataIndex: "create_at",
+      dataIndex: "created_at",
+      render: (row: any) => {
+        return moment(row).format("YYYY-MM-DD HH:MM");
+      },
     },
     {
       title: "วันที่อัพเดตข้อมูล",
-      dataIndex: "update_at",
+      dataIndex: "verify_date",
+      render: (row: any) => {
+        return moment(row).format("YYYY-MM-DD HH:MM");
+      },
     },
   ];
 
@@ -190,10 +220,10 @@ export default function Merchant({}: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "ประเภทร้านค้า" }}
-                    name="chanel"
+                    name="outlet_structure"
                     component={Select}
-                    id="chanel"
-                    placeholder="chanel"
+                    id="outlet_structure"
+                    placeholder="outlet_structure"
                     defaultValue={{ value: "all" }}
                     selectOption={[
                       {
@@ -217,10 +247,10 @@ export default function Merchant({}: Props): ReactElement {
 
                   <Field
                     label={{ text: "ข้อมูลร้านค้า" }}
-                    name="chanel"
+                    name="verify_status"
                     component={Select}
-                    id="chanel"
-                    placeholder="chanel"
+                    id="verify_status"
+                    placeholder="verify_status"
                     defaultValue={{ value: "all" }}
                     selectOption={[
                       {
@@ -245,10 +275,10 @@ export default function Merchant({}: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "สถานะการตรวจสอบ" }}
-                    name="verify"
+                    name="approve_status"
                     component={Select}
-                    id="verify"
-                    placeholder="verify"
+                    id="approve_status"
+                    placeholder="approve_status"
                     selectOption={[
                       {
                         name: "ทุกสถานะ",
@@ -274,26 +304,26 @@ export default function Merchant({}: Props): ReactElement {
                   />
                   <Field
                     label={{ text: "E-KYC" }}
-                    name="verify"
+                    name="ekyc_status"
                     component={Input}
-                    id="verify"
-                    placeholder="verify"
+                    id="ekyc_status"
+                    placeholder="ekyc_status"
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "วันเวลาที่ลงทะเบียน" }}
-                    name="registerDate"
+                    name="date_create"
                     component={DateRangePicker}
-                    id="registerDate"
-                    placeholder="registerDate"
+                    id="date_create"
+                    placeholder="date_create"
                   />
                   <Field
                     label={{ text: "วันเวลาที่อัพเดท" }}
-                    name="updateDate"
+                    name="date_verify"
                     component={DateRangePicker}
-                    id="updateDate"
-                    placeholder="updateDate"
+                    id="date_verify"
+                    placeholder="date_verify"
                   />
                 </Col>
               </Row>
@@ -309,7 +339,9 @@ export default function Merchant({}: Props): ReactElement {
             tableName: "merchant",
             tableColumns: column,
             action: ["view"],
-            dataSource: mockData,
+            dataSource: dataTable,
+            handelDataTableLoad: handelDataTableLoad,
+            pagination: pagination,
           }}
         />
       </Card>

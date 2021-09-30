@@ -17,18 +17,20 @@ interface Config {
   dataTableTitle: string;
   tableColumns: Array<any>;
   dataSource: Array<any>;
-  tableName:string;
+  tableName: string;
   action?: Array<"view" | "edit" | "delete">;
-  loading:boolean
+  loading: boolean;
+  handelDataTableLoad: any;
+  pagination: any;
 }
 
 export default function Table({ config }: Props): ReactElement {
-  const { dataTableTitle, action, dataSource, loading, tableName } = config;
-  let { tableColumns   } = config;
-  const Router = useRouter()
+  const { dataTableTitle, action, dataSource, loading, tableName, handelDataTableLoad } = config;
+  let { tableColumns, pagination } = config;
+  const Router = useRouter();
   if (action) {
-    const View = (path:any) => {
-      Router.push(`/${tableName}/view?`)
+    const View = (path: any) => {
+      Router.push(`/${tableName}/view?`);
     };
     const Edit = () => {};
     const Delete = () => {};
@@ -79,17 +81,18 @@ export default function Table({ config }: Props): ReactElement {
       {
         title: "",
         render: (row: any) => {
-          if(action.length===1){
-
-            return actionElement 
-          }else{
+          if (action.length === 1) {
+            return actionElement;
+          } else {
             return (
               <Dropdown overlay={actionElement} trigger={["click"]}>
-                <EllipsisOutlined style={{ cursor: "pointer", fontSize: "24px" }} />
+                <EllipsisOutlined
+                  style={{ cursor: "pointer", fontSize: "24px" }}
+                />
               </Dropdown>
-            )
+            );
           }
-          },
+        },
       },
     ];
   }
@@ -101,9 +104,9 @@ export default function Table({ config }: Props): ReactElement {
         columns={tableColumns}
         rowKey={(item) => item.id}
         dataSource={dataSource}
-        // pagination={pagination}
+        pagination={pagination}
         loading={loading}
-        // onChange={handelDataTableLoad}
+        onChange={handelDataTableLoad}
       />
     </>
   );

@@ -9,20 +9,25 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import Input from "@/components/Form/Input";
 import Select from "@/components/Form/Select";
-import DateRangePicker from "@/components/Form/DateRangePicker";
+import DateTimeRangePicker from "@/components/Form/DateTimeRangePicker";
 import Table from "@/components/Table";
 
 import { getRider } from '@/services/rider'
 import lodash from "lodash";
 
 interface Props { }
+interface Pagination {
+  total: number;
+  current: number;
+  pageSize: number;
+}
 interface SearchValue {
-  keyword: string,
-  approve_status: string,
-  status: string,
-  ekyc_status: string,
-  created_at: object,
-  updated_at: object,
+  keyword?: string,
+  approve_status?: string,
+  status?: string,
+  ekyc_status?: string,
+  created_at?: object,
+  updated_at?: object,
 }
 
 const StatusConstants = {
@@ -36,7 +41,7 @@ const StatusConstants = {
   },
   REJECTED: {
     TH: "ไม่ผ่าน",
-    EN: "reject",
+    EN: "rejected",
   },
   RE_APPROVED: {
     TH: "ขอเอกสารเพิ่ม",
@@ -46,14 +51,14 @@ const StatusConstants = {
 export default function Rider({ }: Props): ReactElement {
   const initialValues = {
     keyword: "",
-    verify: "all",
-    verifyRider: "all",
-    ekycRider: "all",
-    registerDate: {
+    approve_status: "all",
+    status: "all",
+    ekyc_status: "all",
+    created_at: {
       start: "",
       end: "",
     },
-    updateDate: {
+    updated_at: {
       start: "",
       end: "",
     },
@@ -61,20 +66,24 @@ export default function Rider({ }: Props): ReactElement {
   const Schema = Yup.object().shape({
   });
   let [mockData, setMockData] = useState([]);
-  let [pagination, setPagination] = useState({current: 1, pageSize: 10, total: 0});
+  let [pagination, setPagination] = useState<Pagination>({
+    total: 0,
+    current: 1,
+    pageSize: 10,
+  });
   let [isLoading, setIsLoading] = useState(true);
+  let [filter, setFilter] = useState<SearchValue>(initialValues);
 
   const handleSubmit = (values: any) => {
-    const filter = {
+    const filter: SearchValue = {
       keyword: values.keyword,
-      approve_status: values.verify,
-      status: values.verifyRider,
-      ekyc_status: values.ekycRider,
-      created_at: values.registerDate.start && values.registerDate.end != "" ? values.registerDate : {},
-      updated_at: values.updateDate.start && values.updateDate.end != "" ? values.updateDate: {} ,
+      approve_status: values.approve_status,
+      status: values.status,
+      ekyc_status: values.ekyc_status,
+      created_at: values.created_at.start && values.created_at.end != "" ? values.created_at : {},
+      updated_at: values.updated_at.start && values.updated_at.end != "" ? values.updated_at : {},
     }
-    setIsLoading(true);
-    genData(filter)
+    fetchData(filter, { current: 1, total: 0, pageSize: 10 })
   }
 
   const mapStatus = (status: any) => {
@@ -90,21 +99,32 @@ export default function Rider({ }: Props): ReactElement {
     }
     return result
   }
-  const genData = async (value?: SearchValue) => {
-    // let tempData: any = [];
-    const tempData = await getRider(value)
-    
-    if (tempData.status === 200) {
-      setMockData(lodash.get(tempData, 'result.data'));
-      setPagination({...pagination, total:lodash.get(tempData, 'result.meta.total_count') })
+  const fetchData = async (filterObj: SearchValue = filter, paging: Pagination = pagination) => {
+    const reqBody = {
+      page: paging.current,
+      per_page: paging.pageSize,
+      ...filterObj,
+    };
+    setIsLoading(true);
+    const { result, success } = await getRider(reqBody)
+
+    if (success) {
+      const { meta, data } = result;
+      setMockData(data);
+      setPagination({
+        pageSize: paging.pageSize,
+        current: meta.page,
+        total: meta.total_count,
+      })
       setIsLoading(false);
+      setFilter(filterObj);
     }
   }
-  const handelDataTableLoad = (pagination?:any, filters?:any, sorter?:any) =>{
-    console.log("handelDataTableLoad : ", JSON.stringify(pagination,filters,sorter))
-  }
+  const handelDataTableLoad = (pagination: any) => {
+    fetchData(filter, pagination);
+  };
   useEffect(() => {
-    genData()
+    fetchData()
   }, [])
 
   const column = [
@@ -115,17 +135,14 @@ export default function Rider({ }: Props): ReactElement {
         let fullName = record.first_name + ' ' + record.last_name
         return (fullName)
       },
-      // align: "center"
     },
     {
       title: "เบอร์โทรศัพท์",
       dataIndex: "phoneNumber",
       render: (text: any, record: any) => {
-        
         let phone = "-" //record.phone ? record.phone.slice(0, 7) + "xxx" : "-"
-        let countryCode
         if (record.phone) {
-          phone = record.country_code+'-'+record.phone.replace('-','').slice(2, 7)+"000"
+          phone = record.country_code + '-' + record.phone.replace('-', '').slice(2, 7) + "000"
 
         }
         return phone
@@ -162,13 +179,11 @@ export default function Rider({ }: Props): ReactElement {
     },
     {
       title: "สถาณะการตรวจสอบ",
-      dataIndex: "verify",
+      dataIndex: "approve_status",
       className: "column-typverifye",
       align: "center",
       render: (text: any, record: any) => {
         let verify = mapStatus(record.approve_status)
-        // let verify = mapStatus(record.status, record.ekyc_status)
-        // let verify = record.approve_status
         return verify
       },
     },
@@ -176,8 +191,8 @@ export default function Rider({ }: Props): ReactElement {
       title: "วันและเวลาที่ลงทะเบียน",
       dataIndex: "created_at",
       align: "center",
-      render: (text: any, record: any) => {
-        return Moment(text).format('YYYY-MM-DD HH:MM')
+      render: (row: any, record: any) => {
+        return Moment(row).format("YYYY-MM-DD HH:MM");
       }
     },
     {
@@ -198,7 +213,7 @@ export default function Rider({ }: Props): ReactElement {
           onSubmit={handleSubmit}
           validationSchema={Schema}
         >
-          {({values,resetForm}) => (
+          {({ values, resetForm }) => (
             <Form>
               <Row gutter={16} >
                 <Col className="gutter-row" span={6}>
@@ -221,34 +236,23 @@ export default function Rider({ }: Props): ReactElement {
                     >
                       ค้นหา
                     </Button>
-                    {/* <Button
-                      style={{ width: "120px", marginTop: "31px", marginLeft: "10px" }}
-                      type="default"
-                      size="middle"
-                      htmlType="button"
-                      
-                    >
-                      
-                    </Button> */}
                     <Button
                       style={{ width: "120px", marginTop: "31px", marginLeft: "10px" }}
                       type="default"
                       size="middle"
                       htmlType="reset"
-                      // onClick={}
-                      // type="reset" 
-                      onClick={()=> resetForm()}
+                      onClick={() => resetForm()}
                     >
-เคลียร์
+                      เคลียร์
                     </Button>
                   </div>
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "สถานะการตรวจสอบ" }}
-                    name="verify"
+                    name="approve_status"
                     component={Select}
-                    id="verify"
+                    id="approve_status"
                     placeholder="สถานะการตรวจสอบ"
                     selectOption={[
                       {
@@ -269,15 +273,15 @@ export default function Rider({ }: Props): ReactElement {
                       },
                       {
                         name: "ไม่ผ่านการอนุมัติ",
-                        value: "reject",
+                        value: "rejected",
                       },
                     ]}
                   />
                   <Field
                     label={{ text: "ข้อมูลลงทะเบียน" }}
-                    name="verifyRider"
+                    name="status"
                     component={Select}
-                    id="verifyRider"
+                    id="status"
                     placeholder="ข้อมูลลงทะเบียน"
                     selectOption={[
                       {
@@ -297,8 +301,8 @@ export default function Rider({ }: Props): ReactElement {
                         value: "re-approved",
                       },
                       {
-                        name: "reject",
-                        value: "reject",
+                        name: "rejected",
+                        value: "rejected",
                       },
                     ]}
                   />
@@ -306,16 +310,16 @@ export default function Rider({ }: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "วันเวลาที่ลงทะเบียน" }}
-                    name="registerDate"
-                    component={DateRangePicker}
-                    id="registerDate"
+                    name="created_at"
+                    component={DateTimeRangePicker}
+                    id="created_at"
                     placeholder="registerDate"
                   />
                   <Field
                     label={{ text: "e-kyc" }}
-                    name="ekycRider"
+                    name="ekyc_status"
                     component={Select}
-                    id="ekycRider"
+                    id="ekyc_status"
                     placeholder="e-kyc"
                     selectOption={[
                       {
@@ -335,8 +339,8 @@ export default function Rider({ }: Props): ReactElement {
                         value: "re-approved",
                       },
                       {
-                        name: "reject",
-                        value: "reject",
+                        name: "rejected",
+                        value: "rejected",
                       },
                     ]}
                   />
@@ -344,9 +348,9 @@ export default function Rider({ }: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "วันเวลาที่อัพเดท" }}
-                    name="updateDate"
-                    component={DateRangePicker}
-                    id="updateDate"
+                    name="updated_at"
+                    component={DateTimeRangePicker}
+                    id="updated_at"
                     placeholder="updateDate"
                   />
                 </Col>
@@ -364,11 +368,11 @@ export default function Rider({ }: Props): ReactElement {
             tableColumns: column,
             action: ["view"],
             dataSource: mockData,
-            // pagination: pagination,
-            // handelDataTableLoad: handelDataTableLoad()
+            handelDataTableLoad: handelDataTableLoad,
+            pagination: pagination,
           }}
-         
-          
+
+
         />
       </Card>
     </MainLayout>

@@ -2,6 +2,7 @@ const numberFormat = (x: string | number) => {
     return Number(x).toLocaleString()
 }
 
+
 const uniqueId = () => {
     // always start with a letter (for DOM friendlyness)
     let idstr = String.fromCharCode(Math.floor(Math.random() * 25 + 65));
@@ -15,8 +16,16 @@ const uniqueId = () => {
     return idstr;
 }
 
+const convertJsonToParam = (jsonInput:any)=>{
+    let param = Object.keys((jsonInput)).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(jsonInput[k])
+    }).join('&')
+    return param
+}
+
 
 export {
     numberFormat,
-    uniqueId
+    uniqueId,
+    convertJsonToParam
 }

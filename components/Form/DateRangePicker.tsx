@@ -27,19 +27,18 @@ export default function DateRangePicker({
 
   if (field.value?.start && field.value?.end) {
     defaultValue = [moment(field.value.start), moment(field.value.end)];
-  }else {
-    defaultValue = null
+  }else{
+    defaultValue=null
   }
 
-  const handleChange = (e: any) => {
+  const handleChange = (e:any):void => {
     let value: any = {
       start: "",
       end: "",
     };
     if (e) {
-      const dateConvert = e.map((d: any) => d.format());
-      value.start = dateConvert[0];
-      value.end = dateConvert[1];
+      value.start = e[0].startOf('day').format();
+      value.end = e[0].endOf('day').format()
     }
     props.form.setFieldValue(field.name, value);
   };
@@ -51,10 +50,10 @@ export default function DateRangePicker({
                 <label htmlFor={field.name} className={label.className}>{label.text}</label>
             } */}
         <RangePicker
+          value={defaultValue}
           style={{ width: "100%" }}
           name={field.name}
           onChange={handleChange}
-          value={defaultValue}
         />
 
         <Text type="danger">

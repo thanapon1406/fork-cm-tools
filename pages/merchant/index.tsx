@@ -2,10 +2,9 @@ import React, { ReactElement, useState, useEffect } from "react";
 import MainLayout from "@/layout/MainLayout";
 import Button from "@/components/Button";
 import Table from "@/components/Table";
-import Tag from "@/components/Tag";
 import Card from "@/components/Card";
 import DateRangePicker from "@/components/Form/DateRangePicker";
-import { Row, Col } from "antd";
+import { Row, Col, Typography, Breadcrumb, Space } from "antd";
 
 import Select from "@/components/Form/Select";
 import { Formik, Form, Field } from "formik";
@@ -13,132 +12,198 @@ import * as Yup from "yup";
 import Input from "@/components/Form/Input";
 import { useRecoilState } from "recoil";
 import { personState } from "@/store";
-import { uniqueId } from "@/utils/helpers";
-import { fetchData } from '@/services/merchant'
+import useFetch from "@/hooks/useFetch";
+const { Title } = Typography;
+import { outletList } from "@/services/merchant";
+import moment from "moment";
+import { convertJsonToParam } from "@/utils/helpers";
 
 interface Props {}
+
+interface Pagination {
+  total: number;
+  current: number;
+  pageSize: number;
+}
+
+interface filterObject {
+  keyword?: string;
+  verify_status?: string;
+  ekyc_status?: string;
+  start_date_create?: string;
+  end_date_create?: string;
+  start_date_verify?: string;
+  end_date_verify?: string;
+  approve_status?: string;
+  branch_type?: string;
+  id?: string;
+}
 
 export default function Merchant({}: Props): ReactElement {
   const [userObj, setUserObj] = useRecoilState(personState);
   const initialValues = {
-    name: "",
-    chanel: "",
-    verify: "",
-    registerDate: {
-      start: "",
-      end: "",
+    keyword: "",
+    branch_type: "",
+    verify_status: "",
+    ekyc_status: "",
+    approve_status: "",
+    date_create: {
+      start: null,
+      end: null,
     },
-    updateDate: {
-      start: "",
-      end: "",
+    date_verify: {
+      start: null,
+      end: null,
     },
   };
 
-  let [mockData, setMockData] = useState([]);
-  let [isLoading, setIsLoading] = useState(true);
-
-  const genData = (value: number) => {
-    let tempData: any = [];
-    for (let i = 0; i < value; i++) {
-      const name = uniqueId();
-      const userData = {
-        register: ["register", "E-KYC"][
-          (Math.floor(Math.random() * 2) + 1) % 2
-        ],
-        id: uniqueId(),
-        name: `${name.toLocaleLowerCase()}  ${name}`,
-        phoneNumber: "081111111" + i,
-        type: ["merchant", "raider", "consumer"][
-          (Math.floor(Math.random() * 3) + 1) % 3
-        ],
-        verify: ["waiting", "document", "reject", "approve"][
-          (Math.floor(Math.random() * 4) + 1) % 4
-        ],
-        create_at: "2021-09-01 14:08",
-        update_at: "2021-09-01 14:08",
-      };
-      tempData.push(userData);
-    }
-
-    setTimeout(() => {
-      setMockData(tempData);
-      setIsLoading(false);
-    }, 1300);
-  };
+  let [dataTable, setDataTable] = useState([]);
+  let [_isLoading, setIsLoading] = useState(true);
+  let [pagination, setPagination] = useState<Pagination>({
+    total: 0,
+    current: 1,
+    pageSize: 10,
+  });
+  let [filter, setFilter] = useState<filterObject>({
+    keyword: "",
+    verify_status: "",
+    ekyc_status: "",
+    start_date_create: "",
+    end_date_create: "",
+    start_date_verify: "",
+    end_date_verify: "",
+    approve_status: "",
+    branch_type: "",
+    id: "",
+  });
 
   useEffect(() => {
-    genData(40);
-    testFetch()
+    fetchData();
   }, []);
 
-  const  testFetch = async()=>{
-    const test = await fetchData("62")
-    console.log(`merchantService`, test)
-  }
+  const Schema = Yup.object().shape({});
 
-  const handleSubmit = (values: any) => {
-    console.log("values", values);
-    const rand = Math.floor(Math.random() * 10) + 1;
+  const fetchData = async (
+    filterObj: filterObject = filter,
+    paging: Pagination = pagination
+  ) => {
+    const reqBody = {
+      page: paging.current,
+      per_page: paging.pageSize,
+      ...filterObj,
+    };
+    console.log(`reqBody`, reqBody);
     setIsLoading(true);
-    genData(rand);
+    const { result, success } = await outletList(reqBody);
+    if (success) {
+      const { meta, data } = result;
+      setPagination({
+        pageSize: paging.pageSize,
+        current: meta.page,
+        total: meta.total_count,
+      });
+      setDataTable(data);
+      setIsLoading(false);
+      setFilter(filterObj);
+    }
   };
 
-  const Schema = Yup.object().shape({
-  });
+  const handleSubmit = (values: any) => {
+    console.log(`values`, values);
+    let reqFilter: filterObject = {
+      keyword: values.keyword,
+      verify_status: values.verify_status,
+      ekyc_status: values.ekyc_status,
+      approve_status: values.approve_status,
+      branch_type: values.branch_type,
+      start_date_create: values.date_create.start || "",
+      end_date_create: values.date_create.end || "",
+      start_date_verify: values.date_verify.start || "",
+      end_date_verify: values.date_verify.end || "",
+    };
+    fetchData(reqFilter, { current: 1, total: 0, pageSize: 10 });
+  };
+
+  const handelDataTableLoad = (pagination: any) => {
+    console.log(`pagination`, pagination);
+    fetchData(filter, pagination);
+  };
+
+  const statusMapping:any = {
+    uploaded: "รอการตรวจสอบ",
+    approve: "อนุมัติ",
+    "re-approve": "ขอเอกสารเพิ่มเติม",
+    reject: "ไม่อนุมัติ",
+  };
 
   const column = [
     {
-      title: "ประเภทการลงทะเบียน",
-      dataIndex: "register",
+      title: "ชื่อร้านค้า",
+      dataIndex: "name",
+      align: "center",
+      render: (row: any) => {
+        return row["th"];
+      },
     },
     {
-      title: "ชื่อ-นามสกุล",
+      title: "ประเภทร้านค้า",
+      dataIndex: "branch_type",
+      align: "center",
+    },
+    {
+      title: "ชื่อและนามสกุล",
       dataIndex: "name",
     },
     {
       title: "เบอร์โทรศัพท์",
-      dataIndex: "phoneNumber",
-      align:"center"
+      dataIndex: "tel",
+      align: "center",
     },
     {
-      title: "ช่องทางการลงทะเบียน",
-      dataIndex: "type",
-      className: "column-type",
-      render: (row: any) => {
-        const colorMapping: any = {
-          merchant: "success",
-          raider: "gold",
-          consumer: "blue",
-        };
-        return <Tag type={colorMapping[row]}>{row}</Tag>;
-      },
+      title: "ข้อมูลร้านค้า",
+      dataIndex: "approve_status",
+      align: "center",
     },
     {
-      title: "สถาณะการตรวจสอบ",
-      dataIndex: "verify",
-      className: "column-typverifye",
-      render: (row: any) => {
-        const nameMapping: any = {
-          waiting: "รอการตรวจสอบ",
-          document: "รอเอกสารเพิ่มเติม",
-          reject: "ไม่ผ่านการอนุมัติ",
-          approve: "อนุมัติแล้ว",
-        };
-        return nameMapping[row];
+      title: "E-KYC",
+      dataIndex: "ekyc_status",
+      align: "center",
+    },
+    {
+      title: "สถานะการตรวจสอบ",
+      dataIndex: "approve_status",
+      align: "center",
+      className:"column-typeverifyr",
+      render: (row: string) => {
+        return statusMapping[row]
       },
+      
     },
     {
       title: "วันที่ลงทะเบียน",
-      dataIndex: "create_at",
+      dataIndex: "created_at",
+      align: "center",
+      render: (row: any) => {
+        return moment(row).format("YYYY-MM-DD HH:MM");
+      },
     },
     {
       title: "วันที่อัพเดตข้อมูล",
-      dataIndex: "update_at",
+      dataIndex: "verify_date",
+      align: "center",
+      render: (row: any) => {
+        return moment(row).format("YYYY-MM-DD HH:MM");
+      },
     },
   ];
 
   return (
     <MainLayout>
+      <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+      <Breadcrumb style={{ margin: "16px 0" }}>
+        <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
+        <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
+      </Breadcrumb>
       <Card>
         <Formik
           initialValues={initialValues}
@@ -147,80 +212,88 @@ export default function Merchant({}: Props): ReactElement {
         >
           {(values) => (
             <Form>
-              <Row gutter={16} >
+              <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "ค้นหา" }}
-                    name="name"
+                    name="keyword"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="name"
-                    placeholder="name"
-                    isRange={true}
+                    id="keyword"
+                    placeholder="ค้นหา"
                   />
                   <div className="ant-form ant-form-vertical">
-                    <Button
-                      style={{ width: "120px" , marginTop: "31px"}}
-                      type="primary"
-                      size="middle"
-                      htmlType="submit"
-                    >
-                      ค้นหา
-                    </Button>
+                    <Space>
+                      <Button
+                        style={{ width: "120px", marginTop: "31px" }}
+                        type="primary"
+                        size="middle"
+                        htmlType="submit"
+                      >
+                        ค้นหา
+                      </Button>
+                      {/* <Button
+                        style={{ width: "120px", marginTop: "31px" }}
+                        type="ghost"
+                        size="middle"
+                      >
+                        Clear
+                      </Button> */}
+                    </Space>
                   </div>
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "ประเภทร้านค้า" }}
-                    name="chanel"
+                    name="branch_type"
                     component={Select}
-                    id="chanel"
-                    placeholder="chanel"
+                    id="branch_type"
+                    placeholder="branch_type"
                     defaultValue={{ value: "all" }}
                     selectOption={[
                       {
-                        name: "ประเภททั้งหมด",
-                        value: "all",
+                        name: "ทุกประเภท",
+                        value: "",
                       },
                       {
-                        name: "merchant",
-                        value: "merchant",
+                        name: "สาขาเดี่ยว",
+                        value: "single",
                       },
                       {
-                        name: "raider",
-                        value: "raider",
-                      },
-                      {
-                        name: "consumer",
-                        value: "consumer",
+                        name: "หลายสาขา",
+                        value: "multiple",
                       },
                     ]}
                   />
 
                   <Field
                     label={{ text: "ข้อมูลร้านค้า" }}
-                    name="chanel"
+                    name="verify_status"
                     component={Select}
-                    id="chanel"
-                    placeholder="chanel"
+                    id="verify_status"
+                    placeholder="verify_status"
                     defaultValue={{ value: "all" }}
                     selectOption={[
                       {
-                        name: "ประเภททั้งหมด",
-                        value: "all",
+                        name: "ทุกประเภท",
+                        value: "",
                       },
                       {
-                        name: "merchant",
-                        value: "merchant",
+                        name: "uploaded",
+                        value: "uploaded",
                       },
                       {
-                        name: "raider",
-                        value: "raider",
+                        name: "approve",
+                        value: "approve",
                       },
                       {
-                        name: "consumer",
-                        value: "consumer",
+                        name: "reject",
+                        value: "reject",
+                      },
+                      {
+                        name: "re-approve",
+                        value: "re-approve",
                       },
                     ]}
                   />
@@ -228,55 +301,77 @@ export default function Merchant({}: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "สถานะการตรวจสอบ" }}
-                    name="verify"
+                    name="approve_status"
                     component={Select}
-                    id="verify"
-                    placeholder="verify"
+                    id="approve_status"
+                    placeholder="approve_status"
                     selectOption={[
                       {
                         name: "ทุกสถานะ",
-                        value: "all",
+                        value: "",
                       },
                       {
-                        name: "รอการตรวจสอบ",
-                        value: "waiting",
+                        name: "uploaded",
+                        value: "uploaded",
                       },
                       {
-                        name: "รอเอกสารเพิ่มเติม",
-                        value: "document",
+                        name: "approve",
+                        value: "approve",
                       },
                       {
-                        name: "ไม่ผ่านการอนุมัติ",
+                        name: "reject",
                         value: "reject",
                       },
                       {
-                        name: "อนุมัติแล้ว",
-                        value: "approve",
+                        name: "re-approve",
+                        value: "re-approve",
                       },
                     ]}
                   />
                   <Field
                     label={{ text: "E-KYC" }}
-                    name="verify"
-                    component={Input}
-                    id="verify"
-                    placeholder="verify"
+                    name="ekyc_status"
+                    component={Select}
+                    id="ekyc_status"
+                    placeholder="ekyc_status"
+                    selectOption={[
+                      {
+                        name: "ทุกสถานะ",
+                        value: "",
+                      },
+                      {
+                        name: "รอการตรวจสอบ",
+                        value: "uploaded",
+                      },
+                      {
+                        name: "อนุมัติ",
+                        value: "approve",
+                      },
+                      {
+                        name: "ขอเอกสารเพิ่มเติม",
+                        value: "re-approve",
+                      },
+                      {
+                        name: "ไม่อนุมัติ",
+                        value: "reject",
+                      },
+                    ]}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "วันเวลาที่ลงทะเบียน" }}
-                    name="registerDate"
+                    name="date_create"
                     component={DateRangePicker}
-                    id="registerDate"
-                    placeholder="registerDate"
+                    id="date_create"
+                    placeholder="date_create"
                   />
                   <Field
                     label={{ text: "วันเวลาที่อัพเดท" }}
-                    name="updateDate"
+                    name="date_verify"
                     component={DateRangePicker}
-                    id="updateDate"
-                    placeholder="updateDate"
+                    id="date_verify"
+                    placeholder="date_verify"
                   />
                 </Col>
               </Row>
@@ -288,11 +383,13 @@ export default function Merchant({}: Props): ReactElement {
         <Table
           config={{
             dataTableTitle: "รายการรอตรวจสอบ",
-            loading: isLoading,
+            loading: _isLoading,
             tableName: "merchant",
             tableColumns: column,
             action: ["view"],
-            dataSource: mockData,
+            dataSource: dataTable,
+            handelDataTableLoad: handelDataTableLoad,
+            pagination: pagination,
           }}
         />
       </Card>

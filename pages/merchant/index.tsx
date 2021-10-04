@@ -149,10 +149,26 @@ export default function Merchant({}: Props): ReactElement {
       title: "ประเภทร้านค้า",
       dataIndex: "branch_type",
       align: "center",
+      render: (row: any) => {
+        const textMapping:any = {
+          single:"สาขาเดี่ยว",
+          multiple:"หลายสาขา"
+        }
+        return textMapping[row]||""
+      },
     },
     {
       title: "ชื่อและนามสกุล",
-      dataIndex: "name",
+      dataIndex: "user",
+      align: "center",
+      render: (row: any) => {
+        console.log(`row`, row)
+        if(row){
+          return  `${row["first_name"]} ${row["last_name"]}`;
+        }
+        return ""
+       
+      },
     },
     {
       title: "เบอร์โทรศัพท์",
@@ -168,6 +184,9 @@ export default function Merchant({}: Props): ReactElement {
       title: "E-KYC",
       dataIndex: "ekyc_status",
       align: "center",
+      render:(row:any)=>{
+        return row ||"-"
+      }
     },
     {
       title: "สถานะการตรวจสอบ",

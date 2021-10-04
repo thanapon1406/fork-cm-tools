@@ -19,7 +19,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         `merchant-service/Outlet/FindOutletsCMS`,_body)
       res.status(200).json(data);
     } catch (e) {
-      console.log(`e`, e)
       res.status(e.response?.status || 500).json(e.response?.data);
     }
   } else {

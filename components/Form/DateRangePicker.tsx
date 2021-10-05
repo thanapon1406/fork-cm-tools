@@ -38,7 +38,7 @@ export default function DateRangePicker({
     };
     if (e) {
       value.start = e[0].startOf('day').format();
-      value.end = e[0].endOf('day').format()
+      value.end = e[1].endOf('day').format()
     }
     props.form.setFieldValue(field.name, value);
   };

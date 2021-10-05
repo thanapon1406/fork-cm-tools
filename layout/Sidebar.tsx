@@ -10,6 +10,7 @@ import {
   PieChartOutlined,
   DesktopOutlined,
   CarOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 
 const { Sider } = Layout;
@@ -67,12 +68,19 @@ export default function Sidebar({ }: Props): ReactElement {
             <a> Merchant</a>
           </Link>
         </Menu.Item>
-        {/* <SubMenu key="sub1" icon={<UserOutlined />} title="subnav 1">
-          <Menu.Item key="1">option1</Menu.Item>
-          <Menu.Item key="2">option2</Menu.Item>
-          <Menu.Item key="3">option3</Menu.Item>
-          <Menu.Item key="4">option4</Menu.Item>
-        </SubMenu> */}
+        {/* <Menu.Item key="consumer" icon={<TeamOutlined />}>
+          <Link href="/consumer">
+            <a> Consumer</a>
+          </Link>
+        </Menu.Item> */}
+        
+        <SubMenu key="consumerList" icon={<TeamOutlined />} title="User Consumer">
+          <Menu.Item key="consumer">
+          <Link href="/consumer">
+            Consumer Profile
+            </Link>
+          </Menu.Item>
+        </SubMenu>
 
         <Menu.Item key="rider" icon={<CarOutlined />}>
           <Link href="/rider">

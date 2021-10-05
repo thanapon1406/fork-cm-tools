@@ -50,7 +50,6 @@ export default function Sidebar({}: Props): ReactElement {
     const { result, success } = await findUser();
     if (success) {
       const { firstname = "", lastname = "" } = result.data;
-      console.log(`tee`, `${firstname}  ${lastname}`,)
       const asciiCode = firstname.charCodeAt(0);
       setAvatarColor(profileColor[asciiCode % 6]);
       setUserState({

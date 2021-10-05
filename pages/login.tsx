@@ -1,40 +1,39 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import { Formik, Form, Field } from "formik";
 import Input from "@/components/Form/Input";
 import Link from "next/link";
 import * as Yup from "yup";
 import Layout from "@/components/AuthLayout";
-import { Row, Col, Button, Typography, Card } from "antd";
+import { Row, Col, Button, Typography, Card , Spin, Alert } from "antd";
 import Image from "next/image";
 import logoImg from "../public/logo-kittchenhub.png";
 import { useRouter } from "next/router";
 const { Title } = Typography;
-import { login } from "@/services/login";
+import { login, logout } from "@/services/login";
 
 const Login: NextPage = () => {
   const initialValues = {
     username: "",
     password: "",
   };
-
+  
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.clear();
-    }
+    logout()
   }, []);
 
   const handleSubmit = async (values: any) => {
+    setIsLoading(true)
     const response = await login(
       values
     );
     const { result, success } = response
+    setIsLoading(false)
     if(success){
-      console.log(`result`, result)
       router.push("/")
-      localStorage.setItem("token","test");
     }
     
   };
@@ -91,6 +90,7 @@ const Login: NextPage = () => {
                     type="primary"
                     shape="round"
                     style={{ marginTop: "5px" }}
+                    loading={isLoading}
                     block
                   >
                     ลงชื่อเข้าใช้

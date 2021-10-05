@@ -162,7 +162,6 @@ export default function Merchant({}: Props): ReactElement {
       dataIndex: "user",
       align: "center",
       render: (row: any) => {
-        console.log(`row`, row)
         if(row){
           return  `${row["first_name"]} ${row["last_name"]}`;
         }

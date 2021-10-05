@@ -1,7 +1,6 @@
 import React, { ReactElement } from 'react'
 import MainLayout from "@/layout/MainLayout";
 
-
 interface Props {
     
 }

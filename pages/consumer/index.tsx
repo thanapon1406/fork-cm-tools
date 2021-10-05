@@ -11,7 +11,7 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Input from "@/components/Form/Input";
 import { useRecoilState } from "recoil";
-import { personState,consumerDetail } from "@/store";
+import { personState } from "@/store";
 import useFetch from "@/hooks/useFetch";
 const { Title } = Typography;
 import { consumerList } from "@/services/consumer";
@@ -37,7 +37,6 @@ interface filterObject {
 
 export default function Merchant({}: Props): ReactElement {
   const [userObj, setUserObj] = useRecoilState(personState);
-  const [consumerObj, setConsumerObj] = useRecoilState(consumerDetail);
   const initialValues = {
     keyword: "",
     ranking: "",

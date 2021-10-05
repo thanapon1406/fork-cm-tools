@@ -33,6 +33,8 @@ const Login: NextPage = () => {
     const { result, success } = response
     if(success){
       console.log(`result`, result)
+      router.push("/")
+      localStorage.setItem("token","test");
     }
     
   };

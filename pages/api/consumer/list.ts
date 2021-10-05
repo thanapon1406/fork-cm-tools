@@ -18,7 +18,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const { data, status } = await axiosInstance.post(
         `consumer-service/customer/get-customer-list`,_body)
       res.status(200).json(data);
-    } catch (e) {
+    } catch (e:any) {
       console.log(`e`, e)
       res.status(e.response?.status || 500).json(e.response?.data);
     }

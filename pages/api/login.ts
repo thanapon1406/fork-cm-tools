@@ -15,7 +15,7 @@ const {method, headers, body} = req;
     try {
       const {data, status} = await axiosInstance.post("staff-service/OAuth/token",body);
       res.status(status).json(data);
-    } catch (e) {
+    } catch (e:any) {
       res.status(e.response?.status).json(e.response.data);
     }
   } else {

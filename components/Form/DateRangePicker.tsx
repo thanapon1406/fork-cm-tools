@@ -31,11 +31,12 @@ export default function DateRangePicker({
     defaultValue=null
   }
 
-  const handleChange = (e:any):void => {
+  const handleChange = (e:any,dateS: any):void => {
     let value: any = {
       start: "",
       end: "",
     };
+    console.log(`dateS`, dateS)
     if (e) {
       value.start = e[0].startOf('day').format();
       value.end = e[1].endOf('day').format()

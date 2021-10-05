@@ -18,8 +18,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const { data, status } = await axiosInstance.post(
         `merchant-service/Outlet/FindOutletsCMS`,_body)
       res.status(200).json(data);
-    } catch (e) {
-      console.log(`e`, e)
+    } catch (e:any) {
       res.status(e.response?.status || 500).json(e.response?.data);
     }
   } else {

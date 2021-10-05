@@ -21,7 +21,7 @@ export default  async (req: NextApiRequest, res: NextApiResponse) => {
      
       const { data, status } = await axiosInstance.post("rider-service/rider/find-riders", _body);
       res.status(status).json(data);
-    } catch (e) {
+    } catch (e:any) {
       res.status(e.response?.status || 500).json(e.response?.data);
       // res.status(e.response?.status).json(e.response.data);
     }

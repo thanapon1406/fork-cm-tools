@@ -1,29 +1,61 @@
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useState, useEffect } from "react";
 import MainLayout from "@/layout/MainLayout";
 import { Row, Col } from "antd";
 import { Formik, Form, Field } from "formik";
 import Card from "@/components/Card";
 import Input from "@/components/Form/Input";
 import Button from "@/components/Button";
-
+import { getRiderDetail } from '@/services/rider'
 interface Props {
     
 }
 
+interface filterObject {
+  include?: string;
+  id?: string;
+}
+
+
 export default function view({}: Props): ReactElement {
-	const initialValues = {
-    keyword: "",
-    approve_status: "all",
-    status: "all",
-    ekyc_status: "all",
-    created_at: {
-      start: "",
-      end: "",
-    },
-    updated_at: {
-      start: "",
-      end: "",
-    },
+
+	let [_isLoading, setIsLoading] = useState(true);
+	let [riderDetail, setRiderDetail] = useState({
+		first_name: "abc"
+	});
+
+	let [filter, setFilter] = useState<filterObject>({
+    include: "pdpa",
+    id: "87",
+  });
+
+	useEffect(() => {
+		fetchData();
+	}, []);
+	
+
+	const fetchData = async (
+		filterObj: filterObject = filter
+	) => {
+		const reqBody = {
+			...filterObj,
+		};
+		console.log(`reqBody`, reqBody);
+		setIsLoading(true);
+		const { result, success } = await getRiderDetail(reqBody);
+		if (success) {
+			const { message, data } = result;
+			setRiderDetail({first_name:"testtong"})
+			console.log(message,data);
+			setIsLoading(false);
+			setFilter(filterObj);
+		}
+	};
+
+	console.log(riderDetail.first_name,riderDetail.last_name);
+	
+	let initialValues = {
+    keyword: "เทส",
+		name: riderDetail.first_name
   }
 	
 	const handleSubmit = (values: any) => {
@@ -33,11 +65,12 @@ export default function view({}: Props): ReactElement {
     return (
         <MainLayout>
 							<Formik
-								initialValues={initialValues}
+								initialValues={riderDetail}
 								onSubmit={handleSubmit}
 								//validationSchema={Schema}
 							>
-								{({ values, resetForm }) => (
+								
+								{({ values, resetForm,setFieldValue }) => (
 									<Form>
 										<Card>
 										<Row gutter={16} >
@@ -50,13 +83,14 @@ export default function view({}: Props): ReactElement {
 											<Col className="gutter-row" span={6}>
 												<Field
 													label={{ text: "ชื่อ - สกุล" }}
-													name="keyword"
+													name="first_name"
 													type="text"
 													component={Input}
 													className="form-control round"
 													id="keyword"
 													placeholder="ชื่อ-สกุล"
 													isRange={true}
+													value={values.first_name}
 												/>
 											</Col>
 											<Col className="gutter-row" span={6}>

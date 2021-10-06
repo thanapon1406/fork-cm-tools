@@ -366,7 +366,7 @@ export default function Rider({ }: Props): ReactElement {
             loading: isLoading,
             tableName: "rider",
             tableColumns: column,
-            action: ["view"],
+            action: ["view","edit"],
             dataSource: mockData,
             handelDataTableLoad: handelDataTableLoad,
             pagination: pagination,

@@ -30,7 +30,7 @@ export default function Table({ config }: Props): ReactElement {
   const Router = useRouter();
   if (action) {
     const View = (path: any) => {
-      Router.push(`/${tableName}/view?`);
+      Router.push(`/${tableName}/view?id=87`);
     };
     const Edit = () => {};
     const Delete = () => {};

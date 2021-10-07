@@ -3,6 +3,7 @@ import Router, { useRouter } from "next/router";
 import HeaderContent from "./HeaderContent";
 import Sidebar from "./Sidebar";
 import Head from "next/head";
+import { isLogin } from "@/services/login";
 
 import { Layout, Breadcrumb } from "antd";
 const { Header, Content, Footer, Sider } = Layout;
@@ -15,7 +16,7 @@ export default function MainLayout({ children }: Props) {
   const router = useRouter();
   let authToken: any = false;
   if (typeof window !== "undefined") {
-    authToken = localStorage.getItem("token");
+    authToken = isLogin()
     if (!authToken) {
       Router.replace("/login");
       return <></>;

@@ -1,11 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import ServerFetch from "@/services/api";
+import _ from "lodash";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body } = req;
   if (method === "POST") {
     try {
-      const url: string = `merchant-service/Outlet/FindOutletsCMS`;
+      const url: string = `/staff-service/user/find-user`;
       const { data, status } = await ServerFetch.post(url, body, headers);
       res.status(status).json(data);
     } catch (e: any) {

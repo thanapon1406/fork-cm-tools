@@ -149,10 +149,25 @@ export default function Merchant({}: Props): ReactElement {
       title: "ประเภทร้านค้า",
       dataIndex: "branch_type",
       align: "center",
+      render: (row: any) => {
+        const textMapping:any = {
+          single:"สาขาเดี่ยว",
+          multiple:"หลายสาขา"
+        }
+        return textMapping[row]||""
+      },
     },
     {
       title: "ชื่อและนามสกุล",
-      dataIndex: "name",
+      dataIndex: "user",
+      align: "center",
+      render: (row: any) => {
+        if(row){
+          return  `${row["first_name"]} ${row["last_name"]}`;
+        }
+        return ""
+       
+      },
     },
     {
       title: "เบอร์โทรศัพท์",
@@ -161,13 +176,16 @@ export default function Merchant({}: Props): ReactElement {
     },
     {
       title: "ข้อมูลร้านค้า",
-      dataIndex: "approve_status",
+      dataIndex: "verify_status",
       align: "center",
     },
     {
       title: "E-KYC",
       dataIndex: "ekyc_status",
       align: "center",
+      render:(row:any)=>{
+        return row==="no-ekyc"?"-":row
+      }
     },
     {
       title: "สถานะการตรวจสอบ",
@@ -192,7 +210,7 @@ export default function Merchant({}: Props): ReactElement {
       dataIndex: "verify_date",
       align: "center",
       render: (row: any) => {
-        return moment(row).format("YYYY-MM-DD HH:MM");
+        return row?moment(row).format("YYYY-MM-DD HH:MM"):"-";
       },
     },
   ];
@@ -311,19 +329,19 @@ export default function Merchant({}: Props): ReactElement {
                         value: "",
                       },
                       {
-                        name: "uploaded",
+                        name: "รอการตรวจสอบ",
                         value: "uploaded",
                       },
                       {
-                        name: "approve",
+                        name: "อนุมัติ",
                         value: "approve",
                       },
                       {
-                        name: "reject",
+                        name: "ไม่อนุมัติ",
                         value: "reject",
                       },
                       {
-                        name: "re-approve",
+                        name: "ขอเอกสารเพิ่มเติม",
                         value: "re-approve",
                       },
                     ]}
@@ -340,19 +358,23 @@ export default function Merchant({}: Props): ReactElement {
                         value: "",
                       },
                       {
-                        name: "รอการตรวจสอบ",
+                        name: "no-ekyc",
+                        value: "no-ekyc",
+                      },
+                      {
+                        name: "uploaded",
                         value: "uploaded",
                       },
                       {
-                        name: "อนุมัติ",
+                        name: "approve",
                         value: "approve",
                       },
                       {
-                        name: "ขอเอกสารเพิ่มเติม",
+                        name: "re-approve",
                         value: "re-approve",
                       },
                       {
-                        name: "ไม่อนุมัติ",
+                        name: "reject",
                         value: "reject",
                       },
                     ]}

@@ -1,11 +1,15 @@
 import React, { ReactElement, useState, useEffect } from "react";
 import MainLayout from "@/layout/MainLayout";
-import { Row, Col } from "antd";
+import { Row, Col, Typography, Breadcrumb, Space } from "antd";
 import { Formik, Form, Field } from "formik";
+import _ from 'lodash'
+const { Title } = Typography;
 import Card from "@/components/Card";
 import Input from "@/components/Form/Input";
 import Button from "@/components/Button";
 import { getRiderDetail } from '@/services/rider'
+
+
 interface Props {
     
 }
@@ -19,10 +23,7 @@ interface filterObject {
 export default function view({}: Props): ReactElement {
 
 	let [_isLoading, setIsLoading] = useState(true);
-	let [riderDetail, setRiderDetail] = useState({
-		first_name: "abc"
-	});
-
+	let [riderDetail, setRiderDetail] = useState({});
 	let [filter, setFilter] = useState<filterObject>({
     include: "pdpa",
     id: "87",
@@ -44,19 +45,15 @@ export default function view({}: Props): ReactElement {
 		const { result, success } = await getRiderDetail(reqBody);
 		if (success) {
 			const { message, data } = result;
-			setRiderDetail({first_name:"testtong"})
+			data.name = data.first_name+" "+data.last_name
+			data.contact_emergency= _.find(data.contacts, function(o) { return o.type == "emergency"; });
+			data.contact_refer= _.find(data.contacts, function(o) { return o.type == "refer"; });
+			setRiderDetail(data)
 			console.log(message,data);
 			setIsLoading(false);
 			setFilter(filterObj);
 		}
 	};
-
-	console.log(riderDetail.first_name,riderDetail.last_name);
-	
-	let initialValues = {
-    keyword: "เทส",
-		name: riderDetail.first_name
-  }
 	
 	const handleSubmit = (values: any) => {
     console.log("test");
@@ -64,7 +61,14 @@ export default function view({}: Props): ReactElement {
 
     return (
         <MainLayout>
+					<Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+					<Breadcrumb style={{ margin: "16px 0" }}>
+						<Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
+						<Breadcrumb.Item>ลงทะเบียนคนขับ</Breadcrumb.Item>
+						<Breadcrumb.Item>ข้อมูลคนขับ</Breadcrumb.Item>
+					</Breadcrumb>
 							<Formik
+								enableReinitialize={true}
 								initialValues={riderDetail}
 								onSubmit={handleSubmit}
 								//validationSchema={Schema}
@@ -81,69 +85,76 @@ export default function view({}: Props): ReactElement {
               			</Row>
 										<Row gutter={10} >
 											<Col className="gutter-row" span={6}>
-												<Field
+												<Field 
 													label={{ text: "ชื่อ - สกุล" }}
-													name="first_name"
+													name="name"
 													type="text"
 													component={Input}
 													className="form-control round"
 													id="keyword"
 													placeholder="ชื่อ-สกุล"
 													isRange={true}
-													value={values.first_name}
+													disabled={true}
 												/>
 											</Col>
 											<Col className="gutter-row" span={6}>
 											<Field
 													label={{ text: "เลขบัตรประชาชน" }}
-													name="keyword"
+													name="pdpa.nation_id"
 													type="text"
 													component={Input}
 													className="form-control round"
 													id="keyword"
 													placeholder="เลขบัตรประชาชน"
 													isRange={true}
+													disabled={true}
 												/>
 											</Col>
 											<Col className="gutter-row" span={6}>
 											<Field
 													label={{ text: "เบอร์โทรศัพท์" }}
-													name="keyword"
+													name="phone"
 													type="text"
 													component={Input}
 													className="form-control round"
 													id="keyword"
 													placeholder="เบอร์โทรศัพท์"
 													isRange={true}
+													disabled={true}
 												/>
 											</Col>
 											<Col className="gutter-row" span={6}>
 											<Field
 													label={{ text: "อีเมล" }}
-													name="keyword"
+													name="email"
 													type="text"
 													component={Input}
 													className="form-control round"
 													id="keyword"
 													placeholder="อีเมล"
 													isRange={true}
+													disabled={true}
 												/>
 											</Col>
 											<Col className="gutter-row" span={6}>
 											<Field
 													label={{ text: "SsoID" }}
-													name="keyword"
+													name="sso_id"
 													type="text"
 													component={Input}
 													className="form-control round"
 													id="keyword"
-													placeholder="ชื่อ-สกุล, เบอร์โทรศัพท์"
+													placeholder="SsoID"
 													isRange={true}
+													disabled={true}
 												/>
 											</Col>
 										</Row>
 										</Card>
 										<Card>
+											<Row gutter={16} >
+												<h3>ข้อมูล Rider</h3>
+											</Row>
 											<Row gutter={10}>
 												<Col span={4}>
 													บัตรประชาชน
@@ -161,37 +172,40 @@ export default function view({}: Props): ReactElement {
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "ชื่อ-สกุลของบุคคลที่ติดต่อได้ในกรณีฉุกเฉิน" }}
-														name="keyword"
+														name="contact_emergency.fullname"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="ชื่อ-สกุล"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "ความสัมพันธ์" }}
-														name="keyword"
+														name="contact_emergency.relationship"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="ความสัมพันธ์"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "เบอร์โทรศัพท์" }}
-														name="keyword"
+														name="contact_emergency.phone"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="เบอร์โทรศัพท์"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 											</Row>
@@ -199,13 +213,14 @@ export default function view({}: Props): ReactElement {
 												<Col className="gutter-row" span={18} offset={4}>
 													<Field
 														label={{ text: "ที่อยู่" }}
-														name="keyword"
+														name="contact_emergency.address_no"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="ที่อยู่"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 											</Row>
@@ -216,37 +231,40 @@ export default function view({}: Props): ReactElement {
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "ชื่อ-สกุลของบุคคลอ้างอิง" }}
-														name="keyword"
+														name="contact_refer.fullname"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="ชื่อ-สกุล"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "ความสัมพันธ์" }}
-														name="keyword"
+														name="contact_refer.relationship"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="ความสัมพันธ์"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "เบอร์โทรศัพท์" }}
-														name="keyword"
+														name="contact_refer.phone"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="เบอร์โทรศัพท์"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 											</Row>
@@ -254,13 +272,14 @@ export default function view({}: Props): ReactElement {
 												<Col className="gutter-row" span={18} offset={4}>
 													<Field
 														label={{ text: "ที่อยู่" }}
-														name="keyword"
+														name="contact_refer.address_no"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="ที่อยู่"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 											</Row>
@@ -271,13 +290,14 @@ export default function view({}: Props): ReactElement {
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "กรรมสิทธิ์เจ้าของจักรยานยนต์" }}
-														name="keyword"
+														name="pdpa.car_info[0].ownership"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="กรรมสิทธิ์เจ้าของจักรยานยนต์"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 												<Col className="gutter-row" span={6}>
@@ -290,18 +310,20 @@ export default function view({}: Props): ReactElement {
 														id="keyword"
 														placeholder="ยี่ห้อ/รุ่นรถจักรยานยนต์"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "เลขทะเบียนรถจักรยานยนต์" }}
-														name="keyword"
+														name="pdpa.car_info[0].car_no"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="เลขทะเบียนรถจักรยานยนต์"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 											</Row>
@@ -320,13 +342,14 @@ export default function view({}: Props): ReactElement {
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "ความบกพร่องทางร่างกาย" }}
-														name="keyword"
+														name="pdpa.disable_person[0].disable"
 														type="text"
 														component={Input}
 														className="form-control round"
 														id="keyword"
 														placeholder="ความบกพร่องทางร่างกาย"
 														isRange={true}
+														disabled={true}
 													/>
 												</Col>
 												<Col className="gutter-row" span={6}>
@@ -334,10 +357,26 @@ export default function view({}: Props): ReactElement {
 												</Col>
 											</Row>
 										</Card>
+										<div className="ant-form" style={{float: 'right'}}>
+                      <Button
+                        style={{ width: "120px", marginTop: "31px" }}
+                        type="primary"
+                        size="middle"
+                        htmlType="submit"
+                      >
+                        submit
+                      </Button>
+                      {/* <Button
+                        style={{ width: "120px", marginTop: "31px" }}
+                        type="ghost"
+                        size="middle"
+                      >
+                        Clear
+                      </Button> */}
+                  </div>
 									</Form>
 								)}
 							</Formik>
-            hello
         </MainLayout>
     )
 }

@@ -14,3 +14,7 @@
   height: 5px;
   padding: 6px !important;
 }
+
+.ant-input[disabled] {
+  color: black !important;
+}

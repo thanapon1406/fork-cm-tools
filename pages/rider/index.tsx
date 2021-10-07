@@ -32,7 +32,7 @@ interface SearchValue {
 
 const StatusConstants = {
   UPLOADED: {
-    TH: "รอตรวจสอบ",
+    TH: "รอการตรวจสอบ",
     EN: "uploaded"
   },
   APPROVED: {
@@ -40,11 +40,11 @@ const StatusConstants = {
     EN: "approved",
   },
   REJECTED: {
-    TH: "ไม่ผ่าน",
+    TH: "ไม่อนุมัติ",
     EN: "rejected",
   },
   RE_APPROVED: {
-    TH: "ขอเอกสารเพิ่ม",
+    TH: "ขอเอกสารเพิ่มเติม",
     EN: "re-approved",
   }
 }
@@ -140,7 +140,7 @@ export default function Rider({ }: Props): ReactElement {
       title: "เบอร์โทรศัพท์",
       dataIndex: "phoneNumber",
       render: (text: any, record: any) => {
-        let phone = "-" //record.phone ? record.phone.slice(0, 7) + "xxx" : "-"
+        let phone = "-"
         if (record.phone) {
           phone = record.country_code + '-' + record.phone.replace('-', '').slice(2, 7) + "000"
 
@@ -152,29 +152,11 @@ export default function Rider({ }: Props): ReactElement {
     {
       title: "ข้อมูลลงทะเบียน",
       dataIndex: "status",
-      // render: (row: any) => {
-      //   const nameMapping: any = {
-      //     uploaded: "uploaded",
-      //     're-approved': "re-approved",
-      //     approved: "approved",
-      //     rejected: "reject",
-      //   };
-      //   return nameMapping[row];
-      // },
       align: "center"
     },
     {
       title: "e-kyc",
       dataIndex: "ekyc_status",
-      // render: (row: any) => {
-      //   const nameMapping: any = {
-      //     uploaded: "uploaded",
-      //     're-approved': "re-approved",
-      //     approved: "approved",
-      //     rejected: "reject",
-      //   };
-      //   return nameMapping[row];
-      // },
       align: "center"
     },
     {
@@ -272,7 +254,7 @@ export default function Rider({ }: Props): ReactElement {
                         value: "re-approved",
                       },
                       {
-                        name: "ไม่ผ่านการอนุมัติ",
+                        name: "ไม่อนุมัติ",
                         value: "rejected",
                       },
                     ]}
@@ -371,8 +353,6 @@ export default function Rider({ }: Props): ReactElement {
             handelDataTableLoad: handelDataTableLoad,
             pagination: pagination,
           }}
-
-
         />
       </Card>
     </MainLayout>

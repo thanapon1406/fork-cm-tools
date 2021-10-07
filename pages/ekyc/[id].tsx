@@ -354,9 +354,6 @@ const EkycList = ({ isComponent, sso_id }: EkycDetailProps): ReactElement => {
       defaultActiveKey={['1']}
     >
       <CustomPanel status={ekycDetail?.status || ''} header={renderHeader()} key="1">
-        <Title level={4}>
-          {ekycDetail?.first_name} {ekycDetail?.last_name}
-        </Title>
         <Row style={{ padding: '16px' }} justify="end">
           <Col offset={2} span={6}>
             สถานะการยืนยัน

@@ -46,6 +46,12 @@ const initialValues = {
 }
 const Schema = Yup.object().shape({})
 
+const appIdMapping: any = {
+  '1': 'Consumer',
+  '2': 'Rider',
+  '3': 'Marchart',
+}
+
 const EkycList = (): ReactElement => {
   const [userObj, setUserObj] = useRecoilState(personState)
   const [ekycDataList, setEkycDataList] = useState<Array<EkycDetail>>([])
@@ -70,7 +76,7 @@ const EkycList = (): ReactElement => {
       if (success) {
         const { data } = result
         setEkycDataList(
-          data.map((item: EkycDetail) => ({
+          map(data, (item: EkycDetail) => ({
             ...item,
             name: `${item.first_name} ${item.last_name}`,
             action: item.sso_id,
@@ -121,12 +127,20 @@ const EkycList = (): ReactElement => {
       align: 'center',
     },
     {
-      title: 'Project Id',
-      dataIndex: 'project_id',
+      title: 'Chanel',
+      dataIndex: 'app_id',
+      align: 'center',
+      render: (data: any) => {
+        return <p>{appIdMapping[data]}</p>
+      },
+    },
+    {
+      title: 'เบอร์โทรศัพท์',
+      dataIndex: 'mobile_number',
       align: 'center',
     },
     {
-      title: 'ชื่อและนามสกุล',
+      title: 'Social login',
       dataIndex: 'name',
       align: 'center',
     },

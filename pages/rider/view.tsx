@@ -7,7 +7,9 @@ const { Title } = Typography;
 import Card from "@/components/Card";
 import Input from "@/components/Form/Input";
 import Button from "@/components/Button";
+import Select from "@/components/Form/Select";
 import { getRiderDetail } from '@/services/rider'
+import Multiselect from 'multiselect-react-dropdown';
 
 
 interface Props {
@@ -45,21 +47,27 @@ export default function view({}: Props): ReactElement {
 		const { result, success } = await getRiderDetail(reqBody);
 		if (success) {
 			const { message, data } = result;
+			data.approve_status = "approve"
 			data.name = data.first_name+" "+data.last_name
+			data.status1 = ["approved","uploaded"]
 			data.contact_emergency= _.find(data.contacts, function(o) { return o.type == "emergency"; });
+			data.contact_emergency_address = data.contact_emergency.address_no+" "+data.contact_emergency.district_name+" "+data.contact_emergency.subdistrict_name+" "+data.contact_emergency.province_name+" "+data.contact_emergency.zipcode
 			data.contact_refer= _.find(data.contacts, function(o) { return o.type == "refer"; });
+			data.contact_refer_address = data.contact_refer.address_no+" "+data.contact_refer.district_name+" "+data.contact_refer.subdistrict_name+" "+data.contact_refer.province_name+" "+data.contact_refer.zipcode
+			data.car = data.pdpa.car_info[0].brand_name+"/"+data.pdpa.car_info[0].model_name
 			setRiderDetail(data)
 			console.log(message,data);
 			setIsLoading(false);
 			setFilter(filterObj);
 		}
 	};
+
 	
 	const handleSubmit = (values: any) => {
     console.log("test");
   }
 
-    return (
+    return !_isLoading?(
         <MainLayout>
 					<Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
 					<Breadcrumb style={{ margin: "16px 0" }}>
@@ -213,7 +221,7 @@ export default function view({}: Props): ReactElement {
 												<Col className="gutter-row" span={18} offset={4}>
 													<Field
 														label={{ text: "ที่อยู่" }}
-														name="contact_emergency.address_no"
+														name="contact_emergency_address"
 														type="text"
 														component={Input}
 														className="form-control round"
@@ -272,7 +280,7 @@ export default function view({}: Props): ReactElement {
 												<Col className="gutter-row" span={18} offset={4}>
 													<Field
 														label={{ text: "ที่อยู่" }}
-														name="contact_refer.address_no"
+														name="contact_refer_address"
 														type="text"
 														component={Input}
 														className="form-control round"
@@ -303,11 +311,10 @@ export default function view({}: Props): ReactElement {
 												<Col className="gutter-row" span={6}>
 												<Field
 														label={{ text: "ยี่ห้อ/รุ่นรถจักรยานยนต์" }}
-														name="keyword"
+														name="car"
 														type="text"
 														component={Input}
 														className="form-control round"
-														id="keyword"
 														placeholder="ยี่ห้อ/รุ่นรถจักรยานยนต์"
 														isRange={true}
 														disabled={true}
@@ -357,26 +364,88 @@ export default function view({}: Props): ReactElement {
 												</Col>
 											</Row>
 										</Card>
-										<div className="ant-form" style={{float: 'right'}}>
-                      <Button
-                        style={{ width: "120px", marginTop: "31px" }}
-                        type="primary"
-                        size="middle"
-                        htmlType="submit"
-                      >
-                        submit
-                      </Button>
-                      {/* <Button
-                        style={{ width: "120px", marginTop: "31px" }}
-                        type="ghost"
-                        size="middle"
-                      >
-                        Clear
-                      </Button> */}
-                  </div>
+										{riderDetail.approve_status !== "waiting" &&
+											<>
+												<Row gutter={10}>
+													<Col className="gutter-row" span={6}>
+														<Field
+															label={{ text: "การอนุมัติ" }}
+															name="status"
+															component={Select}
+															id="status2"
+															placeholder="เลือก"
+															selectOption={[
+																{
+																	name: "รอการตรวจสอบ",
+																	value: "uploaded",
+																},
+																{
+																	name: "อนุมัติ",
+																	value: "approved",
+																},
+																{
+																	name: "ขอเอกสารเพิ่มเติม",
+																	value: "re-approved",
+																},
+																{
+																	name: "ไม่ผ่านการอนุมัติ",
+																	value: "rejected",
+																},
+															]}
+														/>
+													</Col>
+													<Col className="gutter-row" span={6}>
+														<Field
+																label={{ text: "เหตุผล" }}
+																mode="multiple"
+																name="status1"
+																allowClear={true}
+																component={Select}
+																id="status1"
+																placeholder="เลือก"
+																selectOption={[
+																	{
+																		name: "รอการตรวจสอบ",
+																		value: "uploaded",
+																	},
+																	{
+																		name: "อนุมัติ",
+																		value: "approved",
+																	},
+																	{
+																		name: "ขอเอกสารเพิ่มเติม",
+																		value: "re-approved",
+																	},
+																	{
+																		name: "ไม่ผ่านการอนุมัติ",
+																		value: "rejected",
+																	},
+																]}
+															/>
+													</Col>
+												</Row>
+												<div className="ant-form" style={{float: 'right'}}>
+													<Button
+														style={{ width: "120px"}}
+														type="primary"
+														size="middle"
+														htmlType="submit"
+													>
+														submit
+													</Button>
+													{/* <Button
+														style={{ width: "120px", marginTop: "31px" }}
+														type="ghost"
+														size="middle"
+													>
+														Clear
+													</Button> */}
+											</div>
+											</>
+										}
 									</Form>
 								)}
 							</Formik>
         </MainLayout>
-    )
+    ):(<div></div>)
 }

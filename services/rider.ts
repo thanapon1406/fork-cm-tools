@@ -4,7 +4,7 @@ import successHandler from './handler/successHandler'
 import errorHandler from './handler/errorHandler'
 
 export {
-  getRider,getRiderDetail
+  getRider,getRiderDetail,getRejectReson
 }
 
 interface queryList {
@@ -37,6 +37,15 @@ const getRider = async (req: queryList) => {
 const getRiderDetail = async (req: queryListDetail) => {
   try {
     const response = await axios.post(`/api/rider/detail`, req);
+    return successHandler(response);
+  } catch (error) {
+    return errorHandler(error);;
+  }
+};
+
+const getRejectReson = async (req: queryListDetail) => {
+  try {
+    const response = await axios.post(`/api/rider/reject-reason`, req);
     return successHandler(response);
   } catch (error) {
     return errorHandler(error);;

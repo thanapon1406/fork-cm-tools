@@ -26,9 +26,7 @@ export default function Table({ config }: Props): ReactElement {
   let { tableColumns, pagination } = config
   const Router = useRouter()
   if (action) {
-    const View = (path: any) => {
-      Router.push(`/${tableName}/view?id=87`);
-    };
+    const View = (path: any) => { };
     const Edit = () => { };
     const Delete = () => { };
     const actionElement = (

@@ -8,6 +8,7 @@ import Card from "@/components/Card";
 import Input from "@/components/Form/Input";
 import Button from "@/components/Button";
 import Select from "@/components/Form/Select";
+import Ekyc from "../ekyc/[id]"
 import { getRiderDetail, getRejectReson } from '@/services/rider'
 import Image from 'next/image'
 
@@ -192,6 +193,7 @@ export default function view({ }: Props): ReactElement {
 									/>
 								</Col>
 							</Row>
+							<Ekyc isComponent sso_id="b450d352-33e7-4896-a994-b9736a85d352" />
 						</Card>
 						<Card>
 							<Row gutter={16} >

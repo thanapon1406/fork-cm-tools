@@ -1,100 +1,83 @@
-import React, { ReactElement } from "react";
-import { Dropdown, Menu, Button, PageHeader, Table as Tables } from "antd";
-import { uniqueId } from "@/utils/helpers";
-import { useRouter } from "next/router";
-import {
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EllipsisOutlined,
-} from "@ant-design/icons";
+import { uniqueId } from '@/utils/helpers'
+import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@ant-design/icons'
+import { Dropdown, Menu, PageHeader, Table as Tables } from 'antd'
+import { useRouter } from 'next/router'
+import React, { ReactElement } from 'react'
 
 interface Props {
-  config: Config;
+  config: Config
 }
 
 interface Config {
-  dataTableTitle: string;
-  tableColumns: Array<any>;
-  dataSource: Array<any>;
-  tableName: string;
-  action?: Array<"view" | "edit" | "delete">;
-  loading: boolean;
-  handelDataTableLoad: any;
-  pagination: any;
+  dataTableTitle: string
+  tableColumns: Array<any>
+  dataSource: Array<any>
+  tableName: string
+  actionKey?: Array<any>
+  action?: Array<'view' | 'edit' | 'delete'>
+  loading: boolean
+  handelDataTableLoad: any
+  pagination: any
 }
 
 export default function Table({ config }: Props): ReactElement {
-  const { dataTableTitle, action, dataSource, loading, tableName, handelDataTableLoad } = config;
-  let { tableColumns, pagination } = config;
-  const Router = useRouter();
+  const { dataTableTitle, action, dataSource, loading, tableName, actionKey, handelDataTableLoad } =
+    config
+  let { tableColumns, pagination } = config
+  const Router = useRouter()
   if (action) {
     const View = (path: any) => {
       Router.push(`/${tableName}/view?id=87`);
     };
-    const Edit = () => {};
-    const Delete = () => {};
+    const Edit = () => { };
+    const Delete = () => { };
     const actionElement = (
       <Menu style={{ width: 130 }}>
         {action.map((action) => {
-          if (action === "view") {
+          if (action === 'view') {
             return (
-              <Menu.Item
-                key={`${uniqueId()}`}
-                icon={<EyeOutlined />}
-                onClick={View}
-              >
+              <Menu.Item key={`${uniqueId()}`} icon={<EyeOutlined />} onClick={View}>
                 View
               </Menu.Item>
-            );
+            )
           }
 
-          if (action === "edit") {
+          if (action === 'edit') {
             return (
-              <Menu.Item
-                key={`${uniqueId()}`}
-                icon={<EditOutlined />}
-                onClick={Edit}
-              >
+              <Menu.Item key={`${uniqueId()}`} icon={<EditOutlined />} onClick={Edit}>
                 Edit
               </Menu.Item>
-            );
+            )
           }
 
-          if (action === "delete") {
+          if (action === 'delete') {
             return (
-              <Menu.Item
-                key={`${uniqueId()}`}
-                icon={<DeleteOutlined />}
-                onClick={Delete}
-              >
+              <Menu.Item key={`${uniqueId()}`} icon={<DeleteOutlined />} onClick={Delete}>
                 Delete
               </Menu.Item>
-            );
+            )
           }
-          return;
+          return
         })}
       </Menu>
-    );
+    )
     tableColumns = [
       ...tableColumns,
       {
-        title: "",
+        title: '',
         render: (row: any) => {
           if (action.length === 1) {
-            return actionElement;
+            return actionElement
           } else {
             return (
-              <Dropdown overlay={actionElement} trigger={["click"]}>
-                <EllipsisOutlined
-                  style={{ cursor: "pointer", fontSize: "24px" }}
-                />
+              <Dropdown overlay={actionElement} trigger={['click']}>
+                <EllipsisOutlined style={{ cursor: 'pointer', fontSize: '24px' }} />
               </Dropdown>
-            );
+            )
           }
         },
       },
-    ];
+    ]
   }
 
   return (
@@ -109,5 +92,5 @@ export default function Table({ config }: Props): ReactElement {
         onChange={handelDataTableLoad}
       />
     </>
-  );
+  )
 }

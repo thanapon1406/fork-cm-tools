@@ -1,8 +1,12 @@
 import { atom } from 'recoil';
-export const personState:any = atom({
+interface Person{
+  username:string;
+  email?:string
+}
+export const personState = atom({
   key: 'personState',
   default: {
-    user: '1234',
-    pass: '5678'
-  }
+    username: '',
+    email:''
+  } as Person,
 });

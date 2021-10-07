@@ -36,7 +36,6 @@ export default function DateRangePicker({
       start: "",
       end: "",
     };
-    console.log(`dateS`, dateS)
     if (e) {
       value.start = e[0].startOf('day').format();
       value.end = e[1].endOf('day').format()

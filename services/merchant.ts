@@ -1,7 +1,6 @@
-import axios from "axios";
-import { convertJsonToParam } from '@/utils/helpers'
 import successHandler from './handler/successHandler'
 import errorHandler from './handler/errorHandler'
+import fetch from './fetch'
 
 interface queryList {
   page: number;
@@ -18,9 +17,9 @@ interface queryList {
   approve_status?: string;
 }
 
-const outletList = async (option: queryList) => {
+const outletList = async (body: queryList) => {
   try {
-    const result = await axios.post(`/api/merchant/list`, option);
+    const result = await fetch.post(`/api/merchant/list`, body);
     return successHandler(result);
   } catch (error) {
     return errorHandler(error);

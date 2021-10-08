@@ -9,7 +9,7 @@ import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
 import { ReactElement, useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
-import { CustomPanel } from './style'
+import CustomPanel from './style'
 import fetcher from '@/services/fetch/fetch'
 import MainLayout from '@/layout/MainLayout'
 import Card from '@/components/Card'
@@ -73,20 +73,20 @@ const EkycList = ({ isComponent, sso_id }: EkycDetailProps): ReactElement => {
         values.status_face === 1
           ? 'ผ่าน'
           : values.status_card === 2
-          ? 'ข้อมูลบัตรไม่ถูกต้อง'
-          : 'บัตรไม่ชัด',
+            ? 'ข้อมูลบัตรไม่ถูกต้อง'
+            : 'บัตรไม่ชัด',
       status_card_text:
         values.status_card === 1
           ? 'ผ่าน'
           : values.status_card === 2
-          ? 'ใบหน้าไม่ชัด'
-          : 'ใบหน้าไม่ตรงกับบัตรประชาชน',
+            ? 'ใบหน้าไม่ชัด'
+            : 'ใบหน้าไม่ตรงกับบัตรประชาชน',
       status_video_text:
         values.status_video === 1
           ? 'ผ่าน'
           : values.status_card === 2
-          ? 'เสียงหาย'
-          : 'ใบหน้าไม่ชัดเจน',
+            ? 'เสียงหาย'
+            : 'ใบหน้าไม่ชัดเจน',
     }
     console.log(payload)
 
@@ -140,10 +140,10 @@ const EkycList = ({ isComponent, sso_id }: EkycDetailProps): ReactElement => {
                 ekycDetail?.status === 'approved '
                   ? '#52e04a'
                   : ekycDetail?.status === 'uploaded'
-                  ? '#e0b34a'
-                  : ekycDetail?.status === 'reject'
-                  ? '#de3e3e'
-                  : '',
+                    ? '#e0b34a'
+                    : ekycDetail?.status === 'reject'
+                      ? '#de3e3e'
+                      : '',
             }}
           >
             {statusMapping[ekycDetail?.status || '']}

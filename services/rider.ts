@@ -4,7 +4,7 @@ import successHandler from './handler/successHandler'
 import errorHandler from './handler/errorHandler'
 
 export {
-  getRider,getRiderDetail,getRejectReson
+  getRider, getRiderDetail, getRejectReson, updateRiderStatus
 }
 
 interface queryList {
@@ -21,8 +21,22 @@ interface queryList {
 }
 
 interface queryListDetail {
-  id?:string,
-  include?:string
+  id?: string,
+  include?: string
+}
+
+interface updateRiderStatus {
+  data: {
+    id?: string;
+    status?: string;
+    ekyc_status?: string;
+    topic?: {
+      id?: number;
+      code?: string;
+      title?: string;
+      status?: boolean;
+    }[];
+  }
 }
 
 const getRider = async (req: queryList) => {
@@ -43,9 +57,18 @@ const getRiderDetail = async (req: queryListDetail) => {
   }
 };
 
-const getRejectReson = async (req: queryListDetail) => {
+const getRejectReson = async () => {
   try {
-    const response = await axios.post(`/api/rider/reject-reason`, req);
+    const response = await axios.post(`/api/rider/reject-reason`);
+    return successHandler(response);
+  } catch (error) {
+    return errorHandler(error);;
+  }
+};
+
+const updateRiderStatus = async (req: updateRiderStatus) => {
+  try {
+    const response = await axios.post(`/api/rider/update-status`, req);
     return successHandler(response);
   } catch (error) {
     return errorHandler(error);;

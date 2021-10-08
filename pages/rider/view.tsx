@@ -1,4 +1,5 @@
 import React, { ReactElement, useState, useEffect } from "react";
+import { notification } from "antd";
 import MainLayout from "@/layout/MainLayout";
 import { Row, Col, Typography, Breadcrumb, Form as antForm, Modal } from "antd";
 import { Formik, Form, Field } from "formik";
@@ -9,7 +10,8 @@ import Input from "@/components/Form/Input";
 import Button from "@/components/Button";
 import Select from "@/components/Form/Select";
 import Ekyc from "../ekyc/[id]"
-import { getRiderDetail, getRejectReson } from '@/services/rider'
+import { getRiderDetail, getRejectReson, updateRiderStatus } from '@/services/rider'
+import { getEkycDetail } from '@/services/ekyc'
 import Image from 'next/image'
 
 
@@ -22,12 +24,19 @@ interface filterObject {
 	id?: string;
 }
 
+// interface updateRiderStatus {
+// 	id?: string;
+// 	status?: string;
+// 	ekyc_status?: string;
+// }
+
 
 export default function view({ }: Props): ReactElement {
 
 	let [_isLoading, setIsLoading] = useState(true);
 	let [riderDetail, setRiderDetail] = useState({});
 	let [disableRejectReason, setDisableRejectReason] = useState(false);
+	let [rejectReason, setRejectReason] = useState([] as any);
 	const [isShowMediaModal, setIsShowMediaModal] = useState(false)
 	const [isLoadingMedia, setIsLoadingMedia] = useState(false)
 	const [imgUrl, setImgUrl] = useState('')
@@ -52,6 +61,8 @@ export default function view({ }: Props): ReactElement {
 		const { result, success } = await getRiderDetail(reqBody);
 		if (success) {
 			const { message, data } = result;
+			data.status = "re-approved"
+			const rider_status = data.status
 			data.approve_status = "approve"
 			data.name = data.first_name + " " + data.last_name
 			data.status1 = ["approved", "uploaded"]
@@ -63,12 +74,23 @@ export default function view({ }: Props): ReactElement {
 			setRiderDetail(data)
 			if (data.status == "waiting" || data.status == "uploaded") {
 				setDisableRejectReason(true)
+			} else {
+				const { result, success } = await getRejectReson();
+				const { message, data } = result
+				for (let index = 0; index < data.length; index++) {
+					data[index].name = data[index].title
+					data[index].value = data[index].id
+					data[index].code = "test"
+				}
+				let reject_reason = _.filter(data, function (o) { return o.type == rider_status; });
+				setRejectReason(reject_reason)
+				//setRejectReason
+				console.log(message, data, reject_reason);
+				setIsLoading(false);
+				setFilter(filterObj);
 			}
-			console.log(message, data);
-			setIsLoading(false);
-			setFilter(filterObj);
-		}
-	};
+		};
+	}
 
 	const onClickViewMedia = async (type: string, pathUrl: string) => {
 		setIsLoadingMedia(true)
@@ -77,9 +99,31 @@ export default function view({ }: Props): ReactElement {
 		setIsShowMediaModal(true)
 	}
 
-	const handleSubmit = (values: any) => {
-		console.log("test");
+	const handleSubmit = async (values: any) => {
+
+		const { result, success } = await getEkycDetail("b450d352-33e7-4896-a994-b9736a85d352")
+		const { data } = result
+		notification.success({
+			message: `ดำเนินการอัพเดตสถานะสำเร็จ`,
+			description: "",
+		});
+		console.log(values, data, success);
+		let reqBody = {
+			data: {
+				"id": riderDetail.id,
+				"status": "re-approved",
+				"ekyc_status": "re-approved",
+				"topic": [
+					{ "id": values, "code": "rider_info", "title": "บัตรประชาชนไม่ถูกต้อง", "status": true }
+				]
+			}
+		}
+		//const message = await updateRiderStatus(reqBody);
 	}
+
+	const handleStatus = (event: any) => {
+		console.log(event.target.value);
+	};
 
 	return !_isLoading ? (
 
@@ -134,7 +178,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="ชื่อ-สกุล"
 										isRange={true}
 										disabled={true}
@@ -147,7 +190,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="เลขบัตรประชาชน"
 										isRange={true}
 										disabled={true}
@@ -160,7 +202,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="เบอร์โทรศัพท์"
 										isRange={true}
 										disabled={true}
@@ -173,7 +214,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="อีเมล"
 										isRange={true}
 										disabled={true}
@@ -186,14 +226,13 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="SsoID"
 										isRange={true}
 										disabled={true}
 									/>
 								</Col>
 							</Row>
-							<Ekyc isComponent sso_id="b450d352-33e7-4896-a994-b9736a85d352" />
+							{/* <Ekyc isComponent sso_id="b450d352-33e7-4896-a994-b9736a85d352" /> */}
 						</Card>
 						<Card>
 							<Row gutter={16} >
@@ -232,7 +271,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="ชื่อ-สกุล"
 										isRange={true}
 										disabled={true}
@@ -245,7 +283,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="ความสัมพันธ์"
 										isRange={true}
 										disabled={true}
@@ -258,7 +295,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="เบอร์โทรศัพท์"
 										isRange={true}
 										disabled={true}
@@ -273,7 +309,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="ที่อยู่"
 										isRange={true}
 										disabled={true}
@@ -291,7 +326,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="ชื่อ-สกุล"
 										isRange={true}
 										disabled={true}
@@ -304,7 +338,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="ความสัมพันธ์"
 										isRange={true}
 										disabled={true}
@@ -317,7 +350,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="เบอร์โทรศัพท์"
 										isRange={true}
 										disabled={true}
@@ -332,7 +364,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="ที่อยู่"
 										isRange={true}
 										disabled={true}
@@ -350,7 +381,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="กรรมสิทธิ์เจ้าของจักรยานยนต์"
 										isRange={true}
 										disabled={true}
@@ -375,7 +405,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="เลขทะเบียนรถจักรยานยนต์"
 										isRange={true}
 										disabled={true}
@@ -429,7 +458,6 @@ export default function view({ }: Props): ReactElement {
 										type="text"
 										component={Input}
 										className="form-control round"
-										id="keyword"
 										placeholder="ความบกพร่องทางร่างกาย"
 										isRange={true}
 										disabled={true}
@@ -454,7 +482,7 @@ export default function view({ }: Props): ReactElement {
 								</Col>
 							</Row>
 						</Card>
-						{riderDetail.approve_status !== "waiting" &&
+						{riderDetail.status !== "waiting" &&
 							<>
 								<Row gutter={10}>
 									<Col className="gutter-row" span={6}>
@@ -493,24 +521,7 @@ export default function view({ }: Props): ReactElement {
 											component={Select}
 											id="status1"
 											placeholder="เลือก"
-											selectOption={[
-												{
-													name: "รอการตรวจสอบ",
-													value: "uploaded",
-												},
-												{
-													name: "อนุมัติ",
-													value: "approved",
-												},
-												{
-													name: "ขอเอกสารเพิ่มเติม",
-													value: "re-approved",
-												},
-												{
-													name: "ไม่ผ่านการอนุมัติ",
-													value: "rejected",
-												},
-											]}
+											selectOption={rejectReason}
 										/>
 									</Col>
 								</Row>

@@ -5,8 +5,7 @@ import {
   saveToken,
   saveRefreshToken,
   clearToken,
-  retrieveToken,
-  tokenProfile
+  retrieveToken
 } from "./fetch/auth";
 import Fetch from './fetch'
 

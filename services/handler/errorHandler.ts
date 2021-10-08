@@ -22,8 +22,8 @@ const errorHandler = (error:any, emptyResult = null) => {
       message: `Request error ${status}`,
       description: errorText,
     });
-    if (error.response.data.jwtExpired) {
-      Router.push("/login");
+    if (error.response.data.jwtExpired || `${status}`==="401") {
+      Router.replace("/login");
     }
     return response.data;
   } else {

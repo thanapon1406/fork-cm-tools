@@ -18,7 +18,7 @@ export default function MainLayout({ children }: Props) {
   if (typeof window !== "undefined") {
     authToken = isLogin()
     if (!authToken) {
-      Router.replace("/login");
+      router.replace("/login");
       return <></>;
     }
   }

@@ -30,11 +30,11 @@ export default function Table({ config }: Props): ReactElement {
   const Router = useRouter();
   if (action) {
     const View = (path: any) => {
-      Router.push(`/${tableName}/view?`);
+      Router.push(`/${tableName}/${path}`);
     };
     const Edit = () => {};
     const Delete = () => {};
-    const actionElement = (
+    const actionElement =(id:any)=> (
       <Menu style={{ width: 130 }}>
         {action.map((action) => {
           if (action === "view") {
@@ -42,7 +42,7 @@ export default function Table({ config }: Props): ReactElement {
               <Menu.Item
                 key={`${uniqueId()}`}
                 icon={<EyeOutlined />}
-                onClick={View}
+                onClick={()=>View(id)}
               >
                 View
               </Menu.Item>
@@ -81,11 +81,12 @@ export default function Table({ config }: Props): ReactElement {
       {
         title: "",
         render: (row: any) => {
+          const { id } = row
           if (action.length === 1) {
-            return actionElement;
+            return actionElement(id);
           } else {
             return (
-              <Dropdown overlay={actionElement} trigger={["click"]}>
+              <Dropdown overlay={actionElement(id)} trigger={["click"]}>
                 <EllipsisOutlined
                   style={{ cursor: "pointer", fontSize: "24px" }}
                 />

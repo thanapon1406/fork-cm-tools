@@ -1,62 +1,63 @@
-import React, { ReactElement, useEffect,useState } from "react";
-import { useRouter } from "next/router";
+import React, { ReactElement, useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
-import MainLayout from "@/layout/MainLayout";
-import Button from "@/components/Button";
-import Table from "@/components/Table";
-import Card from "@/components/Card";
-import { Row, Col, Typography, Breadcrumb, Divider } from "antd";
-import { outletDetail } from "@/services/merchant";
-const { Title } = Typography;
-import { Formik, Form, Field } from "formik";
-import Input from "@/components/Form/Input";
+import MainLayout from '@/layout/MainLayout'
+import Button from '@/components/Button'
+import Table from '@/components/Table'
+import Card from '@/components/Card'
+import { Row, Col, Typography, Breadcrumb, Divider } from 'antd'
+import { outletDetail } from '@/services/merchant'
+const { Title } = Typography
+import { Formik, Form, Field } from 'formik'
+import Input from '@/components/Form/Input'
+import Ekyc from '../ekyc/[id]'
 
 interface Props {}
 
 export default function view({}: Props): ReactElement {
-  const router = useRouter();
-  const { id } = router.query;
-  let [initialValues, setInitialValues] =  useState({
-      outlet_name:"124",
-      outlet_type:"",
-      tax_id:"",
-      email:"",
-      address:""
-  });
+  const router = useRouter()
+  const { id } = router.query
+  let [initialValues, setInitialValues] = useState({
+    outlet_name: '124',
+    outlet_type: '',
+    tax_id: '',
+    email: '',
+    address: '',
+  })
 
   useEffect(() => {
-    console.log(`useEffect`, id);
+    console.log(`useEffect`, id)
     if (id) {
-      getOutlet();
+      getOutlet()
     }
-  }, [id]);
+  }, [id])
 
   const getOutlet = async () => {
     const request = {
       id: id,
-    };
-    const { result, success } = await outletDetail(request);
-    if (success) {
-      const { data } = result;
-      console.log(`data`, data);
-      setInitialValues({
-        outlet_name:data.name.th,
-        outlet_type:data.outlet_type,
-        tax_id:data.tax_id,
-        email:data.email,
-        address:data.address
-    });
     }
-  };
+    const { result, success } = await outletDetail(request)
+    if (success) {
+      const { data } = result
+      console.log(`data`, data)
+      setInitialValues({
+        outlet_name: data.name.th,
+        outlet_type: data.outlet_type,
+        tax_id: data.tax_id,
+        email: data.email,
+        address: data.address,
+      })
+    }
+  }
 
-  const Schema = {};
+  const Schema = {}
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {}
 
   return (
     <MainLayout>
       <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
-      <Breadcrumb style={{ margin: "16px 0" }}>
+      <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
         <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
         <Breadcrumb.Item>ข้อมูลร้านค้า</Breadcrumb.Item>
@@ -76,7 +77,7 @@ export default function view({}: Props): ReactElement {
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: "ชื่อ-นามสกุล" }}
+                    label={{ text: 'ชื่อ-นามสกุล' }}
                     name="keyword"
                     type="text"
                     component={Input}
@@ -88,7 +89,7 @@ export default function view({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: "เลขบัตรประชาชน" }}
+                    label={{ text: 'เลขบัตรประชาชน' }}
                     name="keyword"
                     type="text"
                     component={Input}
@@ -99,7 +100,7 @@ export default function view({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: "เบอร์โทรศัพท์" }}
+                    label={{ text: 'เบอร์โทรศัพท์' }}
                     name="keyword"
                     type="text"
                     component={Input}
@@ -110,7 +111,7 @@ export default function view({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: "อีเมล์" }}
+                    label={{ text: 'อีเมล์' }}
                     name="keyword"
                     type="text"
                     component={Input}
@@ -123,7 +124,7 @@ export default function view({}: Props): ReactElement {
               <Row>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: "ชื่อ-นามสกุล" }}
+                    label={{ text: 'ชื่อ-นามสกุล' }}
                     name="keyword"
                     type="text"
                     component={Input}
@@ -134,13 +135,15 @@ export default function view({}: Props): ReactElement {
                 </Col>
               </Row>
 
-              <div>Ekyc Space</div>
+              <div>
+                <Ekyc isComponent sso_id="b450d352-33e7-4896-a994-b9736a85d352" />
+              </div>
               <Divider />
               <Title level={5}>ข้อมูลร้านค้า</Title>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: "ชื่อร้านค้า" }}
+                    label={{ text: 'ชื่อร้านค้า' }}
                     name="outlet_name"
                     type="text"
                     component={Input}
@@ -152,7 +155,7 @@ export default function view({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: "ประเภทร้านค้า" }}
+                    label={{ text: 'ประเภทร้านค้า' }}
                     name="outlet_type"
                     type="text"
                     component={Input}
@@ -163,7 +166,7 @@ export default function view({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: "หมายเลขประจำตัวผู้เสียภาษี" }}
+                    label={{ text: 'หมายเลขประจำตัวผู้เสียภาษี' }}
                     name="tax_id"
                     type="text"
                     component={Input}
@@ -174,7 +177,7 @@ export default function view({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: "อีเมล์" }}
+                    label={{ text: 'อีเมล์' }}
                     name="email"
                     type="text"
                     component={Input}
@@ -187,7 +190,7 @@ export default function view({}: Props): ReactElement {
               <Row>
                 <Col className="gutter-row" span={18}>
                   <Field
-                    label={{ text: "ที่อยู่" }}
+                    label={{ text: 'ที่อยู่' }}
                     name="address"
                     type="text"
                     component={Input}
@@ -202,5 +205,5 @@ export default function view({}: Props): ReactElement {
         </Formik>
       </Card>
     </MainLayout>
-  );
+  )
 }

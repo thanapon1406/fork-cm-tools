@@ -2,6 +2,7 @@ import React, { ReactElement, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import MainLayout from '@/layout/MainLayout'
+import Select from '@/components/Form/Select'
 import Button from '@/components/Button'
 import Table from '@/components/Table'
 import Card from '@/components/Card'
@@ -11,6 +12,7 @@ const { Title } = Typography
 import { Formik, Form, Field } from 'formik'
 import Input from '@/components/Form/Input'
 import Ekyc from '../ekyc/[id]'
+import * as Yup from 'yup'
 
 interface Props {}
 
@@ -23,6 +25,8 @@ export default function view({}: Props): ReactElement {
     tax_id: '',
     email: '',
     address: '',
+    verify_status: '',
+    verify_detail: [],
   })
 
   useEffect(() => {
@@ -41,6 +45,7 @@ export default function view({}: Props): ReactElement {
       const { data } = result
       console.log(`data`, data)
       setInitialValues({
+        ...initialValues,
         outlet_name: data.name.th,
         outlet_type: data.outlet_type,
         tax_id: data.tax_id,
@@ -50,9 +55,14 @@ export default function view({}: Props): ReactElement {
     }
   }
 
-  const Schema = {}
+  const Schema = Yup.object().shape({
+    verify_status: Yup.string().trim().required('กรุณาเลือกการอนุมัติ'),
+  })
 
-  const handleSubmit = () => {}
+  const handleSubmit = (values: any) => {
+    console.log(`log`)
+    console.log(`values: any`, values)
+  }
 
   return (
     <MainLayout>
@@ -134,10 +144,21 @@ export default function view({}: Props): ReactElement {
                   />
                 </Col>
               </Row>
-
-              <div>
-                <Ekyc isComponent sso_id="b450d352-33e7-4896-a994-b9736a85d352" />
-              </div>
+            </Form>
+          )}
+        </Formik>
+        <div>
+          {/* 7490b5b4-636b-4121-8c93-f0e2fc945a4a */}
+          {/* <Ekyc isComponent sso_id="b450d352-33e7-4896-a994-b9736a85d352" /> */}
+        </div>
+        <Formik
+          enableReinitialize={true}
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          validationSchema={Schema}
+        >
+          {(values) => (
+            <Form>
               <Divider />
               <Title level={5}>ข้อมูลร้านค้า</Title>
               <Row gutter={16}>
@@ -198,6 +219,81 @@ export default function view({}: Props): ReactElement {
                     id="address"
                     placeholder="ที่อยู่"
                   />
+                </Col>
+              </Row>
+              <Row>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'การอนุมัติ' }}
+                    name="verify_status"
+                    component={Select}
+                    id="verify_status"
+                    placeholder="เลือก"
+                    defaultValue="approve"
+                    selectOption={[
+                      {
+                        name: 'Approve',
+                        value: 'approve',
+                      },
+                      {
+                        name: 'Reject',
+                        value: 'reject',
+                      },
+                      {
+                        name: 'Re-approve',
+                        value: 're-approve',
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col className="gutter-row" span={12}>
+                  <Field
+                    label={{ text: 'เหตุผล' }}
+                    name="verify_detail"
+                    component={Select}
+                    id="verify_detail"
+                    mode="multiple"
+                    placeholder="เลือก"
+                    onChange={(value: any, childe: any) => {
+                      const detail = childe.map((val: any) => {
+                        return { id: val?.value, value: val?.children }
+                      })
+                      console.log(`detail`, detail)
+                      values.setValues({ ...initialValues, verify_detail: detail })
+                    }}
+                    selectOption={[
+                      {
+                        name: 'เหตผลที่1',
+                        value: '1',
+                      },
+                      {
+                        name: 'เหตผลที่2',
+                        value: '2',
+                      },
+                      {
+                        name: 'เหตผลที่3',
+                        value: '3',
+                      },
+                      {
+                        name: 'เหตผลที่4',
+                        value: '4',
+                      },
+                      {
+                        name: 'เหตผลที่5',
+                        value: '5',
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Button
+                    style={{ width: '120px', marginTop: '31px' }}
+                    type="primary"
+                    size="middle"
+                    htmlType="submit"
+                  >
+                    Submit
+                  </Button>
                 </Col>
               </Row>
             </Form>

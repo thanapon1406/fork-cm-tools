@@ -13,7 +13,6 @@ interface Config {
   tableColumns: Array<any>
   dataSource: Array<any>
   tableName: string
-  actionKey?: Array<any>
   action?: Array<'view' | 'edit' | 'delete'>
   loading: boolean
   handelDataTableLoad: any
@@ -21,8 +20,7 @@ interface Config {
 }
 
 export default function Table({ config }: Props): ReactElement {
-  const { dataTableTitle, action, dataSource, loading, tableName, actionKey, handelDataTableLoad } =
-    config
+  const { dataTableTitle, action, dataSource, loading, tableName, handelDataTableLoad } = config
   let { tableColumns, pagination } = config
   const Router = useRouter()
   if (action) {

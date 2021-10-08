@@ -1,18 +1,17 @@
 import Button from '@/components/Button'
+import Card from '@/components/Card'
 import Select from '@/components/Form/Select'
 import { EkycApproveStatusInterface, EkycDetail, EkycDetailProps } from '@/interface/ekyc'
+import MainLayout from '@/layout/MainLayout'
 import { downloadImage, getEkycDetail, updateEkycDetail } from '@/services/ekyc'
 import { DownOutlined, UpOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Collapse, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { isUndefined } from 'lodash'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { ReactElement, useCallback, useEffect, useState } from 'react'
-import Image from 'next/image'
 import { CustomPanel } from './style'
-import fetcher from '@/services/fetch/fetch'
-import MainLayout from '@/layout/MainLayout'
-import Card from '@/components/Card'
 const { Title } = Typography
 
 const statusMapping: any = {
@@ -48,9 +47,10 @@ const EkycList = ({ isComponent, sso_id }: EkycDetailProps): ReactElement => {
   const [ekycDetail, setEkycDetail] = useState<EkycDetail>()
   const [isLoading, setLoading] = useState(false)
   const [isLoadingSubmit, setLoadingSubmit] = useState(false)
-  const [imgUrl, setImgUrl] = useState('')
+  const [mediaUrl, setMediaUrl] = useState('')
   const [isShowMediaModal, setIsShowMediaModal] = useState(false)
   const [isLoadingMedia, setIsLoadingMedia] = useState(false)
+  const [mediaType, setMediaType] = useState('')
 
   const fetchEkycDetail = useCallback(async () => {
     setLoading(true)
@@ -105,6 +105,7 @@ const EkycList = ({ isComponent, sso_id }: EkycDetailProps): ReactElement => {
 
   const onClickViewMedia = async (type: string, pathUrl: string) => {
     setIsLoadingMedia(true)
+    setMediaType(type)
     const payload = {
       type: type,
       pathUrl: pathUrl,
@@ -112,7 +113,7 @@ const EkycList = ({ isComponent, sso_id }: EkycDetailProps): ReactElement => {
 
     const res = await downloadImage(payload)
     const url = URL.createObjectURL(res)
-    setImgUrl(url)
+    setMediaUrl(url)
     setIsLoadingMedia(false)
     setIsShowMediaModal(true)
   }
@@ -173,7 +174,20 @@ const EkycList = ({ isComponent, sso_id }: EkycDetailProps): ReactElement => {
             </Button>,
           ]}
         >
-          <Image src={imgUrl} width={1920} height={1200} alt="media" />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              height: '100%',
+              width: '100%',
+            }}
+          >
+            {mediaType === 'image' ? (
+              <Image src={mediaUrl} width={1920} height={1200} alt="media" />
+            ) : (
+              <iframe src={mediaUrl} allow="autoplay; encrypted-media" title="video" />
+            )}
+          </div>
         </Modal>
         <Formik
           initialValues={{

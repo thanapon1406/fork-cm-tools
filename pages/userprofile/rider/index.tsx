@@ -26,7 +26,7 @@ interface Pagination {
 interface filterObject {
   keyword?: string;
   working_status?: string;
-  job_count?: string;
+  job_status?: string;
   status?: string,
   ekyc_status?: string,
   include?: string,
@@ -42,15 +42,15 @@ export default function rider({ }: Props): ReactElement {
   let [filter, setFilter] = useState<filterObject>({
     keyword: "",
     working_status: "",
-    job_count: "",
+    job_status: "",
     status: "approved",
     ekyc_status: "approved",
-    include: "",
+    include: "job_count",
   });
   const initialValues = {
     keyword: "",
     working_status: "",
-    job_count: "",
+    job_status: "",
   };
 
   const handleSubmit = (values: any) => {
@@ -58,10 +58,10 @@ export default function rider({ }: Props): ReactElement {
     let reqFilter: filterObject = {
       keyword: values.keyword,
       working_status: values.working_status,
-      job_count: values.job_count,
+      job_status: values.job_status,
       status: "approved",
       ekyc_status: "approved",
-      include: "",
+      include: "job_count",
     };
     fetchData(reqFilter, { current: 1, total: 0, pageSize: 10 });
   }
@@ -99,7 +99,7 @@ export default function rider({ }: Props): ReactElement {
       dataIndex: "code",
       align: "center",
       render: (row: any, record: any) => {
-        return row+ ' '+ record.id;
+        return row + ' ' + record.id;
       },
     },
     {
@@ -230,10 +230,10 @@ export default function rider({ }: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "สถานะรับงาน" }}
-                    name="job_count"
+                    name="job_status"
                     component={Select}
-                    id="job_count"
-                    placeholder="job_count"
+                    id="job_status"
+                    placeholder="job_status"
                     defaultValue={{ value: "ทุกสถานะ" }}
                     selectOption={[
                       {
@@ -242,11 +242,11 @@ export default function rider({ }: Props): ReactElement {
                       },
                       {
                         name: "ว่างงาน",
-                        value: 0,
+                        value: "available",
                       },
                       {
                         name: "รับงาน",
-                        value: 1,
+                        value: "unavailable",
                       },
                     ]}
                   />
@@ -261,7 +261,7 @@ export default function rider({ }: Props): ReactElement {
           config={{
             dataTableTitle: "รายการรอการตรวจสอบ",
             loading: _isLoading,
-            tableName: "merchant",
+            tableName: "userprofile/rider",
             tableColumns: column,
             action: ["view"],
             dataSource: dataTable,

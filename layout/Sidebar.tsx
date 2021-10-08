@@ -1,8 +1,13 @@
-import React, { ReactElement, useEffect, useState } from "react";
-import { Layout, Menu, Avatar, Dropdown, Typography, Space } from "antd";
-import { logout, findUser } from "@/services/login";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { findUser, logout } from "@/services/login";
 import { personState } from "@/store";
+import {
+  CarOutlined, DesktopOutlined, LogoutOutlined, PieChartOutlined, SettingOutlined, SolutionOutlined, TeamOutlined, UserOutlined
+} from "@ant-design/icons";
+import { Avatar, Dropdown, Layout, Menu, Space, Typography } from "antd";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { ReactElement, useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
 const profileColor: Array<string> = [
   "87d068",
   "d06868",
@@ -12,26 +17,14 @@ const profileColor: Array<string> = [
   "d09d68",
 ];
 
-const { Text } = Typography;
+const { Text } = Typography
 
-import {
-  UserOutlined,
-  LogoutOutlined,
-  SettingOutlined,
-  PieChartOutlined,
-  DesktopOutlined,
-  CarOutlined,
-  TeamOutlined,
-  CaretDownOutlined,
-} from "@ant-design/icons";
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
-import Link from "next/link";
-import { useRouter } from "next/router";
-interface Props {}
+interface Props { }
 
-export default function Sidebar({}: Props): ReactElement {
+export default function Sidebar({ }: Props): ReactElement {
   const Router = useRouter();
   const [avatarColor, setAvatarColor] = useState("87d068");
   const [userObject, setUserState] = useRecoilState(personState);
@@ -96,7 +89,7 @@ export default function Sidebar({}: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={[""]}
+        defaultOpenKeys={['']}
         style={{ borderRight: 0 }}
       >
         <Menu.Item key="dashboard" icon={<PieChartOutlined />}>
@@ -136,10 +129,15 @@ export default function Sidebar({}: Props): ReactElement {
           title="User Profile"
         >
           <Menu.Item key="riderProfile">
-            <Link href="/profile/rider">Rider Profile</Link>
+            <Link href="/userprofile/rider">Rider Profile</Link>
           </Menu.Item>
         </SubMenu>
+        <Menu.Item key="ekyc" icon={<SolutionOutlined />}>
+          <Link href="/ekyc">
+            <a> E-KYC</a>
+          </Link>
+        </Menu.Item>
       </Menu>
     </Sider>
-  );
+  )
 }

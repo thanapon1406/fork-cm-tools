@@ -25,5 +25,13 @@ const outletList = async (body: queryList) => {
     return errorHandler(error);
   }
 };
+const outletDetail = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/merchant/outlet`, body);
+    return successHandler(result);
+  } catch (error) {
+    return errorHandler(error);
+  }
+};
 
-export { outletList };
+export { outletList, outletDetail };

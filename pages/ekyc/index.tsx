@@ -13,6 +13,7 @@ import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { map } from 'lodash'
 import moment from 'moment'
+import { useRouter } from 'next/router'
 import React, { ReactElement, useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import * as Yup from 'yup'
@@ -26,23 +27,20 @@ interface Pagination {
 }
 
 interface filterObject {
-  id?: string
-  project_id?: string
-  sso_id?: string
   status?: string
   start_date?: string
   end_date?: string
-  app_id?: string
+  update_start_date?: string
+  update_end_date?: string
+  keyword?: string
 }
 
 const initialValues = {
-  id: '',
-  project_id: '',
+  keyword: '',
   sso_id: '',
   status: '',
-  start_date: '',
-  end_date: '',
-  app_id: '',
+  created_date: { start: null, end: null },
+  updated_date: { start: null, end: null },
 }
 const Schema = Yup.object().shape({})
 
@@ -53,6 +51,7 @@ const appIdMapping: any = {
 }
 
 const EkycList = (): ReactElement => {
+  const router = useRouter()
   const [userObj, setUserObj] = useRecoilState(personState)
   const [ekycDataList, setEkycDataList] = useState<Array<EkycDetail>>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -63,31 +62,28 @@ const EkycList = (): ReactElement => {
   })
   const [filter, setFilter] = useState<filterObject>({})
 
-  const getEkyc = useCallback(
-    async (filterObj: filterObject = filter, paging: Pagination = pagination) => {
-      setIsLoading(true)
-      const reqBody = {
-        page: paging.current,
-        per_page: paging.pageSize,
-        ...filterObj,
-      }
-      const { result, success } = await getEkycList(reqBody)
+  const getEkyc = async (filterObj: filterObject = filter, paging: Pagination = pagination) => {
+    setIsLoading(true)
+    const reqBody = {
+      page: paging.current,
+      per_page: paging.pageSize,
+      ...filterObj,
+    }
+    const { result, success } = await getEkycList(reqBody)
 
-      if (success) {
-        const { data } = result
-        setEkycDataList(
-          map(data, (item: EkycDetail) => ({
-            ...item,
-            name: `${item.first_name} ${item.last_name}`,
-            action: item.sso_id,
-          }))
-        )
-      }
-      setIsLoading(false)
-      setFilter(filterObj)
-    },
-    [filter, pagination]
-  )
+    if (success) {
+      const { data } = result
+      setEkycDataList(
+        map(data, (item: EkycDetail) => ({
+          ...item,
+          name: `${item.first_name} ${item.last_name}`,
+          action: item.sso_id,
+        }))
+      )
+    }
+    setIsLoading(false)
+    setFilter(filterObj)
+  }
 
   useEffect(() => {
     getEkyc()
@@ -105,13 +101,12 @@ const EkycList = (): ReactElement => {
     console.log(values)
 
     let reqFilter: filterObject = {
-      id: values.id || '',
-      project_id: values.project_id || '',
-      sso_id: values.sso_id || '',
+      keyword: values.keyword || '',
       status: values.status || '',
-      start_date: values.start_date || '',
-      end_date: values.end_date || '',
-      app_id: values.app_id || '',
+      start_date: values.created_date.start || '',
+      end_date: values.created_date.end || '',
+      update_start_date: values.updated_date.start || '',
+      update_end_date: values.updated_date.end || '',
     }
     getEkyc(reqFilter, { current: 1, total: 0, pageSize: 10 })
   }
@@ -166,6 +161,23 @@ const EkycList = (): ReactElement => {
         return moment(row).format('YYYY-MM-DD HH:MM')
       },
     },
+    {
+      title: 'ตรวจสอบ',
+      dataIndex: 'action',
+      align: 'center',
+      render: (data: any) => {
+        return (
+          <Button
+            type="primary"
+            onClick={() => {
+              router.push(`/ekyc/${data}`)
+            }}
+          >
+            ตรวจสอบ
+          </Button>
+        )
+      },
+    },
   ]
 
   return (
@@ -176,7 +188,12 @@ const EkycList = (): ReactElement => {
         <Breadcrumb.Item>ลงทะเบียนการยินยันตัวตน</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
-        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          onReset={handleSubmit}
+          validationSchema={Schema}
+        >
           {({ values }) => (
             <Form>
               <Row gutter={16}>
@@ -193,6 +210,7 @@ const EkycList = (): ReactElement => {
                   <div className="ant-form ant-form-vertical">
                     <Space>
                       <Button
+                        loading={isLoading}
                         style={{ width: '120px', marginTop: '31px' }}
                         type="primary"
                         size="middle"
@@ -204,6 +222,7 @@ const EkycList = (): ReactElement => {
                         style={{ width: '120px', marginTop: '31px' }}
                         type="ghost"
                         size="middle"
+                        htmlType="reset"
                       >
                         ล้างค่า
                       </Button>
@@ -243,10 +262,19 @@ const EkycList = (): ReactElement => {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'วันเวลาที่ลงทะเบียน' }}
-                    name="start_date"
+                    label={{ text: 'วันเวลาที่ทำ E-KYC' }}
+                    name="created_date"
                     component={DateRangePicker}
-                    id="start_date"
+                    id="created_date"
+                    placeholder="date_create"
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'วันเวลาที่อัพเดท' }}
+                    name="updated_date"
+                    component={DateRangePicker}
+                    id="updated_date"
                     placeholder="date_create"
                   />
                 </Col>
@@ -263,7 +291,6 @@ const EkycList = (): ReactElement => {
             tableName: 'ekyc',
             tableColumns: column,
             actionKey: map(ekycDataList, 'sso_id'),
-            action: ['view'],
             dataSource: ekycDataList,
             handelDataTableLoad: handelDataTableLoad,
             pagination: pagination,

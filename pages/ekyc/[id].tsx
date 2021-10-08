@@ -88,9 +88,8 @@ const EkycList = ({ isComponent, sso_id }: EkycDetailProps): ReactElement => {
           ? 'เสียงหาย'
           : 'ใบหน้าไม่ชัดเจน',
     }
-    console.log(payload)
 
-    const { result, message, success } = await updateEkycDetail(payload)
+    const { message, success } = await updateEkycDetail(payload)
 
     if (success) {
       Modal.success({

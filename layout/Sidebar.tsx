@@ -130,6 +130,15 @@ export default function Sidebar({}: Props): ReactElement {
             <a> Rider</a>
           </Link>
         </Menu.Item>
+        <SubMenu
+          key="userProfile"
+          icon={<TeamOutlined />}
+          title="User Profile"
+        >
+          <Menu.Item key="riderProfile">
+            <Link href="/profile/rider">Rider Profile</Link>
+          </Menu.Item>
+        </SubMenu>
       </Menu>
     </Sider>
   );

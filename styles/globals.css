@@ -14,3 +14,7 @@
   height: 5px;
   padding: 6px !important;
 }
+
+#breadcrumb-list a span.sep {
+  color: #ff0000;
+}

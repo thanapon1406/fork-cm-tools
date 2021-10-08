@@ -16,6 +16,7 @@ interface Props extends FormikProps {
     className: string
   }
   selectOption: Array<SelectOption>
+  onChange?: any
 }
 
 interface SelectOption {
@@ -29,10 +30,18 @@ function Select({ label, field, selectOption, ...props }: Props): ReactElement {
     let value = e
     props.form.setFieldValue(field.name, value)
   }
+  const onChangeHandle = () => {
+    if (props.onChange) {
+      return props.onChange
+    } else {
+      return handleChange
+    }
+  }
+
   return (
     <div className="ant-form ant-form-vertical">
       <Form.Item label={label?.text}>
-        <Selects {...field} {...props} onChange={handleChange}>
+        <Selects {...field} {...props} onChange={onChangeHandle()}>
           {selectOption.map((val: SelectOption) => {
             return (
               <Option disabled={val.disabled} key={val.value} value={val.value}>

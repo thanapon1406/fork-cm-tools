@@ -14,7 +14,7 @@ import { Field, Form, Formik } from 'formik'
 import { map } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useCallback, useEffect, useState } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import * as Yup from 'yup'
 
@@ -77,7 +77,7 @@ const EkycList = (): ReactElement => {
         map(data, (item: EkycDetail) => ({
           ...item,
           name: `${item.first_name} ${item.last_name}`,
-          action: item.sso_id,
+          id: item.sso_id,
         }))
       )
     }
@@ -159,23 +159,6 @@ const EkycList = (): ReactElement => {
       align: 'center',
       render: (row: any) => {
         return moment(row).format('YYYY-MM-DD HH:MM')
-      },
-    },
-    {
-      title: 'ตรวจสอบ',
-      dataIndex: 'action',
-      align: 'center',
-      render: (data: any) => {
-        return (
-          <Button
-            type="primary"
-            onClick={() => {
-              router.push(`/ekyc/${data}`)
-            }}
-          >
-            ตรวจสอบ
-          </Button>
-        )
       },
     },
   ]
@@ -290,8 +273,8 @@ const EkycList = (): ReactElement => {
             loading: isLoading,
             tableName: 'ekyc',
             tableColumns: column,
-            actionKey: map(ekycDataList, 'sso_id'),
             dataSource: ekycDataList,
+            action: ['view'],
             handelDataTableLoad: handelDataTableLoad,
             pagination: pagination,
           }}

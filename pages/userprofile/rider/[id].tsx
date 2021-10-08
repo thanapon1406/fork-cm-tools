@@ -8,7 +8,7 @@ const { Title } = Typography
 
 interface Props { }
 
-export default function view({ }: Props): ReactElement {
+export default function View({ }: Props): ReactElement {
     const router = useRouter()
     const { id } = router.query
 

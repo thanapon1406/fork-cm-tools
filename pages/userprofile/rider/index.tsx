@@ -31,7 +31,7 @@ interface filterObject {
   ekyc_status?: string,
   include?: string,
 }
-export default function rider({ }: Props): ReactElement {
+export default function Rider({ }: Props): ReactElement {
   let [dataTable, setDataTable] = useState([]);
   let [_isLoading, setIsLoading] = useState(true);
   let [pagination, setPagination] = useState<Pagination>({

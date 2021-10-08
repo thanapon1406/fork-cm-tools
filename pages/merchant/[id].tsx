@@ -14,9 +14,9 @@ import Input from '@/components/Form/Input'
 import Ekyc from '../ekyc/[id]'
 import * as Yup from 'yup'
 
-interface Props {}
+interface Props { }
 
-export default function view({}: Props): ReactElement {
+export default function View({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   let [initialValues, setInitialValues] = useState({

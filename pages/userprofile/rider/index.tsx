@@ -1,19 +1,17 @@
-import React, { ReactElement, useState, useEffect } from "react";
-import MainLayout from "@/layout/MainLayout";
 import Button from "@/components/Button";
-import Table from "@/components/Table";
 import Card from "@/components/Card";
-import DateRangePicker from "@/components/Form/DateRangePicker";
-import { Row, Col, Typography, Breadcrumb, Space } from "antd";
-const { Title } = Typography;
-import Moment from 'moment';
-
-import Select from "@/components/Form/Select";
 import Input from "@/components/Form/Input";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
+import Select from "@/components/Form/Select";
+import Table from "@/components/Table";
+import MainLayout from "@/layout/MainLayout";
+import { getRider } from '@/services/rider';
+import { Breadcrumb, Col, Row, Space, Typography } from "antd";
+import { Field, Form, Formik } from "formik";
+import Moment from 'moment';
+import React, { ReactElement, useEffect, useState } from "react";
+const { Title } = Typography;
 
-import { getRider } from '@/services/rider'
+
 
 interface Props {
 
@@ -98,8 +96,8 @@ export default function Rider({ }: Props): ReactElement {
       title: "Rider ID",
       dataIndex: "code",
       align: "center",
-      render: (row: any, record: any) => {
-        return row + ' ' + record.id;
+      render: (row: any) => {
+        return row
       },
     },
     {

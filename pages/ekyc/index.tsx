@@ -92,9 +92,9 @@ const EkycList = (): ReactElement => {
 
   const statusMapping: any = {
     uploaded: <Tag type="warning">รอการตรวจสอบ</Tag>,
-    approve: <Tag type="success">อนุมัติ</Tag>,
-    're-approve': <Tag type="default">ขอเอกสารเพิ่มเติม</Tag>,
-    reject: <Tag type="error">ไม่อนุมัติ</Tag>,
+    approved: <Tag type="success">อนุมัติ</Tag>,
+    're-approved': <Tag type="default">ขอเอกสารเพิ่มเติม</Tag>,
+    rejected: <Tag type="error">ไม่อนุมัติ</Tag>,
   }
 
   const handleSubmit = (values: any) => {
@@ -247,15 +247,15 @@ const EkycList = (): ReactElement => {
                       },
                       {
                         name: 'อนุมัติ',
-                        value: 'approve',
+                        value: 'approved',
                       },
                       {
                         name: 'ไม่อนุมัติ',
-                        value: 'reject',
+                        value: 'rejected',
                       },
                       {
                         name: 'ขอเอกสารเพิ่มเติม',
-                        value: 're-approve',
+                        value: 're-approved',
                       },
                     ]}
                   />

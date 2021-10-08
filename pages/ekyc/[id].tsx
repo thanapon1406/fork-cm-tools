@@ -17,9 +17,9 @@ const { Title } = Typography
 
 const statusMapping: any = {
   uploaded: 'รอการตรวจสอบ',
-  approve: 'อนุมัติ',
-  're-approve': 'ขอเอกสารเพิ่มเติม',
-  reject: 'ไม่อนุมัติ',
+  approved: 'อนุมัติ',
+  're-approved': 'ขอเอกสารเพิ่มเติม',
+  rejected: 'ไม่อนุมัติ',
 }
 
 const statusOptionCard = [

@@ -39,8 +39,8 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
   const fetchEkycDetail = async (sso_id: string) => {
     setLoading(true)
     const { result, success } = await getEkycDetail(sso_id)
-    const { data } = result
     if (success) {
+      const { data } = result
       setEkycDetail(data)
       if (setEkycStatus) {
         setEkycStatus(data.status)

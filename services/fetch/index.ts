@@ -26,7 +26,6 @@ const postWithToken = async (url: string, body = {}, options = {}) => {
       },
     })
   }
-  console.log(optionsWithToken, 'optionsWithToken')
 
   return await axios.post(url, body, optionsWithToken)
 }

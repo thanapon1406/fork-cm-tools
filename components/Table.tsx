@@ -1,9 +1,9 @@
 import { uniqueId } from '@/utils/helpers'
 import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@ant-design/icons'
 import { Dropdown, Menu, PageHeader, Table as Tables } from 'antd'
+import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
-import lodash from 'lodash'
 
 interface Props {
   config: Config
@@ -14,7 +14,6 @@ interface Config {
   tableColumns: Array<any>
   dataSource: Array<any>
   tableName: string
-  actionKey?: Array<any>
   action?: Array<'view' | 'edit' | 'delete'>
   loading: boolean
   handelDataTableLoad: any
@@ -23,15 +22,7 @@ interface Config {
 }
 
 export default function Table({ config }: Props): ReactElement {
-  const {
-    dataTableTitle,
-    action,
-    dataSource,
-    loading,
-    tableName,
-    handelDataTableLoad,
-    customAction,
-  } = config
+  const { dataTableTitle, action, dataSource, loading, tableName, handelDataTableLoad } = config
   let { tableColumns, pagination } = config
   const Router = useRouter()
   if (action) {

@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import ServerFetch from '@/services/api'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body } = req

@@ -1,11 +1,9 @@
-import axios from "axios"
-import lodash from "lodash"
-import successHandler from './handler/successHandler'
-import errorHandler from './handler/errorHandler'
 import fetch from './fetch'
+import errorHandler from './handler/errorHandler'
+import successHandler from './handler/successHandler'
 
 export {
-  getRider, getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories
+  getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories
 }
 
 interface queryList {
@@ -13,12 +11,12 @@ interface queryList {
   per_page: number;
   sort_by?: string;
   sort_type?: string;
-  keyword?: string,
-  approve_status?: string,
-  status?: string,
-  ekyc_status?: string,
-  created_at?: object,
-  updated_at?: object,
+  keyword?: string;
+  approve_status?: string;
+  status?: string;
+  ekyc_status?: string;
+  created_at?: object;
+  updated_at?: object;
 }
 
 interface queryListDetail {

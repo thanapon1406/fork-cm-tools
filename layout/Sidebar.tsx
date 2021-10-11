@@ -22,9 +22,9 @@ const { Text } = Typography
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
-interface Props {}
+interface Props { }
 
-export default function Sidebar({}: Props): ReactElement {
+export default function Sidebar({ }: Props): ReactElement {
   const Router = useRouter();
   const [avatarColor, setAvatarColor] = useState("87d068");
   const [userObject, setUserState] = useRecoilState(personState);
@@ -123,6 +123,15 @@ export default function Sidebar({}: Props): ReactElement {
             <a> Rider</a>
           </Link>
         </Menu.Item>
+        <SubMenu
+          key="userProfile"
+          icon={<TeamOutlined />}
+          title="User Profile"
+        >
+          <Menu.Item key="riderProfile">
+            <Link href="/userprofile/rider">Rider Profile</Link>
+          </Menu.Item>
+        </SubMenu>
         <Menu.Item key="ekyc" icon={<SolutionOutlined />}>
           <Link href="/ekyc">
             <a> E-KYC</a>

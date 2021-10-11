@@ -1,42 +1,72 @@
-import React, { ReactElement, useState, useEffect } from "react";
-import { notification } from "antd";
-import MainLayout from "@/layout/MainLayout";
-import { Row, Col, Typography, Breadcrumb, Form as antForm, Modal } from "antd";
-import { Formik, Form, Field } from "formik";
-import _, { isUndefined } from 'lodash'
-const { Title } = Typography;
+import Button from "@/components/Button";
 import Card from "@/components/Card";
 import Input from "@/components/Form/Input";
-import Button from "@/components/Button";
 import Select from "@/components/Form/Select";
-import Ekyc from "../ekyc/[id]"
-import { getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories } from '@/services/rider'
-import { getEkycDetail } from '@/services/ekyc'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
+import MainLayout from "@/layout/MainLayout";
+import { getEkycDetail } from '@/services/ekyc';
+import { getRejectReson, getRiderDetail, getStatusHistories, updateRiderStatus } from '@/services/rider';
+import { Breadcrumb, Col, Form as antForm, Modal, notification, Row, Typography } from "antd";
+import { Field, Form, Formik } from "formik";
+import _, { isUndefined } from 'lodash';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React, { ReactElement, useEffect, useState } from "react";
+const { Title } = Typography;
 
 
 interface Props {
 
 }
 
-interface filterObject {
-	include?: string;
-	id?: string | string[] | undefined;
+interface queryListDetail {
+	id?: string | string[] | undefined
+	include?: string
 }
 
-// interface updateRiderStatus {
-// 	id?: string;
-// 	status?: string;
-// 	ekyc_status?: string;
-// }
+interface queryUpdateRiderStatus {
+	data: {
+		id?: string | undefined;
+		status?: string;
+		ekyc_status?: string;
+		topic?: {
+			id?: number;
+			code?: string;
+			title?: string;
+			status?: boolean;
+		}[];
+	}
+}
+
+interface riderDetail {
+	id?: string | undefined;
+	project_id?: number;
+	sso_id?: string;
+	gender?: string;
+	first_name?: string;
+	last_name?: string;
+	email?: string;
+	phone?: string;
+	country_code?: string;
+	code?: string;
+	verify_email?: boolean;
+	working_status?: string;
+	status?: string;
+	ekyc_status?: string;
+	approve_status?: string;
+	view_approve_status?: boolean;
+	reason?: string[];
+	nation_photo?: string;
+	car_photo?: string;
+	car_tax_photo?: string;
+	disable_photo?: string;
+}
 
 
 export default function view({ }: Props): ReactElement {
 	const router = useRouter()
 	const { id } = router.query
 	let [_isLoading, setIsLoading] = useState(true);
-	let [riderDetail, setRiderDetail] = useState({});
+	let [riderDetail, setRiderDetail] = useState<riderDetail>({});
 	let [disableRejectReason, setDisableRejectReason] = useState(false);
 	let [rejectReason, setRejectReason] = useState([] as any);
 	let [rejectReasonDropDown, setRejectReasonDropDown] = useState([] as any);
@@ -51,13 +81,14 @@ export default function view({ }: Props): ReactElement {
 	}, [id])
 
 	const fetchData = async () => {
-		const request = {
+		const request: queryListDetail = {
 			include: "pdpa",
 			id: id,
 		}
 		setIsLoading(true);
 		const { result, success } = await getRiderDetail(request);
-		let riderID, RiderDetail: any
+		let RiderDetail: riderDetail
+		let riderID: any
 		if (success) {
 			const { message, data } = result;
 			riderID = data.id
@@ -102,8 +133,8 @@ export default function view({ }: Props): ReactElement {
 
 				const statusHistories = await getStatusHistories(reqStatusHistories);
 				if (statusHistories.result.data !== undefined) {
-					statusHistories.result.data[0].topic.forEach(element => {
-						RiderDetail.reason.push(element.id)
+					statusHistories.result.data[0].topic.forEach((element: any) => {
+						RiderDetail.reason?.push(element.id)
 					});
 				}
 			}
@@ -150,9 +181,9 @@ export default function view({ }: Props): ReactElement {
 				return topic
 			});
 
-			let reqBody = {
+			let reqBody: queryUpdateRiderStatus = {
 				data: {
-					"id": riderDetail.id,
+					id: riderDetail.id,
 					"status": riderDetail.status,
 					"ekyc_status": data.status,
 					"topic": topic

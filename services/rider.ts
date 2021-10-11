@@ -20,7 +20,7 @@ interface queryList {
 }
 
 interface queryListDetail {
-  id?: string | string[] | undefined,
+  id?: string | string[] | undefined
   include?: string
 }
 

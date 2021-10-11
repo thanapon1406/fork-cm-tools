@@ -6,15 +6,8 @@ import { Col, Modal, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { isUndefined } from 'lodash'
 import Image from 'next/image'
-import { ReactElement, useCallback, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 const { Title } = Typography
-
-const statusMapping: any = {
-  uploaded: 'รอการตรวจสอบ',
-  approved: 'อนุมัติ',
-  're-approved': 'ขอเอกสารเพิ่มเติม',
-  rejected: 'ไม่อนุมัติ',
-}
 
 const statusOptionCard = [
   { name: 'ผ่าน', value: 1, disabled: false },
@@ -43,7 +36,7 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
   const [isLoadingMedia, setIsLoadingMedia] = useState(false)
   const [mediaType, setMediaType] = useState('')
 
-  const fetchEkycDetail = useCallback(async () => {
+  const fetchEkycDetail = async (sso_id: string) => {
     setLoading(true)
     const { result, success } = await getEkycDetail(sso_id)
     const { data } = result
@@ -54,11 +47,10 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
       }
     }
     setLoading(false)
-  }, [sso_id])
+  }
 
   const onSubmit = async (values: EkycApproveStatusInterface) => {
     setLoadingSubmit(true)
-    console.log(values)
 
     const payload = {
       ...ekycDetail,
@@ -113,9 +105,9 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
   }
 
   useEffect(() => {
-    fetchEkycDetail()
+    fetchEkycDetail(sso_id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [sso_id])
 
   return (
     <>
@@ -265,10 +257,10 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
                   placeholder="กรุณาเลือกสถานะ"
                   selectOption={[
                     { value: 'uploaded', name: 'รอการอนุมัติ' },
-                    { value: 're-approve', name: 'ขอเอกสารเพิ่มเติม' },
-                    { value: 'reject', name: 'ไม่อนุมัติ' },
+                    { value: 're-approved', name: 'ขอเอกสารเพิ่มเติม' },
+                    { value: 'rejected', name: 'ไม่อนุมัติ' },
                     {
-                      value: 'approve',
+                      value: 'approved',
                       name: 'อนุมัติ',
                       disabled:
                         values.status_card !== 1 ||

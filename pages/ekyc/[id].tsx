@@ -11,7 +11,7 @@ import { isUndefined } from 'lodash'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { ReactElement, useCallback, useEffect, useState } from 'react'
-import { CustomPanel } from './style'
+import CustomPanel from './style'
 const { Title } = Typography
 
 const statusMapping: any = {

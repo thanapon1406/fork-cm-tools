@@ -1,24 +1,19 @@
-import React, { ReactElement, useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import MainLayout from '@/layout/MainLayout'
 import Button from '@/components/Button'
-import Table from '@/components/Table'
 import Card from '@/components/Card'
 import DateRangePicker from '@/components/Form/DateRangePicker'
-import { Row, Col, Typography, Breadcrumb, Space, Menu } from 'antd'
-import { EyeOutlined } from '@ant-design/icons'
-
-import Select from '@/components/Form/Select'
-import { Formik, Form, Field } from 'formik'
-import * as Yup from 'yup'
 import Input from '@/components/Form/Input'
-import { useRecoilState } from 'recoil'
-import { merchantState } from '@/store'
-import useFetch from '@/hooks/useFetch'
-const { Title } = Typography
+import Select from '@/components/Form/Select'
+import Table from '@/components/Table'
+import MainLayout from '@/layout/MainLayout'
 import { outletList } from '@/services/merchant'
+import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
+import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
-import { uniqueId } from '@/utils/helpers'
+import { useRouter } from 'next/router'
+import React, { ReactElement, useEffect, useState } from 'react'
+import * as Yup from 'yup'
+
+const { Title } = Typography
 
 interface Props {}
 
@@ -42,7 +37,6 @@ interface filterObject {
 }
 
 export default function Merchant({}: Props): ReactElement {
-  const [userObj, setUserObj] = useRecoilState(merchantState)
   const Router = useRouter()
   const initialValues = {
     keyword: '',
@@ -130,9 +124,9 @@ export default function Merchant({}: Props): ReactElement {
 
   const statusMapping: any = {
     uploaded: 'รอการตรวจสอบ',
-    approve: 'อนุมัติ',
-    're-approve': 'ขอเอกสารเพิ่มเติม',
-    reject: 'ไม่อนุมัติ',
+    approved: 'อนุมัติ',
+    're-approved': 'ขอเอกสารเพิ่มเติม',
+    rejected: 'ไม่อนุมัติ',
   }
 
   const column = [
@@ -296,15 +290,15 @@ export default function Merchant({}: Props): ReactElement {
                       },
                       {
                         name: 'approve',
-                        value: 'approve',
+                        value: 'approved',
                       },
                       {
                         name: 'reject',
-                        value: 'reject',
+                        value: 'rejected',
                       },
                       {
                         name: 're-approve',
-                        value: 're-approve',
+                        value: 're-approved',
                       },
                     ]}
                   />
@@ -327,15 +321,15 @@ export default function Merchant({}: Props): ReactElement {
                       },
                       {
                         name: 'อนุมัติ',
-                        value: 'approve',
+                        value: 'approved',
                       },
                       {
                         name: 'ไม่อนุมัติ',
-                        value: 'reject',
+                        value: 'rejected',
                       },
                       {
                         name: 'ขอเอกสารเพิ่มเติม',
-                        value: 're-approve',
+                        value: 're-approved',
                       },
                     ]}
                   />
@@ -359,16 +353,16 @@ export default function Merchant({}: Props): ReactElement {
                         value: 'uploaded',
                       },
                       {
-                        name: 'approve',
-                        value: 'approve',
+                        name: 'approveed',
+                        value: 'approved',
                       },
                       {
-                        name: 're-approve',
-                        value: 're-approve',
+                        name: 're-approved',
+                        value: 're-approved',
                       },
                       {
-                        name: 'reject',
-                        value: 'reject',
+                        name: 'rejected',
+                        value: 'rejected',
                       },
                     ]}
                   />

@@ -1,6 +1,6 @@
-import successHandler from './handler/successHandler'
-import errorHandler from './handler/errorHandler'
 import fetch from './fetch'
+import errorHandler from './handler/errorHandler'
+import successHandler from './handler/successHandler'
 
 interface queryList {
   page: number
@@ -49,4 +49,13 @@ const approveOutlet = async (body: any): Promise<response> => {
   }
 }
 
-export { outletList, outletDetail, approveOutlet }
+const personalData = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/merchant/personal`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export { outletList, outletDetail, approveOutlet, personalData }

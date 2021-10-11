@@ -3,7 +3,7 @@ import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import MainLayout from '@/layout/MainLayout'
-import { approveOutlet, outletDetail, outletList } from '@/services/merchant'
+import { approveOutlet, outletDetail, personalData } from '@/services/merchant'
 import { Breadcrumb, Col, Divider, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import lodash from 'lodash'
@@ -38,26 +38,43 @@ export default function View({}: Props): ReactElement {
   })
   const verifyDetailList = [
     {
-      name: 'เหตผลที่1',
+      name: 'ชื่อร้านค้า/แบรนด์ ไม่ถูกต้อง',
       value: '1',
     },
     {
-      name: 'เหตผลที่2',
+      name: 'เลขประจำตัวผู้เสียภาษี ไม่ถูกต้อง',
       value: '2',
     },
     {
-      name: 'เหตผลที่3',
+      name: 'ที่อยู่ร้านค้า/แบรนด์ ไม่ถูกต้อง',
       value: '3',
     },
     {
-      name: 'เหตผลที่4',
+      name: 'เบอร์โทรศัพท์ร้านค้า ไม่ถูกต้อง',
       value: '4',
     },
     {
-      name: 'เหตผลที่5',
+      name: 'ชื่อสาขา ไม่ถูกต้อง',
       value: '5',
     },
+    {
+      name: 'เลขประจำตัวผู้เสียภาษีประจำสาขา ไม่ถูกต้อง',
+      value: '6',
+    },
+    {
+      name: 'ที่อยู่สาขา ไม่ถูกต้อง',
+      value: '7',
+    },
+    {
+      name: 'เบอร์โทรศัพท์ร้านค้า ไม่ถูกต้อง',
+      value: '8',
+    },
   ]
+
+  const mapBranchType: any = {
+    single: 'ร้านค้าเดี่ยว',
+    multiple: 'หลายสาขา',
+  }
 
   useEffect(() => {
     if (id) {
@@ -72,7 +89,7 @@ export default function View({}: Props): ReactElement {
       per_page: 10,
       id: id,
     }
-    const { result, success } = await outletList(request)
+    const { result, success } = await personalData(request)
     if (success) {
       const { data } = result
       const { user = {} } = data[0]
@@ -80,7 +97,7 @@ export default function View({}: Props): ReactElement {
       const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
       console.log(`ssoid`, ssoid)
       if (ssoid) {
-        setSsoid(ssoid)
+        setSsoid('TEST_MERCHANT_1')
       }
       setUserInitialValues({
         ...userInitialValues,
@@ -108,7 +125,7 @@ export default function View({}: Props): ReactElement {
       setOutletInitialValues({
         ...outletInitialValues,
         outlet_name: data.name.th,
-        outlet_type: data.outlet_type,
+        outlet_type: mapBranchType[data.branch_type],
         tax_id: data.tax_id,
         email: data.email,
         address: data.address,
@@ -120,27 +137,39 @@ export default function View({}: Props): ReactElement {
 
   const Schema = Yup.object().shape({
     verify_status: Yup.string().trim().required('กรุณาเลือกการอนุมัติ'),
+    verify_detail: Yup.mixed().test('is-42', 'กรุณาเลือกเหตุผล', (value: Array<any>, form: any) => {
+      const { parent } = form
+      const { verify_status = '' } = parent
+      if (verify_status === 'rejected') {
+        return value.length > 0
+      }
+      return true
+    }),
   })
 
   const handleSubmit = async (values: any) => {
     let { verify_detail } = values
-    verify_detail = verify_detail.map((d: any) => {
-      return {
-        id: d,
-        value: lodash.find(verifyDetailList, { value: d })?.name,
-      }
-    })
-    const verifyRequest = {
+    let verifyRequest = {
       data: {
         id: id,
         verify_status: values.verify_status,
-        verify_detail: verify_detail,
+        verify_detail: [],
       },
+    }
+
+    if (values.verify_status === 'rejected') {
+      verify_detail = verify_detail.map((d: any) => {
+        return {
+          id: d,
+          value: lodash.find(verifyDetailList, { value: d })?.name,
+        }
+      })
+      verifyRequest.data.verify_detail = verify_detail
     }
 
     const { result, success } = await approveOutlet(verifyRequest)
     if (success) {
-      console.log(`result`, result)
+      router.push('/merchant')
     }
   }
 
@@ -186,6 +215,7 @@ export default function View({}: Props): ReactElement {
                     className="form-control round"
                     id="user_id"
                     placeholder="เลขบัตรประชาชน"
+                    disabled={true}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
@@ -197,6 +227,7 @@ export default function View({}: Props): ReactElement {
                     className="form-control round"
                     id="user_phone"
                     placeholder="เบอร์โทรศัพท์"
+                    disabled={true}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
@@ -208,6 +239,7 @@ export default function View({}: Props): ReactElement {
                     className="form-control round"
                     id="user_email"
                     placeholder="อีเมล์"
+                    disabled={true}
                   />
                 </Col>
               </Row>
@@ -215,7 +247,7 @@ export default function View({}: Props): ReactElement {
           )}
         </Formik>
         <div>
-          {/* 7490b5b4-636b-4121-8c93-f0e2fc945a4a //fortest*/}
+          {/* "b450d352-33e7-4896-a994-b9736a85d352" */}
           {ssoId && <Ekyc isComponent sso_id={ssoId} />}
         </div>
         <Formik
@@ -250,6 +282,7 @@ export default function View({}: Props): ReactElement {
                     className="form-control round"
                     id="outlet_type"
                     placeholder="ประเภทร้านค้า"
+                    disabled={true}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
@@ -261,6 +294,7 @@ export default function View({}: Props): ReactElement {
                     className="form-control round"
                     id="tax_id"
                     placeholder="หมายเลขประจำตัวผู้เสียภาษี"
+                    disabled={true}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
@@ -272,6 +306,7 @@ export default function View({}: Props): ReactElement {
                     className="form-control round"
                     id="email"
                     placeholder="อีเมล์"
+                    disabled={true}
                   />
                 </Col>
               </Row>
@@ -285,6 +320,7 @@ export default function View({}: Props): ReactElement {
                     className="form-control round"
                     id="address"
                     placeholder="ที่อยู่"
+                    disabled={true}
                   />
                 </Col>
               </Row>
@@ -295,20 +331,20 @@ export default function View({}: Props): ReactElement {
                     name="verify_status"
                     component={Select}
                     id="verify_status"
-                    placeholder="เลือก"
+                    placeholder="เลือกสถานะ"
                     defaultValue="approve"
                     selectOption={[
                       {
                         name: 'Approve',
-                        value: 'approve',
+                        value: 'approved',
                       },
                       {
                         name: 'Reject',
-                        value: 'reject',
+                        value: 'rejected',
                       },
                       {
                         name: 'Re-approve',
-                        value: 're-approve',
+                        value: 're-approved',
                       },
                     ]}
                   />
@@ -320,8 +356,9 @@ export default function View({}: Props): ReactElement {
                     component={Select}
                     id="verify_detail"
                     mode="multiple"
-                    placeholder="เลือก"
+                    placeholder="เลือกเหตุผล"
                     selectOption={verifyDetailList}
+                    disabled={values.values.verify_status !== 'rejected'}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>

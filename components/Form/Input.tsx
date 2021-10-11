@@ -1,7 +1,6 @@
+import { Form, Input, Typography } from "antd";
 import { ErrorMessage } from "formik";
-import { Input, Form } from "antd";
 import { FormikProps } from "./props";
-import { Typography } from "antd";
 const { Text } = Typography;
 
 interface InputProps extends FormikProps {

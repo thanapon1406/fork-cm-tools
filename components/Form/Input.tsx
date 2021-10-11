@@ -13,7 +13,7 @@ interface InputProps extends FormikProps {
     text: string | undefined
     className: string
   }
-  disabled: boolean
+  disabled: boolean | false
 }
 
 const CustomInput = ({ label, field, ...props }: InputProps) => {

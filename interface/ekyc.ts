@@ -1,4 +1,3 @@
-import { ReactElement } from 'react'
 export interface EkycDetail {
   id: string
   project_id: string
@@ -21,7 +20,7 @@ export interface EkycDetail {
 
 export interface EkycDetailProps {
   sso_id: string
-  isComponent: boolean
+  setEkycStatus?: React.Dispatch<React.SetStateAction<string>>
 }
 
 export interface EkycApproveStatusInterface {

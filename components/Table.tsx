@@ -29,7 +29,6 @@ export default function Table({ config }: Props): ReactElement {
     let View = (path: any) => {
       Router.push(`/${tableName}/${path}`)
     }
-
     const Edit = () => {}
     const Delete = () => {}
     const actionElement = (id: any) => (

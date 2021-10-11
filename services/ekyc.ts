@@ -1,8 +1,8 @@
 import { API_PATH_EKYC_SERVICE } from '@/constants/api'
+import fetcher from '@/services/fetch/fetch'
 import fetch from './fetch'
 import errorHandler from './handler/errorHandler'
 import successHandler from './handler/successHandler'
-import fetcher from '@/services/fetch/fetch'
 
 const POS_WAPI = process.env.NEXT_PUBLIC_POS_WAPI
 export interface requestEkycInterface {
@@ -30,6 +30,8 @@ export const getEkycDetail = async (ssoId: any) => {
   const payload = {
     sso_id: ssoId,
   }
+  console.log('getEkycDetail', ssoId)
+
   try {
     const result = await fetch.post(`/api/ekyc/detail`, payload)
     return successHandler(result)

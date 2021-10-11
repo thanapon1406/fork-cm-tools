@@ -115,7 +115,8 @@ export default function Rider({ }: Props): ReactElement {
       render: (text: any, record: any) => {
         let phone = "-"
         if (record.phone) {
-          phone = record.country_code + '-' + record.phone.replace('-', '').slice(2, 7) + "000"
+          phone = record.phone
+          // phone = record.country_code + '-' + record.phone.replace('-', '').slice(2, 7) + "000"
 
         }
         return phone

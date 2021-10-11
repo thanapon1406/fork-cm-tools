@@ -7,19 +7,31 @@ import Button from '@/components/Button'
 import Table from '@/components/Table'
 import Card from '@/components/Card'
 import { Row, Col, Typography, Breadcrumb, Divider } from 'antd'
-import { outletDetail } from '@/services/merchant'
 const { Title } = Typography
 import { Formik, Form, Field } from 'formik'
 import Input from '@/components/Form/Input'
 import Ekyc from '../ekyc/[id]'
 import * as Yup from 'yup'
+import lodash from 'lodash'
+import { approveOutlet, outletDetail, outletList } from '@/services/merchant'
+import { useRecoilState } from 'recoil'
+import { merchantState } from '@/store'
 
 interface Props {}
 
 export default function view({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
-  let [initialValues, setInitialValues] = useState({
+  const [userObj, setUserObj] = useRecoilState(merchantState)
+  const [ssoId, setSsoid] = useState('')
+  let [userInitialValues, setUserInitialValues] = useState({
+    user_name: '',
+    user_id: '',
+    user_phone: '',
+    user_email: '',
+  })
+
+  let [outletInitialValues, setOutletInitialValues] = useState({
     outlet_name: '124',
     outlet_type: '',
     tax_id: '',
@@ -28,13 +40,60 @@ export default function view({}: Props): ReactElement {
     verify_status: '',
     verify_detail: [],
   })
+  const verifyDetailList = [
+    {
+      name: 'เหตผลที่1',
+      value: '1',
+    },
+    {
+      name: 'เหตผลที่2',
+      value: '2',
+    },
+    {
+      name: 'เหตผลที่3',
+      value: '3',
+    },
+    {
+      name: 'เหตผลที่4',
+      value: '4',
+    },
+    {
+      name: 'เหตผลที่5',
+      value: '5',
+    },
+  ]
 
   useEffect(() => {
-    console.log(`useEffect`, id)
     if (id) {
       getOutlet()
+      getPersonal()
     }
   }, [id])
+
+  const getPersonal = async () => {
+    const request: any = {
+      page: 1,
+      per_page: 10,
+      id: id,
+    }
+    const { result, success } = await outletList(request)
+    if (success) {
+      const { data } = result
+      const { user = {} } = data[0]
+      console.log(`user`, user)
+      const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
+      console.log(`ssoid`, ssoid)
+      setSsoid(ssoid)
+      setUserInitialValues({
+        ...userInitialValues,
+        user_name: `${first_name} ${last_name}`,
+        user_id: '',
+        user_phone: tel,
+        user_email: email,
+      })
+    }
+    return
+  }
 
   const getOutlet = async () => {
     const request = {
@@ -43,14 +102,20 @@ export default function view({}: Props): ReactElement {
     const { result, success } = await outletDetail(request)
     if (success) {
       const { data } = result
-      console.log(`data`, data)
-      setInitialValues({
-        ...initialValues,
+      let verifyDetail = []
+      if (data.verify_detail) {
+        verifyDetail = data.verify_detail.map((d: any) => d.id)
+      }
+
+      setOutletInitialValues({
+        ...outletInitialValues,
         outlet_name: data.name.th,
         outlet_type: data.outlet_type,
         tax_id: data.tax_id,
         email: data.email,
         address: data.address,
+        verify_status: data.verify_status,
+        verify_detail: verifyDetail,
       })
     }
   }
@@ -59,9 +124,26 @@ export default function view({}: Props): ReactElement {
     verify_status: Yup.string().trim().required('กรุณาเลือกการอนุมัติ'),
   })
 
-  const handleSubmit = (values: any) => {
-    console.log(`log`)
-    console.log(`values: any`, values)
+  const handleSubmit = async (values: any) => {
+    let { verify_detail } = values
+    verify_detail = verify_detail.map((d: any) => {
+      return {
+        id: d,
+        value: lodash.find(verifyDetailList, { value: d })?.name,
+      }
+    })
+    const verifyRequest = {
+      data: {
+        id: id,
+        verify_status: values.verify_status,
+        verify_detail: verify_detail,
+      },
+    }
+
+    const { result, success } = await approveOutlet(verifyRequest)
+    if (success) {
+      console.log(`result`, result)
+    }
   }
 
   return (
@@ -76,8 +158,8 @@ export default function view({}: Props): ReactElement {
         <br />
         <Formik
           enableReinitialize={true}
-          initialValues={initialValues}
-          onSubmit={handleSubmit}
+          initialValues={userInitialValues}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -88,59 +170,46 @@ export default function view({}: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ชื่อ-นามสกุล' }}
-                    name="keyword"
+                    name="user_name"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="keyword"
-                    placeholder="ชื่อ-นามสกุล"
+                    id="user_name"
+                    placeholder="ชื่อนามสกุล"
                     disabled={true}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'เลขบัตรประชาชน' }}
-                    name="keyword"
+                    name="user_id"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="keyword"
+                    id="user_id"
                     placeholder="เลขบัตรประชาชน"
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'เบอร์โทรศัพท์' }}
-                    name="keyword"
+                    name="user_phone"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="keyword"
+                    id="user_phone"
                     placeholder="เบอร์โทรศัพท์"
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'อีเมล์' }}
-                    name="keyword"
+                    name="user_email"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="keyword"
+                    id="user_email"
                     placeholder="อีเมล์"
-                  />
-                </Col>
-              </Row>
-              <Row>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'ชื่อ-นามสกุล' }}
-                    name="keyword"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="keyword"
-                    placeholder="ชื่อ-นามสกุล"
                   />
                 </Col>
               </Row>
@@ -148,12 +217,12 @@ export default function view({}: Props): ReactElement {
           )}
         </Formik>
         <div>
-          {/* 7490b5b4-636b-4121-8c93-f0e2fc945a4a */}
-          {/* <Ekyc isComponent sso_id="b450d352-33e7-4896-a994-b9736a85d352" /> */}
+          {/* 7490b5b4-636b-4121-8c93-f0e2fc945a4a //fortest*/}
+          {ssoId && <Ekyc isComponent sso_id={ssoId} />}
         </div>
         <Formik
           enableReinitialize={true}
-          initialValues={initialValues}
+          initialValues={outletInitialValues}
           onSubmit={handleSubmit}
           validationSchema={Schema}
         >
@@ -208,7 +277,7 @@ export default function view({}: Props): ReactElement {
                   />
                 </Col>
               </Row>
-              <Row>
+              <Row gutter={16}>
                 <Col className="gutter-row" span={18}>
                   <Field
                     label={{ text: 'ที่อยู่' }}
@@ -221,7 +290,7 @@ export default function view({}: Props): ReactElement {
                   />
                 </Col>
               </Row>
-              <Row>
+              <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'การอนุมัติ' }}
@@ -254,35 +323,7 @@ export default function view({}: Props): ReactElement {
                     id="verify_detail"
                     mode="multiple"
                     placeholder="เลือก"
-                    onChange={(value: any, childe: any) => {
-                      const detail = childe.map((val: any) => {
-                        return { id: val?.value, value: val?.children }
-                      })
-                      console.log(`detail`, detail)
-                      values.setValues({ ...initialValues, verify_detail: detail })
-                    }}
-                    selectOption={[
-                      {
-                        name: 'เหตผลที่1',
-                        value: '1',
-                      },
-                      {
-                        name: 'เหตผลที่2',
-                        value: '2',
-                      },
-                      {
-                        name: 'เหตผลที่3',
-                        value: '3',
-                      },
-                      {
-                        name: 'เหตผลที่4',
-                        value: '4',
-                      },
-                      {
-                        name: 'เหตผลที่5',
-                        value: '5',
-                      },
-                    ]}
+                    selectOption={verifyDetailList}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>

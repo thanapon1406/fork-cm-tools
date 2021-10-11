@@ -3,6 +3,7 @@ import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@an
 import { Dropdown, Menu, PageHeader, Table as Tables } from 'antd'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
+import lodash from 'lodash'
 
 interface Props {
   config: Config
@@ -18,17 +19,26 @@ interface Config {
   loading: boolean
   handelDataTableLoad: any
   pagination: any
+  customAction?: any
 }
 
 export default function Table({ config }: Props): ReactElement {
-  const { dataTableTitle, action, dataSource, loading, tableName, actionKey, handelDataTableLoad } =
-    config
+  const {
+    dataTableTitle,
+    action,
+    dataSource,
+    loading,
+    tableName,
+    handelDataTableLoad,
+    customAction,
+  } = config
   let { tableColumns, pagination } = config
   const Router = useRouter()
   if (action) {
-    const View = (path: any) => {
+    let View = (path: any) => {
       Router.push(`/${tableName}/${path}`)
     }
+
     const Edit = () => {}
     const Delete = () => {}
     const actionElement = (id: any) => (
@@ -61,24 +71,28 @@ export default function Table({ config }: Props): ReactElement {
         })}
       </Menu>
     )
-    tableColumns = [
-      ...tableColumns,
-      {
-        title: '',
-        render: (row: any) => {
-          const { id } = row
-          if (action.length === 1) {
-            return actionElement(id)
-          } else {
-            return (
-              <Dropdown overlay={actionElement(id)} trigger={['click']}>
-                <EllipsisOutlined style={{ cursor: 'pointer', fontSize: '24px' }} />
-              </Dropdown>
-            )
-          }
+    const isCustomAction = lodash.find(tableColumns, { dataIndex: 'action' })
+    if (!isCustomAction) {
+      tableColumns = [
+        ...tableColumns,
+        {
+          title: '',
+          dataIndex: 'action',
+          render: (rows: any, rowData: any) => {
+            const { id } = rowData
+            if (action.length === 1) {
+              return actionElement(id)
+            } else {
+              return (
+                <Dropdown overlay={actionElement(id)} trigger={['click']}>
+                  <EllipsisOutlined style={{ cursor: 'pointer', fontSize: '24px' }} />
+                </Dropdown>
+              )
+            }
+          },
         },
-      },
-    ]
+      ]
+    }
   }
 
   return (

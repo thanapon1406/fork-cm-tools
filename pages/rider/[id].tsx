@@ -62,7 +62,7 @@ interface riderDetail {
 }
 
 
-export default function view({ }: Props): ReactElement {
+export default function RiderDetail({ }: Props): ReactElement {
 	const router = useRouter()
 	const { id } = router.query
 	let [_isLoading, setIsLoading] = useState(true);

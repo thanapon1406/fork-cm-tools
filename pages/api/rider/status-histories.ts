@@ -5,7 +5,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body } = req
   if (method === 'POST') {
     try {
-      const url: string = `rider-service/rider/update-status`
+      const url: string = `rider-service/rider/find-status-histories`
       const { data, status } = await ServerFetch.post(url, body, headers)
       res.status(status).json(data)
     } catch (e: any) {

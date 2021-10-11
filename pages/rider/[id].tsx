@@ -10,9 +10,10 @@ import Input from "@/components/Form/Input";
 import Button from "@/components/Button";
 import Select from "@/components/Form/Select";
 import Ekyc from "../ekyc/[id]"
-import { getRiderDetail, getRejectReson, updateRiderStatus } from '@/services/rider'
+import { getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories } from '@/services/rider'
 import { getEkycDetail } from '@/services/ekyc'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 
 interface Props {
@@ -21,7 +22,7 @@ interface Props {
 
 interface filterObject {
 	include?: string;
-	id?: string;
+	id?: string | string[] | undefined;
 }
 
 // interface updateRiderStatus {
@@ -32,64 +33,94 @@ interface filterObject {
 
 
 export default function view({ }: Props): ReactElement {
-
+	const router = useRouter()
+	const { id } = router.query
 	let [_isLoading, setIsLoading] = useState(true);
 	let [riderDetail, setRiderDetail] = useState({});
 	let [disableRejectReason, setDisableRejectReason] = useState(false);
 	let [rejectReason, setRejectReason] = useState([] as any);
+	let [rejectReasonDropDown, setRejectReasonDropDown] = useState([] as any);
 	const [isShowMediaModal, setIsShowMediaModal] = useState(false)
 	const [isLoadingMedia, setIsLoadingMedia] = useState(false)
 	const [imgUrl, setImgUrl] = useState('')
-	let [filter, setFilter] = useState<filterObject>({
-		include: "pdpa",
-		id: "87",
-	});
 
 	useEffect(() => {
-		fetchData();
-	}, []);
+		if (id) {
+			fetchData()
+		}
+	}, [id])
 
-
-	const fetchData = async (
-		filterObj: filterObject = filter
-	) => {
-		const reqBody = {
-			...filterObj,
-		};
-		console.log(`reqBody`, reqBody);
+	const fetchData = async () => {
+		const request = {
+			include: "pdpa",
+			id: id,
+		}
 		setIsLoading(true);
-		const { result, success } = await getRiderDetail(reqBody);
+		const { result, success } = await getRiderDetail(request);
+		let riderID, RiderDetail: any
 		if (success) {
 			const { message, data } = result;
-			data.status = "re-approved"
+			riderID = data.id
 			const rider_status = data.status
 			data.approve_status = "approve"
 			data.name = data.first_name + " " + data.last_name
-			data.status1 = ["approved", "uploaded"]
-			data.contact_emergency = _.find(data.contacts, function (o) { return o.type == "emergency"; });
-			data.contact_emergency_address = data.contact_emergency.address_no + " " + data.contact_emergency.district_name + " " + data.contact_emergency.subdistrict_name + " " + data.contact_emergency.province_name + " " + data.contact_emergency.zipcode
-			data.contact_refer = _.find(data.contacts, function (o) { return o.type == "refer"; });
-			data.contact_refer_address = data.contact_refer.address_no + " " + data.contact_refer.district_name + " " + data.contact_refer.subdistrict_name + " " + data.contact_refer.province_name + " " + data.contact_refer.zipcode
-			data.car = data.pdpa.car_info[0].brand_name + "/" + data.pdpa.car_info[0].model_name
-			setRiderDetail(data)
-			if (data.status == "waiting" || data.status == "uploaded") {
+			data.phone = data.country_code + data.phone
+			data.reason = []
+			if (isUndefined(data.pdpa)) {
+				data.contact_emergency = ""
+				data.contact_emergency_address = ""
+				data.contact_refer = ""
+				data.contact_refer_address = ""
+				data.car = ""
+				data.nation_photo = ""
+				data.car_photo = ""
+				data.car_tax_photo = ""
+				data.disable_photo = ""
+			} else {
+				data.contact_emergency = _.find(data.contacts, function (o) { return o.type == "emergency"; });
+				data.contact_emergency_phone = _.get(data.contact_emergency, 'country_code', '') + _.get(data.contact_emergency, 'phone', '');
+				data.contact_emergency_address = _.get(data.contact_emergency, 'address_no', ''); + " " + _.get(data.contact_emergency, 'district_name', ''); + " " + _.get(data.subdistrict_name, 'district_name', ''); + " " + _.get(data.subdistrict_name, 'province_name', ''); + " " + _.get(data.subdistrict_name, 'zipcode', '');
+				data.contact_refer = _.find(data.contacts, function (o) { return o.type == "refer"; });
+				data.contact_refer_phone = _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '');
+				data.contact_refer_address = _.get(data.contact_refer, 'address_no', ''); + " " + _.get(data.contact_refer, 'district_name', ''); + " " + _.get(data.contact_emergency, 'subdistrict_name', ''); + " " + _.get(data.contact_emergency, 'province_name', ''); + " " + _.get(data.contact_emergency, 'zipcode', '');
+				data.car = _.get(data.pdpa.car_info[0], 'brand_name', ''); + "/" + _.get(data.pdpa.car_info[0], 'model_name', '');
+				data.nation_photo = (_.get(data.pdpa, 'nation_photo', '').indexOf("http") !== -1) ? _.get(data.pdpa, 'nation_photo', '') : ""
+				data.car_photo = (_.get(data.pdpa.car_info[0], 'photo', '').indexOf("http") !== -1) ? _.get(data.pdpa.car_info[0], 'photo', '') : ""
+				data.car_tax_photo = (_.get(data.pdpa.car_info[0], 'tax_photo', '').indexOf("http") !== -1) ? _.get(data.pdpa.car_info[0], 'tax_photo', '') : ""
+				data.disable_photo = (_.get(data.pdpa.disable_person[0], 'photo', '').indexOf("http") !== -1) ? _.get(data.pdpa.disable_person[0], 'photo', '') : ""
+			}
+			RiderDetail = data
+			if (data.status == "waiting" || data.status == "uploaded" || data.status == "approved") {
 				setDisableRejectReason(true)
 			} else {
-				const { result, success } = await getRejectReson();
-				const { message, data } = result
-				for (let index = 0; index < data.length; index++) {
-					data[index].name = data[index].title
-					data[index].value = data[index].id
-					data[index].code = "test"
+				const reqStatusHistories = {
+					rider_id: riderID,
+					status: ["re-approved", "rejected"],
+					type: ["rider", "ekyc"],
+					per_page: 1
 				}
-				let reject_reason = _.filter(data, function (o) { return o.type == rider_status; });
-				setRejectReason(reject_reason)
-				//setRejectReason
-				console.log(message, data, reject_reason);
-				setIsLoading(false);
-				setFilter(filterObj);
+
+				const statusHistories = await getStatusHistories(reqStatusHistories);
+				if (statusHistories.result.data !== undefined) {
+					statusHistories.result.data[0].topic.forEach(element => {
+						RiderDetail.reason.push(element.id)
+					});
+				}
 			}
+
+			let rejectReason = await getRejectReson();
+			rejectReason = rejectReason.result.data
+			for (let index = 0; index < rejectReason.length; index++) {
+				rejectReason[index].name = rejectReason[index].title
+				rejectReason[index].value = rejectReason[index].id
+			}
+			setRejectReason(rejectReason)
+			let reject_reason = _.filter(rejectReason, function (o) { return o.type == rider_status; });
+			setRejectReasonDropDown(reject_reason)
+			setRiderDetail(RiderDetail)
+			setIsLoading(false);
 		};
+
 	}
 
 	const onClickViewMedia = async (type: string, pathUrl: string) => {
@@ -100,29 +131,62 @@ export default function view({ }: Props): ReactElement {
 	}
 
 	const handleSubmit = async (values: any) => {
-
 		const { result, success } = await getEkycDetail("b450d352-33e7-4896-a994-b9736a85d352")
 		const { data } = result
-		notification.success({
-			message: `ดำเนินการอัพเดตสถานะสำเร็จ`,
-			description: "",
-		});
-		console.log(values, data, success);
-		let reqBody = {
-			data: {
-				"id": riderDetail.id,
-				"status": "re-approved",
-				"ekyc_status": "re-approved",
-				"topic": [
-					{ "id": values, "code": "rider_info", "title": "บัตรประชาชนไม่ถูกต้อง", "status": true }
-				]
+		if (data.status == "uploaded") {
+			notification.error({
+				message: `กรุณาทำการอนุมัติ ekyc`,
+				description: "",
+			});
+		} else {
+			const topic = values.reason.map((n: any) => {
+				const reason = _.find(rejectReason, function (o) { return o.id == n; })
+				const topic = {
+					id: reason.id,
+					code: reason.code,
+					title: reason.title,
+					status: true,
+				}
+				return topic
+			});
+
+			let reqBody = {
+				data: {
+					"id": riderDetail.id,
+					"status": riderDetail.status,
+					"ekyc_status": data.status,
+					"topic": topic
+				}
+			}
+
+			const RiderStatus = await updateRiderStatus(reqBody);
+			if (RiderStatus.result.message == "success") {
+				notification.success({
+					message: `ดำเนินการอัพเดตสถานะสำเร็จ`,
+					description: "",
+				});
+			} else {
+				notification.success({
+					message: `ผิดพลาด`,
+					description: "ไม่สามารถอัพเดตสถานะไรเดอร์ได้",
+				});
 			}
 		}
-		//const message = await updateRiderStatus(reqBody);
 	}
 
 	const handleStatus = (event: any) => {
-		console.log(event.target.value);
+		if (event == "approved" || event == "uploaded") {
+			setDisableRejectReason(true)
+		} else if (event == "rejected") {
+			setRejectReasonDropDown(_.filter(rejectReason, function (o) { return o.type == "rejected"; }))
+			setDisableRejectReason(false)
+		} else {
+			setRejectReasonDropDown(_.filter(rejectReason, function (o) { return o.type == "re-approved"; }))
+			setDisableRejectReason(false)
+		}
+
+		setRiderDetail({ ...riderDetail, status: event, reason: [] })
+		console.log(event);
 	};
 
 	return !_isLoading ? (
@@ -247,10 +311,10 @@ export default function view({ }: Props): ReactElement {
 										<antForm.Item label="รูปบัตรประชาชน">
 											<Button
 												loading={isLoadingMedia}
-												disabled={isUndefined(values.pdpa.nation_photo)}
+												disabled={isUndefined(values.nation_photo) || values.nation_photo == ""}
 												onClick={() => {
-													if (!isUndefined(values.pdpa.nation_photo)) {
-														onClickViewMedia('image', values.pdpa.nation_photo)
+													if (!isUndefined(values.nation_photo)) {
+														onClickViewMedia('image', values.nation_photo)
 													}
 												}}
 											>
@@ -291,7 +355,7 @@ export default function view({ }: Props): ReactElement {
 								<Col className="gutter-row" span={6}>
 									<Field
 										label={{ text: "เบอร์โทรศัพท์" }}
-										name="contact_emergency.phone"
+										name="contact_emergency_phone"
 										type="text"
 										component={Input}
 										className="form-control round"
@@ -346,7 +410,7 @@ export default function view({ }: Props): ReactElement {
 								<Col className="gutter-row" span={6}>
 									<Field
 										label={{ text: "เบอร์โทรศัพท์" }}
-										name="contact_refer.phone"
+										name="contact_refer_phone"
 										type="text"
 										component={Input}
 										className="form-control round"
@@ -417,10 +481,10 @@ export default function view({ }: Props): ReactElement {
 										<antForm.Item label="รูปรายการจดทะเบียนรถจักรยานยนต์">
 											<Button
 												loading={isLoadingMedia}
-												disabled={isUndefined(values.pdpa.nation_photo)}
+												disabled={isUndefined(values.car_photo) || values.car_photo == ""}
 												onClick={() => {
-													if (!isUndefined(values.pdpa.nation_photo)) {
-														onClickViewMedia('image', values.pdpa.nation_photo)
+													if (!isUndefined(values.car_photo)) {
+														onClickViewMedia('image', values.car_photo)
 													}
 												}}
 											>
@@ -434,10 +498,10 @@ export default function view({ }: Props): ReactElement {
 										<antForm.Item label="รูปรายการชำระภาษีรถจักรยานยนต์">
 											<Button
 												loading={isLoadingMedia}
-												disabled={isUndefined(values.pdpa.nation_photo)}
+												disabled={isUndefined(values.car_tax_photo) || values.car_tax_photo == ""}
 												onClick={() => {
-													if (!isUndefined(values.pdpa.nation_photo)) {
-														onClickViewMedia('image', values.pdpa.nation_photo)
+													if (!isUndefined(values.car_tax_photo)) {
+														onClickViewMedia('image', values.car_tax_photo)
 													}
 												}}
 											>
@@ -468,10 +532,10 @@ export default function view({ }: Props): ReactElement {
 										<antForm.Item label="รูปความบกพร่องทางร่างกาย">
 											<Button
 												loading={isLoadingMedia}
-												disabled={isUndefined(values.pdpa.nation_photo)}
+												disabled={isUndefined(values.disable_photo) || values.car_tax_photo == ""}
 												onClick={() => {
-													if (!isUndefined(values.pdpa.nation_photo)) {
-														onClickViewMedia('image', values.pdpa.nation_photo)
+													if (!isUndefined(values.disable_photo)) {
+														onClickViewMedia('image', values.disable_photo)
 													}
 												}}
 											>
@@ -490,8 +554,8 @@ export default function view({ }: Props): ReactElement {
 											label={{ text: "การอนุมัติ" }}
 											name="status"
 											component={Select}
-											id="status2"
 											placeholder="เลือก"
+											onChange={handleStatus}
 											selectOption={[
 												{
 													name: "เลือก",
@@ -516,12 +580,13 @@ export default function view({ }: Props): ReactElement {
 										<Field
 											label={{ text: "เหตุผล" }}
 											mode="multiple"
-											name="status1"
+											name="reason"
 											allowClear={true}
 											component={Select}
-											id="status1"
+											disabled={disableRejectReason}
+											id="reason"
 											placeholder="เลือก"
-											selectOption={rejectReason}
+											selectOption={rejectReasonDropDown}
 										/>
 									</Col>
 								</Row>
@@ -534,13 +599,6 @@ export default function view({ }: Props): ReactElement {
 									>
 										submit
 									</Button>
-									{/* <Button
-														style={{ width: "120px", marginTop: "31px" }}
-														type="ghost"
-														size="middle"
-													>
-														Clear
-													</Button> */}
 								</div>
 							</>
 						}

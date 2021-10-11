@@ -202,6 +202,14 @@ export default function Rider({ }: Props): ReactElement {
       render: (text: any, record: any) => {
         return Moment(text).format('YYYY-MM-DD HH:MM')
       }
+    },
+    {
+      title: "action",
+      dataIndex: "first_name",
+      render: (text: any, record: any) => {
+        let fullName = record.first_name + ' ' + record.last_name
+        return (fullName)
+      },
     }
   ];
 
@@ -366,7 +374,7 @@ export default function Rider({ }: Props): ReactElement {
             loading: isLoading,
             tableName: "rider",
             tableColumns: column,
-            action: ["view","edit"],
+            action: ["view"],
             dataSource: mockData,
             handelDataTableLoad: handelDataTableLoad,
             pagination: pagination,

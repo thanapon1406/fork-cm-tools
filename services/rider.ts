@@ -2,9 +2,10 @@ import axios from "axios"
 import lodash from "lodash"
 import successHandler from './handler/successHandler'
 import errorHandler from './handler/errorHandler'
+import fetch from './fetch'
 
 export {
-  getRider, getRiderDetail, getRejectReson, updateRiderStatus
+  getRider, getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories
 }
 
 interface queryList {
@@ -21,11 +22,11 @@ interface queryList {
 }
 
 interface queryListDetail {
-  id?: string,
+  id?: string | string[] | undefined,
   include?: string
 }
 
-interface updateRiderStatus {
+interface queryUpdateRiderStatus {
   data: {
     id?: string;
     status?: string;
@@ -41,7 +42,7 @@ interface updateRiderStatus {
 
 const getRider = async (req: queryList) => {
   try {
-    const response = await axios.post(`/api/rider/list`, req);
+    const response = await fetch.post(`/api/rider/list`, req);
     return successHandler(response);
   } catch (error) {
     return errorHandler(error);;
@@ -50,7 +51,7 @@ const getRider = async (req: queryList) => {
 
 const getRiderDetail = async (req: queryListDetail) => {
   try {
-    const response = await axios.post(`/api/rider/detail`, req);
+    const response = await fetch.post(`/api/rider/detail`, req);
     return successHandler(response);
   } catch (error) {
     return errorHandler(error);;
@@ -59,16 +60,25 @@ const getRiderDetail = async (req: queryListDetail) => {
 
 const getRejectReson = async () => {
   try {
-    const response = await axios.post(`/api/rider/reject-reason`);
+    const response = await fetch.post(`/api/rider/reject-reason`);
     return successHandler(response);
   } catch (error) {
     return errorHandler(error);;
   }
 };
 
-const updateRiderStatus = async (req: updateRiderStatus) => {
+const updateRiderStatus = async (req: queryUpdateRiderStatus) => {
   try {
-    const response = await axios.post(`/api/rider/update-status`, req);
+    const response = await fetch.post(`/api/rider/update-status`, req);
+    return successHandler(response);
+  } catch (error) {
+    return errorHandler(error);;
+  }
+};
+
+const getStatusHistories = async (req: any) => {
+  try {
+    const response = await fetch.post(`/api/rider/status-histories`, req);
     return successHandler(response);
   } catch (error) {
     return errorHandler(error);;

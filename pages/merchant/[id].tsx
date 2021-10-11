@@ -10,7 +10,7 @@ import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
-import Ekyc from '../ekyc/[id]'
+import Ekyc from '../ekyc/component'
 
 const { Title } = Typography
 
@@ -97,7 +97,7 @@ export default function View({}: Props): ReactElement {
       const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
       console.log(`ssoid`, ssoid)
       if (ssoid) {
-        setSsoid('TEST_MERCHANT_1')
+        setSsoid(ssoid)
       }
       setUserInitialValues({
         ...userInitialValues,

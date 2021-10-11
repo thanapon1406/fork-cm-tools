@@ -1,28 +1,24 @@
-import React, { ReactElement, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-
-import MainLayout from '@/layout/MainLayout'
-import Select from '@/components/Form/Select'
 import Button from '@/components/Button'
-import Table from '@/components/Table'
 import Card from '@/components/Card'
-import { Row, Col, Typography, Breadcrumb, Divider } from 'antd'
-const { Title } = Typography
-import { Formik, Form, Field } from 'formik'
 import Input from '@/components/Form/Input'
-import Ekyc from '../ekyc/[id]'
-import * as Yup from 'yup'
-import lodash from 'lodash'
+import Select from '@/components/Form/Select'
+import MainLayout from '@/layout/MainLayout'
 import { approveOutlet, outletDetail, outletList } from '@/services/merchant'
-import { useRecoilState } from 'recoil'
-import { merchantState } from '@/store'
+import { Breadcrumb, Col, Divider, Row, Typography } from 'antd'
+import { Field, Form, Formik } from 'formik'
+import lodash from 'lodash'
+import { useRouter } from 'next/router'
+import React, { ReactElement, useEffect, useState } from 'react'
+import * as Yup from 'yup'
+import Ekyc from '../ekyc/[id]'
 
-interface Props { }
+const { Title } = Typography
 
-export default function View({ }: Props): ReactElement {
+interface Props {}
+
+export default function View({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
-  const [userObj, setUserObj] = useRecoilState(merchantState)
   const [ssoId, setSsoid] = useState('')
   let [userInitialValues, setUserInitialValues] = useState({
     user_name: '',
@@ -83,7 +79,9 @@ export default function View({ }: Props): ReactElement {
       console.log(`user`, user)
       const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
       console.log(`ssoid`, ssoid)
-      setSsoid(ssoid)
+      if (ssoid) {
+        setSsoid(ssoid)
+      }
       setUserInitialValues({
         ...userInitialValues,
         user_name: `${first_name} ${last_name}`,

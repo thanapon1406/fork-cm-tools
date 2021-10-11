@@ -1,10 +1,10 @@
-import fetch from './fetch'
-import errorHandler from './handler/errorHandler'
-import successHandler from './handler/successHandler'
+import fetch from './fetch';
+import errorHandler from './handler/errorHandler';
+import successHandler from './handler/successHandler';
 
 export {
-  getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories
-}
+  getRider, getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories
+};
 
 interface queryList {
   page: number;

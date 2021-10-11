@@ -3,6 +3,7 @@ import Card from "@/components/Card";
 import Input from "@/components/Form/Input";
 import Select from "@/components/Form/Select";
 import MainLayout from "@/layout/MainLayout";
+import { downloadImage } from '@/services/cdn';
 import { getEkycDetail } from '@/services/ekyc';
 import { getRejectReson, getRiderDetail, getStatusHistories, updateRiderStatus } from '@/services/rider';
 import { Breadcrumb, Col, Form as antForm, Modal, notification, Row, Typography } from "antd";
@@ -115,10 +116,10 @@ export default function RiderDetail({ }: Props): ReactElement {
 				data.contact_refer_phone = _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '');
 				data.contact_refer_address = _.get(data.contact_refer, 'address_no', ''); + " " + _.get(data.contact_refer, 'district_name', ''); + " " + _.get(data.contact_emergency, 'subdistrict_name', ''); + " " + _.get(data.contact_emergency, 'province_name', ''); + " " + _.get(data.contact_emergency, 'zipcode', '');
 				data.car = _.get(data.pdpa.car_info[0], 'brand_name', ''); + "/" + _.get(data.pdpa.car_info[0], 'model_name', '');
-				data.driver_license_photo = (_.get(data.pdpa, 'driver_license_photo', '').indexOf("http") !== -1) ? _.get(data.pdpa, 'driver_license_photo', '') : ""
-				data.car_photo = (_.get(data.pdpa.car_info[0], 'photo', '').indexOf("http") !== -1) ? _.get(data.pdpa.car_info[0], 'photo', '') : ""
-				data.car_tax_photo = (_.get(data.pdpa.car_info[0], 'tax_photo', '').indexOf("http") !== -1) ? _.get(data.pdpa.car_info[0], 'tax_photo', '') : ""
-				data.disable_photo = (_.get(data.pdpa.disable_person[0], 'photo', '').indexOf("http") !== -1) ? _.get(data.pdpa.disable_person[0], 'photo', '') : ""
+				data.driver_license_photo = _.get(data.pdpa, 'driver_license_photo', '')
+				data.car_photo = _.get(data.pdpa.car_info[0], 'photo', '')
+				data.car_tax_photo = _.get(data.pdpa.car_info[0], 'tax_photo', '')
+				data.disable_photo = _.get(data.pdpa.disable_person[0], 'photo', '')
 			}
 			RiderDetail = data
 			if (data.status == "waiting" || data.status == "uploaded" || data.status == "approved") {
@@ -156,9 +157,16 @@ export default function RiderDetail({ }: Props): ReactElement {
 
 	const onClickViewMedia = async (type: string, pathUrl: string) => {
 		setIsLoadingMedia(true)
-		setImgUrl(pathUrl)
+		const payload = {
+			filepath: pathUrl,
+		}
+
+		const res = await downloadImage(payload)
+		const url = URL.createObjectURL(res)
+		setImgUrl(url)
 		setIsLoadingMedia(false)
 		setIsShowMediaModal(true)
+
 	}
 
 	const handleSubmit = async (values: any) => {

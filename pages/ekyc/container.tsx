@@ -2,7 +2,7 @@ import Button from '@/components/Button'
 import Select from '@/components/Form/Select'
 import { EkycApproveStatusInterface, EkycDetail, EkycDetailProps } from '@/interface/ekyc'
 import { downloadImage, getEkycDetail, updateEkycDetail } from '@/services/ekyc'
-import { Col, Modal, Row, Typography } from 'antd'
+import { Col, Empty, Modal, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { isUndefined } from 'lodash'
 import Image from 'next/image'
@@ -109,7 +109,9 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sso_id])
 
-  return (
+  return isUndefined(ekycDetail) ? (
+    <Empty />
+  ) : (
     <>
       <Modal
         closable={false}

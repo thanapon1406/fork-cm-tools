@@ -103,7 +103,6 @@ export default function Rider({ }: Props): ReactElement {
     {
       title: "ชื่อ Rider",
       dataIndex: "first_name",
-      align: "center",
       render: (text: any, record: any) => {
         let fullName = record.first_name + ' ' + record.last_name
         return (fullName)

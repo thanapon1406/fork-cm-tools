@@ -17,9 +17,9 @@ import { approveOutlet, outletDetail, outletList } from '@/services/merchant'
 import { useRecoilState } from 'recoil'
 import { merchantState } from '@/store'
 
-interface Props {}
+interface Props { }
 
-export default function view({}: Props): ReactElement {
+export default function View({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [userObj, setUserObj] = useRecoilState(merchantState)

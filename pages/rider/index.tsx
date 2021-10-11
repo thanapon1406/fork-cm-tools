@@ -1,19 +1,20 @@
-import React, { ReactElement, useState, useEffect } from "react";
-import { Formik, Form, Field } from "formik";
-import { Row, Col } from "antd";
-import * as Yup from "yup";
-import Moment from 'moment';
-
-import MainLayout from "@/layout/MainLayout";
-import Card from "@/components/Card";
 import Button from "@/components/Button";
+import Card from "@/components/Card";
+import DateTimeRangePicker from "@/components/Form/DateTimeRangePicker";
 import Input from "@/components/Form/Input";
 import Select from "@/components/Form/Select";
-import DateTimeRangePicker from "@/components/Form/DateTimeRangePicker";
 import Table from "@/components/Table";
+import MainLayout from "@/layout/MainLayout";
+import { getRider } from '@/services/rider';
+import { Breadcrumb, Col, Row, Typography } from "antd";
+import { Field, Form, Formik } from "formik";
+import Moment from 'moment';
+import React, { ReactElement, useEffect, useState } from "react";
+import * as Yup from "yup";
 
-import { getRider } from '@/services/rider'
-import lodash from "lodash";
+const { Title } = Typography;
+
+
 
 interface Props { }
 interface Pagination {
@@ -32,7 +33,7 @@ interface SearchValue {
 
 const StatusConstants = {
   UPLOADED: {
-    TH: "รอตรวจสอบ",
+    TH: "รอการตรวจสอบ",
     EN: "uploaded"
   },
   APPROVED: {
@@ -40,11 +41,11 @@ const StatusConstants = {
     EN: "approved",
   },
   REJECTED: {
-    TH: "ไม่ผ่าน",
+    TH: "ไม่อนุมัติ",
     EN: "rejected",
   },
   RE_APPROVED: {
-    TH: "ขอเอกสารเพิ่ม",
+    TH: "ขอเอกสารเพิ่มเติม",
     EN: "re-approved",
   }
 }
@@ -140,7 +141,7 @@ export default function Rider({ }: Props): ReactElement {
       title: "เบอร์โทรศัพท์",
       dataIndex: "phoneNumber",
       render: (text: any, record: any) => {
-        let phone = "-" //record.phone ? record.phone.slice(0, 7) + "xxx" : "-"
+        let phone = "-"
         if (record.phone) {
           phone = record.country_code + '-' + record.phone.replace('-', '').slice(2, 7) + "000"
 
@@ -152,29 +153,11 @@ export default function Rider({ }: Props): ReactElement {
     {
       title: "ข้อมูลลงทะเบียน",
       dataIndex: "status",
-      // render: (row: any) => {
-      //   const nameMapping: any = {
-      //     uploaded: "uploaded",
-      //     're-approved': "re-approved",
-      //     approved: "approved",
-      //     rejected: "reject",
-      //   };
-      //   return nameMapping[row];
-      // },
       align: "center"
     },
     {
       title: "e-kyc",
       dataIndex: "ekyc_status",
-      // render: (row: any) => {
-      //   const nameMapping: any = {
-      //     uploaded: "uploaded",
-      //     're-approved': "re-approved",
-      //     approved: "approved",
-      //     rejected: "reject",
-      //   };
-      //   return nameMapping[row];
-      // },
       align: "center"
     },
     {
@@ -207,6 +190,11 @@ export default function Rider({ }: Props): ReactElement {
 
   return (
     <MainLayout>
+      <Title level={4}>อนุมัติผลการลงทะเบียนเข้าใช้งานระบบ</Title>
+      <Breadcrumb style={{ margin: "16px 0" }}>
+        <Breadcrumb.Item>อนุมัติผลการลงทะเบียน</Breadcrumb.Item>
+        <Breadcrumb.Item>ลงทะเบียนคนขับ</Breadcrumb.Item>
+      </Breadcrumb>
       <Card>
         <Formik
           initialValues={initialValues}
@@ -272,7 +260,7 @@ export default function Rider({ }: Props): ReactElement {
                         value: "re-approved",
                       },
                       {
-                        name: "ไม่ผ่านการอนุมัติ",
+                        name: "ไม่อนุมัติ",
                         value: "rejected",
                       },
                     ]}
@@ -371,8 +359,6 @@ export default function Rider({ }: Props): ReactElement {
             handelDataTableLoad: handelDataTableLoad,
             pagination: pagination,
           }}
-
-
         />
       </Card>
     </MainLayout>

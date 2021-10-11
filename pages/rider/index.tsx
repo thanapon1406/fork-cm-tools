@@ -1,19 +1,20 @@
-import React, { ReactElement, useState, useEffect } from "react";
-import { Formik, Form, Field } from "formik";
-import { Row, Col } from "antd";
-import * as Yup from "yup";
-import Moment from 'moment';
-
-import MainLayout from "@/layout/MainLayout";
-import Card from "@/components/Card";
 import Button from "@/components/Button";
+import Card from "@/components/Card";
+import DateTimeRangePicker from "@/components/Form/DateTimeRangePicker";
 import Input from "@/components/Form/Input";
 import Select from "@/components/Form/Select";
-import DateTimeRangePicker from "@/components/Form/DateTimeRangePicker";
 import Table from "@/components/Table";
+import MainLayout from "@/layout/MainLayout";
+import { getRider } from '@/services/rider';
+import { Breadcrumb, Col, Row, Typography } from "antd";
+import { Field, Form, Formik } from "formik";
+import Moment from 'moment';
+import React, { ReactElement, useEffect, useState } from "react";
+import * as Yup from "yup";
 
-import { getRider } from '@/services/rider'
-import lodash from "lodash";
+const { Title } = Typography;
+
+
 
 interface Props { }
 interface Pagination {
@@ -189,6 +190,11 @@ export default function Rider({ }: Props): ReactElement {
 
   return (
     <MainLayout>
+      <Title level={4}>อนุมัติผลการลงทะเบียนเข้าใช้งานระบบ</Title>
+      <Breadcrumb style={{ margin: "16px 0" }}>
+        <Breadcrumb.Item>อนุมัติผลการลงทะเบียน</Breadcrumb.Item>
+        <Breadcrumb.Item>ลงทะเบียนคนขับ</Breadcrumb.Item>
+      </Breadcrumb>
       <Card>
         <Formik
           initialValues={initialValues}

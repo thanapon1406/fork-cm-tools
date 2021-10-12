@@ -2,7 +2,7 @@ import Button from '@/components/Button'
 import Select from '@/components/Form/Select'
 import { EkycApproveStatusInterface, EkycDetail, EkycDetailProps } from '@/interface/ekyc'
 import { downloadImage, getEkycDetail, updateEkycDetail } from '@/services/ekyc'
-import { Col, Empty, Modal, Row, Typography } from 'antd'
+import { Col, Empty, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { isUndefined } from 'lodash'
 import Image from 'next/image'
@@ -109,192 +109,196 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sso_id])
 
-  return isUndefined(ekycDetail) ? (
-    <Empty />
-  ) : (
-    <>
-      <Modal
-        closable={false}
-        onOk={() => {
-          setIsShowMediaModal(false)
-        }}
-        visible={isShowMediaModal}
-        footer={[
-          <Button
-            key="1"
-            type="primary"
-            onClick={() => {
+  return (
+    <Skeleton loading={isLoading}>
+      {isUndefined(ekycDetail) ? (
+        <Empty />
+      ) : (
+        <>
+          <Modal
+            closable={false}
+            onOk={() => {
               setIsShowMediaModal(false)
             }}
-          >
-            ปิด
-          </Button>,
-        ]}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            height: '100%',
-            width: '100%',
-          }}
-        >
-          {mediaType === 'image' ? (
-            <Image src={mediaUrl} width={1920} height={1200} alt="media" />
-          ) : (
-            <iframe src={mediaUrl} allow="autoplay; encrypted-media" title="video" />
-          )}
-        </div>
-      </Modal>
-
-      <Formik
-        initialValues={{
-          video_url: ekycDetail?.video_url,
-          face_photo_url: ekycDetail?.face_photo_url,
-          citizen_card_photo_url: ekycDetail?.citizen_card_photo_url,
-          status_face: ekycDetail?.status_face,
-          status_card: ekycDetail?.status_card,
-          status_video: ekycDetail?.status_video,
-          status: ekycDetail?.status,
-        }}
-        enableReinitialize
-        onSubmit={onSubmit}
-      >
-        {({ values }) => (
-          <Form style={{ justifyContent: 'center' }}>
-            <Row style={{ padding: '16px' }} justify="space-between">
-              <Col offset={2} span={4}>
-                <Title level={5}>สแกนบัตรประชาชน</Title>
-              </Col>
-              <Col offset={2} span={6}>
-                <Button
-                  loading={isLoadingMedia}
-                  disabled={isUndefined(values.citizen_card_photo_url)}
-                  onClick={() => {
-                    const { citizen_card_photo_url } = values
-                    if (!isUndefined(citizen_card_photo_url)) {
-                      onClickViewMedia('image', citizen_card_photo_url)
-                    }
-                  }}
-                >
-                  ดูรูปภาพ
-                </Button>
-              </Col>
-              <Col offset={2} span={4} pull={2}>
-                <Field
-                  name="status_card"
-                  component={Select}
-                  id="status_card"
-                  placeholder="กรุณาเลือกสถานะ"
-                  selectOption={statusOptionCard}
-                />
-              </Col>
-            </Row>
-            <Row style={{ padding: '16px' }} justify="space-between">
-              <Col offset={2} span={4}>
-                <Title level={5}>สแกนใบหน้า</Title>
-              </Col>
-              <Col offset={2} span={6}>
-                <Button
-                  loading={isLoadingMedia}
-                  disabled={isUndefined(values.face_photo_url)}
-                  onClick={() => {
-                    const { face_photo_url } = values
-                    if (!isUndefined(face_photo_url)) {
-                      onClickViewMedia('image', face_photo_url)
-                    }
-                  }}
-                >
-                  ดูรูปภาพ
-                </Button>
-              </Col>
-              <Col offset={2} span={4} pull={2}>
-                <Field
-                  name="status_face"
-                  component={Select}
-                  id="status_face"
-                  placeholder="กรุณาเลือกสถานะ"
-                  selectOption={statusOptionFace}
-                />
-              </Col>
-            </Row>
-            <Row style={{ padding: '16px' }} justify="space-between">
-              <Col offset={2} span={4}>
-                <Title level={5}>อัดคลิปเสียงพร้อมวิดีโอ</Title>
-              </Col>
-              <Col offset={2} span={6}>
-                <Button
-                  loading={isLoadingMedia}
-                  disabled={isUndefined(values.video_url)}
-                  onClick={() => {
-                    const { video_url } = values
-                    if (!isUndefined(video_url)) {
-                      onClickViewMedia('video', video_url)
-                    }
-                  }}
-                >
-                  ดูวิดีโอ
-                </Button>
-              </Col>
-              <Col offset={2} span={4} pull={2}>
-                <Field
-                  name="status_video"
-                  component={Select}
-                  id="status_video"
-                  placeholder="กรุณาเลือกสถานะ"
-                  selectOption={statusVideoOption}
-                />
-              </Col>
-            </Row>
-            <Row style={{ padding: '16px' }} justify="space-between">
-              <Col offset={2} span={4} />
-              <Col offset={2} span={6}>
-                <Title level={5}>การอนุมัติ</Title>
-              </Col>
-              <Col offset={2} span={4} pull={2}>
-                <Field
-                  name="status"
-                  component={Select}
-                  id="status"
-                  placeholder="กรุณาเลือกสถานะ"
-                  selectOption={[
-                    { value: 'uploaded', name: 'รอการอนุมัติ' },
-                    { value: 're-approved', name: 'ขอเอกสารเพิ่มเติม' },
-                    { value: 'rejected', name: 'ไม่อนุมัติ' },
-                    {
-                      value: 'approved',
-                      name: 'อนุมัติ',
-                      disabled:
-                        values.status_card !== 1 ||
-                        values.status_face !== 1 ||
-                        values.status_video !== 1,
-                    },
-                  ]}
-                />
-              </Col>
-            </Row>
-            <Row justify="end">
-              {console.log(values)}
+            visible={isShowMediaModal}
+            footer={[
               <Button
-                disabled={
-                  isUndefined(values.status) ||
-                  isUndefined(values.status_card) ||
-                  isUndefined(values.status_face) ||
-                  isUndefined(values.status_video)
-                }
-                loading={isLoadingSubmit}
-                style={{ width: '120px', marginTop: '31px' }}
+                key="1"
                 type="primary"
-                size="middle"
-                htmlType="submit"
+                onClick={() => {
+                  setIsShowMediaModal(false)
+                }}
               >
-                บันทึก
-              </Button>
-            </Row>
-          </Form>
-        )}
-      </Formik>
-    </>
+                ปิด
+              </Button>,
+            ]}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                height: '100%',
+                width: '100%',
+              }}
+            >
+              {mediaType === 'image' ? (
+                <Image src={mediaUrl} width={1920} height={1200} alt="media" />
+              ) : (
+                <iframe src={mediaUrl} allow="autoplay; encrypted-media" title="video" />
+              )}
+            </div>
+          </Modal>
+
+          <Formik
+            initialValues={{
+              video_url: ekycDetail?.video_url,
+              face_photo_url: ekycDetail?.face_photo_url,
+              citizen_card_photo_url: ekycDetail?.citizen_card_photo_url,
+              status_face: ekycDetail?.status_face,
+              status_card: ekycDetail?.status_card,
+              status_video: ekycDetail?.status_video,
+              status: ekycDetail?.status,
+            }}
+            enableReinitialize
+            onSubmit={onSubmit}
+          >
+            {({ values }) => (
+              <Form style={{ justifyContent: 'center' }}>
+                <Row style={{ padding: '16px' }} justify="space-between">
+                  <Col offset={2} span={4}>
+                    <Title level={5}>สแกนบัตรประชาชน</Title>
+                  </Col>
+                  <Col offset={2} span={6}>
+                    <Button
+                      loading={isLoadingMedia}
+                      disabled={isUndefined(values.citizen_card_photo_url)}
+                      onClick={() => {
+                        const { citizen_card_photo_url } = values
+                        if (!isUndefined(citizen_card_photo_url)) {
+                          onClickViewMedia('image', citizen_card_photo_url)
+                        }
+                      }}
+                    >
+                      ดูรูปภาพ
+                    </Button>
+                  </Col>
+                  <Col offset={2} span={4} pull={2}>
+                    <Field
+                      name="status_card"
+                      component={Select}
+                      id="status_card"
+                      placeholder="กรุณาเลือกสถานะ"
+                      selectOption={statusOptionCard}
+                    />
+                  </Col>
+                </Row>
+                <Row style={{ padding: '16px' }} justify="space-between">
+                  <Col offset={2} span={4}>
+                    <Title level={5}>สแกนใบหน้า</Title>
+                  </Col>
+                  <Col offset={2} span={6}>
+                    <Button
+                      loading={isLoadingMedia}
+                      disabled={isUndefined(values.face_photo_url)}
+                      onClick={() => {
+                        const { face_photo_url } = values
+                        if (!isUndefined(face_photo_url)) {
+                          onClickViewMedia('image', face_photo_url)
+                        }
+                      }}
+                    >
+                      ดูรูปภาพ
+                    </Button>
+                  </Col>
+                  <Col offset={2} span={4} pull={2}>
+                    <Field
+                      name="status_face"
+                      component={Select}
+                      id="status_face"
+                      placeholder="กรุณาเลือกสถานะ"
+                      selectOption={statusOptionFace}
+                    />
+                  </Col>
+                </Row>
+                <Row style={{ padding: '16px' }} justify="space-between">
+                  <Col offset={2} span={4}>
+                    <Title level={5}>อัดคลิปเสียงพร้อมวิดีโอ</Title>
+                  </Col>
+                  <Col offset={2} span={6}>
+                    <Button
+                      loading={isLoadingMedia}
+                      disabled={isUndefined(values.video_url)}
+                      onClick={() => {
+                        const { video_url } = values
+                        if (!isUndefined(video_url)) {
+                          onClickViewMedia('video', video_url)
+                        }
+                      }}
+                    >
+                      ดูวิดีโอ
+                    </Button>
+                  </Col>
+                  <Col offset={2} span={4} pull={2}>
+                    <Field
+                      name="status_video"
+                      component={Select}
+                      id="status_video"
+                      placeholder="กรุณาเลือกสถานะ"
+                      selectOption={statusVideoOption}
+                    />
+                  </Col>
+                </Row>
+                <Row style={{ padding: '16px' }} justify="space-between">
+                  <Col offset={2} span={4} />
+                  <Col offset={2} span={6}>
+                    <Title level={5}>การอนุมัติ</Title>
+                  </Col>
+                  <Col offset={2} span={4} pull={2}>
+                    <Field
+                      name="status"
+                      component={Select}
+                      id="status"
+                      placeholder="กรุณาเลือกสถานะ"
+                      selectOption={[
+                        { value: 'uploaded', name: 'รอการอนุมัติ' },
+                        { value: 're-approved', name: 'ขอเอกสารเพิ่มเติม' },
+                        { value: 'rejected', name: 'ไม่อนุมัติ' },
+                        {
+                          value: 'approved',
+                          name: 'อนุมัติ',
+                          disabled:
+                            values.status_card !== 1 ||
+                            values.status_face !== 1 ||
+                            values.status_video !== 1,
+                        },
+                      ]}
+                    />
+                  </Col>
+                </Row>
+                <Row justify="end">
+                  {console.log(values)}
+                  <Button
+                    disabled={
+                      isUndefined(values.status) ||
+                      isUndefined(values.status_card) ||
+                      isUndefined(values.status_face) ||
+                      isUndefined(values.status_video)
+                    }
+                    loading={isLoadingSubmit}
+                    style={{ width: '120px', marginTop: '31px' }}
+                    type="primary"
+                    size="middle"
+                    htmlType="submit"
+                  >
+                    บันทึก
+                  </Button>
+                </Row>
+              </Form>
+            )}
+          </Formik>
+        </>
+      )}
+    </Skeleton>
   )
 }
 

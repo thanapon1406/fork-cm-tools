@@ -1,26 +1,26 @@
-import { Form, Input, Typography } from "antd";
-import { ErrorMessage } from "formik";
-import { FormikProps } from "./props";
-const { Text } = Typography;
+import { Form, Input, Typography } from 'antd'
+import { ErrorMessage } from 'formik'
+import { FormikProps } from './props'
+const { Text } = Typography
 
 interface InputProps extends FormikProps {
-  id: string | undefined;
-  type: string;
-  className: string | undefined;
-  placeholder: string | undefined;
-  autoComplete: string | undefined;
+  id: string | undefined
+  type: string
+  className: string | undefined
+  placeholder: string | undefined
+  autoComplete: string | undefined
   label: {
-    text: string | undefined;
-    className: string;
-  };
-  disabled: boolean | false;
+    text: string | undefined
+    className: string
+  }
+  disabled: boolean | false
 }
 
 const CustomInput = ({ label, field, ...props }: InputProps) => {
   const handleChange = (e: any) => {
-    let value = e?.target?.value;
-    props.form.setFieldValue(field.name, value);
-  };
+    let value = e?.target?.value
+    props.form.setFieldValue(field.name, value)
+  }
 
   return (
     <div className="ant-form ant-form-vertical">
@@ -38,16 +38,12 @@ const CustomInput = ({ label, field, ...props }: InputProps) => {
         />
         <Text type="danger">
           <div>
-            <ErrorMessage
-              name={field.name}
-              component="div"
-              className="validate-error"
-            />
+            <ErrorMessage name={field.name} component="div" className="validate-error" />
           </div>
         </Text>
       </Form.Item>
     </div>
-  );
-};
+  )
+}
 
-export default CustomInput;
+export default CustomInput

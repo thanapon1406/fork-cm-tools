@@ -40,7 +40,7 @@ interface queryUpdateRiderStatus {
 }
 
 interface riderDetail {
-	id: string;
+	id?: string;
 	project_id?: number;
 	sso_id: string;
 	gender?: string;
@@ -68,7 +68,9 @@ export default function RiderDetail({ }: Props): ReactElement {
 	const router = useRouter()
 	const { id } = router.query
 	let [_isLoading, setIsLoading] = useState(true);
-	let [riderDetail, setRiderDetail] = useState<riderDetail>({});
+	let [riderDetail, setRiderDetail] = useState<riderDetail>({
+		sso_id: ""
+	});
 	let [disableRejectReason, setDisableRejectReason] = useState(false);
 	let [rejectReason, setRejectReason] = useState([] as any);
 	let [rejectReasonDropDown, setRejectReasonDropDown] = useState([] as any);
@@ -116,11 +118,11 @@ export default function RiderDetail({ }: Props): ReactElement {
 				data.contact_refer = _.find(data.contacts, function (o) { return o.type == "refer"; });
 				data.contact_refer_phone = _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '');
 				data.contact_refer_address = _.get(data.contact_refer, 'address_no', ''); + " " + _.get(data.contact_refer, 'district_name', ''); + " " + _.get(data.contact_emergency, 'subdistrict_name', ''); + " " + _.get(data.contact_emergency, 'province_name', ''); + " " + _.get(data.contact_emergency, 'zipcode', '');
-				data.car = _.get(data.pdpa.car_info[0], 'brand_name', ''); + "/" + _.get(data.pdpa.car_info[0], 'model_name', '');
+				data.car = _.get(data.pdpa, 'car_info[0].brand_name', ''); + "/" + _.get(data.pdpa, 'car_info[0].model_name', '');
 				data.driver_license_photo = _.get(data.pdpa, 'driver_license_photo', '')
-				data.car_photo = _.get(data.pdpa.car_info[0], 'photo', '')
-				data.car_tax_photo = _.get(data.pdpa.car_info[0], 'tax_photo', '')
-				data.disable_photo = _.get(data.pdpa.disable_person[0], 'photo', '')
+				data.car_photo = _.get(data.pdpa, 'car_info[0].photo', '')
+				data.car_tax_photo = _.get(data.pdpa, 'car_info[0].tax_photo', '')
+				data.disable_photo = _.get(data.pdpa, 'disable_person[0].photo', '')
 			}
 			RiderDetail = data
 			if (data.status == "waiting" || data.status == "uploaded" || data.status == "approved") {
@@ -572,7 +574,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 										<antForm.Item label="รูปความบกพร่องทางร่างกาย">
 											<Button
 												loading={isLoadingMedia}
-												disabled={isUndefined(values.disable_photo) || values.car_tax_photo == ""}
+												disabled={isUndefined(values.disable_photo) || values.disable_photo == ""}
 												onClick={() => {
 													if (!isUndefined(values.disable_photo)) {
 														onClickViewMedia('image', values.disable_photo)

@@ -14,9 +14,9 @@ import Ekyc from '../ekyc/component'
 
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function View({}: Props): ReactElement {
+export default function View({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoId, setSsoid] = useState('')
@@ -185,7 +185,7 @@ export default function View({}: Props): ReactElement {
         <Formik
           enableReinitialize={true}
           initialValues={userInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -247,7 +247,7 @@ export default function View({}: Props): ReactElement {
         </Formik>
         <div>
           {/* "b450d352-33e7-4896-a994-b9736a85d352" */}
-          {ssoId && <Ekyc isComponent sso_id={ssoId} />}
+          {ssoId && <Ekyc sso_id={ssoId} />}
         </div>
         <Formik
           enableReinitialize={true}

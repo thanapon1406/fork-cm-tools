@@ -1,1 +1,1 @@
-export { personState } from './atom';
+export { personState, merchantState } from './atom'

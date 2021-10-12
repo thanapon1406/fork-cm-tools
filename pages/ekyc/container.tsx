@@ -75,12 +75,17 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
           : 'ใบหน้าไม่ชัดเจน',
     }
 
-    const { message, success } = await updateEkycDetail(payload)
+    const { message, success, result } = await updateEkycDetail(payload)
 
     if (success) {
+      const { data } = result
       Modal.success({
         content: <Title level={4}>อนุมัติการยืนยันตัวตนสำเร็จ</Title>,
       })
+      setEkycDetail(data)
+      if (setEkycStatus) {
+        setEkycStatus(data.status)
+      }
     } else {
       Modal.success({
         content: <Title level={4}>{message}</Title>,

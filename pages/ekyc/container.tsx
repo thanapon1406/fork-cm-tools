@@ -4,7 +4,7 @@ import { EkycApproveStatusInterface, EkycDetail, EkycDetailProps } from '@/inter
 import { downloadImage, getEkycDetail, updateEkycDetail } from '@/services/ekyc'
 import { Col, Empty, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { isUndefined } from 'lodash'
+import { isEmpty, isUndefined } from 'lodash'
 import Image from 'next/image'
 import { ReactElement, useEffect, useState } from 'react'
 const { Title } = Typography
@@ -105,7 +105,9 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
   }
 
   useEffect(() => {
-    fetchEkycDetail(sso_id)
+    if (!isEmpty(sso_id)) {
+      fetchEkycDetail(sso_id)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sso_id])
 

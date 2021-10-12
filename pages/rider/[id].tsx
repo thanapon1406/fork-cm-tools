@@ -125,7 +125,6 @@ export default function RiderDetail({ }: Props): ReactElement {
 				data.disable_photo = _.get(data.pdpa, 'disable_person[0].photo', '')
 			}
 			RiderDetail = data
-			console.log(RiderDetail);
 
 			if (data.status == "waiting" || data.status == "uploaded" || data.status == "approved") {
 				setDisableRejectReason(true)

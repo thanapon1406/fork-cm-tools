@@ -69,10 +69,16 @@ const EkycList = (): ReactElement => {
       per_page: paging.pageSize,
       ...filterObj,
     }
+
     const { result, success } = await getEkycList(reqBody)
 
     if (success) {
-      const { data } = result
+      const { data, meta } = result
+      setPagination({
+        pageSize: paging.pageSize,
+        current: meta.page,
+        total: meta.total_count,
+      })
       setEkycDataList(
         map(data, (item: EkycDetail) => ({
           ...item,

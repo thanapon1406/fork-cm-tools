@@ -3,6 +3,7 @@ import Card from "@/components/Card";
 import Input from "@/components/Form/Input";
 import Select from "@/components/Form/Select";
 import MainLayout from "@/layout/MainLayout";
+import { downloadImage } from '@/services/cdn';
 import { getEkycDetail } from '@/services/ekyc';
 import { getRejectReson, getRiderDetail, getStatusHistories, updateRiderStatus } from '@/services/rider';
 import { Breadcrumb, Col, Form as antForm, Modal, notification, Row, Typography } from "antd";
@@ -55,7 +56,7 @@ interface riderDetail {
 	approve_status?: string;
 	view_approve_status?: boolean;
 	reason?: string[];
-	nation_photo?: string;
+	driver_license_photo?: string;
 	car_photo?: string;
 	car_tax_photo?: string;
 	disable_photo?: string;
@@ -103,7 +104,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 				data.contact_refer = ""
 				data.contact_refer_address = ""
 				data.car = ""
-				data.nation_photo = ""
+				data.driver_license_photo = ""
 				data.car_photo = ""
 				data.car_tax_photo = ""
 				data.disable_photo = ""
@@ -115,10 +116,10 @@ export default function RiderDetail({ }: Props): ReactElement {
 				data.contact_refer_phone = _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '');
 				data.contact_refer_address = _.get(data.contact_refer, 'address_no', ''); + " " + _.get(data.contact_refer, 'district_name', ''); + " " + _.get(data.contact_emergency, 'subdistrict_name', ''); + " " + _.get(data.contact_emergency, 'province_name', ''); + " " + _.get(data.contact_emergency, 'zipcode', '');
 				data.car = _.get(data.pdpa.car_info[0], 'brand_name', ''); + "/" + _.get(data.pdpa.car_info[0], 'model_name', '');
-				data.nation_photo = (_.get(data.pdpa, 'nation_photo', '').indexOf("http") !== -1) ? _.get(data.pdpa, 'nation_photo', '') : ""
-				data.car_photo = (_.get(data.pdpa.car_info[0], 'photo', '').indexOf("http") !== -1) ? _.get(data.pdpa.car_info[0], 'photo', '') : ""
-				data.car_tax_photo = (_.get(data.pdpa.car_info[0], 'tax_photo', '').indexOf("http") !== -1) ? _.get(data.pdpa.car_info[0], 'tax_photo', '') : ""
-				data.disable_photo = (_.get(data.pdpa.disable_person[0], 'photo', '').indexOf("http") !== -1) ? _.get(data.pdpa.disable_person[0], 'photo', '') : ""
+				data.driver_license_photo = _.get(data.pdpa, 'driver_license_photo', '')
+				data.car_photo = _.get(data.pdpa.car_info[0], 'photo', '')
+				data.car_tax_photo = _.get(data.pdpa.car_info[0], 'tax_photo', '')
+				data.disable_photo = _.get(data.pdpa.disable_person[0], 'photo', '')
 			}
 			RiderDetail = data
 			if (data.status == "waiting" || data.status == "uploaded" || data.status == "approved") {
@@ -156,9 +157,16 @@ export default function RiderDetail({ }: Props): ReactElement {
 
 	const onClickViewMedia = async (type: string, pathUrl: string) => {
 		setIsLoadingMedia(true)
-		setImgUrl(pathUrl)
+		const payload = {
+			filepath: pathUrl,
+		}
+
+		const res = await downloadImage(payload)
+		const url = URL.createObjectURL(res)
+		setImgUrl(url)
 		setIsLoadingMedia(false)
 		setIsShowMediaModal(true)
+
 	}
 
 	const handleSubmit = async (values: any) => {
@@ -335,17 +343,17 @@ export default function RiderDetail({ }: Props): ReactElement {
 							</Row>
 							<Row gutter={10}>
 								<Col style={{ marginTop: "31px" }} span={4}>
-									บัตรประชาชน
+									ใบอนุญาติขับรถ
 								</Col>
 								<Col>
 									<div className="ant-form ant-form-vertical">
-										<antForm.Item label="รูปบัตรประชาชน">
+										<antForm.Item label="ใบอนุญาติขับรถ">
 											<Button
 												loading={isLoadingMedia}
-												disabled={isUndefined(values.nation_photo) || values.nation_photo == ""}
+												disabled={isUndefined(values.driver_license_photo) || values.driver_license_photo == ""}
 												onClick={() => {
-													if (!isUndefined(values.nation_photo)) {
-														onClickViewMedia('image', values.nation_photo)
+													if (!isUndefined(values.driver_license_photo)) {
+														onClickViewMedia('image', values.driver_license_photo)
 													}
 												}}
 											>

@@ -1,24 +1,22 @@
-import React, { ReactElement, useState, useEffect } from "react";
-import MainLayout from "@/layout/MainLayout";
 import Button from "@/components/Button";
-import Table from "@/components/Table";
 import Card from "@/components/Card";
 import DateRangePicker from "@/components/Form/DateRangePicker";
-import { Row, Col, Typography, Breadcrumb, Space } from "antd";
-
-import Select from "@/components/Form/Select";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
 import Input from "@/components/Form/Input";
-import { useRecoilState } from "recoil";
-import { personState } from "@/store";
-import useFetch from "@/hooks/useFetch";
-const { Title } = Typography;
+import Select from "@/components/Form/Select";
+import Table from "@/components/Table";
+import MainLayout from "@/layout/MainLayout";
 import { consumerList } from "@/services/consumer";
+import { personState } from "@/store";
+import { Breadcrumb, Col, Row, Space, Typography } from "antd";
+import { Field, Form, Formik } from "formik";
 import moment from "moment";
-import { convertJsonToParam } from "@/utils/helpers";
+import React, { ReactElement, useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
+import * as Yup from "yup";
 
-interface Props {}
+const { Title } = Typography;
+
+interface Props { }
 
 interface Pagination {
   total: number;
@@ -35,7 +33,7 @@ interface filterObject {
   update_end_date?: string;
 }
 
-export default function Merchant({}: Props): ReactElement {
+export default function Merchant({ }: Props): ReactElement {
   const [userObj, setUserObj] = useRecoilState(personState);
   const initialValues = {
     keyword: "",
@@ -120,13 +118,13 @@ export default function Merchant({}: Props): ReactElement {
     fetchData(filter, pagination);
   };
 
-  const statusMapping:any = {
+  const statusMapping: any = {
     uploaded: "รอตรวจสอบ",
     approved: "อนุมัติ",
     "re-approved": "ขอเอกสารเพิ่ม",
     rejected: "ไม่ผ่าน",
   };
-  
+
   const column = [
     {
       title: "Consumer ID",
@@ -142,14 +140,14 @@ export default function Merchant({}: Props): ReactElement {
       title: "Social login name",
       align: "center",
       render: (row: any) => {
-        return row["social_login_first_name"]+" "+row["social_login_last_name"]
+        return row["social_login_first_name"] + " " + row["social_login_last_name"]
       },
     },
     {
       title: "ชื่อและนามสกุล",
       align: "center",
       render: (row: any) => {
-        return row["first_name"]+" "+row["last_name"]
+        return row["first_name"] + " " + row["last_name"]
       },
     },
     {
@@ -254,8 +252,8 @@ export default function Merchant({}: Props): ReactElement {
                     id="login_date"
                     placeholder="login_date"
                   />
-                  </Col>
-                  <Col className="gutter-row" span={6}>
+                </Col>
+                <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: "วันเวลาที่อัพเดท" }}
                     name="update_date"

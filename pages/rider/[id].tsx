@@ -12,6 +12,7 @@ import _, { isUndefined } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useState } from "react";
+import Ekyc from '../ekyc/component';
 const { Title } = Typography;
 
 
@@ -39,9 +40,9 @@ interface queryUpdateRiderStatus {
 }
 
 interface riderDetail {
-	id?: string | undefined;
+	id: string;
 	project_id?: number;
-	sso_id?: string;
+	sso_id: string;
 	gender?: string;
 	first_name?: string;
 	last_name?: string;
@@ -170,7 +171,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 	}
 
 	const handleSubmit = async (values: any) => {
-		const { result, success } = await getEkycDetail("b450d352-33e7-4896-a994-b9736a85d352")
+		const { result, success } = await getEkycDetail(riderDetail.sso_id)
 		const { data } = result
 		if (data.status == "uploaded") {
 			notification.error({
@@ -335,7 +336,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 									/>
 								</Col>
 							</Row>
-							{/* <Ekyc isComponent sso_id="b450d352-33e7-4896-a994-b9736a85d352" /> */}
+							<Ekyc sso_id={riderDetail.sso_id} />
 						</Card>
 						<Card>
 							<Row gutter={16} >

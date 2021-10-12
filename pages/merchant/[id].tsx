@@ -28,7 +28,7 @@ export default function View({}: Props): ReactElement {
   })
 
   let [outletInitialValues, setOutletInitialValues] = useState({
-    outlet_name: '124',
+    outlet_name: '',
     outlet_type: '',
     tax_id: '',
     email: '',
@@ -92,22 +92,21 @@ export default function View({}: Props): ReactElement {
     const { result, success } = await personalData(request)
     if (success) {
       const { data } = result
-      const { user = {} } = data[0]
-      console.log(`user`, user)
-      const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
-      console.log(`ssoid`, ssoid)
-      if (ssoid) {
-        setSsoid(ssoid)
+      if (data[0]) {
+        const { user = {} } = data[0]
+        const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
+        if (ssoid) {
+          setSsoid(ssoid)
+        }
+        setUserInitialValues({
+          ...userInitialValues,
+          user_name: `${first_name} ${last_name}`,
+          user_id: '',
+          user_phone: tel,
+          user_email: email,
+        })
       }
-      setUserInitialValues({
-        ...userInitialValues,
-        user_name: `${first_name} ${last_name}`,
-        user_id: '',
-        user_phone: tel,
-        user_email: email,
-      })
     }
-    return
   }
 
   const getOutlet = async () => {

@@ -1,10 +1,10 @@
 import axios from "axios";
-import successHandler from './handler/successHandler'
-import errorHandler from './handler/errorHandler'
+import errorHandler from './handler/errorHandler';
+import successHandler from './handler/successHandler';
 
 interface queryList {
-  page: number;
-  per_page: number;
+  page?: number;
+  per_page?: number;
   keyword?: string;
   sort_by?: string;
   sort_type?: string;
@@ -13,6 +13,7 @@ interface queryList {
   login_end_date?: string;
   update_start_date?: string;
   update_end_date?: string;
+  id: string;
 }
 
 const consumerList = async (option: queryList) => {

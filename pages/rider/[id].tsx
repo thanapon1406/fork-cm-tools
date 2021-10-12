@@ -40,7 +40,7 @@ interface queryUpdateRiderStatus {
 }
 
 interface riderDetail {
-	id: string;
+	id?: string;
 	project_id?: number;
 	sso_id: string;
 	gender?: string;
@@ -68,7 +68,9 @@ export default function RiderDetail({ }: Props): ReactElement {
 	const router = useRouter()
 	const { id } = router.query
 	let [_isLoading, setIsLoading] = useState(true);
-	let [riderDetail, setRiderDetail] = useState<riderDetail>({});
+	let [riderDetail, setRiderDetail] = useState<riderDetail>({
+		sso_id: ""
+	});
 	let [disableRejectReason, setDisableRejectReason] = useState(false);
 	let [rejectReason, setRejectReason] = useState([] as any);
 	let [rejectReasonDropDown, setRejectReasonDropDown] = useState([] as any);

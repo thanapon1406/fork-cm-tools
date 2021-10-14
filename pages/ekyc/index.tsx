@@ -156,7 +156,7 @@ const EkycList = (): ReactElement => {
       dataIndex: 'created_at',
       align: 'center',
       render: (row: any) => {
-        return moment(row).format('YYYY-MM-DD HH:MM')
+        return moment(row).format('YYYY-MM-DD HH:mm')
       },
     },
     {
@@ -164,7 +164,7 @@ const EkycList = (): ReactElement => {
       dataIndex: 'updated_at',
       align: 'center',
       render: (row: any) => {
-        return moment(row).format('YYYY-MM-DD HH:MM')
+        return moment(row).format('YYYY-MM-DD HH:mm')
       },
     },
   ]

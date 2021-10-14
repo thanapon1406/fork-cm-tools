@@ -193,7 +193,7 @@ export default function Merchant({}: Props): ReactElement {
       dataIndex: 'created_at',
       align: 'center',
       render: (row: any) => {
-        return moment(row).format('YYYY-MM-DD HH:MM')
+        return moment(row).format('YYYY-MM-DD HH:mm')
       },
     },
     {
@@ -201,7 +201,8 @@ export default function Merchant({}: Props): ReactElement {
       dataIndex: 'verify_date',
       align: 'center',
       render: (row: any) => {
-        return row ? moment(row).format('YYYY-MM-DD HH:MM') : '-'
+        console.log(`row`, row)
+        return row ? moment(row).format('YYYY-MM-DD HH:mm') : '-'
       },
     },
   ]

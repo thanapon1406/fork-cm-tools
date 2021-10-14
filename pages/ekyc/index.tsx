@@ -1,5 +1,6 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import { statusMapping } from '@/components/ekyc/common'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
@@ -16,7 +17,6 @@ import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import * as Yup from 'yup'
-import { statusMapping } from './common'
 const { Title } = Typography
 
 interface Pagination {

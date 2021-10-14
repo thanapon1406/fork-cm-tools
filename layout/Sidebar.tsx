@@ -112,15 +112,15 @@ export default function Sidebar({ }: Props): ReactElement {
             </Link>
           </Menu.Item>
         </SubMenu>
-        <SubMenu key="sub2" icon={<TeamOutlined />} title="บัญชีผู้ใช้งาน">
+        <SubMenu key="sub2" icon={<TeamOutlined />} title="User Profile">
           <Menu.Item key="consumer">
-            <Link href="/consumer">บัญชีลูกค้า</Link>
+            <Link href="/consumer">Consumer Profile</Link>
           </Menu.Item>
-          {/* <Menu.Item key="riderProfile">
-            <Link href="/userprofile/rider">Rider Profile</Link>
+          {/* <Menu.Item key="">
+            <Link href="">Merchant Profile</Link>
           </Menu.Item> */}
           <Menu.Item key="riderProfile">
-            <Link href="/userprofile/rider">บัญชีไรเดอร์</Link>
+            <Link href="/userprofile/rider">Rider Profile</Link>
           </Menu.Item>
         </SubMenu>
       </Menu>

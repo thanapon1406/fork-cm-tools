@@ -4,7 +4,6 @@ import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
-import Tag from '@/components/Tag'
 import { EkycDetail } from '@/interface/ekyc'
 import MainLayout from '@/layout/MainLayout'
 import { getEkycList } from '@/services/ekyc'
@@ -17,7 +16,7 @@ import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import * as Yup from 'yup'
-
+import { statusMapping } from './common'
 const { Title } = Typography
 
 interface Pagination {
@@ -83,7 +82,6 @@ const EkycList = (): ReactElement => {
         map(data, (item: EkycDetail) => ({
           ...item,
           name: `${item.first_name} ${item.last_name}`,
-          id: item.sso_id,
         }))
       )
     }
@@ -95,13 +93,6 @@ const EkycList = (): ReactElement => {
     getEkyc()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const statusMapping: any = {
-    uploaded: <Tag type="warning">รอการตรวจสอบ</Tag>,
-    approved: <Tag type="success">อนุมัติ</Tag>,
-    're-approved': <Tag type="default">ขอเอกสารเพิ่มเติม</Tag>,
-    rejected: <Tag type="error">ไม่อนุมัติ</Tag>,
-  }
 
   const handleSubmit = (values: any) => {
     console.log(values)

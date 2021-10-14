@@ -13,8 +13,8 @@ export interface requestEkycInterface {
   start_date?: string
   end_date?: string
   app_id?: string
-  per_page: number
-  page: number
+  per_page?: number
+  page?: number
 }
 
 export const getEkycList = async (option: requestEkycInterface) => {
@@ -26,12 +26,7 @@ export const getEkycList = async (option: requestEkycInterface) => {
   }
 }
 
-export const getEkycDetail = async (ssoId: any) => {
-  const payload = {
-    sso_id: ssoId,
-  }
-  console.log('getEkycDetail', ssoId)
-
+export const getEkycDetail = async (payload: requestEkycInterface) => {
   try {
     const result = await fetch.post(`/api/ekyc/detail`, payload)
     return successHandler(result)
@@ -50,19 +45,10 @@ export const updateEkycDetail = async (payload: any) => {
 }
 
 export const downloadImage = async (payload: any) => {
-  console.log(API_PATH_EKYC_SERVICE)
-  console.log(POS_WAPI)
-
   const res = await fetcher(`${POS_WAPI}${API_PATH_EKYC_SERVICE}/download-img`, {
     method: 'POST',
     body: JSON.stringify(payload),
   })
   const result = await res.blob()
   return result
-  // try {
-  //   const result = await fetch.post(`/api/ekyc?key=download`, payload, { responseType: 'blob' })
-  //   return successHandler(result)
-  // } catch (error) {
-  //   return errorHandler(error)
-  // }
 }

@@ -63,7 +63,7 @@ export default function Sidebar({ }: Props): ReactElement {
   );
 
   return (
-    <Sider breakpoint="lg" collapsedWidth="0">
+    <Sider breakpoint="lg" collapsedWidth="0" width="220px">
       <div className="logo" />
       <Space style={{ padding: "15px" }} size="middle">
         <Avatar shape="square" style={{ backgroundColor: `#${avatarColor}` }}>

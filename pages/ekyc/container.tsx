@@ -176,10 +176,11 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
               status: ekycDetail?.status,
             }}
             enableReinitialize
-            onSubmit={onSubmit}
+            // onSubmit={onSubmit}
+            onSubmit={() => {}}
           >
             {({ values }) => (
-              <Form style={{ justifyContent: 'center' }}>
+              <Form name="ekyc" style={{ justifyContent: 'center' }}>
                 <Row style={{ padding: '16px' }} justify="space-between">
                   <Col offset={2} span={4}>
                     <Title level={5}>สแกนบัตรประชาชน</Title>
@@ -304,7 +305,11 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                     style={{ width: '120px', marginTop: '31px' }}
                     type="primary"
                     size="middle"
-                    htmlType="submit"
+                    htmlType="button"
+                    onClick={() => {
+                      onSubmit(values)
+                    }}
+                    // htmlType="submit"
                   >
                     บันทึก
                   </Button>

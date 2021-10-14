@@ -1,9 +1,9 @@
 import Card from '@/components/Card'
+import { statusMapping } from '@/components/ekyc/common'
 import MainLayout from '@/layout/MainLayout'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { useRouter } from 'next/router'
 import { ReactElement, useState } from 'react'
-import { statusMapping } from './common'
 import EkycContainer from './container'
 const { Title } = Typography
 

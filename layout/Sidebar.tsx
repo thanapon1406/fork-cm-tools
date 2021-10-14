@@ -1,8 +1,6 @@
 import { findUser, logout } from "@/services/login";
 import { personState } from "@/store";
-import {
-  CarOutlined, DesktopOutlined, LogoutOutlined, PieChartOutlined, SettingOutlined, SolutionOutlined, TeamOutlined, UserOutlined
-} from "@ant-design/icons";
+import { LogoutOutlined, PieChartOutlined, SettingOutlined, SolutionOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Dropdown, Layout, Menu, Space, Typography } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -89,7 +87,7 @@ export default function Sidebar({ }: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={['']}
+        defaultOpenKeys={['sub1', 'sub2']}
         style={{ borderRight: 0 }}
       >
         <Menu.Item key="dashboard" icon={<PieChartOutlined />}>
@@ -97,46 +95,34 @@ export default function Sidebar({ }: Props): ReactElement {
             <a> Dashboard</a>
           </Link>
         </Menu.Item>
-        <Menu.Item key="merchant" icon={<DesktopOutlined />}>
-          <Link href="/merchant">
-            <a> Merchant</a>
-          </Link>
-        </Menu.Item>
-        {/* <Menu.Item key="consumer" icon={<TeamOutlined />}>
-          <Link href="/consumer">
-            <a> Consumer</a>
-          </Link>
-        </Menu.Item> */}
-
-        <SubMenu
-          key="consumerList"
-          icon={<TeamOutlined />}
-          title="User Consumer"
-        >
+        <SubMenu key="sub1" icon={<SolutionOutlined />} title="อนุมัติผลการลงทะเบียน">
+          <Menu.Item key="merchant">
+            <Link href="/merchant">
+              <a>ลงทะเบียนร้านค้า</a>
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="rider" >
+            <Link href="/rider">
+              <a>ลงทะเบียนคนขับ</a>
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="ekyc" >
+            <Link href="/ekyc">
+              <a>ลงทะเบียน E-KYC</a>
+            </Link>
+          </Menu.Item>
+        </SubMenu>
+        <SubMenu key="sub2" icon={<TeamOutlined />} title="บัญชีผู้ใช้งาน">
           <Menu.Item key="consumer">
-            <Link href="/consumer">Consumer Profile</Link>
+            <Link href="/consumer">บัญชีลูกค้า</Link>
           </Menu.Item>
-        </SubMenu>
-
-        <Menu.Item key="rider" icon={<CarOutlined />}>
-          <Link href="/rider">
-            <a> Rider</a>
-          </Link>
-        </Menu.Item>
-        <SubMenu
-          key="userProfile"
-          icon={<TeamOutlined />}
-          title="User Profile"
-        >
-          <Menu.Item key="riderProfile">
+          {/* <Menu.Item key="riderProfile">
             <Link href="/userprofile/rider">Rider Profile</Link>
+          </Menu.Item> */}
+          <Menu.Item key="riderProfile">
+            <Link href="/userprofile/rider">บัญชีไรเดอร์</Link>
           </Menu.Item>
         </SubMenu>
-        <Menu.Item key="ekyc" icon={<SolutionOutlined />}>
-          <Link href="/ekyc">
-            <a> E-KYC</a>
-          </Link>
-        </Menu.Item>
       </Menu>
     </Sider>
   )

@@ -174,7 +174,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 	}
 
 	const handleSubmit = async (values: any) => {
-		const { result, success } = await getEkycDetail(riderDetail.sso_id)
+		const { result, success } = await getEkycDetail({sso_id:riderDetail.sso_id})
 		const { data } = result
 		if (data.status == "uploaded") {
 			notification.error({

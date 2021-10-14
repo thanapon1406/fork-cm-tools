@@ -2,11 +2,13 @@ import Card from '@/components/Card'
 import MainLayout from '@/layout/MainLayout'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { useRouter } from 'next/router'
-import { ReactElement } from 'react'
+import { ReactElement, useState } from 'react'
+import { statusMapping } from './common'
 import EkycContainer from './container'
 const { Title } = Typography
 
 const EkycList = (): ReactElement => {
+  const [status, setEkycStatus] = useState('')
   const router = useRouter()
   const { query } = router
 
@@ -14,12 +16,17 @@ const EkycList = (): ReactElement => {
 
   return (
     <MainLayout>
-      <Title level={4}>อนุมัติการยินยันตัวตนผ่านระบบ E-KYC</Title>
+      <Title level={4}>อนุมัติการยืนยันตัวตนผ่านระบบ E-KYC</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>อนุมัติการยินยันตัวตนผ่านระบบ E-KYC</Breadcrumb.Item>
-        <Breadcrumb.Item>ลงทะเบียนการยินยันตัวตน</Breadcrumb.Item>
+        <Breadcrumb.Item>อนุมัติการยืนยันตัวตนผ่านระบบ E-KYC</Breadcrumb.Item>
+        <Breadcrumb.Item>ลงทะเบียนการยืนยันตัวตน</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
+        <Row style={{ padding: '16px' }} justify="end">
+          <Col offset={2} span={6}>
+            สถานะ {statusMapping[status]}
+          </Col>
+        </Row>
         <Row style={{ padding: '16px' }} justify="end">
           <Col offset={2} span={6}>
             การยืนยันตัวตน (E-KYC)
@@ -29,7 +36,7 @@ const EkycList = (): ReactElement => {
             สถานะการยืนยัน
           </Col>
         </Row>
-        <EkycContainer sso_id={id as string} />
+        <EkycContainer id={id as string} setEkycStatus={setEkycStatus} />
       </Card>
     </MainLayout>
   )

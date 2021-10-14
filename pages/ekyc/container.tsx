@@ -1,7 +1,12 @@
 import Button from '@/components/Button'
 import Select from '@/components/Form/Select'
 import { EkycApproveStatusInterface, EkycDetail, EkycDetailProps } from '@/interface/ekyc'
-import { downloadImage, getEkycDetail, updateEkycDetail } from '@/services/ekyc'
+import {
+  downloadImage,
+  getEkycDetail,
+  requestEkycInterface,
+  updateEkycDetail,
+} from '@/services/ekyc'
 import { Col, Empty, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { isEmpty, isUndefined } from 'lodash'
@@ -27,7 +32,7 @@ const statusVideoOption = [
   { name: 'ใบหน้าไม่ชัดเจน', value: 3, disabled: false },
 ]
 
-const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement => {
+const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactElement => {
   const [ekycDetail, setEkycDetail] = useState<EkycDetail>()
   const [isLoading, setLoading] = useState(false)
   const [isLoadingSubmit, setLoadingSubmit] = useState(false)
@@ -36,9 +41,13 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
   const [isLoadingMedia, setIsLoadingMedia] = useState(false)
   const [mediaType, setMediaType] = useState('')
 
-  const fetchEkycDetail = async (sso_id: string) => {
+  const fetchEkycDetail = async (sso_id?: string, id?: string) => {
+    const payload: requestEkycInterface = {
+      sso_id: sso_id || '',
+      id: id || '',
+    }
     setLoading(true)
-    const { result, success } = await getEkycDetail(sso_id)
+    const { result, success } = await getEkycDetail(payload)
     if (success) {
       const { data } = result
       setEkycDetail(data)
@@ -110,11 +119,11 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
   }
 
   useEffect(() => {
-    if (!isEmpty(sso_id)) {
-      fetchEkycDetail(sso_id)
+    if ((!isEmpty(sso_id) && !isUndefined(sso_id)) || (!isEmpty(id) && !isUndefined(id))) {
+      fetchEkycDetail(sso_id, id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sso_id])
+  }, [sso_id, id])
 
   return (
     <Skeleton loading={isLoading}>

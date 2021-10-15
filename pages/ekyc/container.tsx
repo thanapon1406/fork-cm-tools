@@ -125,6 +125,8 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sso_id, id])
 
+  const disableSeleteAndBtn = () => {}
+
   return (
     <Skeleton loading={isLoading}>
       {isUndefined(ekycDetail) ? (
@@ -166,15 +168,16 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
           </Modal>
 
           <Formik
-            initialValues={{
-              video_url: ekycDetail?.video_url,
-              face_photo_url: ekycDetail?.face_photo_url,
-              citizen_card_photo_url: ekycDetail?.citizen_card_photo_url,
-              status_face: ekycDetail?.status_face,
-              status_card: ekycDetail?.status_card,
-              status_video: ekycDetail?.status_video,
-              status: ekycDetail?.status,
-            }}
+            initialValues={ekycDetail}
+            // initialValues={{
+            //   video_url: ekycDetail?.video_url,
+            //   face_photo_url: ekycDetail?.face_photo_url,
+            //   citizen_card_photo_url: ekycDetail?.citizen_card_photo_url,
+            //   status_face: ekycDetail?.status_face,
+            //   status_card: ekycDetail?.status_card,
+            //   status_video: ekycDetail?.status_video,
+            //   status: ekycDetail?.status,
+            // }}
             enableReinitialize
             // onSubmit={onSubmit}
             onSubmit={() => {}}
@@ -275,6 +278,12 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                       name="status"
                       component={Select}
                       id="status"
+                      disabled={
+                        isUndefined(values.status) ||
+                        isUndefined(values.status_card) ||
+                        isUndefined(values.status_face) ||
+                        isUndefined(values.status_video)
+                      }
                       placeholder="กรุณาเลือกสถานะ"
                       selectOption={[
                         { value: 'uploaded', name: 'รอการอนุมัติ' },

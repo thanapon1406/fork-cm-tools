@@ -1,7 +1,8 @@
-import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
-import Select from '@/components/Form/Select'
+import ImgButton from '@/components/ImgButton'
+import Tag from '@/components/Tag'
+import useViewImage from '@/hooks/useViewImage'
 import MainLayout from '@/layout/MainLayout'
 import { approveOutlet, outletDetail, personalData } from '@/services/merchant'
 import { Breadcrumb, Col, Divider, Row, Typography } from 'antd'
@@ -10,13 +11,11 @@ import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
-import Ekyc from '../ekyc/component'
+const { Title, Text } = Typography
 
-const { Title } = Typography
+interface Props {}
 
-interface Props { }
-
-export default function View({ }: Props): ReactElement {
+export default function MerchantUserView({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoId, setSsoid] = useState('')
@@ -32,9 +31,15 @@ export default function View({ }: Props): ReactElement {
     outlet_type: '',
     tax_id: '',
     email: '',
+    full_address: '',
     address: '',
     verify_status: '',
-    verify_detail: [],
+    photo: '',
+    banner_photo: '',
+    latitude: '',
+    longitude: '',
+    tel: '',
+    rating: '',
   })
   const verifyDetailList = [
     {
@@ -116,20 +121,21 @@ export default function View({ }: Props): ReactElement {
     const { result, success } = await outletDetail(request)
     if (success) {
       const { data } = result
-      let verifyDetail = []
-      if (data.verify_detail) {
-        verifyDetail = data.verify_detail.map((d: any) => d.id)
-      }
-
       setOutletInitialValues({
         ...outletInitialValues,
-        outlet_name: data.name.th,
+        outlet_name: data?.name.th,
         outlet_type: mapBranchType[data.branch_type],
-        tax_id: data.tax_id,
-        email: data.email,
+        tax_id: data?.tax_id,
+        email: data?.email,
+        full_address: data.full_address,
         address: data.address,
         verify_status: data.verify_status,
-        verify_detail: verifyDetail,
+        photo: data?.photo,
+        banner_photo: data?.banner_photo,
+        latitude: data?.latitude,
+        longitude: data?.longitude,
+        tel: data?.tel,
+        rating: data?.rating,
       })
     }
   }
@@ -171,6 +177,14 @@ export default function View({ }: Props): ReactElement {
       router.push('/merchant')
     }
   }
+  const {
+    onClickViewMedia,
+    isShowMediaModal,
+    setIsShowMediaModal,
+    mediaType,
+    mediaUrl,
+    isLoadingMedia,
+  } = useViewImage()
 
   return (
     <MainLayout>
@@ -182,15 +196,25 @@ export default function View({ }: Props): ReactElement {
       </Breadcrumb>
       <Card>
         <br />
+
         <Formik
           enableReinitialize={true}
           initialValues={userInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
             <Form>
-              <Title level={5}>ข้อมูลการลงทะเบียน</Title>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={8}>
+                  <Title level={5}>ข้อมูลบัญชีร้านค้า</Title>
+                </Col>
+                <Col className="gutter-row" span={8} offset={8}>
+                  <Title style={{ textAlign: 'end' }} level={5}>
+                    สถานะผู้ใช้งาน : <Tag type="primary">Active</Tag>
+                  </Title>
+                </Col>
+              </Row>
               <Title level={5}>ข้อมูลส่วนบุคคล</Title>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -245,20 +269,30 @@ export default function View({ }: Props): ReactElement {
             </Form>
           )}
         </Formik>
-        <div>
-          {ssoId && <Ekyc sso_id={ssoId} />}
-        </div>
+
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
           onSubmit={handleSubmit}
           validationSchema={Schema}
         >
-          {(values) => (
+          {({ values }) => (
             <Form>
               <Divider />
               <Title level={5}>ข้อมูลร้านค้า</Title>
               <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>รูปภาพร้านค้า</Text>
+                  </div>
+                  <ImgButton url={values.photo} />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>รูปภาพปกร้านค้า</Text>
+                  </div>
+                  <ImgButton url={values.banner_photo} />
+                </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ชื่อร้านค้า' }}
@@ -268,18 +302,6 @@ export default function View({ }: Props): ReactElement {
                     className="form-control round"
                     id="outlet_name"
                     placeholder="ชื่อร้านค้า"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'ประเภทร้านค้า' }}
-                    name="outlet_type"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="outlet_type"
-                    placeholder="ประเภทร้านค้า"
                     disabled={true}
                   />
                 </Col>
@@ -295,79 +317,98 @@ export default function View({ }: Props): ReactElement {
                     disabled={true}
                   />
                 </Col>
+              </Row>
+              <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'อีเมล์' }}
-                    name="email"
+                    label={{ text: 'ประเภทร้านค้า' }}
+                    name="outlet_type"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="email"
-                    placeholder="อีเมล์"
+                    id="outlet_type"
+                    placeholder="ประเภทร้านค้า"
                     disabled={true}
                   />
                 </Col>
-              </Row>
-              <Row gutter={16}>
+
                 <Col className="gutter-row" span={18}>
                   <Field
                     label={{ text: 'ที่อยู่' }}
-                    name="address"
+                    name="full_address"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="address"
+                    id="full_address"
                     placeholder="ที่อยู่"
                     disabled={true}
                   />
                 </Col>
               </Row>
+
               <Row gutter={16}>
-                <Col className="gutter-row" span={6}>
+                <Col className="gutter-row" span={3}>
                   <Field
-                    label={{ text: 'การอนุมัติ' }}
-                    name="verify_status"
-                    component={Select}
-                    id="verify_status"
-                    placeholder="เลือกสถานะ"
-                    defaultValue="approve"
-                    selectOption={[
-                      {
-                        name: 'Approve',
-                        value: 'approved',
-                      },
-                      {
-                        name: 'Reject',
-                        value: 'rejected',
-                      },
-                      {
-                        name: 'Re-approve',
-                        value: 're-approved',
-                      },
-                    ]}
+                    label={{ text: 'ละติจูด' }}
+                    name="latitude"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="latitude"
+                    placeholder="ประเภทร้านค้า"
+                    disabled={true}
                   />
                 </Col>
-                <Col className="gutter-row" span={12}>
+
+                <Col className="gutter-row" span={3}>
                   <Field
-                    label={{ text: 'เหตุผล' }}
-                    name="verify_detail"
-                    component={Select}
-                    id="verify_detail"
-                    mode="multiple"
-                    placeholder="เลือกเหตุผล"
-                    selectOption={verifyDetailList}
-                    disabled={values.values.verify_status !== 'rejected'}
+                    label={{ text: 'ลองจิจูด' }}
+                    name="longitude"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="longitude"
+                    placeholder="ลองจิจูด"
+                    disabled={true}
+                  />
+                </Col>
+
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'ตำแหน่งร้านค้า' }}
+                    name="address"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="address"
+                    placeholder="ตำแหน่งร้านค้า"
+                    disabled={true}
+                  />
+                </Col>
+
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'เบอร์โทรร้านค้า' }}
+                    name="tel"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="tel"
+                    placeholder="เบอร์โทรร้านค้า"
+                    disabled={true}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
-                  <Button
-                    style={{ width: '120px', marginTop: '31px' }}
-                    type="primary"
-                    size="middle"
-                    htmlType="submit"
-                  >
-                    Submit
-                  </Button>
+                  <Field
+                    label={{ text: 'คะแนนร้านค้า' }}
+                    name="rating"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="rating"
+                    placeholder="คะแนนร้านค้า"
+                    disabled={true}
+                  />
                 </Col>
               </Row>
             </Form>

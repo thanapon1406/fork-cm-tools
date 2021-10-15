@@ -102,7 +102,6 @@ export default function Merchant({}: Props): ReactElement {
   }
 
   const handleSubmit = (values: any) => {
-    console.log(`values`, values)
     let reqFilter: filterObject = {
       keyword: values.keyword,
       verify_status: values.verify_status,
@@ -118,7 +117,6 @@ export default function Merchant({}: Props): ReactElement {
   }
 
   const handelDataTableLoad = (pagination: any) => {
-    console.log(`pagination`, pagination)
     fetchData(filter, pagination)
   }
 
@@ -201,7 +199,6 @@ export default function Merchant({}: Props): ReactElement {
       dataIndex: 'verify_date',
       align: 'center',
       render: (row: any) => {
-        console.log(`row`, row)
         return row ? moment(row).format('YYYY-MM-DD HH:mm') : '-'
       },
     },
@@ -216,7 +213,7 @@ export default function Merchant({}: Props): ReactElement {
       </Breadcrumb>
       <Card>
         <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
-          {(values) => (
+          {({ values, resetForm }) => (
             <Form>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -239,13 +236,15 @@ export default function Merchant({}: Props): ReactElement {
                       >
                         ค้นหา
                       </Button>
-                      {/* <Button
-                        style={{ width: "120px", marginTop: "31px" }}
-                        type="ghost"
+                      <Button
+                        style={{ width: '120px', marginTop: '31px', marginLeft: '10px' }}
+                        type="default"
                         size="middle"
+                        htmlType="reset"
+                        onClick={() => resetForm()}
                       >
-                        Clear
-                      </Button> */}
+                        เคลียร์
+                      </Button>
                     </Space>
                   </div>
                 </Col>

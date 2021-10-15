@@ -3,11 +3,13 @@ import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
+import Tag from '@/components/Tag'
 import { Pagination } from '@/interface/dataTable'
 import MainLayout from '@/layout/MainLayout'
-import { outletList } from '@/services/merchant'
+import { getOutletType, outletList } from '@/services/merchant'
 import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import _ from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
@@ -22,6 +24,7 @@ interface filterObject {
   outlet_type?: string
   status?: string
   id?: string
+  approve_status?: string
 }
 
 export default function MerchantProfileList({}: Props): ReactElement {
@@ -31,7 +34,12 @@ export default function MerchantProfileList({}: Props): ReactElement {
     outlet_type: '',
     status: '',
   }
-
+  let [outletType, setOutletType] = useState([
+    {
+      name: 'ทุกประเภท',
+      value: '',
+    },
+  ])
   let [dataTable, setDataTable] = useState([])
   let [_isLoading, setIsLoading] = useState(true)
   let [pagination, setPagination] = useState<Pagination>({
@@ -43,13 +51,29 @@ export default function MerchantProfileList({}: Props): ReactElement {
     keyword: '',
     outlet_type: '',
     status: '',
+    approve_status: '',
   })
 
   useEffect(() => {
+    fetchOutletType()
     fetchData()
   }, [])
 
   const Schema = Yup.object().shape({})
+
+  const fetchOutletType = async () => {
+    const { result, success } = await getOutletType()
+    if (success) {
+      const { data } = result
+      const outletTypeFormat = data.map((d: any) => {
+        return {
+          name: d.name.th,
+          value: d.id,
+        }
+      })
+      setOutletType([...outletType, ...outletTypeFormat])
+    }
+  }
 
   const fetchData = async (filterObj: filterObject = filter, paging: Pagination = pagination) => {
     const reqBody = {
@@ -95,6 +119,11 @@ export default function MerchantProfileList({}: Props): ReactElement {
 
   const column = [
     {
+      title: 'Merchant ID',
+      dataIndex: 'id',
+      align: 'center',
+    },
+    {
       title: 'ชื่อร้านค้า',
       dataIndex: 'name',
       align: 'center',
@@ -104,47 +133,39 @@ export default function MerchantProfileList({}: Props): ReactElement {
     },
     {
       title: 'ประเภทร้านค้า',
-      dataIndex: 'branch_type',
+      dataIndex: 'types',
       align: 'center',
-      render: (row: any) => {
-        const textMapping: any = {
-          single: 'สาขาเดี่ยว',
-          multiple: 'หลายสาขา',
-        }
-        return textMapping[row] || ''
-      },
-    },
-    {
-      title: 'ชื่อและนามสกุล',
-      dataIndex: 'user',
-      align: 'center',
-      render: (row: any) => {
+      render: (row: string) => {
         if (row) {
-          return `${row['first_name']} ${row['last_name']}`
+          // const outletType =
+          // console.log(`outletType`, outletType)
+          return (
+            <>
+              {_.map(row, (d: any) => {
+                return <Tag type="success">{d.name['th']}</Tag>
+              })}
+            </>
+          )
         }
-        return ''
       },
     },
     {
-      title: 'เบอร์โทรศัพท์',
+      title: 'เบอร์ติดต่อร้าน',
       dataIndex: 'tel',
       align: 'center',
     },
     {
-      title: 'ข้อมูลร้านค้า',
-      dataIndex: 'verify_status',
+      title: 'เครดิต',
+      dataIndex: 'credit',
       align: 'center',
     },
     {
-      title: 'E-KYC',
-      dataIndex: 'ekyc_status',
+      title: 'สถานะร้านค้า',
+      dataIndex: 'status',
       align: 'center',
-      render: (row: any) => {
-        return row === 'no-ekyc' ? '-' : row
-      },
     },
     {
-      title: 'สถานะการตรวจสอบ',
+      title: 'ร้านเปิด-ปิด',
       dataIndex: 'approve_status',
       align: 'center',
       className: 'column-typeverifyr',
@@ -153,19 +174,18 @@ export default function MerchantProfileList({}: Props): ReactElement {
       },
     },
     {
-      title: 'วันที่ลงทะเบียน',
-      dataIndex: 'created_at',
+      title: 'Delivery Info',
+      dataIndex: 'delivery_setting',
       align: 'center',
       render: (row: any) => {
-        return moment(row).format('YYYY-MM-DD HH:mm')
+        return _.get(row, 'deliver_by', '-')
       },
     },
     {
-      title: 'วันที่อัพเดตข้อมูล',
+      title: 'Approve Date',
       dataIndex: 'verify_date',
       align: 'center',
       render: (row: any) => {
-        console.log(`row`, row)
         return row ? moment(row).format('YYYY-MM-DD HH:mm') : '-'
       },
     },
@@ -180,7 +200,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
       </Breadcrumb>
       <Card>
         <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
-          {(values) => (
+          {({ values, resetForm }) => (
             <Form>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -203,47 +223,36 @@ export default function MerchantProfileList({}: Props): ReactElement {
                       >
                         ค้นหา
                       </Button>
-                      {/* <Button
-                        style={{ width: "120px", marginTop: "31px" }}
-                        type="ghost"
+                      <Button
+                        style={{ width: '120px', marginTop: '31px', marginLeft: '10px' }}
+                        type="default"
                         size="middle"
+                        htmlType="reset"
+                        onClick={() => resetForm()}
                       >
-                        Clear
-                      </Button> */}
+                        เคลียร์
+                      </Button>
                     </Space>
                   </div>
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ประเภทร้านค้า' }}
-                    name="branch_type"
+                    name="outlet_type"
                     component={Select}
-                    id="branch_type"
-                    placeholder="branch_type"
+                    id="outlet_type"
+                    placeholder="outlet_type"
                     defaultValue={{ value: 'all' }}
-                    selectOption={[
-                      {
-                        name: 'ทุกประเภท',
-                        value: '',
-                      },
-                      {
-                        name: 'สาขาเดี่ยว',
-                        value: 'single',
-                      },
-                      {
-                        name: 'หลายสาขา',
-                        value: 'multiple',
-                      },
-                    ]}
+                    selectOption={outletType}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'สถานะร้านค้า' }}
-                    name="approve_status"
+                    name="status"
                     component={Select}
-                    id="approve_status"
-                    placeholder="approve_status"
+                    id="status"
+                    placeholder="status"
                     selectOption={[
                       {
                         name: 'ทุกสถานะ',
@@ -254,7 +263,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
                         value: 'active',
                       },
                       {
-                        name: 'In-active',
+                        name: 'In-Active',
                         value: 'inactive',
                       },
                     ]}

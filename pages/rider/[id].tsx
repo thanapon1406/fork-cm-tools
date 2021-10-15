@@ -118,7 +118,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 				data.contact_refer = _.find(data.contacts, function (o) { return o.type == "refer"; });
 				data.contact_refer_phone = _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '');
 				data.contact_refer_address = _.get(data.contact_refer, 'address_no', '') + " " + _.get(data.contact_refer, 'district_name', '') + " " + _.get(data.contact_refer, 'subdistrict_name', '') + " " + _.get(data.contact_refer, 'province_name', '') + " " + _.get(data.contact_refer, 'zipcode', '')
-				data.car = _.get(data.pdpa, 'car_info[0].brand_name', '') + "/" + _.get(data.pdpa, 'car_info[0].model_name', '')
+				data.car = _.get(data.pdpa, 'car_info[0].brand_name', '') + (_.get(data.pdpa, 'car_info[0].model_name', '') != '') ? "/" + _.get(data.pdpa, 'car_info[0].model_name', '') : ""
 				data.driver_license_photo = _.get(data.pdpa, 'driver_license_photo', '')
 				data.car_photo = _.get(data.pdpa, 'car_info[0].photo', '')
 				data.car_tax_photo = _.get(data.pdpa, 'car_info[0].tax_photo', '')
@@ -627,6 +627,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 													name="reason"
 													allowClear={true}
 													component={Select}
+													validate={'Required'}
 													disabled={disableRejectReason}
 													id="reason"
 													placeholder="เลือก"

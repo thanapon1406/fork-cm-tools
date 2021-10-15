@@ -12,6 +12,7 @@ import _, { isUndefined } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useState } from "react";
+import * as Yup from 'yup';
 import Ekyc from '../ekyc/component';
 const { Title } = Typography;
 
@@ -137,7 +138,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 				}
 
 				const statusHistories = await getStatusHistories(reqStatusHistories);
-				if (statusHistories.result.data !== undefined) {
+				if (statusHistories.result.data[0].topic !== undefined) {
 					statusHistories.result.data[0].topic.forEach((element: any) => {
 						RiderDetail.reason?.push(element.id)
 					});
@@ -159,6 +160,15 @@ export default function RiderDetail({ }: Props): ReactElement {
 
 	}
 
+	const Schema = () => {
+
+		if (riderDetail.status == "re-approved" || riderDetail.status == "rejected") {
+			return Yup.object().shape({ reason: Yup.array().min(1, "กรุณาเลือกเหตุผล") })
+		} {
+			return Yup.object().shape({})
+		}
+	}
+
 	const onClickViewMedia = async (type: string, pathUrl: string) => {
 		setIsLoadingMedia(true)
 		const payload = {
@@ -174,7 +184,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 	}
 
 	const handleSubmit = async (values: any) => {
-		const { result, success } = await getEkycDetail({sso_id:riderDetail.sso_id})
+		const { result, success } = await getEkycDetail({ sso_id: riderDetail.sso_id })
 		const { data } = result
 		if (data.status == "uploaded") {
 			notification.error({
@@ -266,7 +276,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 						enableReinitialize={true}
 						initialValues={riderDetail}
 						onSubmit={handleSubmit}
-					//validationSchema={Schema}
+						validationSchema={Schema}
 					>
 
 						{({ values, resetForm, setFieldValue }) => (
@@ -627,7 +637,6 @@ export default function RiderDetail({ }: Props): ReactElement {
 													name="reason"
 													allowClear={true}
 													component={Select}
-													validate={'Required'}
 													disabled={disableRejectReason}
 													id="reason"
 													placeholder="เลือก"

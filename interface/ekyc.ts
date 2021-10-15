@@ -19,7 +19,8 @@ export interface EkycDetail {
 }
 
 export interface EkycDetailProps {
-  sso_id: string
+  id?: string
+  sso_id?: string
   setEkycStatus?: React.Dispatch<React.SetStateAction<string>>
 }
 

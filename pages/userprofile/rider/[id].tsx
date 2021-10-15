@@ -3,8 +3,9 @@ import Card from "@/components/Card";
 import Input from "@/components/Form/Input";
 import MainLayout from "@/layout/MainLayout";
 import { downloadImage } from '@/services/cdn';
-import { getRiderDetail } from '@/services/rider';
-import { Breadcrumb, Col, Form as antForm, Modal, Row, Typography } from "antd";
+import { outletListById } from '@/services/merchant';
+import { getRider, getRiderDetail, updateRider } from '@/services/rider';
+import { Breadcrumb, Col, Empty, Form as antForm, Modal, notification, Row, Switch, Typography } from "antd";
 import { Field, Form, Formik } from "formik";
 import _, { isUndefined } from 'lodash';
 import Image from 'next/image';
@@ -58,6 +59,7 @@ interface riderDetail {
   car_photo?: string;
   car_tax_photo?: string;
   disable_photo?: string;
+  outlets?: any;
 }
 
 
@@ -69,6 +71,8 @@ export default function RiderDetail({ }: Props): ReactElement {
     sso_id: ""
   });
   const [isShowMediaModal, setIsShowMediaModal] = useState(false)
+  const [isActive, setActive] = useState("")
+  const [isEdit, setIsEdit] = useState(false)
   const [isLoadingMedia, setIsLoadingMedia] = useState(false)
   const [imgUrl, setImgUrl] = useState('')
 
@@ -95,6 +99,7 @@ export default function RiderDetail({ }: Props): ReactElement {
       data.name = data.first_name + " " + data.last_name
       data.phone = data.country_code + data.phone
       data.reason = []
+      setActive(data.active_status)
       if (isUndefined(data.pdpa)) {
         data.contact_emergency = ""
         data.contact_emergency_address = ""
@@ -108,18 +113,46 @@ export default function RiderDetail({ }: Props): ReactElement {
       } else {
         data.contact_emergency = _.find(data.contacts, function (o) { return o.type == "emergency"; });
         data.contact_emergency_phone = _.get(data.contact_emergency, 'country_code', '') + _.get(data.contact_emergency, 'phone', '');
-        data.contact_emergency_address = _.get(data.contact_emergency, 'address_no', ''); + " " + _.get(data.contact_emergency, 'district_name', ''); + " " + _.get(data.subdistrict_name, 'district_name', ''); + " " + _.get(data.subdistrict_name, 'province_name', ''); + " " + _.get(data.subdistrict_name, 'zipcode', '');
+        data.contact_emergency_address = _.get(data.contact_emergency, 'address_no', '') + " " + _.get(data.contact_emergency, 'district_name', '') + " " + _.get(data.contact_emergency, 'district_name', '') + " " + _.get(data.contact_emergency, 'province_name', '') + " " + _.get(data.contact_emergency, 'zipcode', '');
         data.contact_refer = _.find(data.contacts, function (o) { return o.type == "refer"; });
         data.contact_refer_phone = _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '');
-        data.contact_refer_address = _.get(data.contact_refer, 'address_no', ''); + " " + _.get(data.contact_refer, 'district_name', ''); + " " + _.get(data.contact_emergency, 'subdistrict_name', ''); + " " + _.get(data.contact_emergency, 'province_name', ''); + " " + _.get(data.contact_emergency, 'zipcode', '');
+        data.contact_refer_address = _.get(data.contact_refer, 'address_no', '') + " " + _.get(data.contact_refer, 'district_name', '') + " " + _.get(data.contact_refer, 'subdistrict_name', '') + " " + _.get(data.contact_refer, 'province_name', '') + " " + _.get(data.contact_refer, 'zipcode', '');
+        data.main_address = _.find(data.addresses, function (o) { return o.type == "main_address"; });
+        data.main_address = _.get(data.main_address, 'address_no', '') + " " + _.get(data.main_address, 'district_name', '') + " " + _.get(data.main_address, 'subdistrict_name', '') + " " + _.get(data.main_address, 'province_name', '') + " " + _.get(data.main_address, 'zipcode', '');
+        data.contact_address = _.find(data.addresses, function (o) { return o.type == "contact_address"; });
+        data.contact_address = _.get(data.contact_address, 'address_no', '') + " " + _.get(data.contact_address, 'district_name', '') + " " + _.get(data.contact_address, 'subdistrict_name', '') + " " + _.get(data.contact_address, 'province_name', '') + " " + _.get(data.contact_address, 'zipcode', '');
         data.car = _.get(data.pdpa, 'car_info[0].brand_name', '') + "/" + _.get(data.pdpa, 'car_info[0].model_name', '')
         data.driver_license_photo = _.get(data.pdpa, 'driver_license_photo', '')
         data.car_photo = _.get(data.pdpa, 'car_info[0].photo', '')
         data.car_tax_photo = _.get(data.pdpa, 'car_info[0].tax_photo', '')
         data.disable_photo = _.get(data.pdpa, 'disable_person[0].photo', '')
-      }
-      RiderDetail = data
 
+      }
+
+      if (!isUndefined(data.outlets)) {
+
+        let outlet_ids: number[] = []
+
+        data.outlets.forEach((element: any) => {
+          outlet_ids = [...outlet_ids, element.outlet_id]
+        });
+
+        const outletListQuery = {
+          ids: outlet_ids,
+          page: 1,
+          per_page: 100
+        }
+        let outletList = await outletListById(outletListQuery)
+        if (outletList.success) {
+          let outletData
+          data.outlets.forEach((value: any, key: number) => {
+            outletData = _.find(outletList.result.data, function (o) { return o.id == data.outlets[key].outlet_id; });
+            data.outlets[key].name = _.get(outletData, 'name.th', '')
+          });
+        }
+      }
+
+      RiderDetail = data
       setRiderDetail(RiderDetail)
       setIsLoading(false);
     };
@@ -144,19 +177,62 @@ export default function RiderDetail({ }: Props): ReactElement {
 
   }
 
-  const handleStatus = (event: any) => {
+  const handleEdit = async (values: any) => {
+    if (isEdit) {
+      const riderQuery = {
+        id: id,
+        page: 1,
+        per_page: 1,
+        include: "job_count"
+      }
+      const { result, success } = await getRider(riderQuery)
+      const { message, data } = result;
+      if (data[0].job_count == 0) {
+        const riderQuery = {
+          data: {
+            id: id,
+            active_status: isActive
+          }
+        }
+        const { result, success } = await updateRider(riderQuery)
+        if (success) {
+          notification.success({
+            message: `ดำเนินการอัพเดตสถานะสำเร็จ`,
+            description: "",
+          });
+        }
+      } else if (data[0].job_count > 0 && isActive == "inactive") {
+        notification.error({
+          message: `ไม่สามารถทำการ inactive`,
+          description: "ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ",
+        });
+      }
+    }
+    setIsEdit(!isEdit)
+  }
 
+  const handleStatus = (event: any) => {
+    const checkStatus = (isActive == "active" ? "inactive" : "active")
+    console.log(isActive, checkStatus, event);
+    setActive(checkStatus)
   };
 
   return (
     <MainLayout>
       {!_isLoading &&
         <>
-          <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+          <Button style={{ float: 'right', backGroundColor: 'green' }}
+            type="primary"
+            size="middle"
+            onClick={handleEdit}
+          >
+            {(isEdit) ? `บันทึก` : `แก้ไข`}
+          </Button>
+          <Title level={4}>บัญชีผู้ใช้งาน</Title>
           <Breadcrumb style={{ margin: "16px 0" }}>
-            <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
-            <Breadcrumb.Item>ลงทะเบียนคนขับ</Breadcrumb.Item>
-            <Breadcrumb.Item>ข้อมูลคนขับ</Breadcrumb.Item>
+            <Breadcrumb.Item>บัญชีผู้ใช้งาน</Breadcrumb.Item>
+            <Breadcrumb.Item>บัญชีไรเดอร์</Breadcrumb.Item>
+            <Breadcrumb.Item>ข้อมูลบัญชีไรเดอร์</Breadcrumb.Item>
           </Breadcrumb>
           <Modal
             closable={false}
@@ -189,10 +265,17 @@ export default function RiderDetail({ }: Props): ReactElement {
               <Form>
                 <Card>
                   <Row gutter={16} >
-                    <h2>ข้อมูลการลงทะเบียน(Register Data)</h2>
+                    <Col style={{ paddingLeft: 0 }}>
+                      <h2>ข้อมูลบัญชีไรเดอร์ (Rider Profile Details)</h2>
+                    </Col>
+                    <Col span={4} offset={13} style={{ textAlign: 'right' }}>
+                      {(isEdit) ?
+                        <span >สถานะผู้ใช้งาน: <Switch onClick={handleStatus} checkedChildren="active" unCheckedChildren="inactive" defaultChecked={(isActive == "active") ? true : false} /></span> :
+                        <span >สถานะผู้ใช้งาน: <span style={{ color: 'blue' }}>{isActive}</span></span>}
+                    </Col>
                   </Row>
                   <Row gutter={16} >
-                    <h3>ข้อมูลส่วนบุคคล</h3>
+                    <h3>ข้อมูลส่วนตัว</h3>
                   </Row>
                   <Row gutter={10} >
                     <Col className="gutter-row" span={6}>
@@ -280,7 +363,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                     <Col className="gutter-row" span={24}>
                       <Field
                         label={{ text: "ที่อยู่1" }}
-                        name="contact_emergency_address"
+                        name="main_address"
                         type="text"
                         component={Input}
                         className="form-control round"
@@ -297,7 +380,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                     <Col className="gutter-row" span={24}>
                       <Field
                         label={{ text: "ที่อยู่2" }}
-                        name="contact_emergency_address"
+                        name="contact_address"
                         type="text"
                         component={Input}
                         className="form-control round"
@@ -310,7 +393,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                 </Card>
                 <Card>
                   <Row gutter={16} >
-                    <h3>ข้อมูล Rider</h3>
+                    <h3>ข้อมูลส่วนตัว</h3>
                   </Row>
                   <Row gutter={10}>
                     <Col style={{ marginTop: "31px" }} span={4}>
@@ -556,7 +639,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                     </Col>
                   </Row>
                 </Card>
-                <Card minHeight={100}>
+                {/* <Card minHeight={100}>
                   <Row gutter={10}>
                     <Col style={{ marginTop: "31px" }} span={4}>
                       ช่องทางการสมัคร
@@ -577,157 +660,46 @@ export default function RiderDetail({ }: Props): ReactElement {
                       />
                     </Col>
                   </Row>
-                </Card>
+                </Card> */}
                 <div style={{ maxHeight: 200, overflowY: 'auto', marginBottom: 36 }}>
                   <Card marginBottom={1}>
                     <Row gutter={16} >
                       <h3>ผูกร้านค้า</h3>
                     </Row>
-                    <Row gutter={16}>
-                      <Col style={{ marginTop: "31px" }} span={4}>
-                        ร้านค้าที่ {`1`}
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "ชื่อร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "คำอธิบายร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                    </Row>
-                    <Row gutter={16}>
-                      <Col style={{ marginTop: "31px" }} span={4}>
-                        ร้านค้าที่ {`1`}
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "ชื่อร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "คำอธิบายร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                    </Row>
-                    <Row gutter={16}>
-                      <Col style={{ marginTop: "31px" }} span={4}>
-                        ร้านค้าที่ {`1`}
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "ชื่อร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "คำอธิบายร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                    </Row>
-                    <Row gutter={16}>
-                      <Col style={{ marginTop: "31px" }} span={4}>
-                        ร้านค้าที่ {`1`}
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "ชื่อร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "คำอธิบายร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                    </Row>
-                    <Row gutter={16}>
-                      <Col style={{ marginTop: "31px" }} span={4}>
-                        ร้านค้าที่ {`1`}
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "ชื่อร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                      <Col className="gutter-row" span={6}>
-                        <Field
-                          label={{ text: "คำอธิบายร้านค้า" }}
-                          name="contact_refer.fullname"
-                          type="text"
-                          component={Input}
-                          className="form-control round"
-                          placeholder="ชื่อร้านค้า"
-                          isRange={true}
-                          disabled={true}
-                        />
-                      </Col>
-                    </Row>
+                    {(!isUndefined(riderDetail.outlets)) ?
+                      riderDetail.outlets.map((element: any, index: number) => {
+                        return <Row key={index} gutter={16}>
+                          <Col style={{ marginTop: "31px" }} span={4}>
+                            ร้านค้าที่ {index + 1}
+                          </Col>
+                          <Col className="gutter-row" span={6}>
+                            <Field
+                              label={{ text: "ชื่อร้านค้า" }}
+                              name={`outlets[${index}].name`}
+                              type="text"
+                              component={Input}
+                              className="form-control round"
+                              placeholder="ชื่อร้านค้า"
+                              isRange={true}
+                              disabled={true}
+                            />
+                          </Col>
+                          <Col className="gutter-row" span={6}>
+                            <Field
+                              label={{ text: "คำอธิบายร้านค้า" }}
+                              name={`outlets[${index}].description`}
+                              type="text"
+                              component={Input}
+                              className="form-control round"
+                              placeholder="ชื่อร้านค้า"
+                              isRange={true}
+                              disabled={true}
+                            />
+                          </Col>
+                        </Row>
+                      })
+                      : <Empty />
+                    }
                   </Card>
                 </div>
               </Form>

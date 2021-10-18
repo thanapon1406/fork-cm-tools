@@ -3,10 +3,11 @@ import React, { ReactElement } from 'react'
 
 interface Props {
   type?: string
+  icon?: ReactElement
   children: string | ReactElement
 }
 
-export default function Tag({ children, type = 'primary' }: Props): ReactElement {
+export default function Tag({ children, icon, type = 'primary' }: Props): ReactElement {
   const mapping: any = {
     primary: '#17c2d7',
     success: 'success',
@@ -14,5 +15,9 @@ export default function Tag({ children, type = 'primary' }: Props): ReactElement
     warning: 'warning',
   }
   const color = mapping[type] || type
-  return <Tags color={color}>{children}</Tags>
+  return (
+    <Tags icon={icon} color={color}>
+      {children}
+    </Tags>
+  )
 }

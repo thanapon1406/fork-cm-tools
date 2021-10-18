@@ -1,7 +1,12 @@
 import Button from '@/components/Button'
 import Select from '@/components/Form/Select'
 import { EkycApproveStatusInterface, EkycDetail, EkycDetailProps } from '@/interface/ekyc'
-import { downloadImage, getEkycDetail, updateEkycDetail } from '@/services/ekyc'
+import {
+  downloadImage,
+  getEkycDetail,
+  requestEkycInterface,
+  updateEkycDetail,
+} from '@/services/ekyc'
 import { Col, Empty, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { isEmpty, isUndefined } from 'lodash'
@@ -27,7 +32,7 @@ const statusVideoOption = [
   { name: 'ใบหน้าไม่ชัดเจน', value: 3, disabled: false },
 ]
 
-const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement => {
+const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactElement => {
   const [ekycDetail, setEkycDetail] = useState<EkycDetail>()
   const [isLoading, setLoading] = useState(false)
   const [isLoadingSubmit, setLoadingSubmit] = useState(false)
@@ -36,9 +41,13 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
   const [isLoadingMedia, setIsLoadingMedia] = useState(false)
   const [mediaType, setMediaType] = useState('')
 
-  const fetchEkycDetail = async (sso_id: string) => {
+  const fetchEkycDetail = async (sso_id?: string, id?: string) => {
+    const payload: requestEkycInterface = {
+      sso_id: sso_id || '',
+      id: id || '',
+    }
     setLoading(true)
-    const { result, success } = await getEkycDetail(sso_id)
+    const { result, success } = await getEkycDetail(payload)
     if (success) {
       const { data } = result
       setEkycDetail(data)
@@ -110,11 +119,20 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
   }
 
   useEffect(() => {
-    if (!isEmpty(sso_id)) {
-      fetchEkycDetail(sso_id)
+    if ((!isEmpty(sso_id) && !isUndefined(sso_id)) || (!isEmpty(id) && !isUndefined(id))) {
+      fetchEkycDetail(sso_id, id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sso_id])
+  }, [sso_id, id])
+
+  const disableApprove = (data: EkycDetail) => {
+    return (
+      isUndefined(data.status) ||
+      isUndefined(data.status_card) ||
+      isUndefined(data.status_face) ||
+      isUndefined(data.status_video)
+    )
+  }
 
   return (
     <Skeleton loading={isLoading}>
@@ -156,21 +174,9 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
             </div>
           </Modal>
 
-          <Formik
-            initialValues={{
-              video_url: ekycDetail?.video_url,
-              face_photo_url: ekycDetail?.face_photo_url,
-              citizen_card_photo_url: ekycDetail?.citizen_card_photo_url,
-              status_face: ekycDetail?.status_face,
-              status_card: ekycDetail?.status_card,
-              status_video: ekycDetail?.status_video,
-              status: ekycDetail?.status,
-            }}
-            enableReinitialize
-            onSubmit={onSubmit}
-          >
+          <Formik initialValues={ekycDetail} enableReinitialize onSubmit={() => {}}>
             {({ values }) => (
-              <Form style={{ justifyContent: 'center' }}>
+              <Form name="ekyc" style={{ justifyContent: 'center' }}>
                 <Row style={{ padding: '16px' }} justify="space-between">
                   <Col offset={2} span={4}>
                     <Title level={5}>สแกนบัตรประชาชน</Title>
@@ -265,6 +271,7 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
                       name="status"
                       component={Select}
                       id="status"
+                      disabled={disableApprove(values)}
                       placeholder="กรุณาเลือกสถานะ"
                       selectOption={[
                         { value: 'uploaded', name: 'รอการอนุมัติ' },
@@ -285,17 +292,15 @@ const EkycContainer = ({ sso_id, setEkycStatus }: EkycDetailProps): ReactElement
                 <Row justify="end">
                   {console.log(values)}
                   <Button
-                    disabled={
-                      isUndefined(values.status) ||
-                      isUndefined(values.status_card) ||
-                      isUndefined(values.status_face) ||
-                      isUndefined(values.status_video)
-                    }
+                    disabled={disableApprove(values)}
                     loading={isLoadingSubmit}
                     style={{ width: '120px', marginTop: '31px' }}
                     type="primary"
                     size="middle"
-                    htmlType="submit"
+                    htmlType="button"
+                    onClick={() => {
+                      onSubmit(values)
+                    }}
                   >
                     บันทึก
                   </Button>

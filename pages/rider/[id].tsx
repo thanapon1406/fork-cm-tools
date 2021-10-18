@@ -12,6 +12,7 @@ import _, { isUndefined } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useState } from "react";
+import * as Yup from 'yup';
 import Ekyc from '../ekyc/component';
 const { Title } = Typography;
 
@@ -114,11 +115,11 @@ export default function RiderDetail({ }: Props): ReactElement {
 			} else {
 				data.contact_emergency = _.find(data.contacts, function (o) { return o.type == "emergency"; });
 				data.contact_emergency_phone = _.get(data.contact_emergency, 'country_code', '') + _.get(data.contact_emergency, 'phone', '');
-				data.contact_emergency_address = _.get(data.contact_emergency, 'address_no', ''); + " " + _.get(data.contact_emergency, 'district_name', ''); + " " + _.get(data.subdistrict_name, 'district_name', ''); + " " + _.get(data.subdistrict_name, 'province_name', ''); + " " + _.get(data.subdistrict_name, 'zipcode', '');
+				data.contact_emergency_address = _.get(data.contact_emergency, 'address_no', '') + " " + _.get(data.contact_emergency, 'district_name', '') + " " + _.get(data.contact_emergency, 'subdistrict_name', '') + " " + _.get(data.contact_emergency, 'province_name', '') + " " + _.get(data.contact_emergency, 'zipcode', '')
 				data.contact_refer = _.find(data.contacts, function (o) { return o.type == "refer"; });
 				data.contact_refer_phone = _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '');
-				data.contact_refer_address = _.get(data.contact_refer, 'address_no', ''); + " " + _.get(data.contact_refer, 'district_name', ''); + " " + _.get(data.contact_emergency, 'subdistrict_name', ''); + " " + _.get(data.contact_emergency, 'province_name', ''); + " " + _.get(data.contact_emergency, 'zipcode', '');
-				data.car = _.get(data.pdpa, 'car_info[0].brand_name', '') + "/" + _.get(data.pdpa, 'car_info[0].model_name', '')
+				data.contact_refer_address = _.get(data.contact_refer, 'address_no', '') + " " + _.get(data.contact_refer, 'district_name', '') + " " + _.get(data.contact_refer, 'subdistrict_name', '') + " " + _.get(data.contact_refer, 'province_name', '') + " " + _.get(data.contact_refer, 'zipcode', '')
+				data.car = _.get(data.pdpa, 'car_info[0].brand_name', '') + (_.get(data.pdpa, 'car_info[0].model_name', '') != '') ? "/" + _.get(data.pdpa, 'car_info[0].model_name', '') : ""
 				data.driver_license_photo = _.get(data.pdpa, 'driver_license_photo', '')
 				data.car_photo = _.get(data.pdpa, 'car_info[0].photo', '')
 				data.car_tax_photo = _.get(data.pdpa, 'car_info[0].tax_photo', '')
@@ -137,7 +138,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 				}
 
 				const statusHistories = await getStatusHistories(reqStatusHistories);
-				if (statusHistories.result.data !== undefined) {
+				if (statusHistories.result.data[0].topic !== undefined) {
 					statusHistories.result.data[0].topic.forEach((element: any) => {
 						RiderDetail.reason?.push(element.id)
 					});
@@ -159,6 +160,15 @@ export default function RiderDetail({ }: Props): ReactElement {
 
 	}
 
+	const Schema = () => {
+
+		if (riderDetail.status == "re-approved" || riderDetail.status == "rejected") {
+			return Yup.object().shape({ reason: Yup.array().min(1, "กรุณาเลือกเหตุผล") })
+		} {
+			return Yup.object().shape({})
+		}
+	}
+
 	const onClickViewMedia = async (type: string, pathUrl: string) => {
 		setIsLoadingMedia(true)
 		const payload = {
@@ -174,7 +184,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 	}
 
 	const handleSubmit = async (values: any) => {
-		const { result, success } = await getEkycDetail(riderDetail.sso_id)
+		const { result, success } = await getEkycDetail({ sso_id: riderDetail.sso_id })
 		const { data } = result
 		if (data.status == "uploaded") {
 			notification.error({
@@ -232,422 +242,425 @@ export default function RiderDetail({ }: Props): ReactElement {
 		console.log(event);
 	};
 
-	return !_isLoading ? (
-
+	return (
 		<MainLayout>
-			<Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
-			<Breadcrumb style={{ margin: "16px 0" }}>
-				<Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
-				<Breadcrumb.Item>ลงทะเบียนคนขับ</Breadcrumb.Item>
-				<Breadcrumb.Item>ข้อมูลคนขับ</Breadcrumb.Item>
-			</Breadcrumb>
-			<Modal
-				closable={false}
-				onOk={() => {
-					setIsShowMediaModal(false)
-				}}
-				visible={isShowMediaModal}
-				footer={[
-					<Button
-						key="1"
-						type="primary"
-						onClick={() => {
+			{!_isLoading &&
+				<>
+					<Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+					<Breadcrumb style={{ margin: "16px 0" }}>
+						<Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
+						<Breadcrumb.Item>ลงทะเบียนคนขับ</Breadcrumb.Item>
+						<Breadcrumb.Item>ข้อมูลคนขับ</Breadcrumb.Item>
+					</Breadcrumb>
+					<Modal
+						closable={false}
+						onOk={() => {
 							setIsShowMediaModal(false)
 						}}
+						visible={isShowMediaModal}
+						footer={[
+							<Button
+								key="1"
+								type="primary"
+								onClick={() => {
+									setIsShowMediaModal(false)
+								}}
+							>
+								ปิด
+							</Button>,
+						]}
 					>
-						ปิด
-					</Button>,
-				]}
-			>
-				<Image src={imgUrl} width={1920} height={1200} alt="media" />
-			</Modal>
-			<Formik
-				enableReinitialize={true}
-				initialValues={riderDetail}
-				onSubmit={handleSubmit}
-			//validationSchema={Schema}
-			>
+						<Image src={imgUrl} width={1920} height={1200} alt="media" />
+					</Modal>
+					<Formik
+						enableReinitialize={true}
+						initialValues={riderDetail}
+						onSubmit={handleSubmit}
+						validationSchema={Schema}
+					>
 
-				{({ values, resetForm, setFieldValue }) => (
-					<Form>
-						<Card>
-							<Row gutter={16} >
-								<h2>ข้อมูลการลงทะเบียน(Register Data)</h2>
-							</Row>
-							<Row gutter={16} >
-								<h3>ข้อมูลส่วนบุคคล</h3>
-							</Row>
-							<Row gutter={10} >
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "ชื่อ - สกุล" }}
-										name="name"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="ชื่อ-สกุล"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "เลขบัตรประชาชน" }}
-										name="pdpa.nation_id"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="เลขบัตรประชาชน"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "เบอร์โทรศัพท์" }}
-										name="phone"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="เบอร์โทรศัพท์"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "อีเมล" }}
-										name="email"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="อีเมล"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "SsoID" }}
-										name="sso_id"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="SsoID"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-							</Row>
-							<Ekyc sso_id={riderDetail.sso_id} />
-						</Card>
-						<Card>
-							<Row gutter={16} >
-								<h3>ข้อมูล Rider</h3>
-							</Row>
-							<Row gutter={10}>
-								<Col style={{ marginTop: "31px" }} span={4}>
-									ใบอนุญาติขับรถ
-								</Col>
-								<Col>
-									<div className="ant-form ant-form-vertical">
-										<antForm.Item label="ใบอนุญาติขับรถ">
+						{({ values, resetForm, setFieldValue }) => (
+							<Form>
+								<Card>
+									<Row gutter={16} >
+										<h2>ข้อมูลการลงทะเบียน(Register Data)</h2>
+									</Row>
+									<Row gutter={16} >
+										<h3>ข้อมูลส่วนบุคคล</h3>
+									</Row>
+									<Row gutter={10} >
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "ชื่อ - สกุล" }}
+												name="name"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="ชื่อ-สกุล"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "เลขบัตรประชาชน" }}
+												name="pdpa.nation_id"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="เลขบัตรประชาชน"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "เบอร์โทรศัพท์" }}
+												name="phone"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="เบอร์โทรศัพท์"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "อีเมล" }}
+												name="email"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="อีเมล"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "SsoID" }}
+												name="sso_id"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="SsoID"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+									</Row>
+									<Ekyc sso_id={riderDetail.sso_id} />
+								</Card>
+								<Card>
+									<Row gutter={16} >
+										<h3>ข้อมูล Rider</h3>
+									</Row>
+									<Row gutter={10}>
+										<Col style={{ marginTop: "31px" }} span={4}>
+											ใบอนุญาติขับรถ
+										</Col>
+										<Col>
+											<div className="ant-form ant-form-vertical">
+												<antForm.Item label="ใบอนุญาติขับรถ">
+													<Button
+														loading={isLoadingMedia}
+														disabled={isUndefined(values.driver_license_photo) || values.driver_license_photo == ""}
+														onClick={() => {
+															if (!isUndefined(values.driver_license_photo)) {
+																onClickViewMedia('image', values.driver_license_photo)
+															}
+														}}
+													>
+														ดูรูปภาพ
+													</Button>
+												</antForm.Item>
+											</div>
+										</Col>
+									</Row>
+									<Row gutter={10}>
+										<Col style={{ marginTop: "31px" }} span={4}>
+											บุคคลที่ติดต่อได้ในกรณีฉุกเฉิน
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "ชื่อ-สกุลของบุคคลที่ติดต่อได้ในกรณีฉุกเฉิน" }}
+												name="contact_emergency.fullname"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="ชื่อ-สกุล"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "ความสัมพันธ์" }}
+												name="contact_emergency.relationship"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="ความสัมพันธ์"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "เบอร์โทรศัพท์" }}
+												name="contact_emergency_phone"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="เบอร์โทรศัพท์"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+									</Row>
+									<Row>
+										<Col className="gutter-row" span={18} offset={4}>
+											<Field
+												label={{ text: "ที่อยู่" }}
+												name="contact_emergency_address"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="ที่อยู่"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+									</Row>
+									<Row gutter={10}>
+										<Col style={{ marginTop: "31px" }} span={4}>
+											บุคคลอ้างอิง
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "ชื่อ-สกุลของบุคคลอ้างอิง" }}
+												name="contact_refer.fullname"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="ชื่อ-สกุล"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "ความสัมพันธ์" }}
+												name="contact_refer.relationship"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="ความสัมพันธ์"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "เบอร์โทรศัพท์" }}
+												name="contact_refer_phone"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="เบอร์โทรศัพท์"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+									</Row>
+									<Row>
+										<Col className="gutter-row" span={18} offset={4}>
+											<Field
+												label={{ text: "ที่อยู่" }}
+												name="contact_refer_address"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="ที่อยู่"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+									</Row>
+									<Row gutter={10}>
+										<Col style={{ marginTop: "31px" }} span={4}>
+											รายละเอียดรถ
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "กรรมสิทธิ์เจ้าของจักรยานยนต์" }}
+												name="pdpa.car_info[0].ownership"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="กรรมสิทธิ์เจ้าของจักรยานยนต์"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "ยี่ห้อ/รุ่นรถจักรยานยนต์" }}
+												name="car"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="ยี่ห้อ/รุ่นรถจักรยานยนต์"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "เลขทะเบียนรถจักรยานยนต์" }}
+												name="pdpa.car_info[0].car_no"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="เลขทะเบียนรถจักรยานยนต์"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+									</Row>
+									<Row gutter={10}>
+										<Col className="gutter-row" span={6} offset={4}>
+											<div className="ant-form ant-form-vertical">
+												<antForm.Item label="รูปรายการจดทะเบียนรถจักรยานยนต์">
+													<Button
+														loading={isLoadingMedia}
+														disabled={isUndefined(values.car_photo) || values.car_photo == ""}
+														onClick={() => {
+															if (!isUndefined(values.car_photo)) {
+																onClickViewMedia('image', values.car_photo)
+															}
+														}}
+													>
+														ดูรูปภาพ
+													</Button>
+												</antForm.Item>
+											</div>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<div className="ant-form ant-form-vertical">
+												<antForm.Item label="รูปรายการชำระภาษีรถจักรยานยนต์">
+													<Button
+														loading={isLoadingMedia}
+														disabled={isUndefined(values.car_tax_photo) || values.car_tax_photo == ""}
+														onClick={() => {
+															if (!isUndefined(values.car_tax_photo)) {
+																onClickViewMedia('image', values.car_tax_photo)
+															}
+														}}
+													>
+														ดูรูปภาพ
+													</Button>
+												</antForm.Item>
+											</div>
+										</Col>
+									</Row>
+									<Row gutter={10}>
+										<Col style={{ marginTop: "31px" }} span={4}>
+											ความบกพร่องทางร่างกาย
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<Field
+												label={{ text: "ความบกพร่องทางร่างกาย" }}
+												name="pdpa.disable_person[0].disable"
+												type="text"
+												component={Input}
+												className="form-control round"
+												placeholder="ความบกพร่องทางร่างกาย"
+												isRange={true}
+												disabled={true}
+											/>
+										</Col>
+										<Col className="gutter-row" span={6}>
+											<div className="ant-form ant-form-vertical">
+												<antForm.Item label="รูปความบกพร่องทางร่างกาย">
+													<Button
+														loading={isLoadingMedia}
+														disabled={isUndefined(values.disable_photo) || values.disable_photo == ""}
+														onClick={() => {
+															if (!isUndefined(values.disable_photo)) {
+																onClickViewMedia('image', values.disable_photo)
+															}
+														}}
+													>
+														ดูรูปภาพ
+													</Button>
+												</antForm.Item>
+											</div>
+										</Col>
+									</Row>
+								</Card>
+								{riderDetail.status !== "waiting" &&
+									<>
+										<Row gutter={10}>
+											<Col className="gutter-row" span={6}>
+												<Field
+													label={{ text: "การอนุมัติ" }}
+													name="status"
+													component={Select}
+													placeholder="เลือก"
+													onChange={handleStatus}
+													selectOption={[
+														{
+															name: "เลือก",
+															value: "uploaded",
+														},
+														{
+															name: "อนุมัติ",
+															value: "approved",
+														},
+														{
+															name: "ขอเอกสารเพิ่มเติม",
+															value: "re-approved",
+														},
+														{
+															name: "ไม่ผ่านการอนุมัติ",
+															value: "rejected",
+														},
+													]}
+												/>
+											</Col>
+											<Col className="gutter-row" span={6}>
+												<Field
+													label={{ text: "เหตุผล" }}
+													mode="multiple"
+													name="reason"
+													allowClear={true}
+													component={Select}
+													disabled={disableRejectReason}
+													id="reason"
+													placeholder="เลือก"
+													selectOption={rejectReasonDropDown}
+												/>
+											</Col>
+										</Row>
+										<div className="ant-form" style={{ float: 'right' }}>
 											<Button
-												loading={isLoadingMedia}
-												disabled={isUndefined(values.driver_license_photo) || values.driver_license_photo == ""}
-												onClick={() => {
-													if (!isUndefined(values.driver_license_photo)) {
-														onClickViewMedia('image', values.driver_license_photo)
-													}
-												}}
+												style={{ width: "120px" }}
+												type="primary"
+												size="middle"
+												htmlType="submit"
 											>
-												ดูรูปภาพ
+												submit
 											</Button>
-										</antForm.Item>
-									</div>
-								</Col>
-							</Row>
-							<Row gutter={10}>
-								<Col style={{ marginTop: "31px" }} span={4}>
-									บุคคลที่ติดต่อได้ในกรณีฉุกเฉิน
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "ชื่อ-สกุลของบุคคลที่ติดต่อได้ในกรณีฉุกเฉิน" }}
-										name="contact_emergency.fullname"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="ชื่อ-สกุล"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "ความสัมพันธ์" }}
-										name="contact_emergency.relationship"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="ความสัมพันธ์"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "เบอร์โทรศัพท์" }}
-										name="contact_emergency_phone"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="เบอร์โทรศัพท์"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-							</Row>
-							<Row>
-								<Col className="gutter-row" span={18} offset={4}>
-									<Field
-										label={{ text: "ที่อยู่" }}
-										name="contact_emergency_address"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="ที่อยู่"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-							</Row>
-							<Row gutter={10}>
-								<Col style={{ marginTop: "31px" }} span={4}>
-									บุคคลอ้างอิง
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "ชื่อ-สกุลของบุคคลอ้างอิง" }}
-										name="contact_refer.fullname"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="ชื่อ-สกุล"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "ความสัมพันธ์" }}
-										name="contact_refer.relationship"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="ความสัมพันธ์"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "เบอร์โทรศัพท์" }}
-										name="contact_refer_phone"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="เบอร์โทรศัพท์"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-							</Row>
-							<Row>
-								<Col className="gutter-row" span={18} offset={4}>
-									<Field
-										label={{ text: "ที่อยู่" }}
-										name="contact_refer_address"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="ที่อยู่"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-							</Row>
-							<Row gutter={10}>
-								<Col style={{ marginTop: "31px" }} span={4}>
-									รายละเอียดรถ
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "กรรมสิทธิ์เจ้าของจักรยานยนต์" }}
-										name="pdpa.car_info[0].ownership"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="กรรมสิทธิ์เจ้าของจักรยานยนต์"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "ยี่ห้อ/รุ่นรถจักรยานยนต์" }}
-										name="car"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="ยี่ห้อ/รุ่นรถจักรยานยนต์"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "เลขทะเบียนรถจักรยานยนต์" }}
-										name="pdpa.car_info[0].car_no"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="เลขทะเบียนรถจักรยานยนต์"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-							</Row>
-							<Row gutter={10}>
-								<Col className="gutter-row" span={6} offset={4}>
-									<div className="ant-form ant-form-vertical">
-										<antForm.Item label="รูปรายการจดทะเบียนรถจักรยานยนต์">
-											<Button
-												loading={isLoadingMedia}
-												disabled={isUndefined(values.car_photo) || values.car_photo == ""}
-												onClick={() => {
-													if (!isUndefined(values.car_photo)) {
-														onClickViewMedia('image', values.car_photo)
-													}
-												}}
-											>
-												ดูรูปภาพ
-											</Button>
-										</antForm.Item>
-									</div>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<div className="ant-form ant-form-vertical">
-										<antForm.Item label="รูปรายการชำระภาษีรถจักรยานยนต์">
-											<Button
-												loading={isLoadingMedia}
-												disabled={isUndefined(values.car_tax_photo) || values.car_tax_photo == ""}
-												onClick={() => {
-													if (!isUndefined(values.car_tax_photo)) {
-														onClickViewMedia('image', values.car_tax_photo)
-													}
-												}}
-											>
-												ดูรูปภาพ
-											</Button>
-										</antForm.Item>
-									</div>
-								</Col>
-							</Row>
-							<Row gutter={10}>
-								<Col style={{ marginTop: "31px" }} span={4}>
-									ความบกพร่องทางร่างกาย
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<Field
-										label={{ text: "ความบกพร่องทางร่างกาย" }}
-										name="pdpa.disable_person[0].disable"
-										type="text"
-										component={Input}
-										className="form-control round"
-										placeholder="ความบกพร่องทางร่างกาย"
-										isRange={true}
-										disabled={true}
-									/>
-								</Col>
-								<Col className="gutter-row" span={6}>
-									<div className="ant-form ant-form-vertical">
-										<antForm.Item label="รูปความบกพร่องทางร่างกาย">
-											<Button
-												loading={isLoadingMedia}
-												disabled={isUndefined(values.disable_photo) || values.disable_photo == ""}
-												onClick={() => {
-													if (!isUndefined(values.disable_photo)) {
-														onClickViewMedia('image', values.disable_photo)
-													}
-												}}
-											>
-												ดูรูปภาพ
-											</Button>
-										</antForm.Item>
-									</div>
-								</Col>
-							</Row>
-						</Card>
-						{riderDetail.status !== "waiting" &&
-							<>
-								<Row gutter={10}>
-									<Col className="gutter-row" span={6}>
-										<Field
-											label={{ text: "การอนุมัติ" }}
-											name="status"
-											component={Select}
-											placeholder="เลือก"
-											onChange={handleStatus}
-											selectOption={[
-												{
-													name: "เลือก",
-													value: "uploaded",
-												},
-												{
-													name: "อนุมัติ",
-													value: "approved",
-												},
-												{
-													name: "ขอเอกสารเพิ่มเติม",
-													value: "re-approved",
-												},
-												{
-													name: "ไม่ผ่านการอนุมัติ",
-													value: "rejected",
-												},
-											]}
-										/>
-									</Col>
-									<Col className="gutter-row" span={6}>
-										<Field
-											label={{ text: "เหตุผล" }}
-											mode="multiple"
-											name="reason"
-											allowClear={true}
-											component={Select}
-											disabled={disableRejectReason}
-											id="reason"
-											placeholder="เลือก"
-											selectOption={rejectReasonDropDown}
-										/>
-									</Col>
-								</Row>
-								<div className="ant-form" style={{ float: 'right' }}>
-									<Button
-										style={{ width: "120px" }}
-										type="primary"
-										size="middle"
-										htmlType="submit"
-									>
-										submit
-									</Button>
-								</div>
-							</>
-						}
-					</Form>
-				)}
-			</Formik>
+										</div>
+									</>
+								}
+							</Form>
+						)}
+					</Formik>
+				</>
+			}
 		</MainLayout>
-	) : (<div></div>)
+	)
 }

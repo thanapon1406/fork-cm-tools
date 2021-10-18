@@ -16,6 +16,7 @@ interface queryList {
   end_date_verify?: string
   approve_status?: string
   id?: string | number
+  ids?: number[]
 }
 
 interface response {
@@ -31,6 +32,16 @@ const outletList = async (body: queryList) => {
     return errorHandler(error)
   }
 }
+
+const outletListById = async (body: queryList) => {
+  try {
+    const result = await fetch.post(`/api/merchant/outlet-list`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 const outletDetail = async (body: any) => {
   try {
     const result = await fetch.post(`/api/merchant/outlet`, body)
@@ -71,4 +82,4 @@ const getOutletType = async () => {
   }
 }
 
-export { outletList, outletDetail, approveOutlet, personalData, getOutletType }
+export { outletList, outletDetail, approveOutlet, personalData, getOutletType, outletListById }

@@ -11,7 +11,7 @@ import Moment from 'moment'
 import React, { ReactElement, useEffect, useState } from 'react'
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
 interface Pagination {
   total: number
   current: number
@@ -25,7 +25,7 @@ interface filterObject {
   ekyc_status?: string
   include?: string
 }
-export default function Rider({}: Props): ReactElement {
+export default function Rider({ }: Props): ReactElement {
   let [dataTable, setDataTable] = useState([])
   let [_isLoading, setIsLoading] = useState(true)
   let [pagination, setPagination] = useState<Pagination>({
@@ -40,6 +40,8 @@ export default function Rider({}: Props): ReactElement {
     status: 'approved',
     ekyc_status: 'approved',
     include: 'job_count',
+    // "sort_by" : "approve_date",
+    // "sort_type": "desc"
   })
   const initialValues = {
     keyword: '',
@@ -143,7 +145,7 @@ export default function Rider({}: Props): ReactElement {
     },
     {
       title: 'Approved Date',
-      dataIndex: 'updated_at',
+      dataIndex: 'approve_date',
       align: 'center',
       render: (text: any, record: any) => {
         return Moment(text).format('YYYY-MM-DD HH:mm')
@@ -166,7 +168,7 @@ export default function Rider({}: Props): ReactElement {
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}
-          // validationSchema={Schema}
+        // validationSchema={Schema}
         >
           {(values) => (
             <Form>

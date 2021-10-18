@@ -264,10 +264,10 @@ export default function RiderDetail({ }: Props): ReactElement {
               <Form>
                 <Card>
                   <Row gutter={16} >
-                    <Col style={{ paddingLeft: 0 }}>
+                    <Col span={8} style={{ paddingLeft: 0 }}>
                       <h2>ข้อมูลบัญชีไรเดอร์ (Rider Profile Details)</h2>
                     </Col>
-                    <Col span={4} offset={13} style={{ textAlign: 'right' }}>
+                    <Col span={16} style={{ textAlign: 'right' }}>
                       {(isEdit) ?
                         <span >สถานะผู้ใช้งาน: <Switch onClick={handleStatus} checkedChildren="active" unCheckedChildren="inactive" defaultChecked={(isActive == "active") ? true : false} /></span> :
                         <span >สถานะผู้ใช้งาน: <span style={{ color: 'blue' }}>{isActive}</span></span>}

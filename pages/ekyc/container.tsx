@@ -125,7 +125,14 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sso_id, id])
 
-  const disableSeleteAndBtn = () => {}
+  const disableApprove = (data: EkycDetail) => {
+    return (
+      isUndefined(data.status) ||
+      isUndefined(data.status_card) ||
+      isUndefined(data.status_face) ||
+      isUndefined(data.status_video)
+    )
+  }
 
   return (
     <Skeleton loading={isLoading}>
@@ -167,21 +174,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
             </div>
           </Modal>
 
-          <Formik
-            initialValues={ekycDetail}
-            // initialValues={{
-            //   video_url: ekycDetail?.video_url,
-            //   face_photo_url: ekycDetail?.face_photo_url,
-            //   citizen_card_photo_url: ekycDetail?.citizen_card_photo_url,
-            //   status_face: ekycDetail?.status_face,
-            //   status_card: ekycDetail?.status_card,
-            //   status_video: ekycDetail?.status_video,
-            //   status: ekycDetail?.status,
-            // }}
-            enableReinitialize
-            // onSubmit={onSubmit}
-            onSubmit={() => {}}
-          >
+          <Formik initialValues={ekycDetail} enableReinitialize onSubmit={() => {}}>
             {({ values }) => (
               <Form name="ekyc" style={{ justifyContent: 'center' }}>
                 <Row style={{ padding: '16px' }} justify="space-between">
@@ -278,12 +271,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                       name="status"
                       component={Select}
                       id="status"
-                      disabled={
-                        isUndefined(values.status) ||
-                        isUndefined(values.status_card) ||
-                        isUndefined(values.status_face) ||
-                        isUndefined(values.status_video)
-                      }
+                      disabled={disableApprove(values)}
                       placeholder="กรุณาเลือกสถานะ"
                       selectOption={[
                         { value: 'uploaded', name: 'รอการอนุมัติ' },
@@ -304,12 +292,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                 <Row justify="end">
                   {console.log(values)}
                   <Button
-                    disabled={
-                      isUndefined(values.status) ||
-                      isUndefined(values.status_card) ||
-                      isUndefined(values.status_face) ||
-                      isUndefined(values.status_video)
-                    }
+                    disabled={disableApprove(values)}
                     loading={isLoadingSubmit}
                     style={{ width: '120px', marginTop: '31px' }}
                     type="primary"
@@ -318,7 +301,6 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                     onClick={() => {
                       onSubmit(values)
                     }}
-                    // htmlType="submit"
                   >
                     บันทึก
                   </Button>

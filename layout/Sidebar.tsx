@@ -27,7 +27,6 @@ export default function Sidebar({}: Props): ReactElement {
   const [userObject, setUserState] = useRecoilState(personState)
   const { asPath, pathname } = Router
   let activePath = pathname
-  console.log(`activePath`, activePath)
   const logoutClick = () => {
     logout()
     Router.replace('/login')

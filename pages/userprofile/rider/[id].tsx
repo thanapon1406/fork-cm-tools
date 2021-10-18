@@ -11,10 +11,10 @@ import _, { isUndefined } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useState } from "react";
-import facebookImg from "../../../public/facebook.png";
-import googleImg from "../../../public/google.png";
-import lineImg from "../../../public/line.png";
 const { Title } = Typography;
+// import facebookImg from "../../../public/facebook.png";
+// import googleImg from "../../../public/google.png";
+// import lineImg from "../../../public/line.png";
 
 
 interface Props {
@@ -665,7 +665,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                     </Col>
                   </Row>
                 </Card>
-                <Card minHeight={100}>
+                {/* <Card minHeight={100}>
                   <Row gutter={10}>
                     <Col style={{ marginTop: "31px" }} span={4}>
                       ช่องทางการสมัคร
@@ -692,7 +692,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                       />
                     </Col>
                   </Row>
-                </Card>
+                </Card> */}
                 <div style={{ maxHeight: 200, overflowY: 'auto', marginBottom: 36 }}>
                   <Card marginBottom={1}>
                     <Row gutter={16} >

@@ -12,6 +12,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useState } from "react";
 const { Title } = Typography;
+// import facebookImg from "../../../public/facebook.png";
+// import googleImg from "../../../public/google.png";
+// import lineImg from "../../../public/line.png";
 
 
 interface Props {
@@ -112,7 +115,7 @@ export default function RiderDetail({ }: Props): ReactElement {
       } else {
         data.contact_emergency = _.find(data.contacts, function (o) { return o.type == "emergency"; });
         data.contact_emergency_phone = _.get(data.contact_emergency, 'country_code', '') + _.get(data.contact_emergency, 'phone', '');
-        data.contact_emergency_address = _.get(data.contact_emergency, 'address_no', '') + " " + _.get(data.contact_emergency, 'district_name', '') + " " + _.get(data.contact_emergency, 'district_name', '') + " " + _.get(data.contact_emergency, 'province_name', '') + " " + _.get(data.contact_emergency, 'zipcode', '');
+        data.contact_emergency_address = _.get(data.contact_emergency, 'address_no', '') + " " + _.get(data.contact_emergency, 'district_name', '') + " " + _.get(data.contact_emergency, 'subdistrict_name', '') + " " + _.get(data.contact_emergency, 'province_name', '') + " " + _.get(data.contact_emergency, 'zipcode', '');
         data.contact_refer = _.find(data.contacts, function (o) { return o.type == "refer"; });
         data.contact_refer_phone = _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '');
         data.contact_refer_address = _.get(data.contact_refer, 'address_no', '') + " " + _.get(data.contact_refer, 'district_name', '') + " " + _.get(data.contact_refer, 'subdistrict_name', '') + " " + _.get(data.contact_refer, 'province_name', '') + " " + _.get(data.contact_refer, 'zipcode', '');
@@ -176,6 +179,10 @@ export default function RiderDetail({ }: Props): ReactElement {
 
   }
 
+  const handleCancelEdit = async (values: any) => {
+    setIsEdit(!isEdit)
+  }
+
   const handleEdit = async (values: any) => {
     if (isEdit) {
       const riderQuery = {
@@ -220,13 +227,33 @@ export default function RiderDetail({ }: Props): ReactElement {
     <MainLayout>
       {!_isLoading &&
         <>
-          <Button style={{ float: 'right', backGroundColor: 'green' }}
-            type="primary"
-            size="middle"
-            onClick={handleEdit}
-          >
-            {(isEdit) ? `บันทึก` : `แก้ไข`}
-          </Button>
+          {(isEdit) ?
+            <>
+              <Button style={{ float: 'right', backGroundColor: 'forestgreen !important' }}
+                type="primary"
+                size="middle"
+                className="confirm-button"
+                onClick={handleEdit}
+              >
+                บันทึก
+              </Button>
+              <Button style={{ float: 'right', marginRight: "10px" }}
+                type="default"
+                size="middle"
+                onClick={handleCancelEdit}
+              >
+                ยกเลิก
+              </Button>
+            </>
+            :
+            <Button style={{ float: 'right', backGroundColor: 'forestgreen !important' }}
+              type="primary"
+              size="middle"
+              onClick={handleEdit}
+            >
+              แก้ไข
+            </Button>
+          }
           <Title level={4}>บัญชีผู้ใช้งาน</Title>
           <Breadcrumb style={{ margin: "16px 0" }}>
             <Breadcrumb.Item>บัญชีผู้ใช้งาน</Breadcrumb.Item>
@@ -644,7 +671,13 @@ export default function RiderDetail({ }: Props): ReactElement {
                       ช่องทางการสมัคร
                     </Col>
                     <Col className="gutter-row" span={6}>
-                      <span>social</span>
+                      <div className="ant-form ant-form-vertical">
+                        <antForm.Item label="Social Link Account">
+                          <Image src={facebookImg} width={20} height={20} />
+                          <Image src={googleImg} width={20} height={20} />
+                          <Image src={lineImg} width={20} height={20} />
+                        </antForm.Item>
+                      </div>
                     </Col>
                     <Col className="gutter-row" span={6}>
                       <Field

@@ -14,6 +14,7 @@ interface Props {
   onClick?: any
   loading?: boolean
   disabled?: boolean
+  className?: string
 }
 
 function Button({
@@ -24,6 +25,7 @@ function Button({
   size = 'middle',
   loading,
   disabled,
+  className,
   ...Props
 }: Props): ReactElement {
   return (
@@ -35,6 +37,7 @@ function Button({
       htmlType={htmlType}
       icon={icon}
       size={size}
+      className={className}
     >
       {children}
     </Buttons>

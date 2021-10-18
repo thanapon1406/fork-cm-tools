@@ -26,7 +26,8 @@ export default function Sidebar({}: Props): ReactElement {
   const [avatarColor, setAvatarColor] = useState('87d068')
   const [userObject, setUserState] = useRecoilState(personState)
   const { asPath, pathname } = Router
-  let activePath = pathname.split('/')[1] || 'dashboard'
+  let activePath = pathname
+  console.log(`activePath`, activePath)
   const logoutClick = () => {
     logout()
     Router.replace('/login')
@@ -62,7 +63,17 @@ export default function Sidebar({}: Props): ReactElement {
   )
 
   return (
-    <Sider breakpoint="lg" collapsedWidth="0" width="220px">
+    <Sider
+      style={{
+        overflow: 'auto',
+        height: '100vh',
+        position: 'fixed',
+        left: 0,
+      }}
+      breakpoint="lg"
+      collapsedWidth="0"
+      width="220px"
+    >
       <div className="logo" />
       <Space style={{ padding: '15px' }} size="middle">
         <Avatar shape="square" style={{ backgroundColor: `#${avatarColor}` }}>
@@ -93,30 +104,30 @@ export default function Sidebar({}: Props): ReactElement {
           </Link>
         </Menu.Item>
         <SubMenu key="sub1" icon={<SolutionOutlined />} title="อนุมัติผลการลงทะเบียน">
-          <Menu.Item key="merchant">
+          <Menu.Item key="/merchant">
             <Link href="/merchant">
               <a>ลงทะเบียนร้านค้า</a>
             </Link>
           </Menu.Item>
-          <Menu.Item key="rider">
+          <Menu.Item key="/rider">
             <Link href="/rider">
               <a>ลงทะเบียนคนขับ</a>
             </Link>
           </Menu.Item>
-          <Menu.Item key="ekyc">
+          <Menu.Item key="/ekyc">
             <Link href="/ekyc">
               <a>ลงทะเบียน E-KYC</a>
             </Link>
           </Menu.Item>
         </SubMenu>
         <SubMenu key="sub2" icon={<TeamOutlined />} title="User Profile">
-          <Menu.Item key="consumer">
+          <Menu.Item key="/consumer">
             <Link href="/consumer">Consumer Profile</Link>
           </Menu.Item>
           {/* <Menu.Item key="">
             <Link href="">Merchant Profile</Link>
           </Menu.Item> */}
-          <Menu.Item key="riderProfile">
+          <Menu.Item key="/userprofile/rider">
             <Link href="/userprofile/rider">Rider Profile</Link>
           </Menu.Item>
           <Menu.Item key="/userprofile/merchant">

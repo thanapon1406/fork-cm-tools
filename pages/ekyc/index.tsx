@@ -162,10 +162,10 @@ const EkycList = (): ReactElement => {
 
   return (
     <MainLayout>
-      <Title level={4}>อนุมัติการยินยันตัวตนผ่านระบบ E-KYC</Title>
+      <Title level={4}>อนุมัติการยืนยันตัวตนผ่านระบบ E-KYC</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>อนุมัติการยินยันตัวตนผ่านระบบ E-KYC</Breadcrumb.Item>
-        <Breadcrumb.Item>ลงทะเบียนการยินยันตัวตน</Breadcrumb.Item>
+        <Breadcrumb.Item>อนุมัติการยืนยันตัวตนผ่านระบบ E-KYC</Breadcrumb.Item>
+        <Breadcrumb.Item>ลงทะเบียนการยืนยันตัวตน</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
         <Formik

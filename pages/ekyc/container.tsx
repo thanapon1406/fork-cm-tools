@@ -169,7 +169,13 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
               {mediaType === 'image' ? (
                 <Image src={mediaUrl} width={1920} height={1200} alt="media" />
               ) : (
-                <iframe src={mediaUrl} allow="autoplay; encrypted-media" title="video" />
+                <iframe
+                  src={mediaUrl}
+                  width={600}
+                  height={400}
+                  allow="autoplay; encrypted-media"
+                  title="video"
+                />
               )}
             </div>
           </Modal>
@@ -280,17 +286,12 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                         {
                           value: 'approved',
                           name: 'อนุมัติ',
-                          disabled:
-                            values.status_card !== 1 ||
-                            values.status_face !== 1 ||
-                            values.status_video !== 1,
                         },
                       ]}
                     />
                   </Col>
                 </Row>
                 <Row justify="end">
-                  {console.log(values)}
                   <Button
                     disabled={disableApprove(values)}
                     loading={isLoadingSubmit}

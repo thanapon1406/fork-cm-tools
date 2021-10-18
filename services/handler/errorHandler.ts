@@ -1,6 +1,6 @@
+import codeMessage from '@/constants/codeMessage'
 import { notification } from 'antd'
 import Router from 'next/router'
-import codeMessage from '@/constants/codeMessage'
 
 const errorHandler = (error: any, emptyResult = null) => {
   const { response } = error
@@ -14,6 +14,14 @@ const errorHandler = (error: any, emptyResult = null) => {
     const message = response.data && response.data.detail
     const errorText = message || codeMessage[response.status]
     const { status } = response
+    if (error.response.data.jwtExpired || `${status}` === '401') {
+      Router.replace('/login')
+      return response.data
+    }
+
+    if (`${status}` === '404') {
+      return response.data
+    }
     notification.config({
       duration: 20,
     })
@@ -21,9 +29,6 @@ const errorHandler = (error: any, emptyResult = null) => {
       message: `Request error ${status}`,
       description: errorText,
     })
-    if (error.response.data.jwtExpired || `${status}` === '401') {
-      Router.replace('/login')
-    }
     return response.data
   } else {
     notification.config({

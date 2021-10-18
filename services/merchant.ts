@@ -69,5 +69,34 @@ const personalData = async (body: any) => {
   }
 }
 
-export { outletList, outletDetail, approveOutlet, personalData, outletListById }
+const getOutletType = async () => {
+  try {
+    const body: queryList = {
+      page: 1,
+      per_page: 50,
+    }
+    const result = await fetch.post(`/api/merchant/type`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
 
+const updateOutlet = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/merchant/update`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export {
+  outletList,
+  outletDetail,
+  approveOutlet,
+  personalData,
+  getOutletType,
+  outletListById,
+  updateOutlet,
+}

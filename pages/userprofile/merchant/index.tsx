@@ -51,7 +51,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
     keyword: '',
     outlet_type: '',
     status: '',
-    approve_status: '',
+    approve_status: 'approved',
   })
 
   useEffect(() => {
@@ -97,11 +97,11 @@ export default function MerchantProfileList({}: Props): ReactElement {
   }
 
   const handleSubmit = (values: any) => {
-    console.log(`values`, values)
     let reqFilter: filterObject = {
-      keyword: '',
-      outlet_type: '',
-      status: '',
+      keyword: values.keyword,
+      outlet_type: values.type,
+      status: values.status,
+      approve_status: 'approved',
     }
     fetchData(reqFilter, { current: 1, total: 0, pageSize: 10 })
   }
@@ -197,10 +197,10 @@ export default function MerchantProfileList({}: Props): ReactElement {
 
   return (
     <MainLayout>
-      <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+      <Title level={4}>บัญชีผู้ใช้งาน</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
-        <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
+        <Breadcrumb.Item>บัญชีผู้ใช้งาน</Breadcrumb.Item>
+        <Breadcrumb.Item>บัญชีร้านค้า</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
         <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>

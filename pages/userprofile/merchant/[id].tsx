@@ -196,11 +196,11 @@ export default function MerchantUserView({}: Props): ReactElement {
     <MainLayout>
       <Row justify="space-around" align="middle">
         <Col span={8}>
-          <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+          <Title level={4}>บัญชีผู้ใช้งาน</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
-            <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
-            <Breadcrumb.Item>ข้อมูลร้านค้า</Breadcrumb.Item>
+            <Breadcrumb.Item>บัญชีผู้ใช้งาน</Breadcrumb.Item>
+            <Breadcrumb.Item>บัญชีร้านค้า</Breadcrumb.Item>
+            <Breadcrumb.Item>ข้อมูลบัญชีร้านค้า</Breadcrumb.Item>
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}>

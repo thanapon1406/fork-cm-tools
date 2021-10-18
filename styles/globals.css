@@ -9,6 +9,9 @@
 .site-layout .site-layout-background {
   background: #fff;
 }
+[data-theme='dark'] .site-layout .site-layout-background {
+  background: #141414;
+}
 
 .ant-table-tbody > tr > td {
   height: 5px;
@@ -22,8 +25,7 @@
   color: #ff0000;
 }
 
-.confirm-button{
+.confirm-button {
   background-color: forestgreen !important;
   border-color: forestgreen !important;
 }
-

@@ -7,3 +7,8 @@ export const days: any = {
   fri: 'วันศุกร์',
   sat: 'วันเสาร์',
 }
+
+export const outletStatus: any = {
+  active: 'Active',
+  inactive: 'In-active',
+}

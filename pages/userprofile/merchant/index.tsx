@@ -170,7 +170,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
     },
     {
       title: 'ร้านเปิด-ปิด',
-      dataIndex: 'approve_status',
+      dataIndex: 'status',
       align: 'center',
       className: 'column-typeverifyr',
       render: (row: string) => {

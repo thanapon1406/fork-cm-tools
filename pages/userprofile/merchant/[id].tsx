@@ -1,15 +1,15 @@
+import Button from '@/components/Button'
 import Card from '@/components/Card'
 import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
 import Tag from '@/components/Tag'
-import { days } from '@/constants/textMapping'
-import useViewImage from '@/hooks/useViewImage'
+import { days, outletStatus } from '@/constants/textMapping'
 import MainLayout from '@/layout/MainLayout'
-import { approveOutlet, outletDetail, personalData } from '@/services/merchant'
-import { Breadcrumb, Col, Divider, Row, Typography } from 'antd'
+import { outletDetail, personalData, updateOutlet } from '@/services/merchant'
+import { Breadcrumb, Col, Divider, Modal, Row, Space, Switch, Typography } from 'antd'
 import { Field, FieldArray, Form, Formik } from 'formik'
-import lodash from 'lodash'
+import _ from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
@@ -20,7 +20,9 @@ interface Props {}
 export default function MerchantUserView({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
-  const [ssoId, setSsoid] = useState('')
+  const [ssoid, setSsoid] = useState('')
+  const [isEdit, setIsEdit] = useState(false)
+
   let [userInitialValues, setUserInitialValues] = useState({
     user_name: '',
     user_id: '',
@@ -42,106 +44,12 @@ export default function MerchantUserView({}: Props): ReactElement {
     longitude: '',
     tel: '',
     rating: '',
-    business_times: [
-      {
-        id: 113,
-        day: 'mon',
-        outlet_id: 174,
-        opening_time: '09:00',
-        closed_time: '22:00',
-        created_at: '2021-10-15T08:39:22Z',
-        updated_at: '2021-10-15T08:39:22Z',
-      },
-      {
-        id: 114,
-        day: 'tue',
-        outlet_id: 174,
-        opening_time: '09:00',
-        closed_time: '22:00',
-        created_at: '2021-10-15T08:39:22Z',
-        updated_at: '2021-10-15T08:39:22Z',
-      },
-      {
-        id: 115,
-        day: 'wed',
-        outlet_id: 174,
-        opening_time: '09:00',
-        closed_time: '22:00',
-        created_at: '2021-10-15T08:39:22Z',
-        updated_at: '2021-10-15T08:39:22Z',
-      },
-      {
-        id: 116,
-        day: 'thu',
-        outlet_id: 174,
-        opening_time: '09:00',
-        closed_time: '22:00',
-        created_at: '2021-10-15T08:39:22Z',
-        updated_at: '2021-10-15T08:39:22Z',
-      },
-      {
-        id: 117,
-        day: 'fri',
-        outlet_id: 174,
-        opening_time: '09:00',
-        closed_time: '22:00',
-        created_at: '2021-10-15T08:39:22Z',
-        updated_at: '2021-10-15T08:39:22Z',
-      },
-      {
-        id: 118,
-        day: 'sat',
-        outlet_id: 174,
-        opening_time: '09:00',
-        closed_time: '22:00',
-        created_at: '2021-10-15T08:39:22Z',
-        updated_at: '2021-10-15T08:39:22Z',
-      },
-      {
-        id: 119,
-        day: 'sun',
-        outlet_id: 174,
-        opening_time: '09:00',
-        closed_time: '22:00',
-        created_at: '2021-10-15T08:39:22Z',
-        updated_at: '2021-10-15T08:39:22Z',
-      },
-    ],
+    business_times: [],
+    business_extra_times: [],
+    status: '',
+    opening_time: '',
+    closed_time: '',
   })
-  const verifyDetailList = [
-    {
-      name: 'ชื่อร้านค้า/แบรนด์ ไม่ถูกต้อง',
-      value: '1',
-    },
-    {
-      name: 'เลขประจำตัวผู้เสียภาษี ไม่ถูกต้อง',
-      value: '2',
-    },
-    {
-      name: 'ที่อยู่ร้านค้า/แบรนด์ ไม่ถูกต้อง',
-      value: '3',
-    },
-    {
-      name: 'เบอร์โทรศัพท์ร้านค้า ไม่ถูกต้อง',
-      value: '4',
-    },
-    {
-      name: 'ชื่อสาขา ไม่ถูกต้อง',
-      value: '5',
-    },
-    {
-      name: 'เลขประจำตัวผู้เสียภาษีประจำสาขา ไม่ถูกต้อง',
-      value: '6',
-    },
-    {
-      name: 'ที่อยู่สาขา ไม่ถูกต้อง',
-      value: '7',
-    },
-    {
-      name: 'เบอร์โทรศัพท์ร้านค้า ไม่ถูกต้อง',
-      value: '8',
-    },
-  ]
 
   const mapBranchType: any = {
     single: 'ร้านค้าเดี่ยว',
@@ -188,6 +96,21 @@ export default function MerchantUserView({}: Props): ReactElement {
     const { result, success } = await outletDetail(request)
     if (success) {
       const { data } = result
+      let business_times_Set: any
+      let business_extra_times_Set: any
+      if (data?.business_times) {
+        const convertStatus = (d: any) => {
+          return {
+            ...d,
+            status: d.status === 'open' ? true : false,
+          }
+        }
+        business_extra_times_Set = _.filter(data.business_times, { day: 'extra' })
+        business_times_Set = _.filter(data.business_times, (d: any) => d.day !== 'extra')
+        business_extra_times_Set = business_extra_times_Set.map(convertStatus)
+        business_times_Set = business_times_Set.map(convertStatus)
+      }
+
       setOutletInitialValues({
         ...outletInitialValues,
         outlet_name: data?.name.th,
@@ -203,6 +126,11 @@ export default function MerchantUserView({}: Props): ReactElement {
         longitude: data?.longitude,
         tel: data?.tel,
         rating: data?.rating,
+        business_times: business_times_Set,
+        business_extra_times: business_extra_times_Set,
+        status: data?.status,
+        opening_time: data?.opening_time,
+        closed_time: data?.closed_time,
       })
     }
   }
@@ -219,51 +147,98 @@ export default function MerchantUserView({}: Props): ReactElement {
     }),
   })
 
-  const handleSubmit = async (values: any) => {
-    let { verify_detail } = values
-    let verifyRequest = {
+  const handleSubmit = async (values: any) => {}
+  const handleSubmitStatus = async () => {
+    const body = {
       data: {
         id: id,
-        verify_status: values.verify_status,
-        verify_detail: [],
+        opening_time: outletInitialValues.opening_time,
+        closed_time: outletInitialValues.closed_time,
+        tel: outletInitialValues.tel,
+        status: outletInitialValues.status,
       },
     }
 
-    if (values.verify_status === 'rejected') {
-      verify_detail = verify_detail.map((d: any) => {
-        return {
-          id: d,
-          value: lodash.find(verifyDetailList, { value: d })?.name,
-        }
-      })
-      verifyRequest.data.verify_detail = verify_detail
-    }
-
-    const { result, success } = await approveOutlet(verifyRequest)
+    const { result, success } = await updateOutlet(body)
     if (success) {
-      router.push('/merchant')
+      Modal.success({
+        content: <Title level={4}>แก้ไขเรียบร้อยแล้ว</Title>,
+      })
     }
   }
-  const {
-    onClickViewMedia,
-    isShowMediaModal,
-    setIsShowMediaModal,
-    mediaType,
-    mediaUrl,
-    isLoadingMedia,
-  } = useViewImage()
+
+  const outletStatusRender = (status: string) => {
+    const statusSet: any = {
+      active: <Tag type="primary">{outletStatus[status]}</Tag>,
+      inactive: <Tag type="default">{outletStatus[status]}</Tag>,
+    }
+    return statusSet[status] || <Tag type="error">{status}</Tag>
+  }
+
+  const statusEditForm = (status: string) => {
+    const onChange = (event: any) => {
+      setOutletInitialValues({
+        ...outletInitialValues,
+        status: event ? 'active' : 'inactive',
+      })
+    }
+    return (
+      <Switch
+        onChange={onChange}
+        checkedChildren="Active"
+        unCheckedChildren="In-active"
+        defaultChecked={status === 'active'}
+      />
+    )
+  }
 
   return (
     <MainLayout>
-      <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
-        <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
-        <Breadcrumb.Item>ข้อมูลร้านค้า</Breadcrumb.Item>
-      </Breadcrumb>
+      <Row justify="space-around" align="middle">
+        <Col span={8}>
+          <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+          <Breadcrumb style={{ margin: '16px 0' }}>
+            <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
+            <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
+            <Breadcrumb.Item>ข้อมูลร้านค้า</Breadcrumb.Item>
+          </Breadcrumb>
+        </Col>
+        <Col span={8} offset={8} style={{ textAlign: 'end' }}>
+          {isEdit ? (
+            <Space size="small">
+              <Button
+                type="default"
+                onClick={() => {
+                  setIsEdit(false)
+                }}
+              >
+                ยกเลิก
+              </Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setIsEdit(false)
+                  handleSubmitStatus()
+                }}
+              >
+                บันทึก
+              </Button>
+            </Space>
+          ) : (
+            <Button
+              type="default"
+              onClick={() => {
+                setIsEdit(true)
+              }}
+            >
+              แก้ไข
+            </Button>
+          )}
+        </Col>
+      </Row>
+
       <Card>
         <br />
-
         <Formik
           enableReinitialize={true}
           initialValues={userInitialValues}
@@ -278,7 +253,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={8} offset={8}>
                   <Title style={{ textAlign: 'end' }} level={5}>
-                    สถานะผู้ใช้งาน : <Tag type="primary">Active</Tag>
+                    สถานะผู้ใช้งาน :{' '}
+                    {isEdit
+                      ? statusEditForm(outletInitialValues.status)
+                      : outletStatusRender(outletInitialValues.status)}
                   </Title>
                 </Col>
               </Row>
@@ -480,102 +458,120 @@ export default function MerchantUserView({}: Props): ReactElement {
               </Row>
 
               <Title level={5}>ข้อมูลการเปิด-ปิดร้าน</Title>
+              <br />
+              {_.isEmpty(values.business_times) === false && (
+                <Row gutter={16}>
+                  <Col className="gutter-row" span={6}>
+                    <Text style={{ marginTop: '12px' }}>วันเวลาที่เปิดปิด</Text>
+                  </Col>
+                  <Col className="gutter-row" span={18}>
+                    <FieldArray
+                      name="business_times"
+                      render={(arrayHelpers) => (
+                        <div>
+                          {values.business_times.map((day, index) => {
+                            return (
+                              <Row gutter={16} justify="space-around" align="middle" key={index}>
+                                <Col className="gutter-row" span={8}>
+                                  <Field
+                                    label={{ text: days[day['day']] }}
+                                    name={`business_times.${index}.status`}
+                                    component={CheckBox}
+                                    className="form-control round"
+                                    id="day"
+                                    disabled={true}
+                                  />
+                                </Col>
+                                <Col className="gutter-row" span={8}>
+                                  <Field
+                                    label={{ text: 'เวลา' }}
+                                    name={`business_times.${index}.opening_time`}
+                                    type="text"
+                                    component={Input}
+                                    className="form-control round"
+                                    id="rating"
+                                    placeholder="เวลา"
+                                    disabled={true}
+                                  />
+                                </Col>
+                                <Col className="gutter-row" span={8}>
+                                  <Field
+                                    label={{ text: 'เวลา' }}
+                                    name={`business_times.${index}.closed_time`}
+                                    type="text"
+                                    component={Input}
+                                    className="form-control round"
+                                    id="rating"
+                                    placeholder="เวลา"
+                                    disabled={true}
+                                  />
+                                </Col>
+                              </Row>
+                            )
+                          })}
+                        </div>
+                      )}
+                    />
+                  </Col>
+                </Row>
+              )}
 
-              <Row gutter={16}>
-                <Col className="gutter-row" span={6}>
-                  <Text style={{ marginTop: '12px' }}>วันเวลาที่เปิดปิด</Text>
-                </Col>
-                <Col className="gutter-row" span={18}>
-                  <FieldArray
-                    name="friends"
-                    render={(arrayHelpers) => (
-                      <div>
-                        {values.business_times.map((day, index) => {
-                          return (
-                            <Row gutter={16} justify="space-around" align="middle" key={index}>
-                              <Col className="gutter-row" span={8}>
-                                <Field
-                                  label={{ text: days[day['day']] }}
-                                  name={`business_times.${index}.day`}
-                                  component={CheckBox}
-                                  className="form-control round"
-                                  id="day"
-                                  disabled={true}
-                                />
-                              </Col>
-                              <Col className="gutter-row" span={8}>
-                                <Field
-                                  label={{ text: 'เวลา' }}
-                                  name={`business_times.${index}.opening_time`}
-                                  type="text"
-                                  component={Input}
-                                  className="form-control round"
-                                  id="rating"
-                                  placeholder="เวลา"
-                                  disabled={true}
-                                />
-                              </Col>
-                              <Col className="gutter-row" span={8}>
-                                <Field
-                                  label={{ text: 'เวลา' }}
-                                  name={`business_times.${index}.closed_time`}
-                                  type="text"
-                                  component={Input}
-                                  className="form-control round"
-                                  id="rating"
-                                  placeholder="เวลา"
-                                  disabled={true}
-                                />
-                              </Col>
-                            </Row>
-                          )
-                        })}
-                      </div>
-                    )}
-                  />
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col className="gutter-row" span={6}>
-                  <Text style={{ marginTop: '12px' }}>วันหยุดพิเศษ</Text>
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'วันหยุดพิเศษ 1' }}
-                    name="rating"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="rating"
-                    placeholder="เวลา"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'วันหยุดพิเศษ 2' }}
-                    name="rating"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="rating"
-                    placeholder="เวลา"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'วันหยุดพิเศษ 3' }}
-                    name="rating"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="rating"
-                    placeholder="เวลา"
-                    disabled={true}
-                  />
-                </Col>
-              </Row>
+              {_.isEmpty(values.business_extra_times) === false && (
+                <Row gutter={16}>
+                  <Col className="gutter-row" span={6}>
+                    <Text style={{ marginTop: '12px' }}>วันหยุดพิเศษ</Text>
+                  </Col>
+                  <Col className="gutter-row" span={18}>
+                    <FieldArray
+                      name="business_extra_times"
+                      render={(arrayHelpers) => (
+                        <div>
+                          {values.business_extra_times.map((day, index) => {
+                            return (
+                              <Row gutter={16} justify="space-around" align="middle" key={index}>
+                                <Col className="gutter-row" span={8}>
+                                  <Field
+                                    label={{ text: `วันหยุดพิเศษ ${index + 1}` }}
+                                    name={`business_extra_times.${index}.status`}
+                                    component={CheckBox}
+                                    className="form-control round"
+                                    id="day"
+                                    disabled={true}
+                                  />
+                                </Col>
+                                <Col className="gutter-row" span={8}>
+                                  <Field
+                                    label={{ text: 'วันที่' }}
+                                    name={`business_extra_times.${index}.start_date`}
+                                    type="text"
+                                    component={Input}
+                                    className="form-control round"
+                                    id="rating"
+                                    placeholder="วันที่"
+                                    disabled={true}
+                                  />
+                                </Col>
+                                <Col className="gutter-row" span={8}>
+                                  <Field
+                                    label={{ text: 'วันที่' }}
+                                    name={`business_extra_times.${index}.end_date`}
+                                    type="text"
+                                    component={Input}
+                                    className="form-control round"
+                                    id="rating"
+                                    placeholder="วันที่"
+                                    disabled={true}
+                                  />
+                                </Col>
+                              </Row>
+                            )
+                          })}
+                        </div>
+                      )}
+                    />
+                  </Col>
+                </Row>
+              )}
             </Form>
           )}
         </Formik>

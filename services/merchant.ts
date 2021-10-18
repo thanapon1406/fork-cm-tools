@@ -82,4 +82,21 @@ const getOutletType = async () => {
   }
 }
 
-export { outletList, outletDetail, approveOutlet, personalData, getOutletType, outletListById }
+const updateOutlet = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/merchant/update`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export {
+  outletList,
+  outletDetail,
+  approveOutlet,
+  personalData,
+  getOutletType,
+  outletListById,
+  updateOutlet,
+}

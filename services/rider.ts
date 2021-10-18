@@ -3,7 +3,7 @@ import errorHandler from './handler/errorHandler';
 import successHandler from './handler/successHandler';
 
 export {
-  getRider, getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories
+  getRider, getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories, updateRider
 };
 
 interface queryList {
@@ -17,6 +17,7 @@ interface queryList {
   ekyc_status?: string;
   created_at?: object;
   updated_at?: object;
+  include?: string;
 }
 
 interface queryListDetail {
@@ -35,6 +36,21 @@ interface queryUpdateRiderStatus {
       title?: string;
       status?: boolean;
     }[];
+  }
+}
+
+interface riderUpdate {
+  data: {
+    id: string | string[] | undefined;
+    status?: string;
+    verify_email?: boolean;
+    view_approve_status?: boolean;
+    first_name?: string;
+    email?: string;
+    last_name?: string;
+    phone?: string;
+    country_code?: string;
+    active_status?: string;
   }
 }
 
@@ -77,6 +93,15 @@ const updateRiderStatus = async (req: queryUpdateRiderStatus) => {
 const getStatusHistories = async (req: any) => {
   try {
     const response = await fetch.post(`/api/rider/status-histories`, req);
+    return successHandler(response);
+  } catch (error) {
+    return errorHandler(error);;
+  }
+};
+
+const updateRider = async (req: riderUpdate) => {
+  try {
+    const response = await fetch.post(`/api/rider/update`, req);
     return successHandler(response);
   } catch (error) {
     return errorHandler(error);;

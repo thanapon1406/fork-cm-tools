@@ -2,16 +2,18 @@ import React, { ReactElement } from "react";
 
 interface Props {
   children: any;
+  minHeight?: number;
+  marginBottom?: number;
 }
 
-export default function Card({ children }: Props): ReactElement {
+export default function Card({ children, minHeight, marginBottom }: Props): ReactElement {
   return (
     <div
       className="site-layout-background"
       style={{
         padding: 24,
-        minHeight: 200,
-        marginBottom: 36,
+        minHeight: minHeight || 200,
+        marginBottom: marginBottom || 36,
         overflow: "scroll",
       }}
     >

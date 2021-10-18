@@ -644,7 +644,7 @@ export default function RiderDetail({ }: Props): ReactElement {
 												/>
 											</Col>
 										</Row>
-										<div className="ant-form" style={{ float: 'right' }}>
+										<div className="ant-form" style={{ float: 'right', marginBottom: 25 }}>
 											<Button
 												style={{ width: "120px" }}
 												type="primary"

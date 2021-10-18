@@ -7,10 +7,10 @@ import {
   requestEkycInterface,
   updateEkycDetail,
 } from '@/services/ekyc'
-import { Col, Empty, Modal, Row, Skeleton, Typography } from 'antd'
+import { Col, Empty, Image, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { isEmpty, isUndefined } from 'lodash'
-import Image from 'next/image'
+// import Image from 'next/image'
 import { ReactElement, useEffect, useState } from 'react'
 const { Title } = Typography
 
@@ -167,7 +167,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
               }}
             >
               {mediaType === 'image' ? (
-                <Image src={mediaUrl} width={1920} height={1200} alt="media" />
+                <Image src={mediaUrl} alt="media" />
               ) : (
                 <iframe
                   src={mediaUrl}

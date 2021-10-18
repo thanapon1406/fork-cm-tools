@@ -142,7 +142,11 @@ export default function MerchantProfileList({}: Props): ReactElement {
           return (
             <>
               {_.map(row, (d: any) => {
-                return <Tag type="success">{d.name['th']}</Tag>
+                return (
+                  <Tag key={d.id} type="success">
+                    {d.name['th']}
+                  </Tag>
+                )
               })}
             </>
           )

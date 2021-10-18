@@ -1,12 +1,14 @@
 import Card from '@/components/Card'
+import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
 import Tag from '@/components/Tag'
+import { days } from '@/constants/textMapping'
 import useViewImage from '@/hooks/useViewImage'
 import MainLayout from '@/layout/MainLayout'
 import { approveOutlet, outletDetail, personalData } from '@/services/merchant'
 import { Breadcrumb, Col, Divider, Row, Typography } from 'antd'
-import { Field, Form, Formik } from 'formik'
+import { Field, FieldArray, Form, Formik } from 'formik'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
@@ -40,6 +42,71 @@ export default function MerchantUserView({}: Props): ReactElement {
     longitude: '',
     tel: '',
     rating: '',
+    business_times: [
+      {
+        id: 113,
+        day: 'mon',
+        outlet_id: 174,
+        opening_time: '09:00',
+        closed_time: '22:00',
+        created_at: '2021-10-15T08:39:22Z',
+        updated_at: '2021-10-15T08:39:22Z',
+      },
+      {
+        id: 114,
+        day: 'tue',
+        outlet_id: 174,
+        opening_time: '09:00',
+        closed_time: '22:00',
+        created_at: '2021-10-15T08:39:22Z',
+        updated_at: '2021-10-15T08:39:22Z',
+      },
+      {
+        id: 115,
+        day: 'wed',
+        outlet_id: 174,
+        opening_time: '09:00',
+        closed_time: '22:00',
+        created_at: '2021-10-15T08:39:22Z',
+        updated_at: '2021-10-15T08:39:22Z',
+      },
+      {
+        id: 116,
+        day: 'thu',
+        outlet_id: 174,
+        opening_time: '09:00',
+        closed_time: '22:00',
+        created_at: '2021-10-15T08:39:22Z',
+        updated_at: '2021-10-15T08:39:22Z',
+      },
+      {
+        id: 117,
+        day: 'fri',
+        outlet_id: 174,
+        opening_time: '09:00',
+        closed_time: '22:00',
+        created_at: '2021-10-15T08:39:22Z',
+        updated_at: '2021-10-15T08:39:22Z',
+      },
+      {
+        id: 118,
+        day: 'sat',
+        outlet_id: 174,
+        opening_time: '09:00',
+        closed_time: '22:00',
+        created_at: '2021-10-15T08:39:22Z',
+        updated_at: '2021-10-15T08:39:22Z',
+      },
+      {
+        id: 119,
+        day: 'sun',
+        outlet_id: 174,
+        opening_time: '09:00',
+        closed_time: '22:00',
+        created_at: '2021-10-15T08:39:22Z',
+        updated_at: '2021-10-15T08:39:22Z',
+      },
+    ],
   })
   const verifyDetailList = [
     {
@@ -96,7 +163,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     }
     const { result, success } = await personalData(request)
     if (success) {
-      const { data } = result
+      const { data = [] } = result
       if (data[0]) {
         const { user = {} } = data[0]
         const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
@@ -407,6 +474,104 @@ export default function MerchantUserView({}: Props): ReactElement {
                     className="form-control round"
                     id="rating"
                     placeholder="คะแนนร้านค้า"
+                    disabled={true}
+                  />
+                </Col>
+              </Row>
+
+              <Title level={5}>ข้อมูลการเปิด-ปิดร้าน</Title>
+
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <Text style={{ marginTop: '12px' }}>วันเวลาที่เปิดปิด</Text>
+                </Col>
+                <Col className="gutter-row" span={18}>
+                  <FieldArray
+                    name="friends"
+                    render={(arrayHelpers) => (
+                      <div>
+                        {values.business_times.map((day, index) => {
+                          return (
+                            <Row gutter={16} justify="space-around" align="middle" key={index}>
+                              <Col className="gutter-row" span={8}>
+                                <Field
+                                  label={{ text: days[day['day']] }}
+                                  name={`business_times.${index}.day`}
+                                  component={CheckBox}
+                                  className="form-control round"
+                                  id="day"
+                                  disabled={true}
+                                />
+                              </Col>
+                              <Col className="gutter-row" span={8}>
+                                <Field
+                                  label={{ text: 'เวลา' }}
+                                  name={`business_times.${index}.opening_time`}
+                                  type="text"
+                                  component={Input}
+                                  className="form-control round"
+                                  id="rating"
+                                  placeholder="เวลา"
+                                  disabled={true}
+                                />
+                              </Col>
+                              <Col className="gutter-row" span={8}>
+                                <Field
+                                  label={{ text: 'เวลา' }}
+                                  name={`business_times.${index}.closed_time`}
+                                  type="text"
+                                  component={Input}
+                                  className="form-control round"
+                                  id="rating"
+                                  placeholder="เวลา"
+                                  disabled={true}
+                                />
+                              </Col>
+                            </Row>
+                          )
+                        })}
+                      </div>
+                    )}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <Text style={{ marginTop: '12px' }}>วันหยุดพิเศษ</Text>
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'วันหยุดพิเศษ 1' }}
+                    name="rating"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="rating"
+                    placeholder="เวลา"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'วันหยุดพิเศษ 2' }}
+                    name="rating"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="rating"
+                    placeholder="เวลา"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'วันหยุดพิเศษ 3' }}
+                    name="rating"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="rating"
+                    placeholder="เวลา"
                     disabled={true}
                   />
                 </Col>

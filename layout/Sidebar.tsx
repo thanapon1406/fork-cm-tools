@@ -37,7 +37,7 @@ export default function Sidebar({}: Props): ReactElement {
   }, [])
 
   const findUserData = async () => {
-    const { result, success } = await findUser()
+    const { result = {}, success = false } = await findUser()
     if (success) {
       const { firstname = '', lastname = '' } = result.data
       const asciiCode = firstname.charCodeAt(0)

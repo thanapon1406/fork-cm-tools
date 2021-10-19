@@ -44,6 +44,15 @@ export const updateEkycDetail = async (payload: any) => {
   }
 }
 
+export const getPresignUrl = async (params: object) => {
+  try {
+    const result = await fetch.get('/api/ekyc/presign-url', { params })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 export const downloadImage = async (payload: any) => {
   const res = await fetcher(`${POS_WAPI}${API_PATH_EKYC_SERVICE}/download-img`, {
     method: 'POST',

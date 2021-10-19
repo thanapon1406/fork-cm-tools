@@ -128,7 +128,6 @@ export default function RiderDetail({ }: Props): ReactElement {
         data.car_photo = _.get(data.pdpa, 'car_info[0].photo', '')
         data.car_tax_photo = _.get(data.pdpa, 'car_info[0].tax_photo', '')
         data.disable_photo = _.get(data.pdpa, 'disable_person[0].photo', '')
-        console.log(data, "tst");
 
       }
 
@@ -209,6 +208,7 @@ export default function RiderDetail({ }: Props): ReactElement {
           });
         }
       } else if (data[0].job_count > 0 && isActive == "inactive") {
+        setActive("active")
         notification.error({
           message: `ไม่สามารถทำการ inactive`,
           description: "ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ",
@@ -220,7 +220,6 @@ export default function RiderDetail({ }: Props): ReactElement {
 
   const handleStatus = (event: any) => {
     const checkStatus = (isActive == "active" ? "inactive" : "active")
-    console.log(isActive, checkStatus, event);
     setActive(checkStatus)
   };
 

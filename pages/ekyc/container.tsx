@@ -2,15 +2,14 @@ import Button from '@/components/Button'
 import Select from '@/components/Form/Select'
 import { EkycApproveStatusInterface, EkycDetail, EkycDetailProps } from '@/interface/ekyc'
 import {
-  downloadImage,
   getEkycDetail,
+  getPresignUrl,
   requestEkycInterface,
   updateEkycDetail,
 } from '@/services/ekyc'
-import { Col, Empty, Image, Modal, Row, Skeleton, Typography } from 'antd'
+import { Col, Empty, Image, message, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { isEmpty, isUndefined } from 'lodash'
-// import Image from 'next/image'
 import { ReactElement, useEffect, useState } from 'react'
 const { Title } = Typography
 
@@ -103,19 +102,22 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
     setLoadingSubmit(false)
   }
 
-  const onClickViewMedia = async (type: string, pathUrl: string) => {
+  const onClickViewMedia = async (type: string) => {
     setIsLoadingMedia(true)
     setMediaType(type)
     const payload = {
-      type: type,
-      pathUrl: pathUrl,
+      id: sso_id || id,
+      media_type: type,
     }
-
-    const res = await downloadImage(payload)
-    const url = URL.createObjectURL(res)
-    setMediaUrl(url)
+    const { result, success } = await getPresignUrl(payload)
+    if (success) {
+      const { url } = result
+      setMediaUrl(url)
+      setIsShowMediaModal(true)
+    } else {
+      message.error('ไม่สามารถดึงค่าข้อมูลได้')
+    }
     setIsLoadingMedia(false)
-    setIsShowMediaModal(true)
   }
 
   useEffect(() => {
@@ -158,26 +160,18 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
               </Button>,
             ]}
           >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              {mediaType === 'image' ? (
+            {mediaType === 'video' ? (
+              <>
+                <iframe src={mediaUrl} width="100%" height={400} title="video" />
+                <Title style={{ textAlign: 'center', padding: '0.5rem' }} level={4}>
+                  {ekycDetail.wording}
+                </Title>
+              </>
+            ) : (
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <Image preview={false} src={mediaUrl} alt="media" />
-              ) : (
-                <iframe
-                  src={mediaUrl}
-                  width={600}
-                  height={400}
-                  allow="autoplay; encrypted-media"
-                  title="video"
-                />
-              )}
-            </div>
+              </div>
+            )}
           </Modal>
 
           <Formik initialValues={ekycDetail} enableReinitialize onSubmit={() => {}}>
@@ -190,12 +184,8 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                   <Col offset={2} span={6}>
                     <Button
                       loading={isLoadingMedia}
-                      disabled={isUndefined(values.citizen_card_photo_url)}
                       onClick={() => {
-                        const { citizen_card_photo_url } = values
-                        if (!isUndefined(citizen_card_photo_url)) {
-                          onClickViewMedia('image', citizen_card_photo_url)
-                        }
+                        onClickViewMedia('card')
                       }}
                     >
                       ดูรูปภาพ
@@ -218,12 +208,8 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                   <Col offset={2} span={6}>
                     <Button
                       loading={isLoadingMedia}
-                      disabled={isUndefined(values.face_photo_url)}
                       onClick={() => {
-                        const { face_photo_url } = values
-                        if (!isUndefined(face_photo_url)) {
-                          onClickViewMedia('image', face_photo_url)
-                        }
+                        onClickViewMedia('face')
                       }}
                     >
                       ดูรูปภาพ
@@ -246,12 +232,8 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                   <Col offset={2} span={6}>
                     <Button
                       loading={isLoadingMedia}
-                      disabled={isUndefined(values.video_url)}
                       onClick={() => {
-                        const { video_url } = values
-                        if (!isUndefined(video_url)) {
-                          onClickViewMedia('video', video_url)
-                        }
+                        onClickViewMedia('video')
                       }}
                     >
                       ดูวิดีโอ

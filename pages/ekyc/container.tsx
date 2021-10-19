@@ -167,7 +167,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
               }}
             >
               {mediaType === 'image' ? (
-                <Image src={mediaUrl} alt="media" />
+                <Image preview={false} src={mediaUrl} alt="media" />
               ) : (
                 <iframe
                   src={mediaUrl}

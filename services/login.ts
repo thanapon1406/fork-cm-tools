@@ -12,6 +12,7 @@ interface loginRequest {
 
 export const login = async ({ username, password }: loginRequest) => {
   try {
+    clearToken()
     const body = {
       client_id: 'test',
       client_secret: 'test',

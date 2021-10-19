@@ -2,7 +2,6 @@ import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
 import {
   LogoutOutlined,
-  PieChartOutlined,
   SettingOutlined,
   SolutionOutlined,
   TeamOutlined,
@@ -21,12 +20,33 @@ const { Sider } = Layout
 const { SubMenu } = Menu
 interface Props {}
 
+interface MenuItem {
+  index: number
+  title: string
+  icon: any | undefined
+  key: string
+  link: string
+  sub: Array<SubMenuItem>
+}
+
+interface SubMenuItem {
+  key: string
+  link: string
+  title: string
+}
+
 export default function Sidebar({}: Props): ReactElement {
   const Router = useRouter()
   const [avatarColor, setAvatarColor] = useState('87d068')
   const [userObject, setUserState] = useRecoilState(personState)
-  const { asPath, pathname } = Router
+  const { asPath, pathname, query } = Router
   let activePath = pathname
+  if (Object.keys(query).length !== 0) {
+    let getPath = pathname.split('/')
+    getPath.pop()
+    activePath = getPath.join('/')
+  }
+
   const logoutClick = () => {
     logout()
     Router.replace('/login')
@@ -48,7 +68,7 @@ export default function Sidebar({}: Props): ReactElement {
     }
   }
 
-  const menu = (
+  const profileMenu = (
     <Menu>
       <Menu.Item>
         <UserOutlined />
@@ -61,6 +81,65 @@ export default function Sidebar({}: Props): ReactElement {
     </Menu>
   )
 
+  const routingPath: Array<MenuItem> = [
+    {
+      index: 1,
+      title: 'Dashboard',
+      icon: <SolutionOutlined />,
+      key: 'dashboard',
+      link: '/',
+      sub: [],
+    },
+    {
+      index: 2,
+      title: 'อนุมัติผลการลงทะเบียน',
+      icon: <SolutionOutlined />,
+      key: 'register',
+      link: '/',
+      sub: [
+        {
+          title: 'ลงทะเบียนร้านค้า',
+          link: '/merchant',
+          key: '/merchant',
+        },
+        {
+          title: 'ลงทะเบียนคนขับ',
+          link: '/rider',
+          key: '/rider',
+        },
+        {
+          title: 'ลงทะเบียน E-KYC',
+          link: '/ekyc',
+          key: '/ekyc',
+        },
+      ],
+    },
+    {
+      index: 3,
+      title: 'User Profile',
+      icon: <TeamOutlined />,
+      key: 'userProfile',
+      link: '/userprofile',
+      sub: [
+        {
+          title: 'Consumer Profile',
+          link: '/consumer',
+          key: 'consumer',
+        },
+        {
+          title: 'Rider Profile',
+          link: '/userprofile/rider',
+          key: '/userprofile/rider',
+        },
+        {
+          title: 'บัญชีร้านค้า',
+          link: '/userprofile/merchant',
+          key: '/userprofile/merchant',
+        },
+      ],
+    },
+  ]
+
   return (
     <Sider
       style={{
@@ -69,7 +148,7 @@ export default function Sidebar({}: Props): ReactElement {
         position: 'fixed',
         left: 0,
       }}
-      breakpoint="lg"
+      // breakpoint="lg"
       collapsedWidth="0"
       width="220px"
     >
@@ -80,7 +159,7 @@ export default function Sidebar({}: Props): ReactElement {
           {userObject.username[0]?.toUpperCase()}
         </Avatar>
         {/* <Text type="warning">Welcome</Text> */}
-        <Dropdown overlay={menu}>
+        <Dropdown overlay={profileMenu}>
           <Text type="warning">
             <Space>
               {userObject.username}
@@ -94,45 +173,36 @@ export default function Sidebar({}: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={['sub1', 'sub2']}
+        defaultOpenKeys={['register', 'userProfile']}
         style={{ borderRight: 0 }}
       >
-        <Menu.Item key="dashboard" icon={<PieChartOutlined />}>
-          <Link href="/">
-            <a> Dashboard</a>
-          </Link>
-        </Menu.Item>
-        <SubMenu key="sub1" icon={<SolutionOutlined />} title="อนุมัติผลการลงทะเบียน">
-          <Menu.Item key="/merchant">
-            <Link href="/merchant">
-              <a>ลงทะเบียนร้านค้า</a>
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/rider">
-            <Link href="/rider">
-              <a>ลงทะเบียนคนขับ</a>
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/ekyc">
-            <Link href="/ekyc">
-              <a>ลงทะเบียน E-KYC</a>
-            </Link>
-          </Menu.Item>
-        </SubMenu>
-        <SubMenu key="sub2" icon={<TeamOutlined />} title="User Profile">
-          <Menu.Item key="/consumer">
-            <Link href="/consumer">Consumer Profile</Link>
-          </Menu.Item>
-          {/* <Menu.Item key="">
-            <Link href="">Merchant Profile</Link>
-          </Menu.Item> */}
-          <Menu.Item key="/userprofile/rider">
-            <Link href="/userprofile/rider">Rider Profile</Link>
-          </Menu.Item>
-          <Menu.Item key="/userprofile/merchant">
-            <Link href="/userprofile/merchant">บัญชีร้านค้า</Link>
-          </Menu.Item>
-        </SubMenu>
+        {routingPath.map((path: MenuItem) => {
+          const { sub = [], title, icon, key, link } = path
+          if (sub.length > 0) {
+            return (
+              <SubMenu key={key} icon={icon} title={title}>
+                {sub.map((subValue: SubMenuItem) => {
+                  const { title: subTitle, link: subLink, key: subKey } = subValue
+                  return (
+                    <Menu.Item key={subKey}>
+                      <Link href={subLink}>
+                        <a>{subTitle}</a>
+                      </Link>
+                    </Menu.Item>
+                  )
+                })}
+              </SubMenu>
+            )
+          } else {
+            return (
+              <Menu.Item key={key} icon={icon}>
+                <Link href={link}>
+                  <a> {title}</a>
+                </Link>
+              </Menu.Item>
+            )
+          }
+        })}
       </Menu>
     </Sider>
   )

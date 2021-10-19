@@ -123,7 +123,7 @@ export default function RiderDetail({ }: Props): ReactElement {
         data.main_address = _.get(data.main_address, 'address_no', '') + " " + _.get(data.main_address, 'district_name', '') + " " + _.get(data.main_address, 'subdistrict_name', '') + " " + _.get(data.main_address, 'province_name', '') + " " + _.get(data.main_address, 'zipcode', '');
         data.contact_address = _.find(data.addresses, function (o) { return o.type == "contact_address"; });
         data.contact_address = _.get(data.contact_address, 'address_no', '') + " " + _.get(data.contact_address, 'district_name', '') + " " + _.get(data.contact_address, 'subdistrict_name', '') + " " + _.get(data.contact_address, 'province_name', '') + " " + _.get(data.contact_address, 'zipcode', '');
-        data.car = _.get(data.pdpa, 'car_info[0].brand_name', '') + (_.get(data.pdpa, 'car_info[0].model_name', '') != '') ? "/" + _.get(data.pdpa, 'car_info[0].model_name', '') : ""
+        data.car = _.get(data.pdpa, 'car_info[0].brand_name', '') + "/" + _.get(data.pdpa, 'car_info[0].model_name', '')
         data.driver_license_photo = _.get(data.pdpa, 'driver_license_photo', '')
         data.car_photo = _.get(data.pdpa, 'car_info[0].photo', '')
         data.car_tax_photo = _.get(data.pdpa, 'car_info[0].tax_photo', '')
@@ -208,6 +208,7 @@ export default function RiderDetail({ }: Props): ReactElement {
           });
         }
       } else if (data[0].job_count > 0 && isActive == "inactive") {
+        setActive("active")
         notification.error({
           message: `ไม่สามารถทำการ inactive`,
           description: "ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ",
@@ -219,7 +220,6 @@ export default function RiderDetail({ }: Props): ReactElement {
 
   const handleStatus = (event: any) => {
     const checkStatus = (isActive == "active" ? "inactive" : "active")
-    console.log(isActive, checkStatus, event);
     setActive(checkStatus)
   };
 

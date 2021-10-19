@@ -1,6 +1,6 @@
 import { uniqueId } from '@/utils/helpers'
 import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@ant-design/icons'
-import { Dropdown, Menu, PageHeader, Table as Tables } from 'antd'
+import { Dropdown, Menu, PageHeader, Table as Tables, TablePaginationConfig } from 'antd'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
@@ -17,7 +17,7 @@ interface Config {
   action?: Array<'view' | 'edit' | 'delete'>
   loading: boolean
   handelDataTableLoad: any
-  pagination: any
+  pagination: TablePaginationConfig | false
   customAction?: any
 }
 

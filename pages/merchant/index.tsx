@@ -4,24 +4,19 @@ import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
+import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { outletList } from '@/services/merchant'
 import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
+import React, { ReactElement } from 'react'
 import * as Yup from 'yup'
 
 const { Title } = Typography
 
 interface Props {}
-
-interface Pagination {
-  total: number
-  current: number
-  pageSize: number
-}
 
 interface filterObject {
   keyword?: string
@@ -54,14 +49,7 @@ export default function Merchant({}: Props): ReactElement {
     },
   }
 
-  let [dataTable, setDataTable] = useState([])
-  let [_isLoading, setIsLoading] = useState(true)
-  let [pagination, setPagination] = useState<Pagination>({
-    total: 0,
-    current: 1,
-    pageSize: 10,
-  })
-  let [filter, setFilter] = useState<filterObject>({
+  const filterRequest: filterObject = {
     keyword: '',
     verify_status: '',
     ekyc_status: '',
@@ -72,34 +60,12 @@ export default function Merchant({}: Props): ReactElement {
     approve_status: '',
     branch_type: '',
     id: '',
-  })
-
-  useEffect(() => {
-    fetchData()
-  }, [])
+  }
+  const requestApi: Function = outletList
+  const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } =
+    useFetchTable(requestApi, filterRequest)
 
   const Schema = Yup.object().shape({})
-
-  const fetchData = async (filterObj: filterObject = filter, paging: Pagination = pagination) => {
-    const reqBody = {
-      page: paging.current,
-      per_page: paging.pageSize,
-      ...filterObj,
-    }
-    setIsLoading(true)
-    const { result, success } = await outletList(reqBody)
-    if (success) {
-      const { meta, data } = result
-      setPagination({
-        pageSize: paging.pageSize,
-        current: meta.page,
-        total: meta.total_count,
-      })
-      setDataTable(data)
-      setIsLoading(false)
-      setFilter(filterObj)
-    }
-  }
 
   const handleSubmit = (values: any) => {
     let reqFilter: filterObject = {
@@ -113,11 +79,7 @@ export default function Merchant({}: Props): ReactElement {
       start_date_verify: values.date_verify.start || '',
       end_date_verify: values.date_verify.end || '',
     }
-    fetchData(reqFilter, { current: 1, total: 0, pageSize: 10 })
-  }
-
-  const handelDataTableLoad = (pagination: any) => {
-    fetchData(filter, pagination)
+    handleFetchData(reqFilter)
   }
 
   const statusMapping: any = {
@@ -392,12 +354,12 @@ export default function Merchant({}: Props): ReactElement {
         <Table
           config={{
             dataTableTitle: 'รายการรอตรวจสอบ',
-            loading: _isLoading,
+            loading: isLoading,
             tableName: 'merchant',
             tableColumns: column,
             action: ['view'],
             dataSource: dataTable,
-            handelDataTableLoad: handelDataTableLoad,
+            handelDataTableLoad: handelDataTableChange,
             pagination: pagination,
           }}
         />

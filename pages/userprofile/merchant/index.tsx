@@ -21,7 +21,7 @@ interface Props {}
 
 interface filterObject {
   keyword?: string
-  outlet_type?: string
+  outlet_types?: string
   status?: string
   id?: string
   approve_status?: string
@@ -31,7 +31,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     keyword: '',
-    outlet_type: '',
+    outlet_types: '',
     status: '',
   }
   let [outletType, setOutletType] = useState([
@@ -47,7 +47,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
 
   const filterRequest: filterObject = {
     keyword: '',
-    outlet_type: '',
+    outlet_types: '',
     status: '',
     approve_status: 'approved',
   }
@@ -74,7 +74,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
   const handleSubmit = (values: any) => {
     let reqFilter: filterObject = {
       keyword: values.keyword,
-      outlet_type: values.type,
+      outlet_types: `${values.outlet_type}`,
       status: values.status,
       approve_status: 'approved',
     }

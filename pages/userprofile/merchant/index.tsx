@@ -4,7 +4,7 @@ import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
 import Tag from '@/components/Tag'
-import { Pagination } from '@/interface/dataTable'
+import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { getOutletType, outletList } from '@/services/merchant'
 import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
@@ -40,24 +40,20 @@ export default function MerchantProfileList({}: Props): ReactElement {
       value: '',
     },
   ])
-  let [dataTable, setDataTable] = useState([])
-  let [_isLoading, setIsLoading] = useState(true)
-  let [pagination, setPagination] = useState<Pagination>({
-    total: 0,
-    current: 1,
-    pageSize: 10,
-  })
-  let [filter, setFilter] = useState<filterObject>({
+
+  useEffect(() => {
+    fetchOutletType()
+  }, [])
+
+  const filterRequest: filterObject = {
     keyword: '',
     outlet_type: '',
     status: '',
     approve_status: 'approved',
-  })
-
-  useEffect(() => {
-    fetchOutletType()
-    fetchData()
-  }, [])
+  }
+  const requestApi: Function = outletList
+  const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } =
+    useFetchTable(requestApi, filterRequest)
 
   const Schema = Yup.object().shape({})
 
@@ -75,27 +71,6 @@ export default function MerchantProfileList({}: Props): ReactElement {
     }
   }
 
-  const fetchData = async (filterObj: filterObject = filter, paging: Pagination = pagination) => {
-    const reqBody = {
-      page: paging.current,
-      per_page: paging.pageSize,
-      ...filterObj,
-    }
-    setIsLoading(true)
-    const { result, success } = await outletList(reqBody)
-    if (success) {
-      const { meta, data } = result
-      setPagination({
-        pageSize: paging.pageSize,
-        current: meta.page,
-        total: meta.total_count,
-      })
-      setDataTable(data)
-      setIsLoading(false)
-      setFilter(filterObj)
-    }
-  }
-
   const handleSubmit = (values: any) => {
     let reqFilter: filterObject = {
       keyword: values.keyword,
@@ -103,11 +78,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
       status: values.status,
       approve_status: 'approved',
     }
-    fetchData(reqFilter, { current: 1, total: 0, pageSize: 10 })
-  }
-
-  const handelDataTableLoad = (pagination: any) => {
-    fetchData(filter, pagination)
+    handleFetchData(reqFilter)
   }
 
   const statusMapping: any = {
@@ -283,12 +254,12 @@ export default function MerchantProfileList({}: Props): ReactElement {
         <Table
           config={{
             dataTableTitle: 'รายการรอตรวจสอบ',
-            loading: _isLoading,
+            loading: isLoading,
             tableName: 'userprofile/merchant',
             tableColumns: column,
             action: ['view'],
             dataSource: dataTable,
-            handelDataTableLoad: handelDataTableLoad,
+            handelDataTableLoad: handelDataTableChange,
             pagination: pagination,
           }}
         />

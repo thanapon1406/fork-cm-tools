@@ -158,12 +158,10 @@ export default function Sidebar({}: Props): ReactElement {
           {' '}
           {userObject.username[0]?.toUpperCase()}
         </Avatar>
-        {/* <Text type="warning">Welcome</Text> */}
-        <Dropdown overlay={profileMenu}>
+        <Dropdown overlay={profileMenu} trigger={['click']}>
           <Text type="warning">
             <Space>
               {userObject.username}
-              {/* <CaretDownOutlined /> */}
               <SettingOutlined style={{ cursor: 'pointer', fontSize: '17px' }} />
             </Space>
           </Text>

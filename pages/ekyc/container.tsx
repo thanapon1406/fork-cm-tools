@@ -45,6 +45,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
       sso_id: sso_id || '',
       id: id || '',
     }
+
     setLoading(true)
     const { result, success } = await getEkycDetail(payload)
     if (success) {
@@ -106,7 +107,8 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
     setIsLoadingMedia(true)
     setMediaType(type)
     const payload = {
-      id: sso_id || id,
+      id: id || '',
+      sso_id: sso_id || '',
       media_type: type,
     }
     const { result, success } = await getPresignUrl(payload)

@@ -1,5 +1,6 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import { statusMapping } from '@/components/ekyc/common'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
@@ -80,13 +81,6 @@ export default function Merchant({}: Props): ReactElement {
       end_date_verify: values.date_verify.end || '',
     }
     handleFetchData(reqFilter)
-  }
-
-  const statusMapping: any = {
-    uploaded: 'รอการตรวจสอบ',
-    approved: 'อนุมัติ',
-    're-approved': 'ขอเอกสารเพิ่มเติม',
-    rejected: 'ไม่อนุมัติ',
   }
 
   const column = [

@@ -1,7 +1,7 @@
-import React, { ReactElement } from 'react'
-import { Select as Selects, Typography, Form } from 'antd'
-import { FormikProps } from './props'
+import { Form, Select as Selects, Typography } from 'antd'
 import { ErrorMessage } from 'formik'
+import React, { ReactElement } from 'react'
+import { FormikProps } from './props'
 const { Text } = Typography
 const { Option } = Selects
 

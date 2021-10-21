@@ -34,7 +34,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
     outlet_types: '',
     status: '',
   }
-  let [outletType, setOutletType] = useState([
+  let [outletType, setOutletType] = useState<Array<any>>([
     {
       name: 'ทุกประเภท',
       value: '',
@@ -216,8 +216,8 @@ export default function MerchantProfileList({}: Props): ReactElement {
                     name="outlet_type"
                     component={Select}
                     id="outlet_type"
-                    placeholder="outlet_type"
-                    defaultValue={{ value: 'all' }}
+                    placeholder="ประเภทร้านค้า"
+                    defaultValue=""
                     selectOption={outletType}
                   />
                 </Col>

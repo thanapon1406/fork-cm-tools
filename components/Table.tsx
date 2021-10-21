@@ -24,6 +24,13 @@ interface Config {
 export default function Table({ config }: Props): ReactElement {
   const { dataTableTitle, action, dataSource, loading, tableName, handelDataTableLoad } = config
   let { tableColumns, pagination } = config
+  pagination = {
+    ...pagination,
+    pageSizeOptions: ['10', '20', '50', '100'],
+    showSizeChanger: true,
+    showTotal: (total: any, range: any) => `${range[0]}-${range[1]} of ${total} items`,
+  }
+
   const Router = useRouter()
   if (action) {
     let View = (path: any) => {

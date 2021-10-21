@@ -45,8 +45,8 @@ const Schema = Yup.object().shape({})
 
 const appIdMapping: any = {
   '1': 'Consumer',
-  '2': 'Rider',
-  '3': 'Marchart',
+  '2': 'Marchart',
+  '3': 'Rider',
 }
 
 const EkycList = (): ReactElement => {

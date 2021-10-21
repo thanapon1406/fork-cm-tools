@@ -10,6 +10,7 @@ import {
 import { Col, Empty, Image, message, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { isEmpty, isUndefined } from 'lodash'
+// import Image from 'next/image'
 import { ReactElement, useEffect, useState } from 'react'
 const { Title } = Typography
 

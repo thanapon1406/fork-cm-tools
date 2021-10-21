@@ -246,7 +246,6 @@ export default function View({ }: Props): ReactElement {
           )}
         </Formik>
         <div>
-          {/* "b450d352-33e7-4896-a994-b9736a85d352" */}
           {ssoId && <Ekyc sso_id={ssoId} />}
         </div>
         <Formik

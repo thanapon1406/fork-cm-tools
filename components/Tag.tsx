@@ -9,7 +9,7 @@ interface Props {
 
 export default function Tag({ children, icon, type = 'primary' }: Props): ReactElement {
   const mapping: any = {
-    primary: '#17c2d',
+    primary: '#17c2d7',
     success: 'success',
     error: 'error',
     warning: 'warning',

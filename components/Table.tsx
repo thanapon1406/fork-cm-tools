@@ -1,6 +1,6 @@
 import { uniqueId } from '@/utils/helpers'
 import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@ant-design/icons'
-import { Dropdown, Menu, PageHeader, Table as Tables } from 'antd'
+import { Dropdown, Menu, PageHeader, Table as Tables, TablePaginationConfig } from 'antd'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
@@ -17,13 +17,20 @@ interface Config {
   action?: Array<'view' | 'edit' | 'delete'>
   loading: boolean
   handelDataTableLoad: any
-  pagination: any
+  pagination: TablePaginationConfig | false
   customAction?: any
 }
 
 export default function Table({ config }: Props): ReactElement {
   const { dataTableTitle, action, dataSource, loading, tableName, handelDataTableLoad } = config
   let { tableColumns, pagination } = config
+  pagination = {
+    ...pagination,
+    pageSizeOptions: ['10', '20', '50', '100'],
+    showSizeChanger: true,
+    showTotal: (total: any, range: any) => `${range[0]}-${range[1]} of ${total} items`,
+  }
+
   const Router = useRouter()
   if (action) {
     let View = (path: any) => {

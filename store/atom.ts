@@ -1,3 +1,4 @@
+import { BrandDetail } from '@/interface/brand'
 import { atom } from 'recoil'
 interface Person {
   username: string
@@ -22,4 +23,9 @@ export const merchantState = atom({
       tel: '',
     },
   },
+})
+
+export const brandState = atom({
+  key: 'brandState',
+  default: {} as BrandDetail,
 })

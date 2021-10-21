@@ -52,11 +52,12 @@ const deleteServerSide = async (url: string, headers: any) => {
   return await axiosInstance.delete(url, options)
 }
 
-const getServerSideRest = async (url: string, headers: any) => {
+const getServerSideRest = async (url: string, headers: any, params = {}) => {
   const options = {
     headers: {
       Authorization: _.get(headers, 'authorization'),
     },
+    params,
   }
   return await axiosRestInstance.get(url, options)
 }

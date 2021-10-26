@@ -1,6 +1,7 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
 import {
+  FileTextOutlined,
   LogoutOutlined,
   SettingOutlined,
   SolutionOutlined,
@@ -135,6 +136,20 @@ export default function Sidebar({}: Props): ReactElement {
           title: 'บัญชีร้านค้า',
           link: '/userprofile/merchant',
           key: '/userprofile/merchant',
+        },
+      ],
+    },
+    {
+      index: 4,
+      title: 'การจัดการออเดอร์',
+      icon: <FileTextOutlined />,
+      key: 'order',
+      link: '/order',
+      sub: [
+        {
+          title: 'ออเดอร์ทั้งหมด',
+          link: '/orderhistory',
+          key: 'orderhistory',
         },
       ],
     },

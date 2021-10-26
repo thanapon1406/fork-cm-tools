@@ -1,10 +1,10 @@
+import { ScrollTable } from '@/interface/dataTable'
 import { uniqueId } from '@/utils/helpers'
 import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@ant-design/icons'
 import { Dropdown, Menu, PageHeader, Table as Tables, TablePaginationConfig } from 'antd'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
-
 interface Props {
   config: Config
 }
@@ -19,10 +19,19 @@ interface Config {
   handelDataTableLoad: any
   pagination: TablePaginationConfig | false
   customAction?: any
+  scrollTable?: ScrollTable
 }
 
 export default function Table({ config }: Props): ReactElement {
-  const { dataTableTitle, action, dataSource, loading, tableName, handelDataTableLoad } = config
+  const {
+    dataTableTitle,
+    action,
+    dataSource,
+    loading,
+    tableName,
+    handelDataTableLoad,
+    scrollTable,
+  } = config
   let { tableColumns, pagination } = config
   pagination = {
     ...pagination,
@@ -96,6 +105,7 @@ export default function Table({ config }: Props): ReactElement {
     <>
       <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
       <Tables
+        scroll={scrollTable}
         columns={tableColumns}
         rowKey={(item) => item.id}
         dataSource={dataSource}

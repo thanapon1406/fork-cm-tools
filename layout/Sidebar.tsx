@@ -46,7 +46,7 @@ export default function Sidebar({}: Props): ReactElement {
     getPath.pop()
     activePath = getPath.join('/')
   }
-  console.log(`activePath`, activePath)
+
   const logoutClick = () => {
     logout()
     Router.replace('/login')

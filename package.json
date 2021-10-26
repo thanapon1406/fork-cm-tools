@@ -25,6 +25,7 @@
     "next-plugin-antd-less": "1.4.3",
     "node-blob": "^0.0.2",
     "nookies": "2.5.2",
+    "nprogress": "^0.2.0",
     "qs": "6.10.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@types/lodash": "4.14.173",
+    "@types/nprogress": "^0.2.0",
     "@types/qs": "6.9.7",
     "@types/react": "17.0.24",
     "eslint": "7.32.0",

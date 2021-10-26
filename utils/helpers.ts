@@ -1,6 +1,9 @@
 import { isEmpty, join, map } from 'lodash'
-const numberFormat = (x: string | number) => {
-  return Number(x).toLocaleString()
+const numberFormat = (x: string | number, minDigit = 2, maxDigit = 2) => {
+  return Number(x).toLocaleString('th-TH', {
+    minimumFractionDigits: minDigit,
+    maximumFractionDigits: maxDigit,
+  })
 }
 
 const uniqueId = () => {

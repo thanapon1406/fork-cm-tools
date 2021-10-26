@@ -1,7 +1,8 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { API_PATH_CONSUMER_SERVICE, PREFIX_CUSTOMER } from '@/constants/api';
+import ServerFetch from '@/services/api';
 import axios from "axios";
-import { convertJsonToParam } from '@/utils/helpers'
-import _ from 'lodash'
+import _ from 'lodash';
+import { NextApiRequest, NextApiResponse } from "next";
 const host = process.env.POS_GRPC_API;
 
 const axiosInstance = axios.create({
@@ -11,14 +12,16 @@ const axiosInstance = axios.create({
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body } = req;
-  
+
   if (method === "POST") {
     try {
-    let _body = _.pickBy(body, _.identity);
-      const { data, status } = await axiosInstance.post(
-        `consumer-service/customer/get-customer-list`,_body)
+      let _body = _.pickBy(body, _.identity);
+      const { data, status } = await ServerFetch.post(
+        `${API_PATH_CONSUMER_SERVICE}${PREFIX_CUSTOMER}/get-customer-list`,
+        _body,
+        headers)
       res.status(200).json(data);
-    } catch (e:any) {
+    } catch (e: any) {
       console.log(`e`, e)
       res.status(e.response?.status || 500).json(e.response?.data);
     }

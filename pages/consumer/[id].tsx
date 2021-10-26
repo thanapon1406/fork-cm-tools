@@ -26,6 +26,7 @@ export default function View({ }: Props): ReactElement {
   const router = useRouter()
   const [isActive, setActive] = useState("")
   const id = router.query.id as string
+
   let [initialValues, setInitialValues] = useState({
     email: '',
     ssoId: '',
@@ -531,7 +532,7 @@ export default function View({ }: Props): ReactElement {
             payload={{ ...paramsHistory }}
             tableHeader={
               <div style={{ textAlign: 'right' }}>
-                <Link href="/orderhistory">
+                <Link href={`/orderhistory?sso_id=${initialValues.ssoId}`}>
                   <a>
                     view all <DoubleRightOutlined />
                   </a>

@@ -6,6 +6,7 @@ import { getOrderTransaction, requestReportInterface } from '@/services/report'
 import { Card, TablePaginationConfig } from 'antd'
 import { isEmpty, isNull, isUndefined } from 'lodash'
 import Moment from 'moment'
+import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { numberFormat } from 'utils/helpers'
 interface Props {
@@ -151,6 +152,9 @@ const OrderHistoryComponent = ({
   let [pagination, setPagination] = useState<false | TablePaginationConfig>(false)
   let [scrollTable, setScrollTable] = useState<ScrollTable>({ x: 0 })
 
+  const router = useRouter()
+  const ssoId = router.query.sso_id as string
+
   const handelDataTableLoad = (pagination: any) => {
     fetchOrderTransaction({ ...payload, page: pagination.current, per_page: pagination.pageSize })
   }
@@ -168,6 +172,7 @@ const OrderHistoryComponent = ({
   }
 
   const fetchOrderTransaction = async (params: requestReportInterface) => {
+    params.sso_id = !isEmpty(params.sso_id) ? params.sso_id : ssoId
     const { result, success } = await getOrderTransaction(params)
     setIsLoading(true)
     if (success) {

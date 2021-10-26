@@ -143,7 +143,6 @@ export default function Merchant({}: Props): ReactElement {
       title: 'สถานะการตรวจสอบ',
       dataIndex: 'approve_status',
       align: 'center',
-      className: 'column-typeverifyr',
       render: (row: string) => {
         return statusMapping[row]
       },

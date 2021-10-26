@@ -138,6 +138,20 @@ export default function Sidebar({}: Props): ReactElement {
         },
       ],
     },
+    {
+      index: 4,
+      title: 'การจัดการเครดิตร้านค้า',
+      icon: <TeamOutlined />,
+      key: 'credit',
+      link: '/credit',
+      sub: [
+        {
+          title: 'เครดิตร้านค้าทั้งหมด',
+          link: '/credit/merchant',
+          key: '/credit/merchant',
+        },
+      ],
+    },
   ]
 
   return (
@@ -171,7 +185,7 @@ export default function Sidebar({}: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={['register', 'userProfile']}
+        defaultOpenKeys={['register', 'userProfile', 'credit']}
         style={{ borderRight: 0 }}
       >
         {routingPath.map((path: MenuItem) => {

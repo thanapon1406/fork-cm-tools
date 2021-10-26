@@ -4,3 +4,8 @@ export interface Pagination {
   pageSize: number
   perPage?: number
 }
+
+export interface ScrollTable {
+  x?: any
+  y?: any
+}

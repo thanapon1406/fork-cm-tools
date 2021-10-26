@@ -2,13 +2,11 @@ import Button from "@/components/Button";
 import Card from '@/components/Card';
 import Input from "@/components/Form/Input";
 import { Address } from '@/interface/customer';
-import { Pagination } from '@/interface/dataTable';
 import MainLayout from '@/layout/MainLayout';
 import { consumerList, consumerUpdate } from '@/services/consumer';
 import { checkOutletBySsoId } from '@/services/merchant';
 import { requestReportInterface } from '@/services/report';
 import { getRiderDetail } from '@/services/rider';
-import { brandState } from '@/store';
 import { DoubleRightOutlined } from '@ant-design/icons';
 import { Breadcrumb, Col, Image, notification, Row, Switch, Typography } from "antd";
 import { Field, FieldArray, Form, Formik } from "formik";
@@ -16,19 +14,19 @@ import { isEmpty, map } from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { default as React, ReactElement, useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
 import OrderHistoryComponent from '../orderhistory/component';
 const { Title } = Typography
 
 interface Props { }
 
 export default function View({ }: Props): ReactElement {
-  const [brandObject, setBrandState] = useRecoilState(brandState)
+  // const [brandObject, setBrandState] = useRecoilState(brandState)
   let [_isLoading, setIsLoading] = useState(true);
   const [isEdit, setIsEdit] = useState(false)
   const router = useRouter()
   const [isActive, setActive] = useState("")
   const id = router.query.id as string
+
   let [initialValues, setInitialValues] = useState({
     email: '',
     ssoId: '',
@@ -47,19 +45,8 @@ export default function View({ }: Props): ReactElement {
     rider: 'No'
   })
 
-
-  console.log("brandObject");
-  console.log(brandObject);
-
-
-
-  let [pagination, setPagination] = useState<Pagination>({
-    total: 0,
-    current: 1,
-    pageSize: 10,
-  })
   let [paramsHistory, setparamsHistory] = useState<requestReportInterface>({
-    brand_id: brandObject.id,
+    // brand_id: brandObject.id,
     page: 1,
     per_page: 10,
     sso_id: "",
@@ -130,8 +117,7 @@ export default function View({ }: Props): ReactElement {
 
         setparamsHistory({
           ...paramsHistory,
-          // sso_id: data.sso_id,
-          sso_id: "uuidv6",
+          sso_id: data.sso_id,
           // brand_id: brandObject.id,
           page: 1,
           per_page: 5,
@@ -546,7 +532,7 @@ export default function View({ }: Props): ReactElement {
             payload={{ ...paramsHistory }}
             tableHeader={
               <div style={{ textAlign: 'right' }}>
-                <Link href="/orderhistory">
+                <Link href={`/orderhistory?sso_id=${initialValues.ssoId}`}>
                   <a>
                     view all <DoubleRightOutlined />
                   </a>

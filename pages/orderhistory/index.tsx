@@ -3,34 +3,37 @@ import Card from '@/components/Card'
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
+import { SelectOption } from '@/interface/common'
 import { CustomerDetail } from '@/interface/customer'
 import { Pagination } from '@/interface/dataTable'
+import { OutletDetail } from '@/interface/outlet'
+import { RiderDetail } from '@/interface/rider'
 import MainLayout from '@/layout/MainLayout'
+import { outletListById } from '@/services/merchant'
 import { requestReportInterface } from '@/services/report'
-import { brandState } from '@/store'
-import { DoubleRightOutlined } from '@ant-design/icons'
+import { getRider } from '@/services/rider'
 import { Breadcrumb, Col, Row, Select as AntSelect, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { debounce } from 'lodash'
+import { debounce, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
-import Link from 'next/link'
 import React, { ReactElement, useState } from 'react'
-import { useRecoilState } from 'recoil'
 import * as Yup from 'yup'
 import { consumerList } from '../../services/consumer'
 import OrderHistoryComponent from './component'
-
 const { Title } = Typography
 const { Option } = AntSelect
 
 const OrderHistory = (): ReactElement => {
-  const [brandObject, setBrandState] = useRecoilState(brandState)
-  const [customers, setCustomer] = useState<Array<CustomerDetail>>([])
+  const Schema = Yup.object().shape({})
+  // const [brandObject, setBrandState] = useRecoilState(brandState)
+  const [customerDropDown, setCustomerDropDown] = useState<Array<SelectOption>>([])
+  const [merchantDropDown, setMerchantDropDown] = useState<Array<SelectOption>>([])
+  const [riderDropDown, setRiderDropDown] = useState<Array<SelectOption>>([])
+
   const initialValues = {
-    brand_id: brandObject.id,
+    brand_id: 'all',
     page: 1,
     per_page: 10,
-    rider_id: '',
     status: '',
     startdate: '',
     enddate: '',
@@ -38,7 +41,6 @@ const OrderHistory = (): ReactElement => {
     endtime: '',
     order_number: '',
   }
-  const Schema = Yup.object().shape({})
 
   let [pagination, setPagination] = useState<Pagination>({
     total: 0,
@@ -46,7 +48,7 @@ const OrderHistory = (): ReactElement => {
     pageSize: 10,
   })
   let [params, setParams] = useState<requestReportInterface>({
-    brand_id: brandObject.id,
+    brand_id: 'all',
     page: pagination.current,
     per_page: pagination.pageSize,
   })
@@ -57,10 +59,12 @@ const OrderHistory = (): ReactElement => {
 
     setParams({
       ...params,
-      brand_id: brandObject.id,
+      brand_id: 'all',
+      sso_id: values.sso_id || '',
       status: values.status || '',
       order_overall_status: values.order_overall_status || '',
       rider_id: values.rider_id || '',
+      branch_id: values.branch_id || '',
       merchant_overall_status: values.merchant_overall_status || '',
       rider_status: values.rider_status || '',
       rider_overall_status: values.rider_overall_status || '',
@@ -72,10 +76,29 @@ const OrderHistory = (): ReactElement => {
     })
   }
 
+  const overAllOption = [
+    {
+      name: 'ทุกสถานะ',
+      value: '',
+    },
+    {
+      name: 'waiting',
+      value: 'waiting',
+    },
+    {
+      name: 'success',
+      value: 'success',
+    },
+    {
+      name: 'cancel',
+      value: 'cancel',
+    },
+  ]
   const onSearchCustomerDebounce = debounce(async (message) => await fetchCustomer(message), 800)
+  const onSearchMerchantDebounce = debounce(async (message) => await fetchMerchant(message), 800)
+  const onSearchRiderDebounce = debounce(async (message) => await fetchRider(message), 800)
 
   const fetchCustomer = async (message: any) => {
-    console.log('message', message)
     const request = {
       keyword: message,
     }
@@ -83,17 +106,67 @@ const OrderHistory = (): ReactElement => {
     const { result, success } = await consumerList(request)
     if (success) {
       const { meta, data } = result
-      setCustomer(data)
-      console.log('fetchCustomer data', data)
+
+      let customerData = map<CustomerDetail, SelectOption>(data, function (item: CustomerDetail) {
+        return { name: item.first_name + ' ' + item.last_name, value: item.sso_id }
+      })
+
+      setCustomerDropDown(customerData)
     }
   }
 
   const fetchRider = async (message: any) => {
-    console.log('message', message)
+    const request = {
+      keyword: message,
+      page: 1,
+      per_page: 100,
+    }
+
+    const { result, success } = await getRider(request)
+    if (success) {
+      const { meta, data } = result
+
+      let uniqData = uniqWith(data, isEqual)
+
+      let riderData = map<RiderDetail, SelectOption>(uniqData, function (item: RiderDetail) {
+        return { name: item.first_name + ' ' + item.last_name, value: String(item.id) }
+      })
+
+      setRiderDropDown(riderData)
+    }
   }
 
-  const fetchMerchant = async (message: any) => {
-    console.log('message', message)
+  const fetchMerchant = async (message: string) => {
+    const request = {
+      keyword: message,
+      page: 1,
+      per_page: 100,
+    }
+
+    const { result, success } = await outletListById(request)
+    if (success) {
+      const { meta, data } = result
+
+      let uniqData = uniqWith(data, isEqual)
+
+      let outletData = map<OutletDetail, SelectOption>(uniqData, function (item: OutletDetail) {
+        return { name: item.name.en, value: String(item.id) }
+      })
+
+      setMerchantDropDown(outletData)
+    }
+  }
+
+  const onClearCustomer = () => {
+    setCustomerDropDown([])
+  }
+
+  const onClearMerchant = () => {
+    setRiderDropDown([])
+  }
+
+  const onClearRider = () => {
+    setMerchantDropDown([])
   }
 
   return (
@@ -123,34 +196,24 @@ const OrderHistory = (): ReactElement => {
                     component={Select}
                     id="order_overall_status"
                     placeholder="สถานะออเดอร์"
-                    selectOption={[
-                      {
-                        name: 'ทุกสถานะ',
-                        value: '',
-                      },
-                      {
-                        name: 'waiting',
-                        value: 'waiting',
-                      },
-                      {
-                        name: 'success',
-                        value: 'success',
-                      },
-                      {
-                        name: 'cancel',
-                        value: 'cancel',
-                      },
-                    ]}
+                    selectOption={overAllOption}
                   />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ชื่อร้านค้า' }}
-                    name="outlet_name"
-                    component={Input}
-                    id="outlet_name"
+                    name="branch_id"
+                    component={Select}
+                    id="branch_id"
                     placeholder="ชื่อร้านค้า"
+                    showSearch
+                    showArrow={false}
+                    onSearch={onSearchMerchantDebounce}
+                    selectOption={merchantDropDown}
+                    filterOption={false}
+                    allowClear={true}
+                    onClear={onClearMerchant}
                   />
 
                   <Field
@@ -159,35 +222,24 @@ const OrderHistory = (): ReactElement => {
                     component={Select}
                     id="merchant_overall_status"
                     placeholder="สถานะร้านค้า"
-                    // defaultValue={'ทุกสถานะ'}
-                    selectOption={[
-                      {
-                        name: 'ทุกสถานะ',
-                        value: '',
-                      },
-                      {
-                        name: 'waiting',
-                        value: 'waiting',
-                      },
-                      {
-                        name: 'success',
-                        value: 'success',
-                      },
-                      {
-                        name: 'cancel',
-                        value: 'cancel',
-                      },
-                    ]}
+                    selectOption={overAllOption}
                   />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ชื่อไรเดอร์' }}
-                    name="rider_name"
-                    component={Input}
-                    id="rider_name"
+                    name="rider_id"
+                    component={Select}
+                    id="rider_id"
                     placeholder="ชื่อไรเดอร์"
+                    showSearch
+                    showArrow={false}
+                    onSearch={onSearchRiderDebounce}
+                    selectOption={riderDropDown}
+                    filterOption={false}
+                    allowClear={true}
+                    onClear={onClearRider}
                   />
 
                   <Field
@@ -196,62 +248,25 @@ const OrderHistory = (): ReactElement => {
                     component={Select}
                     id="rider_overall_status"
                     placeholder="สถานะไรเดอร์"
-                    // defaultValue={'ทุกสถานะ'}
-                    selectOption={[
-                      {
-                        name: 'ทุกสถานะ',
-                        value: '',
-                      },
-                      {
-                        name: 'waiting',
-                        value: 'waiting',
-                      },
-                      {
-                        name: 'success',
-                        value: 'success',
-                      },
-                      {
-                        name: 'cancel',
-                        value: 'cancel',
-                      },
-                    ]}
+                    selectOption={overAllOption}
                   />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
-                  {/* <Field
-                    label={{ text: 'ชื่อลูกค้า' }}
-                    name="customer_name"
-                    component={Input}
-                    id="customer_name"
-                    placeholder="ชื่อลูกค้า"
-                  /> */}
-
                   <Field
                     label={{ text: 'ชื่อลูกค้า' }}
-                    name="customer_name"
+                    name="sso_id"
                     component={Select}
-                    id="customer_name"
+                    id="sso_id"
                     placeholder="ชื่อลูกค้า"
                     showSearch
                     showArrow={false}
                     onSearch={onSearchCustomerDebounce}
-                    // defaultValue={{ value: 'all' }}
-                    selectOption={[]}
+                    selectOption={customerDropDown}
+                    filterOption={false}
+                    allowClear={true}
+                    onClear={onClearCustomer}
                   />
-
-                  {/* <AntSelect
-                    showArrow={false}
-                    showSearch
-                    style={{ width: 200 }}
-                    placeholder="Select Brand"
-                    optionFilterProp="children"
-                    onSearch={onSearchDebounce}
-                  >
-                    <Option value="jack">Jack aaaaaaaaaaaa</Option>
-                    <Option value="lucy">Lucy</Option>
-                    <Option value="tom">Tom</Option>
-                  </AntSelect> */}
 
                   <Field
                     label={{ text: 'วันเวลาที่ทำรายการ' }}
@@ -288,19 +303,7 @@ const OrderHistory = (): ReactElement => {
           )}
         </Formik>
       </Card>
-      <OrderHistoryComponent
-        payload={{ ...params }}
-        tableHeader={
-          <div style={{ textAlign: 'right' }}>
-            <Link href="/orderhistory">
-              <a>
-                view all <DoubleRightOutlined />
-              </a>
-            </Link>
-          </div>
-        }
-        isPagination={pagination}
-      />
+      <OrderHistoryComponent payload={{ ...params }} isPagination={pagination} />
     </MainLayout>
   )
 }

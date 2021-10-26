@@ -1,6 +1,7 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
 import {
+  FileTextOutlined,
   LogoutOutlined,
   SettingOutlined,
   SolutionOutlined,
@@ -10,7 +11,7 @@ import {
 import { Avatar, Dropdown, Layout, Menu, Space, Typography } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
+import React, { ReactElement, useEffect } from 'react'
 import { useRecoilState } from 'recoil'
 const profileColor: Array<string> = ['87d068', 'd06868', 'c068d0', '6897d0', 'cad068', 'd09d68']
 
@@ -37,7 +38,6 @@ interface SubMenuItem {
 
 export default function Sidebar({}: Props): ReactElement {
   const Router = useRouter()
-  const [avatarColor, setAvatarColor] = useState('87d068')
   const [userObject, setUserState] = useRecoilState(personState)
   const { asPath, pathname, query } = Router
   let activePath = pathname
@@ -61,7 +61,6 @@ export default function Sidebar({}: Props): ReactElement {
     if (success) {
       const { firstname = '', lastname = '' } = result.data
       const asciiCode = firstname.charCodeAt(0)
-      setAvatarColor(profileColor[asciiCode % 6])
       setUserState({
         username: `${firstname}  ${lastname}`,
       })
@@ -124,7 +123,7 @@ export default function Sidebar({}: Props): ReactElement {
         {
           title: 'Consumer Profile',
           link: '/consumer',
-          key: 'consumer',
+          key: '/consumer',
         },
         {
           title: 'Rider Profile',
@@ -152,6 +151,20 @@ export default function Sidebar({}: Props): ReactElement {
         },
       ],
     },
+    {
+      index: 5,
+      title: 'การจัดการออเดอร์',
+      icon: <FileTextOutlined />,
+      key: 'order',
+      link: '/order',
+      sub: [
+        {
+          title: 'ออเดอร์ทั้งหมด',
+          link: '/orderhistory',
+          key: 'orderhistory',
+        },
+      ],
+    },
   ]
 
   return (
@@ -168,7 +181,7 @@ export default function Sidebar({}: Props): ReactElement {
     >
       <div className="logo" />
       <Space style={{ padding: '15px' }} size="middle">
-        <Avatar shape="square" style={{ backgroundColor: `#${avatarColor}` }}>
+        <Avatar shape="square" style={{ backgroundColor: `#87d068` }}>
           {' '}
           {userObject.username[0]?.toUpperCase()}
         </Avatar>

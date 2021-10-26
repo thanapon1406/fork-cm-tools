@@ -42,9 +42,9 @@ function Select({ label, field, selectOption, ...props }: Props): ReactElement {
     <div className="ant-form ant-form-vertical">
       <Form.Item label={label?.text}>
         <Selects {...field} {...props} onChange={onChangeHandle()}>
-          {selectOption.map((val: SelectOption) => {
+          {selectOption.map((val: SelectOption, index: number) => {
             return (
-              <Option disabled={val.disabled} key={val.value} value={val.value}>
+              <Option disabled={val.disabled} key={index} value={val.value}>
                 {val.name}
               </Option>
             )

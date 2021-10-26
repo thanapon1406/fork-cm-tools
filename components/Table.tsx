@@ -33,11 +33,13 @@ export default function Table({ config }: Props): ReactElement {
     scrollTable,
   } = config
   let { tableColumns, pagination } = config
-  pagination = {
-    ...pagination,
-    pageSizeOptions: ['10', '20', '50', '100'],
-    showSizeChanger: true,
-    showTotal: (total: any, range: any) => `${range[0]}-${range[1]} of ${total} items`,
+  if (pagination) {
+    pagination = {
+      ...pagination,
+      pageSizeOptions: ['10', '20', '50', '100'],
+      showSizeChanger: true,
+      showTotal: (total: any, range: any) => `${range[0]}-${range[1]} of ${total} items`,
+    }
   }
 
   const Router = useRouter()

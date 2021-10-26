@@ -139,20 +139,6 @@ export default function Sidebar({}: Props): ReactElement {
     },
     {
       index: 4,
-      title: 'การจัดการเครดิตร้านค้า',
-      icon: <TeamOutlined />,
-      key: 'credit',
-      link: '/credit',
-      sub: [
-        {
-          title: 'เครดิตร้านค้าทั้งหมด',
-          link: '/credit/merchant',
-          key: '/credit/merchant',
-        },
-      ],
-    },
-    {
-      index: 5,
       title: 'การจัดการออเดอร์',
       icon: <FileTextOutlined />,
       key: 'order',
@@ -162,6 +148,20 @@ export default function Sidebar({}: Props): ReactElement {
           title: 'ออเดอร์ทั้งหมด',
           link: '/orderhistory',
           key: 'orderhistory',
+        },
+      ],
+    },
+    {
+      index: 5,
+      title: 'การจัดการเครดิตร้านค้า',
+      icon: <TeamOutlined />,
+      key: 'credit',
+      link: '/credit',
+      sub: [
+        {
+          title: 'เครดิตร้านค้าทั้งหมด',
+          link: '/credit/merchant',
+          key: '/credit/merchant',
         },
       ],
     },
@@ -198,7 +198,7 @@ export default function Sidebar({}: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={['register', 'userProfile', 'credit']}
+        defaultOpenKeys={['register', 'userProfile', 'credit', 'order']}
         style={{ borderRight: 0 }}
       >
         {routingPath.map((path: MenuItem) => {

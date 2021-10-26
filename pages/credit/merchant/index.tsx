@@ -8,7 +8,7 @@ import { creditPaymentChanel } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { creditTransaction } from '@/services/credit'
-import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
+import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
 import { useRouter } from 'next/router'
@@ -211,25 +211,23 @@ export default function MerchantCredit({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div className="ant-form ant-form-vertical">
-                    <Space>
-                      <Button
-                        style={{ width: '120px', marginTop: '31px' }}
-                        type="primary"
-                        size="middle"
-                        htmlType="submit"
-                      >
-                        ค้นหา
-                      </Button>
-                      <Button
-                        style={{ width: '120px', marginTop: '31px', marginLeft: '10px' }}
-                        type="default"
-                        size="middle"
-                        htmlType="reset"
-                        onClick={() => resetForm()}
-                      >
-                        เคลียร์
-                      </Button>
-                    </Space>
+                    <Button
+                      style={{ width: '120px', marginTop: '31px' }}
+                      type="primary"
+                      size="middle"
+                      htmlType="submit"
+                    >
+                      ค้นหา
+                    </Button>
+                    <Button
+                      style={{ width: '120px', marginTop: '31px', marginLeft: '10px' }}
+                      type="default"
+                      size="middle"
+                      htmlType="reset"
+                      onClick={() => resetForm()}
+                    >
+                      เคลียร์
+                    </Button>
                   </div>
                 </Col>
               </Row>
@@ -247,7 +245,7 @@ export default function MerchantCredit({}: Props): ReactElement {
             action: ['view'],
             dataSource: dataTable,
             handelDataTableLoad: handelDataTableChange,
-            pagination: pagination,
+            pagination: false,
           }}
         />
       </Card>

@@ -38,12 +38,12 @@ export default function HeaderContent() {
   }
 
   useEffect(() => {
-    getBrand()
+    // getBrand()
   }, [])
 
   return (
     <Header className="site-layout-sub-header-background" style={{ padding: 0, color: '#fff' }}>
-      <Select
+      {/* <Select
         showSearch
         style={{ width: 500 }}
         placeholder="Select Brand"
@@ -57,7 +57,7 @@ export default function HeaderContent() {
             {v.name.th}
           </Option>
         ))}
-      </Select>
+      </Select> */}
     </Header>
   )
 }

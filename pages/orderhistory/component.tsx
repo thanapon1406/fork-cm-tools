@@ -1,14 +1,14 @@
 import CustomBadge from '@/components/Badge'
 import Table from '@/components/Table'
-import { Pagination } from '@/interface/dataTable'
+import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
 import { Card, TablePaginationConfig } from 'antd'
-import { isUndefined } from 'lodash'
+import { isEmpty, isNull, isUndefined } from 'lodash'
 import Moment from 'moment'
+import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { numberFormat } from 'utils/helpers'
-
 interface Props {
   payload: requestReportInterface
   tableHeader?: ReactElement
@@ -21,42 +21,75 @@ const columns = [
     dataIndex: 'order_no',
     align: 'center',
     key: 'order_no',
+    width: '200px',
+    wrap: true,
+    center: true,
     render: (text: any, record: any) => {
       return record.order_no
     },
   },
   {
-    title: 'ร้านอาหาร',
+    title: 'ชื่อร้านค้า',
     dataIndex: 'outlet_name',
     align: 'center',
     key: 'outlet_name',
+    width: '200px',
+    wrap: true,
+    center: true,
     render: (text: any, record: any) => {
       return record.outlet_name
     },
   },
   {
-    title: 'ปลายทาง',
-    dataIndex: 'address',
+    title: 'ชื่อลูกค้า',
+    dataIndex: 'buyer_info',
     align: 'center',
-    key: 'address',
+    key: 'buyer_info',
+    width: '200px',
+    wrap: true,
+    center: true,
     render: (text: any, record: any) => {
-      return record.outlet_info.address
+      if (
+        !isUndefined(record.buyer_info) &&
+        !isNull(record.buyer_info?.first_name) &&
+        !isEmpty(record.buyer_info?.first_name)
+      ) {
+        return record.buyer_info.first_name + ' ' + record.buyer_info.last_name
+      } else {
+        return '-'
+      }
     },
   },
   {
-    title: 'รายการอาหาร',
-    dataIndex: 'total_products',
+    title: 'ชื่อไรเดอร์',
+    dataIndex: 'rider_info',
     align: 'center',
-    key: 'total_products',
+    key: 'rider_info',
+    width: '200px',
+    wrap: true,
+    center: true,
+    render: (text: any, record: any) => {
+      if (
+        !isUndefined(record.rider_info) &&
+        !isNull(record.rider_info?.first_name) &&
+        !isEmpty(record.rider_info?.first_name)
+      ) {
+        return record.rider_info?.first_name + ' ' + record.rider_info?.last_name
+      } else {
+        return '-'
+      }
+    },
   },
   {
     title: 'ราคา',
     dataIndex: 'total',
     align: 'center',
     key: 'total',
+    width: '100px',
+    wrap: true,
+    center: true,
     render: (text: any, record: any) => {
       return numberFormat(text)
-      // return text
     },
   },
   {
@@ -64,6 +97,9 @@ const columns = [
     dataIndex: 'client_time',
     align: 'center',
     key: 'client_time',
+    width: '200px',
+    wrap: true,
+    center: true,
     render: (text: any, record: any) => {
       return Moment(text).format('YYYY-MM-DD HH:mm:ss')
     },
@@ -73,26 +109,33 @@ const columns = [
     dataIndex: 'status',
     align: 'center',
     key: 'status',
+    width: '150px',
+    wrap: true,
+    center: true,
     render: (text: any, record: any) => {
       return <CustomBadge badgeStatus={text} badgeText={text}></CustomBadge>
     },
   },
-  ,
   {
     title: 'สถานะ merchant',
     dataIndex: 'merchant_status',
     align: 'center',
     key: 'merchant_status',
+    width: '150px',
+    wrap: true,
+    center: true,
     render: (text: any, record: any) => {
       return <CustomBadge badgeStatus={text} badgeText={text}></CustomBadge>
     },
   },
-  ,
   {
     title: 'สถานะ rider',
     dataIndex: 'rider_status',
     align: 'center',
     key: 'rider_status',
+    width: '150px',
+    wrap: true,
+    center: true,
     render: (text: any, record: any) => {
       return <CustomBadge badgeStatus={text} badgeText={text}></CustomBadge>
     },
@@ -107,6 +150,10 @@ const OrderHistoryComponent = ({
   let [dataTable, setDataTable] = useState([])
   let [_isLoading, setIsLoading] = useState(true)
   let [pagination, setPagination] = useState<false | TablePaginationConfig>(false)
+  let [scrollTable, setScrollTable] = useState<ScrollTable>({ x: 0 })
+
+  const router = useRouter()
+  const ssoId = router.query.sso_id as string
 
   const handelDataTableLoad = (pagination: any) => {
     fetchOrderTransaction({ ...payload, page: pagination.current, per_page: pagination.pageSize })
@@ -125,6 +172,7 @@ const OrderHistoryComponent = ({
   }
 
   const fetchOrderTransaction = async (params: requestReportInterface) => {
+    params.sso_id = !isEmpty(params.sso_id) ? params.sso_id : ssoId
     const { result, success } = await getOrderTransaction(params)
     setIsLoading(true)
     if (success) {
@@ -167,6 +215,7 @@ const OrderHistoryComponent = ({
           dataSource: dataTable,
           handelDataTableLoad: handelDataTableLoad,
           pagination: pagination,
+          scrollTable: scrollTable,
         }}
       />
     </Card>

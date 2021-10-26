@@ -16,7 +16,7 @@ export interface requestReportInterface {
   endtime?: string
   page?: number
   per_page?: number
-  brand_id?: number
+  brand_id?: string
   order_number?: string
   order_type?: string
   sort_by?: string
@@ -29,6 +29,7 @@ export interface requestReportInterface {
   order_overall_status?: string
   rider_overall_status?: string
   merchant_overall_status?: string
+  branch_id?: number
 }
 
 export const getOrderTransaction = async (params: requestReportInterface) => {

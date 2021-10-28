@@ -59,9 +59,10 @@ export default function Sidebar({}: Props): ReactElement {
   const findUserData = async () => {
     const { result = {}, success = false } = await findUser()
     if (success) {
-      const { firstname = '', lastname = '' } = result.data
+      const { id, firstname = '', lastname = '' } = result.data
       const asciiCode = firstname.charCodeAt(0)
       setUserState({
+        id: `${id}`,
         username: `${firstname}  ${lastname}`,
       })
     }
@@ -147,7 +148,21 @@ export default function Sidebar({}: Props): ReactElement {
         {
           title: 'ออเดอร์ทั้งหมด',
           link: '/orderhistory',
-          key: 'orderhistory',
+          key: '/orderhistory',
+        },
+      ],
+    },
+    {
+      index: 5,
+      title: 'การจัดการเครดิตร้านค้า',
+      icon: <TeamOutlined />,
+      key: 'credit',
+      link: '/credit',
+      sub: [
+        {
+          title: 'เครดิตร้านค้าทั้งหมด',
+          link: '/credit/merchant',
+          key: '/credit/merchant',
         },
       ],
     },
@@ -184,7 +199,7 @@ export default function Sidebar({}: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={['register', 'userProfile']}
+        defaultOpenKeys={['register', 'userProfile', 'credit', 'order']}
         style={{ borderRight: 0 }}
       >
         {routingPath.map((path: MenuItem) => {

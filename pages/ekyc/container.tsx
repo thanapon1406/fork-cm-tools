@@ -90,14 +90,14 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
     if (success) {
       const { data } = result
       Modal.success({
-        content: <Title level={4}>อนุมัติการยืนยันตัวตนสำเร็จ</Title>,
+        content: <Title level={4}>บันทึกสำเร็จ</Title>,
       })
       setEkycDetail(data)
       if (setEkycStatus) {
         setEkycStatus(data.status)
       }
     } else {
-      Modal.success({
+      Modal.error({
         content: <Title level={4}>{message}</Title>,
       })
     }

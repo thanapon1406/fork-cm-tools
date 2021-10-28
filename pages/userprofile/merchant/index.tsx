@@ -74,7 +74,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
   const handleSubmit = (values: any) => {
     let reqFilter: filterObject = {
       keyword: values.keyword,
-      outlet_types: `${values.outlet_type}`,
+      outlet_types: values.outlet_type ? `${values.outlet_type}` : '',
       status: values.status,
       approve_status: 'approved',
     }
@@ -131,7 +131,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
     },
     {
       title: 'เครดิต',
-      dataIndex: 'credit',
+      dataIndex: 'available_credit',
       align: 'center',
     },
     {

@@ -3,15 +3,16 @@ import errorHandler from './handler/errorHandler'
 import successHandler from './handler/successHandler'
 
 interface queryList {
-  ref_id: string
-  outlet_name?: string
-  credit_chanel?: string
-  date?: string
+  id?: string
+  keyword?: string
+  type?: string
+  start_date?: string
+  end_date?: string
   status?: string
 }
 
-interface querySsoId {
-  sso_id?: string
+interface queryById {
+  id?: string
 }
 
 interface response {
@@ -28,4 +29,22 @@ const creditTransaction = async (body: queryList) => {
   }
 }
 
-export { creditTransaction }
+const transactionDetail = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/credit/detail`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const verifyTransaction = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/credit/verify`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export { creditTransaction, transactionDetail, verifyTransaction }

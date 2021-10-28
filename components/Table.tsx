@@ -109,7 +109,7 @@ export default function Table({ config }: Props): ReactElement {
       <Tables
         scroll={scrollTable}
         columns={tableColumns}
-        rowKey={(item) => item.id}
+        rowKey={(item) => item.id || `${uniqueId()}`}
         dataSource={dataSource}
         pagination={pagination}
         loading={loading}

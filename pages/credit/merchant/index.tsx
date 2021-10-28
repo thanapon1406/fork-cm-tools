@@ -1,15 +1,17 @@
+import CustomBadge from '@/components/Badge'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
-import { creditPaymentChanel } from '@/constants/textMapping'
+import { creditPaymentChanel, creditStatus } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { creditTransaction } from '@/services/credit'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import { get } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
@@ -20,11 +22,11 @@ const { Title } = Typography
 interface Props {}
 
 interface filterObject {
-  refId?: string
-  outlet_name?: string
+  id?: string
+  keyword?: string
   type?: string
-  startDate?: string
-  endDate?: string
+  start_date?: string
+  end_date?: string
   status?: string
 }
 
@@ -58,14 +60,13 @@ export default function MerchantCredit({}: Props): ReactElement {
 
   const handleSubmit = (values: typeof initialValues) => {
     let reqFilter: filterObject = {
-      refId: values.refId,
-      outlet_name: values.outlet_name,
+      id: values.refId,
+      keyword: values.outlet_name,
       type: values.type,
-      startDate: values.date.start,
-      endDate: values.date.end,
+      start_date: values.date.start,
+      end_date: values.date.end,
       status: values.status,
     }
-    console.log(`reqFilter`, reqFilter)
     handleFetchData(reqFilter)
   }
 
@@ -77,10 +78,10 @@ export default function MerchantCredit({}: Props): ReactElement {
     },
     {
       title: 'ชื่อร้านค้า',
-      dataIndex: 'outlet_id',
+      dataIndex: 'outlet_name',
       align: 'center',
       render: (row: any) => {
-        return row['th'] || ''
+        return get(row, 'th', '')
       },
     },
     {
@@ -108,15 +109,26 @@ export default function MerchantCredit({}: Props): ReactElement {
       title: 'สถานะร้านค้า',
       dataIndex: 'status',
       align: 'center',
+      render: (row: string) => {
+        const status = creditStatus[row]
+        return (
+          <CustomBadge
+            customMapping={{
+              status: status.status,
+              text: status.text,
+            }}
+          ></CustomBadge>
+        )
+      },
     },
   ]
 
   return (
     <MainLayout>
-      <Title level={4}>บัญชีผู้ใช้งาน</Title>
+      <Title level={4}>การจัดการเครดิตร้านค้า</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>บัญชีผู้ใช้งาน</Breadcrumb.Item>
-        <Breadcrumb.Item>บัญชีร้านค้า</Breadcrumb.Item>
+        <Breadcrumb.Item>การจัดการเครดิตร้านค้า</Breadcrumb.Item>
+        <Breadcrumb.Item>เครดิตร้านค้าทั้งหมด</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
         <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
@@ -160,7 +172,7 @@ export default function MerchantCredit({}: Props): ReactElement {
                       },
                       {
                         name: 'บัญชีธนาคาร',
-                        value: 'bank',
+                        value: 'bank_tranfer',
                       },
                       {
                         name: 'QR Code',
@@ -204,7 +216,7 @@ export default function MerchantCredit({}: Props): ReactElement {
                       },
                       {
                         name: 'รอการยืนยัน',
-                        value: 'waiting',
+                        value: 'progressing',
                       },
                     ]}
                   />
@@ -238,14 +250,14 @@ export default function MerchantCredit({}: Props): ReactElement {
       <Card>
         <Table
           config={{
-            dataTableTitle: 'รายการรอตรวจสอบ',
+            dataTableTitle: 'บัญชีร้านค้า',
             loading: isLoading,
-            tableName: 'userprofile/merchant',
+            tableName: 'credit/merchant',
             tableColumns: column,
             action: ['view'],
             dataSource: dataTable,
             handelDataTableLoad: handelDataTableChange,
-            pagination: false,
+            pagination: pagination,
           }}
         />
       </Card>

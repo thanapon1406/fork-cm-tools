@@ -113,7 +113,7 @@ export async function getServerSideProps(context: any) {
   }
 
   if (data) {
-    const { photo = defaultDeeplink.photo, name, id } = data.data
+    const { photo = defaultDeeplink.photo, name = { th: defaultDeeplink.title }, id } = data.data
     const deeplink = {
       photo: photo,
       title: name?.th,

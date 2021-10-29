@@ -6,7 +6,7 @@ import {
   SettingOutlined,
   SolutionOutlined,
   TeamOutlined,
-  UserOutlined,
+  UserOutlined
 } from '@ant-design/icons'
 import { Avatar, Dropdown, Layout, Menu, Space, Typography } from 'antd'
 import Link from 'next/link'
@@ -19,7 +19,7 @@ const { Text } = Typography
 
 const { Sider } = Layout
 const { SubMenu } = Menu
-interface Props {}
+interface Props { }
 
 interface MenuItem {
   index: number
@@ -36,7 +36,7 @@ interface SubMenuItem {
   title: string
 }
 
-export default function Sidebar({}: Props): ReactElement {
+export default function Sidebar({ }: Props): ReactElement {
   const Router = useRouter()
   const [avatarColor, setAvatarColor] = useState('87d068')
   const [userObject, setUserState] = useRecoilState(personState)
@@ -133,7 +133,7 @@ export default function Sidebar({}: Props): ReactElement {
           key: '/userprofile/rider',
         },
         {
-          title: 'บัญชีร้านค้า',
+          title: 'Merchant Profile',
           link: '/userprofile/merchant',
           key: '/userprofile/merchant',
         },

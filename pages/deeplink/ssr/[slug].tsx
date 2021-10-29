@@ -1,13 +1,56 @@
 import axios from 'axios'
 import Head from 'next/head'
-import React, { ReactElement } from 'react'
-
+import { useRouter } from 'next/router'
+import React, { ReactElement, useEffect } from 'react'
+import { isMobile } from 'react-device-detect'
 interface Props {
   data: any
 }
 
 export default function ServerSide({ data }: Props): ReactElement {
-  const { photo, title } = data
+  const { photo, title, id } = data
+  const Router = useRouter()
+  const url: string = 'https://www.kitchenhub-th.com/'
+  const fallbackToWeb = true
+  console.log(`this 1`)
+  useEffect(() => {
+    console.log(`this 2`, id)
+    if (id) {
+      console.log(`this 3`)
+      if (typeof window !== 'undefined') {
+        deepRoute()
+      }
+    }
+  }, [id])
+
+  const deepRoute = () => {
+    console.log(`window`, window)
+    const deeplink = require('browser-deeplink')
+    const URI = 'robinhoodth://merchantlanding/id/85804'
+    deeplink.setup({
+      iOS: {
+        storeUrl: 'itms-apps://itunes.apple.com/app/id1526791835?mt=8',
+        fallbackWebUrl: url,
+      },
+      android: {
+        appId: 'th.in.robinhood',
+        storeUrl: null,
+        fallbackWebUrl: url,
+      },
+      fallback: true,
+      fallbackToWeb: fallbackToWeb,
+    })
+    console.log(`deeplink`, deeplink)
+    console.log(`isMobile`, isMobile)
+    if (isMobile) {
+      if (id) {
+        deeplink.open(URI)
+      }
+    } else if (url) {
+      Router.replace(url)
+    }
+  }
+
   return (
     <div>
       <Head>
@@ -78,10 +121,11 @@ export async function getServerSideProps(context: any) {
 
   if (result.data) {
     const { data } = result
-    const { photo = defaultDeeplink.photo, name } = data.data
+    const { photo = defaultDeeplink.photo, name, id } = data.data
     const deeplink = {
       photo: photo,
       title: name?.th,
+      id: id,
     }
     return { props: { data: deeplink } }
   }

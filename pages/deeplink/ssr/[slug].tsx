@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { isEmpty } from 'lodash'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect } from 'react'
@@ -8,11 +9,17 @@ interface Props {
 }
 
 export default function ServerSide({ data }: Props): ReactElement {
-  const { photo, title, id } = data
+  const defalutPhoto = 'https://www.kitchenhub-th.com/assets/images/logo-kittchenhub.png'
+  let { photo = defalutPhoto, title, id } = data
+  if (title) {
+    title = `${title} - Kitchen Hub ส่งอาหาร delivery ออนไลน์จากร้านอาหารดังใกล้บ้านคุณทั่วประเทศไทย`
+  } else {
+    title = `Kitchen Hub ส่งอาหาร delivery ออนไลน์จากร้านอาหารดังใกล้บ้านคุณทั่วประเทศไทย`
+  }
+
   const Router = useRouter()
   const url: string = 'https://www.kitchenhub-th.com/'
   const fallbackToWeb = true
-  console.log(`data`, data)
   console.log(`this 1`)
   useEffect(() => {
     console.log(`this 2`, id)
@@ -25,7 +32,6 @@ export default function ServerSide({ data }: Props): ReactElement {
   }, [id])
 
   const deepRoute = () => {
-    console.log(`window`, window)
     const deeplink = require('browser-deeplink')
     const URI = 'robinhoodth://merchantlanding/id/85804'
     deeplink.setup({
@@ -64,10 +70,7 @@ export default function ServerSide({ data }: Props): ReactElement {
         />
         <meta property="og:locale" content="th_TH" />
         <meta property="og:type" content="website" />
-        <meta
-          property="og:title"
-          content={`${title} - Kitchen Hub ส่งอาหาร delivery ออนไลน์จากร้านอาหารดังใกล้บ้านคุณทั่วประเทศไทย`}
-        />
+        <meta property="og:title" content={title} />
         <meta
           property="og:description"
           content="ทางเลือกใหม่ในการสั่งอาหาร หรือ Food Delivery ที่จะพาร้านอาหาร ขึ้นชื่อ พร้อมเมนูแสนอร่อยที่มีคนกล่าวถึงในจังหวัดต่างๆ ทั่วประเทศมาส่งตรงถึงหน้าบ้านคุณ ในราคาที่จับต้องได้ สะดวก และรวดเร็ว"
@@ -112,15 +115,15 @@ export async function getServerSideProps(context: any) {
     id: 0,
   }
 
-  if (data) {
-    const { photo = defaultDeeplink.photo, name = { th: defaultDeeplink.title }, id } = data.data
+  if (isEmpty(data) === false) {
+    const { photo = defaultDeeplink.photo, name = { th: defaultDeeplink.title } } = data.data
     const deeplink = {
       photo: photo,
       title: name?.th,
-      id: id,
+      id: slug,
     }
     return { props: { data: deeplink } }
   }
 
-  return { props: { data: defaultDeeplink } }
+  return { props: { data: {} } }
 }

@@ -110,15 +110,17 @@ export default function MerchantCredit({}: Props): ReactElement {
       dataIndex: 'status',
       align: 'center',
       render: (row: string) => {
-        const status = creditStatus[row]
-        return (
-          <CustomBadge
-            customMapping={{
-              status: status.status,
-              text: status.text,
-            }}
-          ></CustomBadge>
-        )
+        if (row) {
+          const status = creditStatus[row]
+          return (
+            <CustomBadge
+              customMapping={{
+                status: status.status,
+                text: status.text,
+              }}
+            ></CustomBadge>
+          )
+        }
       },
     },
   ]

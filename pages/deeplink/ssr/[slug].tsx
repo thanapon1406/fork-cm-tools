@@ -105,7 +105,7 @@ export async function getServerSideProps(context: any) {
 
   const host = process.env.POS_GRPC_API
   const result = await axios.post(host + '/merchant-service/Outlet/OutletDeeplink', request)
-  const { data } = result
+  const { data = false } = result
   const defaultDeeplink = {
     photo: 'https://www.kitchenhub-th.com/assets/images/logo-kittchenhub.png',
     title: 'Kitchen Hub ส่งอาหาร delivery ออนไลน์จากร้านอาหารดังใกล้บ้านคุณทั่วประเทศไทย',

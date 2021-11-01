@@ -28,6 +28,7 @@ interface filterObject {
   start_date?: string
   end_date?: string
   status?: string
+  transaction_id?: string
 }
 
 export default function MerchantCredit({}: Props): ReactElement {
@@ -60,7 +61,7 @@ export default function MerchantCredit({}: Props): ReactElement {
 
   const handleSubmit = (values: typeof initialValues) => {
     let reqFilter: filterObject = {
-      id: values.refId,
+      transaction_id: values.refId,
       keyword: values.outlet_name,
       type: values.type,
       start_date: values.date.start,

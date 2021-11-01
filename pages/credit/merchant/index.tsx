@@ -72,9 +72,12 @@ export default function MerchantCredit({}: Props): ReactElement {
 
   const column = [
     {
+      title: 'Transaction ID',
+      dataIndex: 'order_id',
+    },
+    {
       title: 'Ref ID',
-      dataIndex: 'id',
-      align: 'center',
+      dataIndex: 'transaction_id',
     },
     {
       title: 'ชื่อร้านค้า',

@@ -29,3 +29,8 @@
   background-color: forestgreen !important;
   border-color: forestgreen !important;
 }
+
+.order-menu-background {
+  background-color: #eeeeee;
+  padding-top: 10px;
+}

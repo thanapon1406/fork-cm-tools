@@ -3,4 +3,6 @@ export const API_PATH_CONSUMER_SERVICE = '/consumer-service'
 export const PREFIX_CUSTOMER = '/customer'
 export const PREFIX_EKYC = '/ekyc'
 export const API_PATH_CDN = '/cdn-service'
-export const PREFIX_REPORT = "/report-service"
+export const PREFIX_REPORT = '/report-service'
+export const API_PATH_ORDER_SERVICE = '/order-service'
+export const PREFIX_ORDER_STATUS = '/order-status'

@@ -142,12 +142,12 @@ export default function Sidebar({}: Props): ReactElement {
       title: 'การจัดการออเดอร์',
       icon: <FileTextOutlined />,
       key: 'order',
-      link: '/order',
+      link: '/',
       sub: [
         {
           title: 'ออเดอร์ทั้งหมด',
           link: '/orderhistory',
-          key: 'orderhistory',
+          key: '/orderhistory',
         },
       ],
     },

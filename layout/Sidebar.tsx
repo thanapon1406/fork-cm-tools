@@ -6,7 +6,7 @@ import {
   SettingOutlined,
   SolutionOutlined,
   TeamOutlined,
-  UserOutlined,
+  UserOutlined
 } from '@ant-design/icons'
 import { Avatar, Dropdown, Layout, Menu, Space, Typography } from 'antd'
 import Link from 'next/link'
@@ -19,7 +19,7 @@ const { Text } = Typography
 
 const { Sider } = Layout
 const { SubMenu } = Menu
-interface Props {}
+interface Props { }
 
 interface MenuItem {
   index: number
@@ -36,7 +36,7 @@ interface SubMenuItem {
   title: string
 }
 
-export default function Sidebar({}: Props): ReactElement {
+export default function Sidebar({ }: Props): ReactElement {
   const Router = useRouter()
   const [userObject, setUserState] = useRecoilState(personState)
   const { asPath, pathname, query } = Router
@@ -59,9 +59,10 @@ export default function Sidebar({}: Props): ReactElement {
   const findUserData = async () => {
     const { result = {}, success = false } = await findUser()
     if (success) {
-      const { firstname = '', lastname = '' } = result.data
+      const { id, firstname = '', lastname = '' } = result.data
       const asciiCode = firstname.charCodeAt(0)
       setUserState({
+        id: `${id}`,
         username: `${firstname}  ${lastname}`,
       })
     }
@@ -131,7 +132,7 @@ export default function Sidebar({}: Props): ReactElement {
           key: '/userprofile/rider',
         },
         {
-          title: 'บัญชีร้านค้า',
+          title: 'Merchant Profile',
           link: '/userprofile/merchant',
           key: '/userprofile/merchant',
         },
@@ -142,12 +143,26 @@ export default function Sidebar({}: Props): ReactElement {
       title: 'การจัดการออเดอร์',
       icon: <FileTextOutlined />,
       key: 'order',
-      link: '/',
+      link: '/order',
       sub: [
         {
           title: 'ออเดอร์ทั้งหมด',
           link: '/orderhistory',
           key: '/orderhistory',
+        },
+      ],
+    },
+    {
+      index: 5,
+      title: 'การจัดการเครดิตร้านค้า',
+      icon: <TeamOutlined />,
+      key: 'credit',
+      link: '/credit',
+      sub: [
+        {
+          title: 'เครดิตร้านค้าทั้งหมด',
+          link: '/credit/merchant',
+          key: '/credit/merchant',
         },
       ],
     },
@@ -184,7 +199,7 @@ export default function Sidebar({}: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={['register', 'userProfile']}
+        defaultOpenKeys={['register', 'userProfile', 'credit', 'order']}
         style={{ borderRight: 0 }}
       >
         {routingPath.map((path: MenuItem) => {

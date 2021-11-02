@@ -1,4 +1,5 @@
 import { isEmpty, join, map } from 'lodash'
+import moment from 'moment'
 const numberFormat = (x: string | number, minDigit = 2, maxDigit = 2) => {
   return Number(x).toLocaleString('th-TH', {
     minimumFractionDigits: minDigit,
@@ -38,4 +39,8 @@ const mapQueryParams = (params = {}): string => {
         ).join('&')
 }
 
-export { numberFormat, uniqueId, convertJsonToParam, mapQueryParams }
+const convertDateToString = (date: string, format: string = 'YYYY-MM-DD HH:mm') => {
+  return date ? moment(date).format(format) : ''
+}
+
+export { numberFormat, uniqueId, convertJsonToParam, mapQueryParams, convertDateToString }

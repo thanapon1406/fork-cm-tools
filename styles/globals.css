@@ -29,3 +29,17 @@
   background-color: forestgreen !important;
   border-color: forestgreen !important;
 }
+
+.order-menu-background {
+  background-color: #eeeeee;
+  padding-top: 10px;
+}
+
+.order-tracking {
+  width: 150%;
+  overflow: scroll;
+}
+
+.width-140 {
+  width: 140% !important;
+}

@@ -34,7 +34,16 @@ export interface requestReportInterface {
 
 export const getOrderTransaction = async (params: requestReportInterface) => {
   try {
-    const result = await fetch.get(`/api/report/get-order`, { params: params })
+    const result = await fetch.get(`/api/report/get-orders`, { params: params })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export const findOrder = async (params: requestReportInterface) => {
+  try {
+    const result = await fetch.get(`/api/report/find-order`, { params: params })
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

@@ -299,7 +299,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
 
               <Title level={5}>รายการอาหาร {orderData?.products.length} รายการ</Title>
               <Row gutter={16}>
-                <Col className="gutter-row order-menu-background" span={12}>
+                <Col className="gutter-row order-menu-background" span={18}>
                   <div style={{ maxHeight: '400px', overflow: 'scroll' }}>
                     <Row gutter={16}>
                       <Col className="gutter-row" span={1}>
@@ -320,6 +320,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       <Col className="gutter-row" span={5}>
                         หมายเหตุ
                       </Col>
+                      <Divider />
                     </Row>
 
                     {orderData?.products?.map((val, index: number) => {
@@ -384,7 +385,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 </Col>
                                 <Col className="gutter-row" span={5}></Col>
                               </Row>
-                              <br />
+                              <Divider />
                             </>
                           }
                         </>
@@ -413,7 +414,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         <Text>ยอดรวม </Text>
                       </Col>
                       <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>500.00</Text>
+                        <Text>{numberFormat(orderData?.total_amount || 0)}</Text>
                       </Col>
                     </Row>
                   </div>
@@ -476,7 +477,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                 </Col>
 
-                <Col className="gutter-row" span={6}>
+                {/* <Col className="gutter-row" span={6}>
                   <Title level={5}>ติดตามออเดอร์</Title>
                   {!isUndefined(orderStatusHistory) ? (
                     <Steps direction="vertical" size="small" current={orderStatusHistory?.length}>
@@ -567,9 +568,112 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       />
                     </Steps>
                   )}
-                </Col>
+                </Col> */}
               </Row>
 
+              <Row gutter={16}>
+                <Col
+                  className={`gutter-row ${orderStatusHistory?.length > 5 ? 'order-tracking' : ''}`}
+                  span={24}
+                >
+                  <br />
+                  <Title level={5}>ติดตามออเดอร์</Title>
+                  {!isUndefined(orderStatusHistory) ? (
+                    <Steps
+                      className={`${orderStatusHistory?.length > 5 ? 'width-140' : ''}`}
+                      direction="horizontal"
+                      size="small"
+                      current={orderStatusHistory?.length}
+                    >
+                      <Step
+                        title={determineTrackingOrderStatus(Constant.WAITING).status}
+                        description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
+                        icon={
+                          <Image
+                            width={24}
+                            height={24}
+                            style={{
+                              backgroundColor: '#69d1e1',
+                              borderRadius: '50%',
+                              border: 'solid 2px',
+                            }}
+                            preview={false}
+                            src={determineTrackingOrderStatus(Constant.WAITING).imagePath}
+                          />
+                        }
+                      />
+
+                      {orderStatusHistory?.map((val: OrderStatusHistoryDetail, index: number) => {
+                        return (
+                          <Step
+                            key={val.order_no}
+                            title={
+                              determineTrackingOrderStatus(
+                                val?.current_status_info?.order_status,
+                                val?.current_status_info?.merchant_status,
+                                val?.current_status_info?.rider_status
+                              ).status
+                            }
+                            description={Moment(val.created_at).format(Constant.DATE_FORMAT)}
+                            icon={
+                              <Image
+                                width={24}
+                                height={24}
+                                style={{
+                                  backgroundColor: '#69d1e1',
+                                  borderRadius: '50%',
+                                  border: 'solid 2px',
+                                }}
+                                preview={false}
+                                src={
+                                  determineTrackingOrderStatus(
+                                    val?.current_status_info?.order_status,
+                                    val?.current_status_info?.merchant_status,
+                                    val?.current_status_info?.rider_status
+                                  ).imagePath
+                                }
+                              />
+                            }
+                          />
+                        )
+                      })}
+                    </Steps>
+                  ) : (
+                    <Steps direction="vertical" size="small" current={1}>
+                      <Step
+                        key={orderData?.order_no}
+                        title={
+                          determineTrackingOrderStatus(
+                            orderData?.status,
+                            orderData?.merchant_status,
+                            orderData?.rider_status
+                          ).status
+                        }
+                        description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
+                        icon={
+                          <Image
+                            width={24}
+                            height={24}
+                            style={{
+                              backgroundColor: '#69d1e1',
+                              borderRadius: '50%',
+                              border: 'solid 2px',
+                            }}
+                            preview={false}
+                            src={
+                              determineTrackingOrderStatus(
+                                orderData?.status,
+                                orderData?.merchant_status,
+                                orderData?.rider_status
+                              ).imagePath
+                            }
+                          />
+                        }
+                      />
+                    </Steps>
+                  )}
+                </Col>
+              </Row>
               <br />
               <Title level={5}>การชำระเงิน</Title>
               <Row gutter={16}>

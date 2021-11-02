@@ -251,7 +251,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={8} offset={8}>
                   <Title style={{ textAlign: 'end' }} level={5}>
-                    สถานะผู้ใช้งาน : {outletStatusRender(initialValues.status)}
+                    สถานะ : {outletStatusRender(initialValues.status)}
                   </Title>
                 </Col>
               </Row>

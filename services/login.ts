@@ -1,6 +1,6 @@
 import codeMessage from '@/constants/codeMessage'
 import { notification } from 'antd'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import jwt_decode from 'jwt-decode'
 import Fetch from './fetch'
 import { clearToken, retrieveToken, saveRefreshToken, saveToken } from './fetch/auth'
@@ -37,10 +37,10 @@ export const login = async ({ username, password }: loginRequest) => {
       saveRefreshToken(refresh_token)
       return successHandler(response)
     }
-  } catch (error) {
-    const { response } = error
-    const message = response.data && response.data.detail
-    const errorText = message || codeMessage[response.status]
+  } catch (error: any) {
+    const { response } = error as AxiosError
+    const message = response?.data && response?.data.detail
+    const errorText = message || codeMessage[response?.status || 500]
 
     notification.error({
       message: `Request error ${status}`,

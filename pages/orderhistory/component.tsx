@@ -1,6 +1,7 @@
 import CustomBadge from '@/components/Badge'
 import Table from '@/components/Table'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
+import { OrderDetail } from '@/interface/order'
 import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
 import { Card, TablePaginationConfig } from 'antd'
@@ -201,6 +202,10 @@ const OrderHistoryComponent = ({
     }
   }, [payload])
 
+  const getMappingPath = (rowData: OrderDetail) => {
+    return `${rowData.order_no}?brand_id=${rowData.brand_id}&outlet_id=${rowData.outlet_id}`
+  }
+
   return (
     <Card>
       {tableHeader}
@@ -211,7 +216,8 @@ const OrderHistoryComponent = ({
           loading: _isLoading,
           tableName: 'orderhistory',
           tableColumns: columns,
-          // action: ['view'],
+          action: ['view'],
+          mappingPath: getMappingPath,
           dataSource: dataTable,
           handelDataTableLoad: handelDataTableLoad,
           pagination: pagination,

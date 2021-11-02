@@ -12,3 +12,29 @@ export const outletStatus: any = {
   active: 'Active',
   inactive: 'In-active',
 }
+
+export const creditPaymentChanel: any = {
+  qr_payment: 'QR Code',
+  bank_tranfer: 'บัญชีธนาคาร',
+  credit_card: 'บัตรเครดิต',
+}
+
+export const creditStatus: any = {
+  progressing: {
+    text: 'รอการยืนยัน',
+    status: 'waiting',
+  },
+  success: {
+    text: 'สำเร็จ',
+    status: 'success',
+  },
+  failed: {
+    text: 'ไม่สำเร็จ',
+    status: 'failed',
+  },
+}
+
+export const verifyStatusMapping: any = {
+  approved: 'อนุมัติ',
+  rejected: 'ไม่อนุมัติ',
+}

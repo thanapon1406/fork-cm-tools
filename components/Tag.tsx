@@ -13,6 +13,8 @@ export default function Tag({ children, icon, type = 'primary' }: Props): ReactE
     success: 'success',
     error: 'error',
     warning: 'warning',
+    waiting: 'warning',
+    failed: 'error',
   }
   const color = mapping[type] || type
   return (

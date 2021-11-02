@@ -6,12 +6,12 @@ import {
   SettingOutlined,
   SolutionOutlined,
   TeamOutlined,
-  UserOutlined
+  UserOutlined,
 } from '@ant-design/icons'
 import { Avatar, Dropdown, Layout, Menu, Space, Typography } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
+import React, { ReactElement, useEffect } from 'react'
 import { useRecoilState } from 'recoil'
 const profileColor: Array<string> = ['87d068', 'd06868', 'c068d0', '6897d0', 'cad068', 'd09d68']
 
@@ -19,7 +19,7 @@ const { Text } = Typography
 
 const { Sider } = Layout
 const { SubMenu } = Menu
-interface Props { }
+interface Props {}
 
 interface MenuItem {
   index: number
@@ -36,9 +36,8 @@ interface SubMenuItem {
   title: string
 }
 
-export default function Sidebar({ }: Props): ReactElement {
+export default function Sidebar({}: Props): ReactElement {
   const Router = useRouter()
-  const [avatarColor, setAvatarColor] = useState('87d068')
   const [userObject, setUserState] = useRecoilState(personState)
   const { asPath, pathname, query } = Router
   let activePath = pathname
@@ -60,10 +59,10 @@ export default function Sidebar({ }: Props): ReactElement {
   const findUserData = async () => {
     const { result = {}, success = false } = await findUser()
     if (success) {
-      const { firstname = '', lastname = '' } = result.data
+      const { id, firstname = '', lastname = '' } = result.data
       const asciiCode = firstname.charCodeAt(0)
-      setAvatarColor(profileColor[asciiCode % 6])
       setUserState({
+        id: `${id}`,
         username: `${firstname}  ${lastname}`,
       })
     }
@@ -125,7 +124,7 @@ export default function Sidebar({ }: Props): ReactElement {
         {
           title: 'Consumer Profile',
           link: '/consumer',
-          key: 'consumer',
+          key: '/consumer',
         },
         {
           title: 'Rider Profile',
@@ -149,7 +148,21 @@ export default function Sidebar({ }: Props): ReactElement {
         {
           title: 'ออเดอร์ทั้งหมด',
           link: '/orderhistory',
-          key: 'orderhistory',
+          key: '/orderhistory',
+        },
+      ],
+    },
+    {
+      index: 5,
+      title: 'การจัดการเครดิตร้านค้า',
+      icon: <TeamOutlined />,
+      key: 'credit',
+      link: '/credit',
+      sub: [
+        {
+          title: 'เครดิตร้านค้าทั้งหมด',
+          link: '/credit/merchant',
+          key: '/credit/merchant',
         },
       ],
     },
@@ -169,7 +182,7 @@ export default function Sidebar({ }: Props): ReactElement {
     >
       <div className="logo" />
       <Space style={{ padding: '15px' }} size="middle">
-        <Avatar shape="square" style={{ backgroundColor: `#${avatarColor}` }}>
+        <Avatar shape="square" style={{ backgroundColor: `#87d068` }}>
           {' '}
           {userObject.username[0]?.toUpperCase()}
         </Avatar>
@@ -186,7 +199,7 @@ export default function Sidebar({ }: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={['register', 'userProfile']}
+        defaultOpenKeys={['register', 'userProfile', 'credit', 'order']}
         style={{ borderRight: 0 }}
       >
         {routingPath.map((path: MenuItem) => {

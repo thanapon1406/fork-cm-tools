@@ -1,6 +1,7 @@
 import codeMessage from '@/constants/codeMessage'
 import { notification } from 'antd'
 import Router from 'next/router'
+import { logout } from '../login'
 
 const errorHandler = (error: any, emptyResult = null) => {
   const { response } = error
@@ -15,7 +16,10 @@ const errorHandler = (error: any, emptyResult = null) => {
     const errorText = message || codeMessage[response.status]
     const { status } = response
     if (error.response.data.jwtExpired || `${status}` === '401') {
-      Router.replace('/login')
+      logout()
+      setTimeout(() => {
+        Router.replace('/login')
+      }, 2000)
       return response.data
     }
 

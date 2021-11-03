@@ -172,12 +172,12 @@ export default function Rider({ }: Props): ReactElement {
           row == 'active' ?
             <div>
               <DotGreen />
-              <span>active</span>
+              <span>Active</span>
             </div>
             :
             <div>
               <DotRed />
-              <span>in-active</span>
+              <span>Inactive</span>
             </div>
 
         )

@@ -12,7 +12,7 @@ import MainLayout from '@/layout/MainLayout'
 import { outletListById } from '@/services/merchant'
 import { requestReportInterface } from '@/services/report'
 import { getRider } from '@/services/rider'
-import { Breadcrumb, Col, Row, Select as AntSelect, Typography } from 'antd'
+import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { debounce, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
@@ -21,7 +21,6 @@ import * as Yup from 'yup'
 import { consumerList } from '../../services/consumer'
 import OrderHistoryComponent from './component'
 const { Title } = Typography
-const { Option } = AntSelect
 
 const OrderHistory = (): ReactElement => {
   const Schema = Yup.object().shape({})

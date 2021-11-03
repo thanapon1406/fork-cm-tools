@@ -110,7 +110,7 @@ export default function MerchantCredit({}: Props): ReactElement {
       },
     },
     {
-      title: 'สถานะร้านค้า',
+      title: 'สถานะ',
       dataIndex: 'status',
       align: 'center',
       render: (row: string) => {

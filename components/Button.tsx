@@ -15,6 +15,7 @@ interface Props {
   loading?: boolean
   disabled?: boolean
   className?: string
+  isDanger?: boolean
 }
 
 function Button({
@@ -26,6 +27,7 @@ function Button({
   loading,
   disabled,
   className,
+  isDanger = false,
   ...Props
 }: Props): ReactElement {
   return (
@@ -38,6 +40,7 @@ function Button({
       icon={icon}
       size={size}
       className={className}
+      danger={isDanger}
     >
       {children}
     </Buttons>

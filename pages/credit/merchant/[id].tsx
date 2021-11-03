@@ -23,6 +23,7 @@ interface Props {}
 export default function MerchantCreditDetail({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
+  const [isLoading, setIsLoading] = useState(true)
   let [initialValues, setInitialValues] = useState({
     ref_id: '',
     outlet_name: '',
@@ -84,6 +85,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
     }
 
     const { result, success } = await transactionDetail(request)
+    setIsLoading(false)
     if (success) {
       const { data } = result
       const status = get(data, 'status', '')
@@ -223,9 +225,9 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
   }
 
   return (
-    <MainLayout>
+    <MainLayout isLoading={isLoading}>
       <Row justify="space-around" align="middle">
-        <Col span={8}>
+        <Col span={12}>
           <Title level={4}>การจัดการเครดิตร้านค้า</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>การจัดการเครดิตร้านค้า</Breadcrumb.Item>
@@ -233,7 +235,8 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
             <Breadcrumb.Item>รายละเอียด</Breadcrumb.Item>
           </Breadcrumb>
         </Col>
-        <Col span={16}></Col>
+        <Col span={12}></Col>
+        <Col span={12}></Col>
       </Row>
 
       <Formik
@@ -251,7 +254,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={8} offset={8}>
                   <Title style={{ textAlign: 'end' }} level={5}>
-                    สถานะผู้ใช้งาน : {outletStatusRender(initialValues.status)}
+                    สถานะ : {outletStatusRender(initialValues.status)}
                   </Title>
                 </Col>
               </Row>

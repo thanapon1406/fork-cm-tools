@@ -1,0 +1,105 @@
+export interface OrderDetail {
+  sso_id: string
+  created_at: Date
+  updated_at: Date
+  client_time: Date
+
+  order_no: string
+  order_type: string
+
+  brand_id: string
+  status: string
+  merchant_status: string
+
+  rider_info: {
+    id: string
+    first_name: string
+    last_name: string
+    phone: string
+    partner_name: string
+    photo: string
+  }
+  rider_status: string
+  rider_type: string
+
+  outlet_id: number
+  outlet_name: string
+  outlet_no: string
+  outlet_tax_id: string
+  outlet_code: string
+  outlet_info: CommonInfo
+
+  buyer_info: CommonInfo
+
+  products: [
+    {
+      id: number
+      name: NameInfo
+      price: number
+      quantity: number
+      total: number
+      total_amount: number
+      total_discount: number
+      total_vat: number
+      vat: number
+      remark: string
+      selected_choices: [
+        {
+          id: number
+          name: NameInfo
+          option_id: number
+          option_name: NameInfo
+          price: number
+          sorting: number
+          status: string
+        }
+      ]
+    }
+  ]
+
+  payment_channel: string
+  payment_channel_detail: {
+    channel_key: string
+    name: string
+    status: string
+  }
+
+  cooking_time: number
+  delivery_type: number
+  delivery_time: number
+  delivery_fee: number
+  distance: number
+  discount_amount: number
+
+  total: number
+  total_amount: number
+  total_products: number
+  total_discount: number
+  total_products_without_promotion: number
+  total_vat: number
+
+  images: [
+    {
+      path: string
+    }
+  ]
+}
+
+interface CommonInfo {
+  email: string
+  first_name: string
+  last_name: string
+  phone: string
+  address_name: string
+  address: string
+  remark: string
+  location: {
+    latitude: number
+    longitude: number
+  }
+}
+
+interface NameInfo {
+  en: string
+  th: string
+}

@@ -1,7 +1,7 @@
 import fetch from './fetch'
 import errorHandler from './handler/errorHandler'
 import successHandler from './handler/successHandler'
-interface queryList {
+export interface queryList {
   page?: number
   per_page?: number
   keyword?: string
@@ -16,6 +16,7 @@ interface queryList {
   first_name?: string
   last_name?: string
   id?: string
+  sso_id?: string
 }
 interface update {
   data?: queryList
@@ -39,5 +40,13 @@ const consumerUpdate = async (option: update) => {
   }
 }
 
-export { consumerList, consumerUpdate }
+const getCustomer = async (params: queryList) => {
+  try {
+    const result = await fetch.get(`/api/consumer/get-customer`, { params: params })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
 
+export { consumerList, consumerUpdate, getCustomer }

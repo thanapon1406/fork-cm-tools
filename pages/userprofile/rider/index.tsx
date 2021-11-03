@@ -265,11 +265,11 @@ export default function Rider({ }: Props): ReactElement {
                         value: '',
                       },
                       {
-                        name: 'active',
+                        name: 'Active',
                         value: 'active',
                       },
                       {
-                        name: 'inactive',
+                        name: 'Inactive',
                         value: 'inactive',
                       },
                     ]}

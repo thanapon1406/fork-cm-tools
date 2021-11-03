@@ -164,20 +164,19 @@ export default function Rider({ }: Props): ReactElement {
     },
     {
       title: 'สถานะไรเดอร์',
-      dataIndex: 'active_status', //'working_status',
+      dataIndex: 'active_status',
       align: 'left',
       render: (row: any) => {
-        // return row == 'offline' ? 'in-active' : 'active'
         return (
           row == 'active' ?
             <div>
               <DotGreen />
-              <span>active</span>
+              <span>Active</span>
             </div>
             :
             <div>
               <DotRed />
-              <span>in-active</span>
+              <span>Inactive</span>
             </div>
 
         )
@@ -265,11 +264,11 @@ export default function Rider({ }: Props): ReactElement {
                         value: '',
                       },
                       {
-                        name: 'active',
+                        name: 'Active',
                         value: 'active',
                       },
                       {
-                        name: 'inactive',
+                        name: 'Inactive',
                         value: 'inactive',
                       },
                     ]}

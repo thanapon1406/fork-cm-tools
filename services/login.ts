@@ -1,4 +1,6 @@
-import axios from 'axios'
+import codeMessage from '@/constants/codeMessage'
+import { notification } from 'antd'
+import axios, { AxiosError } from 'axios'
 import jwt_decode from 'jwt-decode'
 import Fetch from './fetch'
 import { clearToken, retrieveToken, saveRefreshToken, saveToken } from './fetch/auth'
@@ -9,6 +11,9 @@ interface loginRequest {
   username: string
   password: string
 }
+notification.config({
+  duration: 20,
+})
 
 export const login = async ({ username, password }: loginRequest) => {
   try {
@@ -32,8 +37,20 @@ export const login = async ({ username, password }: loginRequest) => {
       saveRefreshToken(refresh_token)
       return successHandler(response)
     }
-  } catch (error) {
-    return errorHandler(error)
+  } catch (error: any) {
+    const { response } = error as AxiosError
+    const message = response?.data && response?.data.detail
+    const errorText = message || codeMessage[response?.status || 500]
+
+    notification.error({
+      message: `Request error ${status}`,
+      description: errorText,
+    })
+    return {
+      success: false,
+      result: null,
+      message: 'Cannot connect to the server, Check your internet network',
+    }
   }
 }
 

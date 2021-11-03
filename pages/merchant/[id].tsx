@@ -20,6 +20,7 @@ export default function View({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoId, setSsoid] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
   let [userInitialValues, setUserInitialValues] = useState({
     user_name: '',
     user_id: '',
@@ -114,6 +115,7 @@ export default function View({}: Props): ReactElement {
       id: id,
     }
     const { result, success } = await outletDetail(request)
+    setIsLoading(false)
     if (success) {
       const { data } = result
       let verifyDetail = []
@@ -173,7 +175,7 @@ export default function View({}: Props): ReactElement {
   }
 
   return (
-    <MainLayout>
+    <MainLayout isLoading={isLoading}>
       <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>

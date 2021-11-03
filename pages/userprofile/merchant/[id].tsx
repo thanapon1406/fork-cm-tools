@@ -22,6 +22,7 @@ export default function MerchantUserView({}: Props): ReactElement {
   const { id } = router.query
   const [ssoid, setSsoid] = useState('')
   const [isEdit, setIsEdit] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   let [userInitialValues, setUserInitialValues] = useState({
     user_name: '',
@@ -70,6 +71,7 @@ export default function MerchantUserView({}: Props): ReactElement {
       id: id,
     }
     const { result, success } = await personalData(request)
+    setIsLoading(false)
     if (success) {
       const { data = [] } = result
       if (data[0]) {
@@ -193,7 +195,7 @@ export default function MerchantUserView({}: Props): ReactElement {
   }
 
   return (
-    <MainLayout>
+    <MainLayout isLoading={isLoading}>
       <Row justify="space-around" align="middle">
         <Col span={8}>
           <Title level={4}>บัญชีผู้ใช้งาน</Title>

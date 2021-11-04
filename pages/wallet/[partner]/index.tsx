@@ -8,8 +8,10 @@ import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { getLalamoveWallet } from '@/services/wallet'
 import { currencyFormat } from '@/utils/helpers'
+import { WarningOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import _ from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
@@ -33,6 +35,7 @@ interface filterObject {
 
 export default function Wallet({ }: Props): ReactElement {
   const Router = useRouter()
+  const partner = _.get(Router, 'query.partner') ? _.get(Router, 'query.partner') : ""
   const initialValues = {
     transaction_id: '',
     rider_name: '',
@@ -52,11 +55,13 @@ export default function Wallet({ }: Props): ReactElement {
   let [balanceAmount, SetBalanceAmount] = useState(0)
   let [spendingLastestAmount, SetSpendingLastestAmount] = useState(0)
   let [topUpLastestAmount, SetTopUpLastestAmount] = useState(0)
+  let [minimumBalanceAmount, SetMinimumBalanceAmount] = useState(0)
 
   useEffect(() => {
     SetBalanceAmount(490)
     SetSpendingLastestAmount(5000)
     SetTopUpLastestAmount(10000)
+    SetMinimumBalanceAmount(500)
   }, [])
 
   const filterRequest: filterObject = {}
@@ -142,7 +147,7 @@ export default function Wallet({ }: Props): ReactElement {
       <Title level={4}>กระเป๋าตังค์</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>กระเป๋าตังค์</Breadcrumb.Item>
-        <Breadcrumb.Item>LALAMOVE</Breadcrumb.Item>
+        <Breadcrumb.Item>{partner.toUpperCase()}</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
         <Row gutter={16}>
@@ -154,7 +159,9 @@ export default function Wallet({ }: Props): ReactElement {
               style={{ width: '120px' }}
               type="primary"
               size="middle"
-              htmlType="submit"
+              onClick={() => {
+                Router.push('/wallet/[partner]/setting', `/wallet/${partner}/setting`);
+              }}
             >
               ตั้งค่า
             </Button>
@@ -165,10 +172,10 @@ export default function Wallet({ }: Props): ReactElement {
             <p>ยอดเครดิตคงเหลือ</p>
           </Col>
           <Col span={6}>
-            <span style={{ color: normal_color }}>{currencyFormat(topUpLastestAmount)}</span>
+            <span style={{ color: normal_color }}>{currencyFormat(balanceAmount)}</span>
           </Col>
           <Col span={12}>
-            ยอดเงินในกระเป๋าของคุณน้อยกว่า ฿500 กรุณาเติมเงินก่อนใช้งาน
+            {balanceAmount < minimumBalanceAmount ? <><WarningOutlined /> ยอดเงินในกระเป๋าของคุณน้อยกว่า ฿{minimumBalanceAmount} กรุณาเติมเงินก่อนใช้งาน</> : ``}
           </Col>
         </Row>
         <Row gutter={16} style={{ paddingTop: 5 }} >
@@ -186,7 +193,7 @@ export default function Wallet({ }: Props): ReactElement {
             <p>(1 w.ย. 64 - 30 w.ย. 64)</p>
           </Col>
           <Col span={6}>
-            <span style={{ color: increase_color }}>{`${'+'}${currencyFormat(balanceAmount)}`}</span>
+            <span style={{ color: increase_color }}>{`${'+'}${currencyFormat(topUpLastestAmount)}`}</span>
           </Col>
         </Row>
       </Card>

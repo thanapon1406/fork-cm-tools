@@ -1,10 +1,10 @@
+import { ScrollTable } from '@/interface/dataTable'
 import { uniqueId } from '@/utils/helpers'
 import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@ant-design/icons'
 import { Dropdown, Menu, PageHeader, Table as Tables, TablePaginationConfig } from 'antd'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
-
 interface Props {
   config: Config
 }
@@ -19,31 +19,48 @@ interface Config {
   handelDataTableLoad: any
   pagination: TablePaginationConfig | false
   customAction?: any
+  scrollTable?: ScrollTable
+  mappingPath?: (rowData: any) => string
 }
 
 export default function Table({ config }: Props): ReactElement {
-  const { dataTableTitle, action, dataSource, loading, tableName, handelDataTableLoad } = config
+  const {
+    dataTableTitle,
+    action,
+    dataSource,
+    loading,
+    tableName,
+    handelDataTableLoad,
+    scrollTable,
+    mappingPath,
+  } = config
   let { tableColumns, pagination } = config
-  pagination = {
-    ...pagination,
-    pageSizeOptions: ['10', '20', '50', '100'],
-    showSizeChanger: true,
-    showTotal: (total: any, range: any) => `${range[0]}-${range[1]} of ${total} items`,
+  if (pagination) {
+    pagination = {
+      ...pagination,
+      pageSizeOptions: ['10', '20', '50', '100'],
+      showSizeChanger: true,
+      showTotal: (total: any, range: any) => `${range[0]}-${range[1]} of ${total} items`,
+    }
   }
 
   const Router = useRouter()
   if (action) {
-    let View = (path: any) => {
+    let View = (rowData: any) => {
+      let path = rowData.id
+      if (mappingPath) {
+        path = mappingPath(rowData)
+      }
       Router.push(`/${tableName}/${path}`)
     }
     const Edit = () => {}
     const Delete = () => {}
-    const actionElement = (id: any) => (
+    const actionElement = (rowData: any) => (
       <Menu style={{ width: 130 }}>
         {action.map((action) => {
           if (action === 'view') {
             return (
-              <Menu.Item key={`${uniqueId()}`} icon={<EyeOutlined />} onClick={() => View(id)}>
+              <Menu.Item key={`${uniqueId()}`} icon={<EyeOutlined />} onClick={() => View(rowData)}>
                 View
               </Menu.Item>
             )
@@ -78,7 +95,7 @@ export default function Table({ config }: Props): ReactElement {
           render: (rows: any, rowData: any) => {
             const { id } = rowData
             if (action.length === 1) {
-              return actionElement(id)
+              return actionElement(rowData)
             } else {
               return (
                 <Dropdown overlay={actionElement(id)} trigger={['click']}>
@@ -92,12 +109,21 @@ export default function Table({ config }: Props): ReactElement {
     }
   }
 
+  const determineRowKey = (item: any) => {
+    if (mappingPath) {
+      return mappingPath(item)
+    } else {
+      return item.id
+    }
+  }
+
   return (
     <>
       <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
       <Tables
+        scroll={scrollTable}
         columns={tableColumns}
-        rowKey={(item) => item.id}
+        rowKey={determineRowKey}
         dataSource={dataSource}
         pagination={pagination}
         loading={loading}

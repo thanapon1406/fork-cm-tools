@@ -14,17 +14,19 @@ import Ekyc from '../ekyc/component'
 
 const { Title } = Typography
 
-interface Props { }
+interface Props {}
 
-export default function View({ }: Props): ReactElement {
+export default function View({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoId, setSsoid] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
   let [userInitialValues, setUserInitialValues] = useState({
     user_name: '',
     user_id: '',
     user_phone: '',
     user_email: '',
+    nation_id: '',
   })
 
   let [outletInitialValues, setOutletInitialValues] = useState({
@@ -91,10 +93,19 @@ export default function View({ }: Props): ReactElement {
     }
     const { result, success } = await personalData(request)
     if (success) {
-      const { data } = result
-      if (data[0]) {
+      const { data = [] } = result
+
+      if (data.length > 0 && data[0]) {
         const { user = {} } = data[0]
-        const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
+        const {
+          email = '',
+          first_name = '',
+          last_name = '',
+          tel = '',
+          ssoid = '',
+          nation_id = '',
+        } = user
+        console.log(`nation_id`, nation_id)
         if (ssoid) {
           setSsoid(ssoid)
         }
@@ -104,7 +115,10 @@ export default function View({ }: Props): ReactElement {
           user_id: '',
           user_phone: tel,
           user_email: email,
+          nation_id: nation_id,
         })
+      } else {
+        router.replace('/merchant')
       }
     }
   }
@@ -114,6 +128,7 @@ export default function View({ }: Props): ReactElement {
       id: id,
     }
     const { result, success } = await outletDetail(request)
+    setIsLoading(false)
     if (success) {
       const { data } = result
       let verifyDetail = []
@@ -173,7 +188,7 @@ export default function View({ }: Props): ReactElement {
   }
 
   return (
-    <MainLayout>
+    <MainLayout isLoading={isLoading}>
       <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
@@ -185,7 +200,7 @@ export default function View({ }: Props): ReactElement {
         <Formik
           enableReinitialize={true}
           initialValues={userInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -208,11 +223,11 @@ export default function View({ }: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'เลขบัตรประชาชน' }}
-                    name="user_id"
+                    name="nation_id"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="user_id"
+                    id="nation_id"
                     placeholder="เลขบัตรประชาชน"
                     disabled={true}
                   />
@@ -245,9 +260,7 @@ export default function View({ }: Props): ReactElement {
             </Form>
           )}
         </Formik>
-        <div>
-          {ssoId && <Ekyc sso_id={ssoId} />}
-        </div>
+        <div>{ssoId && <Ekyc sso_id={ssoId} />}</div>
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}

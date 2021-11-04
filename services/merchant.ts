@@ -3,6 +3,7 @@ import errorHandler from './handler/errorHandler'
 import successHandler from './handler/successHandler'
 
 interface queryList {
+  sso_id?: string
   page: number
   per_page: number
   keyword?: string
@@ -19,6 +20,10 @@ interface queryList {
   ids?: number[]
 }
 
+interface querySsoId {
+  sso_id?: string
+}
+
 interface response {
   success: boolean
   result: any
@@ -27,6 +32,15 @@ interface response {
 const outletList = async (body: queryList) => {
   try {
     const result = await fetch.post(`/api/merchant/list`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const checkOutletBySsoId = async (body: querySsoId) => {
+  try {
+    const result = await fetch.get(`/api/merchant/check-is-link-outlet`, { params: body })
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)
@@ -99,4 +113,5 @@ export {
   getOutletType,
   outletListById,
   updateOutlet,
+  checkOutletBySsoId
 }

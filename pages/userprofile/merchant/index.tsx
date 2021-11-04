@@ -34,7 +34,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
     outlet_types: '',
     status: '',
   }
-  let [outletType, setOutletType] = useState([
+  let [outletType, setOutletType] = useState<Array<any>>([
     {
       name: 'ทุกประเภท',
       value: '',
@@ -74,7 +74,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
   const handleSubmit = (values: any) => {
     let reqFilter: filterObject = {
       keyword: values.keyword,
-      outlet_types: `${values.outlet_type}`,
+      outlet_types: values.outlet_type ? `${values.outlet_type}` : '',
       status: values.status,
       approve_status: 'approved',
     }
@@ -131,7 +131,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
     },
     {
       title: 'เครดิต',
-      dataIndex: 'credit',
+      dataIndex: 'available_credit',
       align: 'center',
     },
     {
@@ -143,7 +143,6 @@ export default function MerchantProfileList({}: Props): ReactElement {
       title: 'ร้านเปิด-ปิด',
       dataIndex: 'status',
       align: 'center',
-      className: 'column-typeverifyr',
       render: (row: string) => {
         return statusMapping[row]
       },
@@ -216,8 +215,8 @@ export default function MerchantProfileList({}: Props): ReactElement {
                     name="outlet_type"
                     component={Select}
                     id="outlet_type"
-                    placeholder="outlet_type"
-                    defaultValue={{ value: 'all' }}
+                    placeholder="ประเภทร้านค้า"
+                    defaultValue=""
                     selectOption={outletType}
                   />
                 </Col>

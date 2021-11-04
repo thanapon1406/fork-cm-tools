@@ -9,6 +9,7 @@ import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import Moment from 'moment'
 import React, { ReactElement, useEffect, useState } from 'react'
+import styled from 'styled-components'
 const { Title } = Typography
 
 interface Props { }
@@ -19,12 +20,35 @@ interface Pagination {
 }
 interface filterObject {
   keyword?: string
+  active_status?: string
   working_status?: string
-  job_status?: string
   status?: string
   ekyc_status?: string
   include?: string
+  sort_by?: string
+  sort_type?: string
 }
+const dateFormat = 'YYYY-MM-DD HH:mm'
+
+const DotRed = styled.span`
+  height: 11px;
+  width: 11px;
+  background-color: #B3B2B2;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+  margin-bottom: -1px;
+`
+const DotGreen = styled.span`
+  height: 11px;
+  width: 11px;
+  background-color: #00AB00;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+  margin-bottom: -1px;
+`
+
 export default function Rider({ }: Props): ReactElement {
   let [dataTable, setDataTable] = useState([])
   let [_isLoading, setIsLoading] = useState(true)
@@ -35,29 +59,31 @@ export default function Rider({ }: Props): ReactElement {
   })
   let [filter, setFilter] = useState<filterObject>({
     keyword: '',
+    active_status: '',
     working_status: '',
-    job_status: '',
     status: 'approved',
     ekyc_status: 'approved',
     include: 'job_count',
-    // "sort_by" : "approve_date",
-    // "sort_type": "desc"
+    sort_by: 'updated_at',
+    sort_type: 'desc'
   })
   const initialValues = {
     keyword: '',
+    active_status: '',
     working_status: '',
-    job_status: '',
   }
 
   const handleSubmit = (values: any) => {
     console.log(`values`, values)
     let reqFilter: filterObject = {
       keyword: values.keyword,
+      active_status: values.active_status,
       working_status: values.working_status,
-      job_status: values.job_status,
       status: 'approved',
       ekyc_status: 'approved',
       include: 'job_count',
+      sort_by: 'updated_at',
+      sort_type: 'desc'
     }
     fetchData(reqFilter, { current: 1, total: 0, pageSize: 10 })
   }
@@ -120,14 +146,6 @@ export default function Rider({ }: Props): ReactElement {
       },
     },
     {
-      title: 'สถานะ Rider',
-      dataIndex: 'working_status',
-      align: 'center',
-      render: (row: any) => {
-        return row == 'offline' ? 'in-active' : 'active'
-      },
-    },
-    {
       title: 'Rating',
       dataIndex: 'rating',
       align: 'center',
@@ -135,20 +153,57 @@ export default function Rider({ }: Props): ReactElement {
         return row
       },
     },
-    {
-      title: 'สถานะรับงาน',
-      dataIndex: 'job_count',
-      align: 'center',
-      render: (row: any) => {
-        return row > 0 ? 'รับงาน' : 'ว่างงาน'
-      },
-    },
+
     {
       title: 'Approved Date',
       dataIndex: 'approve_date',
       align: 'center',
       render: (text: any, record: any) => {
-        return Moment(text).format('YYYY-MM-DD HH:mm')
+        return Moment(text).format(dateFormat)
+      },
+    },
+    {
+      title: 'สถานะไรเดอร์',
+      dataIndex: 'active_status', //'working_status',
+      align: 'left',
+      render: (row: any) => {
+        // return row == 'offline' ? 'in-active' : 'active'
+        return (
+          row == 'active' ?
+            <div>
+              <DotGreen />
+              <span>Active</span>
+            </div>
+            :
+            <div>
+              <DotRed />
+              <span>Inactive</span>
+            </div>
+
+        )
+      },
+    },
+    {
+      title: 'สถานะรับงาน',
+      dataIndex: 'working_status',
+      align: 'center',
+      render: (row: any, record: any) => {
+        console.log(" row : ", row)
+        console.log(" record : ", record)
+        // return row > 0 ? 'รับงาน (' + row + ')' : 'ว่างงาน'
+        return (
+          row == 'online' ?
+            <div>
+              <DotGreen />
+              <span>ออนไลน์ {record.job_count > 0 ? '(' + record.job_count + ')' : ""}</span>
+
+            </div>
+            :
+            <div>
+              <DotRed />
+              <span>ออฟไลน์</span>
+            </div>
+        )
       },
     },
   ]
@@ -199,6 +254,30 @@ export default function Rider({ }: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'สถานะ Rider' }}
+                    name="active_status"
+                    component={Select}
+                    id="active_status"
+                    placeholder="active_status"
+                    defaultValue={{ value: 'ทุกสถานะ' }}
+                    selectOption={[
+                      {
+                        name: 'ทุกสถานะ',
+                        value: '',
+                      },
+                      {
+                        name: 'Active',
+                        value: 'active',
+                      },
+                      {
+                        name: 'Inactive',
+                        value: 'inactive',
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'สถานะรับงาน' }}
                     name="working_status"
                     component={Select}
                     id="working_status"
@@ -210,36 +289,12 @@ export default function Rider({ }: Props): ReactElement {
                         value: '',
                       },
                       {
-                        name: 'active',
+                        name: 'ออนไลน์',
                         value: 'online',
                       },
                       {
-                        name: 'in-active',
+                        name: 'ออฟไลน์',
                         value: 'offline',
-                      },
-                    ]}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'สถานะรับงาน' }}
-                    name="job_status"
-                    component={Select}
-                    id="job_status"
-                    placeholder="job_status"
-                    defaultValue={{ value: 'ทุกสถานะ' }}
-                    selectOption={[
-                      {
-                        name: 'ทุกสถานะ',
-                        value: '',
-                      },
-                      {
-                        name: 'ว่างงาน',
-                        value: 'available',
-                      },
-                      {
-                        name: 'รับงาน',
-                        value: 'unavailable',
                       },
                     ]}
                   />
@@ -252,7 +307,7 @@ export default function Rider({ }: Props): ReactElement {
       <Card>
         <Table
           config={{
-            dataTableTitle: 'รายการรอการตรวจสอบ',
+            dataTableTitle: 'บัญชีไรเดอร์',
             loading: _isLoading,
             tableName: 'userprofile/rider',
             tableColumns: column,

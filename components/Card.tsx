@@ -1,9 +1,9 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement } from 'react'
 
 interface Props {
-  children: any;
-  minHeight?: number;
-  marginBottom?: number;
+  children: any
+  minHeight?: number
+  marginBottom?: number
 }
 
 export default function Card({ children, minHeight, marginBottom }: Props): ReactElement {
@@ -12,12 +12,12 @@ export default function Card({ children, minHeight, marginBottom }: Props): Reac
       className="site-layout-background"
       style={{
         padding: 24,
-        minHeight: minHeight || 200,
+        minHeight: minHeight || 160,
         marginBottom: marginBottom || 36,
-        overflow: "scroll",
+        overflow: 'scroll',
       }}
     >
       {children}
     </div>
-  );
+  )
 }

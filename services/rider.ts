@@ -22,6 +22,7 @@ interface queryList {
 
 interface queryListDetail {
   id?: string | string[] | undefined
+  sso_id?: string
   include?: string
 }
 

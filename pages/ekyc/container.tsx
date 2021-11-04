@@ -9,7 +9,8 @@ import {
 } from '@/services/ekyc'
 import { Col, Empty, Image, message, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { isEmpty, isUndefined } from 'lodash'
+import { isEmpty, isUndefined, omitBy } from 'lodash'
+// import Image from 'next/image'
 import { ReactElement, useEffect, useState } from 'react'
 const { Title } = Typography
 
@@ -45,6 +46,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
       sso_id: sso_id || '',
       id: id || '',
     }
+
     setLoading(true)
     const { result, success } = await getEkycDetail(payload)
     if (success) {
@@ -88,14 +90,14 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
     if (success) {
       const { data } = result
       Modal.success({
-        content: <Title level={4}>อนุมัติการยืนยันตัวตนสำเร็จ</Title>,
+        content: <Title level={4}>บันทึกสำเร็จ</Title>,
       })
       setEkycDetail(data)
       if (setEkycStatus) {
         setEkycStatus(data.status)
       }
     } else {
-      Modal.success({
+      Modal.error({
         content: <Title level={4}>{message}</Title>,
       })
     }
@@ -106,10 +108,11 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
     setIsLoadingMedia(true)
     setMediaType(type)
     const payload = {
-      id: sso_id || id,
+      id: id || '',
+      sso_id: sso_id || '',
       media_type: type,
     }
-    const { result, success } = await getPresignUrl(payload)
+    const { result, success } = await getPresignUrl(omitBy(payload, isEmpty))
     if (success) {
       const { url } = result
       setMediaUrl(url)

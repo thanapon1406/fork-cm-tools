@@ -1,6 +1,10 @@
 import { isEmpty, join, map } from 'lodash'
-const numberFormat = (x: string | number) => {
-  return Number(x).toLocaleString()
+import moment from 'moment'
+const numberFormat = (x: string | number, minDigit = 2, maxDigit = 2) => {
+  return Number(x).toLocaleString('th-TH', {
+    minimumFractionDigits: minDigit,
+    maximumFractionDigits: maxDigit,
+  })
 }
 
 const uniqueId = () => {
@@ -35,4 +39,8 @@ const mapQueryParams = (params = {}): string => {
         ).join('&')
 }
 
-export { numberFormat, uniqueId, convertJsonToParam, mapQueryParams }
+const convertDateToString = (date: string, format: string = 'YYYY-MM-DD HH:mm') => {
+  return date ? moment(date).format(format) : ''
+}
+
+export { numberFormat, uniqueId, convertJsonToParam, mapQueryParams, convertDateToString }

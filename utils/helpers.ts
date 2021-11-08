@@ -33,14 +33,18 @@ const mapQueryParams = (params = {}): string => {
   return isEmpty(params)
     ? ''
     : '?' +
-        map(
-          params,
-          (param, key) => `${key}=${typeof param === 'object' ? join(param, ',') : param}`
-        ).join('&')
+    map(
+      params,
+      (param, key) => `${key}=${typeof param === 'object' ? join(param, ',') : param}`
+    ).join('&')
 }
 
 const convertDateToString = (date: string, format: string = 'YYYY-MM-DD HH:mm') => {
   return date ? moment(date).format(format) : ''
 }
 
-export { numberFormat, uniqueId, convertJsonToParam, mapQueryParams, convertDateToString }
+const currencyFormat = (num: number) => {
+  return '฿' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
+export { numberFormat, uniqueId, convertJsonToParam, mapQueryParams, convertDateToString, currencyFormat }

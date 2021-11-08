@@ -5,11 +5,11 @@ import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
 import { getRider } from '@/services/rider'
-import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
+import { Badge, Breadcrumb, Col, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import Moment from 'moment'
 import React, { ReactElement, useEffect, useState } from 'react'
-import styled from 'styled-components'
+
 const { Title } = Typography
 
 interface Props { }
@@ -30,24 +30,6 @@ interface filterObject {
 }
 const dateFormat = 'YYYY-MM-DD HH:mm'
 
-const DotRed = styled.span`
-  height: 11px;
-  width: 11px;
-  background-color: #B3B2B2;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 4px;
-  margin-bottom: -1px;
-`
-const DotGreen = styled.span`
-  height: 11px;
-  width: 11px;
-  background-color: #00AB00;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 4px;
-  margin-bottom: -1px;
-`
 
 export default function Rider({ }: Props): ReactElement {
   let [dataTable, setDataTable] = useState([])
@@ -74,7 +56,6 @@ export default function Rider({ }: Props): ReactElement {
   }
 
   const handleSubmit = (values: any) => {
-    console.log(`values`, values)
     let reqFilter: filterObject = {
       keyword: values.keyword,
       active_status: values.active_status,
@@ -89,7 +70,6 @@ export default function Rider({ }: Props): ReactElement {
   }
 
   const handelDataTableLoad = (pagination: any) => {
-    console.log(`pagination`, pagination)
     fetchData(filter, pagination)
   }
 
@@ -170,13 +150,11 @@ export default function Rider({ }: Props): ReactElement {
         return (
           row == 'active' ?
             <div>
-              <DotGreen />
-              <span>Active</span>
+              <Badge status="success" text="Active" />
             </div>
             :
             <div>
-              <DotRed />
-              <span>Inactive</span>
+              <Badge status="default" text="Inactive" />
             </div>
 
         )
@@ -187,20 +165,15 @@ export default function Rider({ }: Props): ReactElement {
       dataIndex: 'working_status',
       align: 'center',
       render: (row: any, record: any) => {
-        console.log(" row : ", row)
-        console.log(" record : ", record)
-        // return row > 0 ? 'รับงาน (' + row + ')' : 'ว่างงาน'
         return (
           row == 'online' ?
-            <div>
-              <DotGreen />
-              <span>ออนไลน์ {record.job_count > 0 ? '(' + record.job_count + ')' : ""}</span>
 
+            <div>
+              <Badge status="success" text={`ออนไลน์${record.job_count > 0 ? '(' + record.job_count + ')' : ""}`} />
             </div>
             :
             <div>
-              <DotRed />
-              <span>ออฟไลน์</span>
+              <Badge status="default" text="ออฟไลน์" />
             </div>
         )
       },

@@ -39,6 +39,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
     verify_date: '',
     verify_detail: [],
     verify_user: '',
+    outlet_id: 0,
   })
   const [userObject, setUserState] = useRecoilState(personState)
   const [approveStatus, setApproveStatus] = useState('default')
@@ -120,6 +121,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
         verify_date: convertDateToString(get(data, 'verify_date', '')),
         verify_detail: verifyDetail,
         verify_user: get(data, 'verify_user.name', ''),
+        outlet_id: get(data, 'outlet_id', ''),
       })
     }
   }
@@ -148,6 +150,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
     let { verify_detail } = values
     const reqBody: any = {
       id: id,
+      outlet_id: values.outlet_id,
       verify_status: values.verify_status,
       verify_detail: [],
       verify_user: {

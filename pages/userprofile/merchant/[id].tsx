@@ -3,8 +3,8 @@ import Card from '@/components/Card'
 import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
-import Tag from '@/components/Tag'
-import { days, outletStatus } from '@/constants/textMapping'
+import { StatusMapping } from '@/components/outlet/Status'
+import { days } from '@/constants/textMapping'
 import MainLayout from '@/layout/MainLayout'
 import { outletDetail, personalData, updateOutlet } from '@/services/merchant'
 import { Breadcrumb, Col, Divider, Modal, Row, Space, Switch, Typography } from 'antd'
@@ -170,11 +170,7 @@ export default function MerchantUserView({}: Props): ReactElement {
   }
 
   const outletStatusRender = (status: string) => {
-    const statusSet: any = {
-      active: <Tag type="primary">{outletStatus[status]}</Tag>,
-      inactive: <Tag type="default">{outletStatus[status]}</Tag>,
-    }
-    return statusSet[status] || <Tag type="error">{status}</Tag>
+    return StatusMapping[status]
   }
 
   const statusEditForm = (status: string) => {

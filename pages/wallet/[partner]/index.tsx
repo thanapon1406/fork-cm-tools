@@ -6,10 +6,10 @@ import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { getLalamoveWallet } from '@/services/wallet'
+import { getLalamoveWallet, getWalletBalanceSetting } from '@/services/wallet'
 import { currencyFormat } from '@/utils/helpers'
 import { WarningOutlined } from '@ant-design/icons'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _ from 'lodash'
 import moment from 'moment'
@@ -52,17 +52,57 @@ export default function Wallet({ }: Props): ReactElement {
     },
   ])
 
+  interface IQueryWalletSetting {
+    partner_name: string
+  }
+
+  interface IWalletSettingDetail {
+    id?: string;
+    min_alert_balance?: number;
+    min_alert_email?: string[];
+    min_alert_status?: boolean;
+    partner_name?: string;
+    top_up_alert_email?: string[];
+    top_up_alert_status?: boolean;
+    total_balance?: number;
+  }
+
+  let [_isLoading, setIsLoading] = useState(true);
   let [balanceAmount, SetBalanceAmount] = useState(0)
   let [spendingLastestAmount, SetSpendingLastestAmount] = useState(0)
   let [topUpLastestAmount, SetTopUpLastestAmount] = useState(0)
   let [minimumBalanceAmount, SetMinimumBalanceAmount] = useState(0)
 
   useEffect(() => {
-    SetBalanceAmount(490)
-    SetSpendingLastestAmount(5000)
-    SetTopUpLastestAmount(10000)
-    SetMinimumBalanceAmount(500)
-  }, [])
+    if (partner) {
+      fetchData()
+    }
+    // SetBalanceAmount(490)
+    // SetSpendingLastestAmount(5000)
+    // SetTopUpLastestAmount(10000)
+    // SetMinimumBalanceAmount(500)
+  }, [partner])
+
+  const fetchData = async () => {
+    const request: IQueryWalletSetting = {
+      partner_name: partner,
+    }
+    setIsLoading(true);
+    const { result, success } = await getWalletBalanceSetting(request);
+    if (success) {
+      const { data } = result;
+      const balanceAmount = _.get(data, 'total_balance') ? _.get(data, 'total_balance') : 0
+      SetBalanceAmount(balanceAmount)
+      setIsLoading(false);
+    } else {
+      // Handle Case : Not Success
+      setIsLoading(false);
+      notification.success({
+        message: `ไม่สำเร็จ`,
+        description: "",
+      });
+    }
+  }
 
   const filterRequest: filterObject = {}
   const requestApi: Function = getLalamoveWallet
@@ -144,171 +184,174 @@ export default function Wallet({ }: Props): ReactElement {
 
   return (
     <MainLayout>
-      <Title level={4}>กระเป๋าตังค์</Title>
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>กระเป๋าตังค์</Breadcrumb.Item>
-        <Breadcrumb.Item>{partner.toUpperCase()}</Breadcrumb.Item>
-      </Breadcrumb>
-      <Card>
-        <Row gutter={16}>
-          <Col span={8} style={{ paddingLeft: 0 }}>
-            <h3>กระเป๋าตังค์</h3>
-          </Col>
-          <Col span={16} style={{ textAlign: 'right' }}>
-            <Button
-              style={{ width: '120px' }}
-              type="primary"
-              size="middle"
-              onClick={() => {
-                Router.push('/wallet/[partner]/setting', `/wallet/${partner}/setting`);
+      {!_isLoading &&
+        <>
+          <Title level={4}>กระเป๋าตังค์</Title>
+          <Breadcrumb style={{ margin: '16px 0' }}>
+            <Breadcrumb.Item>กระเป๋าตังค์</Breadcrumb.Item>
+            <Breadcrumb.Item>{partner.toUpperCase()}</Breadcrumb.Item>
+          </Breadcrumb>
+          <Card>
+            <Row gutter={16}>
+              <Col span={8} style={{ paddingLeft: 0 }}>
+                <h3>กระเป๋าตังค์</h3>
+              </Col>
+              <Col span={16} style={{ textAlign: 'right' }}>
+                <Button
+                  style={{ width: '120px' }}
+                  type="primary"
+                  size="middle"
+                  onClick={() => {
+                    Router.push('/wallet/[partner]/setting', `/wallet/${partner}/setting`);
+                  }}
+                >
+                  ตั้งค่า
+                </Button>
+              </Col>
+            </Row>
+            <Row gutter={16} style={{ paddingTop: 5 }}>
+              <Col span={6} style={{ paddingLeft: 0 }}>
+                <p>ยอดเครดิตคงเหลือ</p>
+              </Col>
+              <Col span={6}>
+                <span style={{ color: normal_color }}>{currencyFormat(balanceAmount)}</span>
+              </Col>
+              <Col span={12}>
+                {balanceAmount < minimumBalanceAmount ? <><WarningOutlined /> ยอดเงินในกระเป๋าของคุณน้อยกว่า ฿{minimumBalanceAmount} กรุณาเติมเงินก่อนใช้งาน</> : ``}
+              </Col>
+            </Row>
+            <Row gutter={16} style={{ paddingTop: 5 }} >
+              <Col span={6} style={{ paddingLeft: 0 }}>
+                <p style={{ marginBottom: 0 }}>ยอดเครดิตที่ใช้ไป</p>
+                <p>(1 w.ย. 64 - 30 w.ย. 64)</p>
+              </Col>
+              <Col span={6}>
+                <span style={{ color: decrease_color }}>{`${'-'}${currencyFormat(spendingLastestAmount)}`}</span>
+              </Col>
+            </Row>
+            <Row gutter={16} style={{ paddingTop: 5 }} >
+              <Col span={6} style={{ paddingLeft: 0 }}>
+                <p style={{ marginBottom: 0 }}>ยอดเติมเครดิตล่าสุด</p>
+                <p>(1 w.ย. 64 - 30 w.ย. 64)</p>
+              </Col>
+              <Col span={6}>
+                <span style={{ color: increase_color }}>{`${'+'}${currencyFormat(topUpLastestAmount)}`}</span>
+              </Col>
+            </Row>
+          </Card>
+          <Card>
+            <Title level={5}>กรุณากรอกข้อมูลที่ต้องการค้นหา</Title>
+            <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
+              {({ values, resetForm }) => (
+                <Form>
+                  <Row gutter={16}>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'Transaction ID' }}
+                        name="transactionId"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        id="transactionId"
+                        placeholder="Transaction ID"
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'ประเภท' }}
+                        name="type"
+                        component={Select}
+                        id="type"
+                        placeholder="ประเภท"
+                        defaultValue=""
+                        selectOption={[
+                          {
+                            name: 'ทั้งหมด',
+                            value: '',
+                          },
+                          {
+                            name: 'เติมเงิน',
+                            value: 'top-up',
+                          },
+                          {
+                            name: 'เงินเข้า',
+                            value: 'increase',
+                          },
+                          {
+                            name: 'เงินออก',
+                            value: 'decrease',
+                          },
+                        ]}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'ชื่อไรเดอร์' }}
+                        name="rider_name"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        id="rider_name"
+                        placeholder="ชื่อไรเดอร์"
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'วันที่' }}
+                        name="date"
+                        component={DateRangePicker}
+                        id="date"
+                        placeholder="วันที่"
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}></Col>
+                  </Row>
+                  <Row gutter={16}>
+                    <Col className="gutter-row" span={6}>
+                      <div className="ant-form ant-form-vertical">
+                        <Button
+                          style={{ width: '120px', marginTop: '31px' }}
+                          type="primary"
+                          size="middle"
+                          htmlType="submit"
+                        >
+                          ค้นหา
+                        </Button>
+                        <Button
+                          style={{ width: '120px', marginTop: '31px', marginLeft: '10px' }}
+                          type="default"
+                          size="middle"
+                          htmlType="reset"
+                          onClick={() => resetForm()}
+                        >
+                          เคลียร์
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+                </Form>
+              )}
+            </Formik>
+          </Card>
+          <Card>
+            <Table
+              config={{
+                dataTableTitle: 'รายการ',
+                loading: isLoading,
+                tableName: 'wallet/lalamove',
+                tableColumns: column,
+                action: ['view'],
+                dataSource: dataTable,
+                handelDataTableLoad: handelDataTableChange,
+                pagination: pagination,
+                isExport: true,
+                handelDataExport: () => {
+                  console.log("EXPORT!")
+                }
               }}
-            >
-              ตั้งค่า
-            </Button>
-          </Col>
-        </Row>
-        <Row gutter={16} style={{ paddingTop: 5 }}>
-          <Col span={6} style={{ paddingLeft: 0 }}>
-            <p>ยอดเครดิตคงเหลือ</p>
-          </Col>
-          <Col span={6}>
-            <span style={{ color: normal_color }}>{currencyFormat(balanceAmount)}</span>
-          </Col>
-          <Col span={12}>
-            {balanceAmount < minimumBalanceAmount ? <><WarningOutlined /> ยอดเงินในกระเป๋าของคุณน้อยกว่า ฿{minimumBalanceAmount} กรุณาเติมเงินก่อนใช้งาน</> : ``}
-          </Col>
-        </Row>
-        <Row gutter={16} style={{ paddingTop: 5 }} >
-          <Col span={6} style={{ paddingLeft: 0 }}>
-            <p style={{ marginBottom: 0 }}>ยอดเครดิตที่ใช้ไป</p>
-            <p>(1 w.ย. 64 - 30 w.ย. 64)</p>
-          </Col>
-          <Col span={6}>
-            <span style={{ color: decrease_color }}>{`${'-'}${currencyFormat(spendingLastestAmount)}`}</span>
-          </Col>
-        </Row>
-        <Row gutter={16} style={{ paddingTop: 5 }} >
-          <Col span={6} style={{ paddingLeft: 0 }}>
-            <p style={{ marginBottom: 0 }}>ยอดเติมเครดิตล่าสุด</p>
-            <p>(1 w.ย. 64 - 30 w.ย. 64)</p>
-          </Col>
-          <Col span={6}>
-            <span style={{ color: increase_color }}>{`${'+'}${currencyFormat(topUpLastestAmount)}`}</span>
-          </Col>
-        </Row>
-      </Card>
-      <Card>
-        <Title level={5}>กรุณากรอกข้อมูลที่ต้องการค้นหา</Title>
-        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
-          {({ values, resetForm }) => (
-            <Form>
-              <Row gutter={16}>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'Transaction ID' }}
-                    name="transactionId"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="transactionId"
-                    placeholder="Transaction ID"
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'ประเภท' }}
-                    name="type"
-                    component={Select}
-                    id="type"
-                    placeholder="ประเภท"
-                    defaultValue=""
-                    selectOption={[
-                      {
-                        name: 'ทั้งหมด',
-                        value: '',
-                      },
-                      {
-                        name: 'เติมเงิน',
-                        value: 'top-up',
-                      },
-                      {
-                        name: 'เงินเข้า',
-                        value: 'increase',
-                      },
-                      {
-                        name: 'เงินออก',
-                        value: 'decrease',
-                      },
-                    ]}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'ชื่อไรเดอร์' }}
-                    name="rider_name"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="rider_name"
-                    placeholder="ชื่อไรเดอร์"
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'วันที่' }}
-                    name="date"
-                    component={DateRangePicker}
-                    id="date"
-                    placeholder="วันที่"
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}></Col>
-              </Row>
-              <Row gutter={16}>
-                <Col className="gutter-row" span={6}>
-                  <div className="ant-form ant-form-vertical">
-                    <Button
-                      style={{ width: '120px', marginTop: '31px' }}
-                      type="primary"
-                      size="middle"
-                      htmlType="submit"
-                    >
-                      ค้นหา
-                    </Button>
-                    <Button
-                      style={{ width: '120px', marginTop: '31px', marginLeft: '10px' }}
-                      type="default"
-                      size="middle"
-                      htmlType="reset"
-                      onClick={() => resetForm()}
-                    >
-                      เคลียร์
-                    </Button>
-                  </div>
-                </Col>
-              </Row>
-            </Form>
-          )}
-        </Formik>
-      </Card>
-      <Card>
-        <Table
-          config={{
-            dataTableTitle: 'รายการ',
-            loading: isLoading,
-            tableName: 'wallet/lalamove',
-            tableColumns: column,
-            action: ['view'],
-            dataSource: dataTable,
-            handelDataTableLoad: handelDataTableChange,
-            pagination: pagination,
-            isExport: true,
-            handelDataExport: () => {
-              console.log("EXPORT!")
-            }
-          }}
-        />
-      </Card>
+            />
+          </Card>
+        </>}
     </MainLayout >
   )
 }

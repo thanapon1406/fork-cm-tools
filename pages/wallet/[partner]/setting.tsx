@@ -133,7 +133,7 @@ export default function WalletSetting({ }: Props): ReactElement {
                     <Title level={4}>กระเป๋าตังค์</Title>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                       <Breadcrumb.Item>กระเป๋าตังค์</Breadcrumb.Item>
-                      <Breadcrumb.Item>{partner.toUpperCase()}</Breadcrumb.Item>
+                      <Breadcrumb.Item><a href={`/wallet/${partner}`}>{partner.toUpperCase()}</a></Breadcrumb.Item>
                       <Breadcrumb.Item>ตั้งค่ากระเป๋าตังค์</Breadcrumb.Item>
                     </Breadcrumb>
                   </Col>
@@ -176,7 +176,7 @@ export default function WalletSetting({ }: Props): ReactElement {
                     </Col>
                   </Row>
                   <Row gutter={16} style={{ paddingTop: 5 }}>
-                    <Col span={10} offset={6}>
+                    <Col span={16} offset={6}>
                       <Select
                         defaultValue={walletSettingDetail.min_alert_email}
                         mode="tags"
@@ -205,7 +205,7 @@ export default function WalletSetting({ }: Props): ReactElement {
                         }}
                       />
                     </Col>
-                    <Col span={10}>
+                    <Col span={16}>
                       <Select
                         defaultValue={walletSettingDetail.top_up_alert_email}
                         mode="tags"

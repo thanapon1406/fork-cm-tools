@@ -1,3 +1,4 @@
+import fetch from './fetch'
 import errorHandler from './handler/errorHandler'
 import successHandler from './handler/successHandler'
 
@@ -16,6 +17,23 @@ interface queryById {
 interface response {
   success: boolean
   result: any
+}
+
+interface IQueryWalletSetting {
+  partner_name: string
+}
+
+interface IWalletSettingDetail {
+  id?: string;
+  min_alert_balance?: number;
+  min_alert_email?: string;
+  min_alert_status?: boolean;
+  top_up_alert_email?: string;
+  top_up_alert_status?: boolean;
+}
+
+interface IUpdateWalletSettingDetail {
+  data: IWalletSettingDetail
 }
 
 const getLalamoveWallet = async (body: queryList) => {
@@ -89,5 +107,23 @@ const getLalamoveWallet = async (body: queryList) => {
   }
 }
 
-export { getLalamoveWallet }
+const getWalletBalanceSetting = async (req: IQueryWalletSetting) => {
+  try {
+    const result = await fetch.post(`/api/wallet-balance/find`, req)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const saveWalletBalanceSetting = async (req: IUpdateWalletSettingDetail) => {
+  try {
+    const result = await fetch.post(`/api/wallet-balance/update`, req)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export { getLalamoveWallet, getWalletBalanceSetting, saveWalletBalanceSetting }
 

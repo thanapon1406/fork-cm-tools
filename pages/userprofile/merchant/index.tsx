@@ -2,8 +2,10 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
+import { StatusMapping } from '@/components/outlet/Status'
 import Table from '@/components/Table'
 import Tag from '@/components/Tag'
+import { deliveryInfo } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { getOutletType, outletList } from '@/services/merchant'
@@ -114,7 +116,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
             <>
               {_.map(row, (d: any) => {
                 return (
-                  <Tag key={d.id} type="success">
+                  <Tag key={d.id} type="warning">
                     {d.name['th']}
                   </Tag>
                 )
@@ -138,6 +140,9 @@ export default function MerchantProfileList({}: Props): ReactElement {
       title: 'สถานะร้านค้า',
       dataIndex: 'status',
       align: 'center',
+      render: (row: any) => {
+        return StatusMapping[row]
+      },
     },
     {
       title: 'ร้านเปิด-ปิด',
@@ -152,7 +157,8 @@ export default function MerchantProfileList({}: Props): ReactElement {
       dataIndex: 'delivery_setting',
       align: 'center',
       render: (row: any) => {
-        return _.get(row, 'deliver_by', '-')
+        const delivery = _.get(row, 'deliver_by', false)
+        return delivery ? deliveryInfo[delivery] : '-'
       },
     },
     {
@@ -252,7 +258,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
       <Card>
         <Table
           config={{
-            dataTableTitle: 'รายการรอตรวจสอบ',
+            dataTableTitle: 'บัญชีร้านค้า',
             loading: isLoading,
             tableName: 'userprofile/merchant',
             tableColumns: column,

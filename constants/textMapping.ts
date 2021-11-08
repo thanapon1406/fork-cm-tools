@@ -11,6 +11,7 @@ export const days: any = {
 export const outletStatus: any = {
   active: 'Active',
   inactive: 'In-active',
+  closed: 'Closed',
 }
 
 export const creditPaymentChanel: any = {
@@ -37,4 +38,9 @@ export const creditStatus: any = {
 export const verifyStatusMapping: any = {
   approved: 'อนุมัติ',
   rejected: 'ไม่อนุมัติ',
+}
+
+export const deliveryInfo: any = {
+  outlet: 'default',
+  partner: 'rider',
 }

@@ -31,7 +31,9 @@ const Login: NextPage = () => {
     const { result, success } = response
     setIsLoading(false)
     if (success) {
-      router.push('/')
+      setTimeout(() => {
+        router.push('/')
+      }, 1000)
     }
   }
 

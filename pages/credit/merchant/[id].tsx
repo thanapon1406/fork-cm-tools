@@ -40,7 +40,6 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
     verify_detail: [],
     verify_user: '',
   })
-
   const [userObject, setUserState] = useRecoilState(personState)
   const [approveStatus, setApproveStatus] = useState('default')
 
@@ -107,7 +106,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
 
       setInitialValues({
         ...initialValues,
-        ref_id: get(data, 'id', ''),
+        ref_id: get(data, 'transaction_id', ''),
         outlet_name: get(data, 'outlet_name.th', ''),
         amount: get(data, 'amount', ''),
         type: creditPaymentChanel[get(data, 'type', '')],

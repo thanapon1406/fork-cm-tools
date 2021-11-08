@@ -258,7 +258,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
       <Card>
         <Table
           config={{
-            dataTableTitle: 'รายการรอตรวจสอบ',
+            dataTableTitle: 'บัญชีร้านค้า',
             loading: isLoading,
             tableName: 'userprofile/merchant',
             tableColumns: column,

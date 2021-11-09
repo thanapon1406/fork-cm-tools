@@ -86,8 +86,8 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
     }
 
     const { result, success } = await transactionDetail(request)
-    setIsLoading(false)
     if (success) {
+      setIsLoading(false)
       const { data } = result
       const status = get(data, 'status', '')
       const verify_status = get(data, 'verify_status', '')
@@ -266,7 +266,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'Ref Id' }}
+                    label={{ text: 'Order No.' }}
                     name="order_no"
                     type="text"
                     component={Input}

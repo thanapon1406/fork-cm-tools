@@ -71,8 +71,8 @@ export default function MerchantUserView({}: Props): ReactElement {
       id: id,
     }
     const { result, success } = await personalData(request)
-    setIsLoading(false)
     if (success) {
+      setIsLoading(false)
       const { data = [] } = result
       if (data[0]) {
         const { user = {} } = data[0]

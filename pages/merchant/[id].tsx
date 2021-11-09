@@ -129,8 +129,8 @@ export default function View({}: Props): ReactElement {
       id: id,
     }
     const { result, success } = await outletDetail(request)
-    setIsLoading(false)
     if (success) {
+      setIsLoading(false)
       const { data } = result
       let verifyDetail = []
       if (data.verify_detail) {

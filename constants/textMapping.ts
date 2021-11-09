@@ -41,6 +41,6 @@ export const verifyStatusMapping: any = {
 }
 
 export const deliveryInfo: any = {
-  outlet: 'default',
-  partner: 'rider',
+  outlet: 'Default rider',
+  partner: 'Partner',
 }

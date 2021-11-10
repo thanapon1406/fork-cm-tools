@@ -8,7 +8,7 @@ import CustomPanel from './style'
 const { Title } = Typography
 
 const statusMapping: any = {
-  uploaded: 'รอการตรวจสอบ',
+  uploaded: 'รอการอนุมัติ',
   approved: 'อนุมัติ',
   're-approved': 'ขอเอกสารเพิ่มเติม',
   rejected: 'ไม่อนุมัติ',

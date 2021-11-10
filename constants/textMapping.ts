@@ -44,3 +44,8 @@ export const deliveryInfo: any = {
   outlet: 'Default rider',
   partner: 'Partner',
 }
+
+export const onlineStatus: any = {
+  online: 'Online',
+  offline: 'Offline',
+}

@@ -2,7 +2,7 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
-import { StatusMapping } from '@/components/outlet/Status'
+import { OnlineStatusMapping, StatusMapping } from '@/components/outlet/Status'
 import Table from '@/components/Table'
 import Tag from '@/components/Tag'
 import { deliveryInfo } from '@/constants/textMapping'
@@ -27,6 +27,7 @@ interface filterObject {
   status?: string
   id?: string
   approve_status?: string
+  online_status?: string
 }
 
 export default function MerchantProfileList({}: Props): ReactElement {
@@ -35,6 +36,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
     keyword: '',
     outlet_types: '',
     status: '',
+    online_status: '',
   }
   let [outletType, setOutletType] = useState<Array<any>>([
     {
@@ -78,16 +80,10 @@ export default function MerchantProfileList({}: Props): ReactElement {
       keyword: values.keyword,
       outlet_types: values.outlet_type ? `${values.outlet_type}` : '',
       status: values.status,
+      online_status: values.online_status,
       approve_status: 'approved',
     }
     handleFetchData(reqFilter)
-  }
-
-  const statusMapping: any = {
-    uploaded: 'รอการตรวจสอบ',
-    approved: 'อนุมัติ',
-    're-approved': 'ขอเอกสารเพิ่มเติม',
-    rejected: 'ไม่อนุมัติ',
   }
 
   const column = [
@@ -141,15 +137,15 @@ export default function MerchantProfileList({}: Props): ReactElement {
       dataIndex: 'status',
       align: 'center',
       render: (row: any) => {
-        return StatusMapping[row]
+        return row ? StatusMapping[row] : '-'
       },
     },
     {
       title: 'ร้านเปิด-ปิด',
-      dataIndex: 'status',
+      dataIndex: 'online_status',
       align: 'center',
       render: (row: string) => {
-        return statusMapping[row]
+        return row ? OnlineStatusMapping[row] : '-'
       },
     },
     {

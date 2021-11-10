@@ -1,21 +1,22 @@
-import Button from '@/components/Button'
-import Card from '@/components/Card'
-import DateRangePicker from '@/components/Form/DateRangePicker'
-import Input from '@/components/Form/Input'
-import Select from '@/components/Form/Select'
-import Table from '@/components/Table'
-import useFetchTable from '@/hooks/useFetchTable'
-import MainLayout from '@/layout/MainLayout'
-import { getLalamoveWallet, getWalletBalanceSetting } from '@/services/wallet'
-import { currencyFormat } from '@/utils/helpers'
-import { WarningOutlined } from '@ant-design/icons'
-import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
-import { Field, Form, Formik } from 'formik'
-import _ from 'lodash'
-import moment from 'moment'
-import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
-import * as Yup from 'yup'
+import Button from '@/components/Button';
+import Card from '@/components/Card';
+import DateRangePicker from '@/components/Form/DateRangePicker';
+import Input from '@/components/Form/Input';
+import Select from '@/components/Form/Select';
+import Table from '@/components/Table';
+import useFetchTable from '@/hooks/useFetchTable';
+import MainLayout from '@/layout/MainLayout';
+import { generateRepoertWalletTransaction, getLalamoveWallet, getWalletBalanceSetting, getWalletExcel } from '@/services/wallet';
+import { currencyFormat } from '@/utils/helpers';
+import { WarningOutlined } from '@ant-design/icons';
+import { Breadcrumb, Col, Modal, notification, Row, Typography } from 'antd';
+import FileSaver from 'file-saver';
+import { Field, Form, Formik } from 'formik';
+import _ from 'lodash';
+import moment from "moment";
+import { useRouter } from 'next/router';
+import React, { ReactElement, useEffect, useState } from 'react';
+import * as Yup from 'yup';
 
 const { Title } = Typography
 const normal_color = "#17C2D7"
@@ -26,11 +27,11 @@ interface Props { }
 
 interface filterObject {
   id?: string
-  keyword?: string
+  rider_name?: string
   type?: string
-  start_date?: string
-  end_date?: string
-  transaction_id?: string
+  created_at?: object
+  partner_order_id?: string
+  partner_name: string
 }
 
 export default function Wallet({ }: Props): ReactElement {
@@ -40,10 +41,10 @@ export default function Wallet({ }: Props): ReactElement {
     transaction_id: '',
     rider_name: '',
     type: '',
-    date: {
+    created_at: {
       start: '',
       end: '',
-    }
+    },
   }
   let [outletType, setOutletType] = useState<Array<any>>([
     {
@@ -54,6 +55,10 @@ export default function Wallet({ }: Props): ReactElement {
 
   interface IQueryWalletSetting {
     partner_name: string
+  }
+
+  interface generateExcel {
+    key: string
   }
 
   interface IWalletSettingDetail {
@@ -72,6 +77,8 @@ export default function Wallet({ }: Props): ReactElement {
   let [spendingLastestAmount, SetSpendingLastestAmount] = useState(0)
   let [topUpLastestAmount, SetTopUpLastestAmount] = useState(0)
   let [minimumBalanceAmount, SetMinimumBalanceAmount] = useState(0)
+  let [paramExport, SetparamExport] = useState<filterObject>()
+
 
   useEffect(() => {
     if (partner) {
@@ -92,6 +99,12 @@ export default function Wallet({ }: Props): ReactElement {
     if (success) {
       const { data } = result;
       const balanceAmount = _.get(data, 'total_balance') ? _.get(data, 'total_balance') : 0
+      const minAlertBalance = _.get(data, 'min_alert_balance') ? _.get(data, 'min_alert_balance') : 0
+      const minAlertStatus = _.get(data, 'min_alert_status') ? _.get(data, 'min_alert_status') : false
+      if (minAlertStatus && balanceAmount < minAlertBalance) {
+        warning(minAlertBalance)
+        SetMinimumBalanceAmount(minAlertBalance)
+      }
       SetBalanceAmount(balanceAmount)
       setIsLoading(false);
     } else {
@@ -104,7 +117,21 @@ export default function Wallet({ }: Props): ReactElement {
     }
   }
 
-  const filterRequest: filterObject = {}
+  const warning = (Amount: any) => {
+    const CurrentDate = moment().format("YYYY-MM-DD");
+    const DateLastAlert = localStorage.getItem("minAlertLasted")
+    if (CurrentDate != DateLastAlert) {
+      localStorage.setItem("minAlertLasted", CurrentDate)
+      Modal.warning({
+        title: `ยอดเงินในกระเป๋าน้อยกว่า ฿${Amount}`,
+        content: 'กรุณาติดต่อเจ้าหน้าที่บัญชีเพื่อทำการเติมเงิน',
+      });
+    }
+  }
+
+  const filterRequest: filterObject = {
+    partner_name: partner
+  }
   const requestApi: Function = getLalamoveWallet
   const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } =
     useFetchTable(requestApi, filterRequest)
@@ -113,13 +140,29 @@ export default function Wallet({ }: Props): ReactElement {
 
   const handleSubmit = (values: typeof initialValues) => {
     let reqFilter: filterObject = {
-      transaction_id: values.transaction_id,
-      keyword: values.rider_name,
+      partner_order_id: values.transaction_id,
+      rider_name: values.rider_name,
       type: values.type,
-      start_date: values.date.start,
-      end_date: values.date.end
+      created_at: values.created_at.start && values.created_at.end != '' ? values.created_at : {},
+      partner_name: partner
     }
+    SetparamExport(reqFilter)
     handleFetchData(reqFilter)
+  }
+
+  const handleGenerateExcel = async () => {
+    const requestExport: filterObject = {
+      ...paramExport,
+      partner_name: partner
+    }
+    const { result, success } = await generateRepoertWalletTransaction(requestExport)
+    console.log(result);
+    const request: generateExcel = {
+      key: result.download_key
+    }
+    const res = await getWalletExcel(request)
+    const filename = "WalletTransaction_2021-11-09.xlsx"
+    FileSaver.saveAs(res, decodeURIComponent(filename))
   }
 
   const column = [
@@ -132,7 +175,7 @@ export default function Wallet({ }: Props): ReactElement {
     },
     {
       title: 'Transaction ID',
-      dataIndex: 'transaction_id',
+      dataIndex: 'partner_order_id',
     },
     {
       title: 'ประเภท',
@@ -151,7 +194,18 @@ export default function Wallet({ }: Props): ReactElement {
     },
     {
       title: 'รายละเอียด',
-      dataIndex: 'description',
+      dataIndex: 'type',
+      render: (row: any, record: any) => {
+        let typeText = ""
+        if (row === "top-up") {
+          typeText = "เติมเงินเข้ากระเป๋าตังค์"
+        } else if (row === "increase") {
+          typeText = `Refund (${record["order_no"]})`
+        } else if (row === "decrease") {
+          typeText = `จัดส่ง (${record["order_no"]})`
+        }
+        return typeText
+      }
     },
     {
       title: 'ชื่อไรเดอร์',
@@ -181,6 +235,7 @@ export default function Wallet({ }: Props): ReactElement {
       },
     },
   ]
+
 
   return (
     <MainLayout>
@@ -220,7 +275,7 @@ export default function Wallet({ }: Props): ReactElement {
                 {balanceAmount < minimumBalanceAmount ? <><WarningOutlined /> ยอดเงินในกระเป๋าของคุณน้อยกว่า ฿{minimumBalanceAmount} กรุณาเติมเงินก่อนใช้งาน</> : ``}
               </Col>
             </Row>
-            <Row gutter={16} style={{ paddingTop: 5 }} >
+            {/* <Row gutter={16} style={{ paddingTop: 5 }} >
               <Col span={6} style={{ paddingLeft: 0 }}>
                 <p style={{ marginBottom: 0 }}>ยอดเครดิตที่ใช้ไป</p>
                 <p>(1 w.ย. 64 - 30 w.ย. 64)</p>
@@ -237,7 +292,7 @@ export default function Wallet({ }: Props): ReactElement {
               <Col span={6}>
                 <span style={{ color: increase_color }}>{`${'+'}${currencyFormat(topUpLastestAmount)}`}</span>
               </Col>
-            </Row>
+            </Row> */}
           </Card>
           <Card>
             <Title level={5}>กรุณากรอกข้อมูลที่ต้องการค้นหา</Title>
@@ -248,7 +303,7 @@ export default function Wallet({ }: Props): ReactElement {
                     <Col className="gutter-row" span={6}>
                       <Field
                         label={{ text: 'Transaction ID' }}
-                        name="transactionId"
+                        name="transaction_id"
                         type="text"
                         component={Input}
                         className="form-control round"
@@ -298,9 +353,9 @@ export default function Wallet({ }: Props): ReactElement {
                     <Col className="gutter-row" span={6}>
                       <Field
                         label={{ text: 'วันที่' }}
-                        name="date"
+                        name="created_at"
                         component={DateRangePicker}
-                        id="date"
+                        id="created_at"
                         placeholder="วันที่"
                       />
                     </Col>
@@ -340,13 +395,12 @@ export default function Wallet({ }: Props): ReactElement {
                 loading: isLoading,
                 tableName: 'wallet/lalamove',
                 tableColumns: column,
-                action: ['view'],
                 dataSource: dataTable,
                 handelDataTableLoad: handelDataTableChange,
                 pagination: pagination,
                 isExport: true,
                 handelDataExport: () => {
-                  console.log("EXPORT!")
+                  handleGenerateExcel()
                 }
               }}
             />

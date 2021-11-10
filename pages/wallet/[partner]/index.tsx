@@ -272,7 +272,7 @@ export default function Wallet({ }: Props): ReactElement {
                 <span style={{ color: normal_color }}>{currencyFormat(balanceAmount)}</span>
               </Col>
               <Col span={12}>
-                {balanceAmount < minimumBalanceAmount ? <><WarningOutlined /> ยอดเงินในกระเป๋าของคุณน้อยกว่า ฿{minimumBalanceAmount} กรุณาเติมเงินก่อนใช้งาน</> : ``}
+                {balanceAmount < minimumBalanceAmount ? <><WarningOutlined /> ยอดเงินในกระเป๋าของคุณน้อยกว่า ฿{minimumBalanceAmount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} กรุณาเติมเงินก่อนใช้งาน</> : ``}
               </Col>
             </Row>
             {/* <Row gutter={16} style={{ paddingTop: 5 }} >

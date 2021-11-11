@@ -123,7 +123,7 @@ export default function Wallet({ }: Props): ReactElement {
     if (CurrentDate != DateLastAlert) {
       localStorage.setItem("minAlertLasted", CurrentDate)
       Modal.warning({
-        title: `ยอดเงินในกระเป๋าน้อยกว่า ฿${Amount}`,
+        title: `ยอดเงินในกระเป๋าน้อยกว่า ฿${Amount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`,
         content: 'กรุณาติดต่อเจ้าหน้าที่บัญชีเพื่อทำการเติมเงิน',
       });
     }

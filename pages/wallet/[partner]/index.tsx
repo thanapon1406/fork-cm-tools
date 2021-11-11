@@ -161,7 +161,8 @@ export default function Wallet({ }: Props): ReactElement {
       key: result.download_key
     }
     const res = await getWalletExcel(request)
-    const filename = "WalletTransaction_2021-11-09.xlsx"
+    const CurrentDate = moment().format("YYYY-MM-DD");
+    const filename = `WalletTransaction_${CurrentDate}.xlsx`
     FileSaver.saveAs(res, decodeURIComponent(filename))
   }
 

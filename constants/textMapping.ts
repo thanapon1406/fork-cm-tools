@@ -46,6 +46,6 @@ export const deliveryInfo: any = {
 }
 
 export const onlineStatus: any = {
-  online: 'Online',
-  offline: 'Offline',
+  online: 'ร้านเปิด',
+  offline: 'ร้านปิด',
 }

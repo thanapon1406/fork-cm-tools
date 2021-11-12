@@ -20,8 +20,7 @@ import { ReactElement, useEffect, useState } from 'react'
 import { numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
 
-
-const { confirm } = Modal;
+const { confirm } = Modal
 const { Title, Text } = Typography
 const { Step } = Steps
 interface Props {
@@ -116,9 +115,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           })
         }
         if (!isUndefined(rider_images) && rider_images.length > 0) {
-          let rider_image = (rider_images.pop()).path
+          let rider_image = rider_images.pop().path
           setRiderImages(rider_image)
-
         }
 
         if (!isUndefined(buyer_info)) {
@@ -204,7 +202,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     const query: orderStatusInterface = {
       order_no: String(id),
       page: 1,
-      per_page: 20,
+      per_page: 100,
       sort_by: 'created_at',
       sort_type: 'asc',
     }
@@ -231,22 +229,22 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       if (order_status === Constant.WAITING || rider_status === Constant.WAITING) {
         respObj.status = 'ออเดอร์ใหม่'
         respObj.imagePath = '/asset/images/new-order.png'
-      } else if (
-        order_status === Constant.COOKING &&
-        (merchant_status === Constant.COOKING || merchant_status === Constant.COOKED)
-      ) {
+      } else if (rider_status === Constant.ASSIGNING) {
+        respObj.status = 'กำลังหาไรเดอร์'
+        respObj.imagePath = '/asset/images/delivery.png'
+      } else if (merchant_status === Constant.COOKING || merchant_status === Constant.COOKED) {
         respObj.status = 'กำลังปรุง'
         respObj.imagePath = '/asset/images/cook.png'
-      } else if (order_status === Constant.COOKING && rider_status === Constant.GOING_MERCHANT) {
+      } else if (rider_status === Constant.GOING_MERCHANT) {
         respObj.status = 'ไรเดอร์กำลังไปที่ร้าน'
         respObj.imagePath = '/asset/images/delivery.png'
-      } else if (order_status === Constant.COOKING && rider_status === Constant.PICKING_UP) {
+      } else if (rider_status === Constant.PICKING_UP) {
         respObj.status = 'ไรเดอร์มาถึงร้าน'
         respObj.imagePath = '/asset/images/store.png'
-      } else if (order_status === Constant.PICKED_UP && rider_status === Constant.PICKED_UP) {
+      } else if (rider_status === Constant.PICKED_UP) {
         respObj.status = 'ไรเดอร์รับอาหารและกำลังจัดส่ง '
         respObj.imagePath = '/asset/images/shopping-bag.png'
-      } else if (order_status === Constant.ARRIVED && rider_status === Constant.ARRIVED) {
+      } else if (rider_status === Constant.ARRIVED) {
         respObj.status = 'ไรเดอร์ถึงจุดหมาย'
         respObj.imagePath = '/asset/images/placeholder.png'
       } else if (
@@ -268,9 +266,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       icon: <ExclamationCircleOutlined />,
       content: 'หลังจากยกเลิกต้องดำเนินจากร้านค้า เพื่อเรียกไรเดอร์ใหม่อีกครั้ง',
       async onOk() {
-        console.log('OK');
         const body = {
-          order_no: String(order_no)
+          order_no: String(order_no),
         }
         const { result, success } = await cancelRider(body)
         if (success) {
@@ -280,7 +277,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       // onCancel() {
       //   console.log('Cancel');
       // },
-    });
+    })
   }
 
   useEffect(() => {
@@ -335,7 +332,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -788,7 +785,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -871,7 +868,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1008,14 +1005,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
             <Form>
-              <Title level={5}>
-                ข้อมูลไรเดอร์{' '}
-              </Title>
+              <Title level={5}>ข้อมูลไรเดอร์ </Title>
 
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -1076,7 +1071,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     <Text>รูปหลักฐานการส่ง</Text>
                   </div>
                   <ImgButton url={riderImages} />
-
                 </Col>
               </Row>
             </Form>

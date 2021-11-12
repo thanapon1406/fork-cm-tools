@@ -306,7 +306,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             type="primary"
             isDanger={true}
             size="middle"
-            ghost
             // orderStatusHistory
             disabled={isCancelRider}
             onClick={() => fetchcancelRider(id)}

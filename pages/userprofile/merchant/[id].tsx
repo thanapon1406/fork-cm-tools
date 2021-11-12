@@ -251,7 +251,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={8} offset={8}>
                   <Title style={{ textAlign: 'end' }} level={5}>
-                    สถานะผู้ใช้งาน :{' '}
+                    สถานะร้านค้า :{' '}
                     {isEdit
                       ? statusEditForm(outletInitialValues.status)
                       : outletStatusRender(outletInitialValues.status)}

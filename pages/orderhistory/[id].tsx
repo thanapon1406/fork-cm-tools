@@ -254,6 +254,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       ) {
         respObj.status = 'จัดส่งสำเร็จ'
         respObj.imagePath = '/asset/images/success.png'
+      } else if (
+        order_status === Constant.CANCEL ||
+        merchant_status === Constant.CANCEL ||
+        rider_status === Constant.CANCEL
+      ) {
+        respObj.status = 'ยกเลิกออเดอร์'
+        respObj.imagePath = '/asset/images/cancel.png'
       }
     }
 
@@ -640,6 +647,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       direction="horizontal"
                       size="small"
                       current={orderStatusHistory?.length}
+                      status={orderData?.status === Constant.CANCEL ? 'error' : 'process'}
                     >
                       <Step
                         title={determineTrackingOrderStatus(Constant.WAITING).status}

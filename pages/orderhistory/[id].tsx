@@ -9,7 +9,9 @@ import MainLayout from '@/layout/MainLayout'
 import { consumerList, queryList } from '@/services/consumer'
 import { findOrdersStatusHistory, orderStatusInterface } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
-import { Breadcrumb, Col, Divider, Image, Row, Steps, Typography } from 'antd'
+import { cancelRider } from '@/services/rider'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { forEach, isEmpty, isUndefined } from 'lodash'
 import Moment from 'moment'
@@ -18,6 +20,8 @@ import { ReactElement, useEffect, useState } from 'react'
 import { numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
 
+
+const { confirm } = Modal;
 const { Title, Text } = Typography
 const { Step } = Steps
 interface Props {
@@ -40,6 +44,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     rider_phone: '',
     rider_partner: '',
   })
+
+  let [riderImages, setRiderImages] = useState('')
 
   let [outletInitialValues, setOutletInitialValues] = useState({
     outlet_name: '',
@@ -72,6 +78,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     imagePath_4: '',
   })
 
+  let [isCancelRider, setIsCancelRider] = useState(true)
+
   const fetchOrderTransaction = async (params: requestReportInterface) => {
     const { result, success } = await findOrder(params)
 
@@ -80,7 +88,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
 
       setOrderData(data)
 
-      const { buyer_info = '', outlet_info = '', rider_info = '', images = '' } = data
+      const { buyer_info = '', outlet_info = '', rider_info = '', images = '', rider_images = '' } = data
 
       if (!isUndefined(data) && !isEmpty(data)) {
         setOrderInitialValues({
@@ -105,6 +113,11 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             rider_partner: rider_info.partner_name || '-',
             rider_phone: rider_info.phone || '-',
           })
+        }
+        if (!isUndefined(rider_images) && rider_images.length > 0) {
+          let rider_image = (rider_images.pop()).path
+          setRiderImages(rider_image)
+
         }
 
         if (!isUndefined(buyer_info)) {
@@ -154,6 +167,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             imagePath_3: image3,
             imagePath_4: image4,
           })
+        }
+
+        if (!isUndefined(rider_info) && data.rider_type == 'outlet') {
+          if (data.rider_status != 'waiting' && data.rider_status != 'assigning' && data.rider_status != 'arrived' && data.rider_status != 'success') {
+            setIsCancelRider(false)
+          }
         }
       }
     }
@@ -236,6 +255,27 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     return respObj
   }
 
+  const fetchcancelRider = async (order_no: any) => {
+    confirm({
+      title: 'ยืนยันการยกเลิกไรเดอร์ ?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'หลังจากยกเลิกต้องดำเนินจากร้านค้า เพื่อเรียกไรเดอร์ใหม่อีกครั้ง',
+      async onOk() {
+        console.log('OK');
+        const body = {
+          order_no: String(order_no)
+        }
+        const { result, success } = await cancelRider(body)
+        if (success) {
+          setIsCancelRider(true)
+        }
+      },
+      // onCancel() {
+      //   console.log('Cancel');
+      // },
+    });
+  }
+
   useEffect(() => {
     if (id) {
       const request: requestReportInterface = {
@@ -266,6 +306,18 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             type="primary"
             isDanger={true}
             size="middle"
+            ghost
+            // orderStatusHistory
+            disabled={isCancelRider}
+            onClick={() => fetchcancelRider(id)}
+          >
+            ยกเลิกไรเดอร์
+          </Button>
+          <Button
+            style={{ width: '120px', marginLeft: '10px' }}
+            type="primary"
+            isDanger={true}
+            size="middle"
           >
             ยกเลิก
           </Button>
@@ -276,7 +328,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -729,7 +781,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -812,7 +864,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -949,16 +1001,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
             <Form>
               <Title level={5}>
                 ข้อมูลไรเดอร์{' '}
-                <Button style={{ width: '120px', marginLeft: '10px' }} type="primary" size="middle">
-                  เปลี่ยนไรเดอร์
-                </Button>
               </Title>
 
               <Row gutter={16}>
@@ -1012,6 +1061,15 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     placeholder="พาร์ทเนอร์"
                     disabled={true}
                   />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>รูปหลักฐานการส่ง</Text>
+                  </div>
+                  <ImgButton url={riderImages} />
+
                 </Col>
               </Row>
             </Form>

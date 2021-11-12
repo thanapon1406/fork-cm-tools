@@ -89,7 +89,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
   const column = [
     {
       title: 'Merchant ID',
-      dataIndex: 'id',
+      dataIndex: 'shop_id',
       align: 'center',
     },
     {

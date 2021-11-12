@@ -3,7 +3,7 @@ import errorHandler from './handler/errorHandler';
 import successHandler from './handler/successHandler';
 
 export {
-  getRider, getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories, updateRider
+  getRider, getRiderDetail, getRejectReson, updateRiderStatus, getStatusHistories, updateRider, cancelRider
 };
 
 interface queryList {
@@ -108,3 +108,12 @@ const updateRider = async (req: riderUpdate) => {
     return errorHandler(error);;
   }
 };
+
+const cancelRider = async (req: any) => {
+  try {
+    const response = await fetch.post(`/api/rider/cancel`, req);
+    return successHandler(response);
+  } catch (error) {
+    return errorHandler(error);;
+  }
+}

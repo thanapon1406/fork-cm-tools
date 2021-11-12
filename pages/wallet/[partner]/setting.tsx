@@ -72,6 +72,9 @@ export default function WalletSetting({ }: Props): ReactElement {
   }
 
   const handleSubmit = async (values: IWalletSettingDetail) => {
+    if (walletSettingDetail.min_alert_balance != values.min_alert_balance) {
+      localStorage.removeItem("minAlertLasted")
+    }
     let min_alert_email_string = ""
     let top_up_alert_email_string = ""
     let min_alert_emails = _.get(values, "min_alert_email") ? _.get(values, "min_alert_email") : []

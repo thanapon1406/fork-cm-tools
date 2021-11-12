@@ -8,7 +8,6 @@ import useFetchTable from '@/hooks/useFetchTable';
 import MainLayout from '@/layout/MainLayout';
 import { generateRepoertWalletTransaction, getLalamoveWallet, getWalletBalanceSetting, getWalletExcel } from '@/services/wallet';
 import { currencyFormat } from '@/utils/helpers';
-import { WarningOutlined } from '@ant-design/icons';
 import { Breadcrumb, Col, Modal, notification, Row, Typography } from 'antd';
 import FileSaver from 'file-saver';
 import { Field, Form, Formik } from 'formik';
@@ -273,7 +272,7 @@ export default function Wallet({ }: Props): ReactElement {
                 <span style={{ color: normal_color }}>{currencyFormat(balanceAmount)}</span>
               </Col>
               <Col span={12}>
-                {balanceAmount < minimumBalanceAmount ? <><WarningOutlined /> ยอดเงินในกระเป๋าของคุณน้อยกว่า ฿{minimumBalanceAmount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} กรุณาเติมเงินก่อนใช้งาน</> : ``}
+                {balanceAmount < minimumBalanceAmount ? <><img width={13} height={13} src="https://ft-pos-dev.s3-ap-southeast-1.amazonaws.com/icons/c7ba971d-b8e7-4515-9f8e-1f4b19044de9/Alert.png" /> ยอดเงินในกระเป๋าของคุณน้อยกว่า ฿{minimumBalanceAmount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} กรุณาเติมเงินก่อนใช้งาน</> : ``}
               </Col>
             </Row>
             {/* <Row gutter={16} style={{ paddingTop: 5 }} >

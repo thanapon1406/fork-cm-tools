@@ -79,6 +79,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   })
 
   let [isCancelRider, setIsCancelRider] = useState(true)
+  let [isOrderStatus, setIsOrderStatus] = useState(true)
 
   const fetchOrderTransaction = async (params: requestReportInterface) => {
     const { result, success } = await findOrder(params)
@@ -88,7 +89,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
 
       setOrderData(data)
 
-      const { buyer_info = '', outlet_info = '', rider_info = '', images = '', rider_images = '' } = data
+      const { buyer_info = '', outlet_info = '', rider_info = '', images = '', rider_images = '', status } = data
 
       if (!isUndefined(data) && !isEmpty(data)) {
         setOrderInitialValues({
@@ -170,8 +171,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         }
 
         if (!isUndefined(rider_info) && data.rider_type == 'outlet') {
-          if (data.rider_status != 'waiting' && data.rider_status != 'assigning' && data.rider_status != 'arrived' && data.rider_status != 'success') {
+          if (data.rider_status != 'waiting' && data.rider_status != 'assigning' && data.rider_status != 'arrived' && data.rider_status != 'success' && data.rider_status != 'cancel') {
             setIsCancelRider(false)
+          }
+        }
+
+        if (!isUndefined(status)) {
+          if (status != 'cancel' && status != 'success') {
+            setIsOrderStatus(false)
           }
         }
       }
@@ -317,6 +324,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             type="primary"
             isDanger={true}
             size="middle"
+            disabled={isOrderStatus}
           >
             ยกเลิก
           </Button>

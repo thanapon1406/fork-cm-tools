@@ -88,7 +88,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
 
       setOrderData(data)
 
-      const { buyer_info = '', outlet_info = '', rider_info = '', images = '', rider_images = '', status } = data
+      const {
+        buyer_info = '',
+        outlet_info = '',
+        rider_info = '',
+        images = '',
+        rider_images = '',
+        status,
+      } = data
 
       if (!isUndefined(data) && !isEmpty(data)) {
         setOrderInitialValues({
@@ -169,7 +176,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         }
 
         if (!isUndefined(rider_info) && data.rider_type == 'outlet') {
-          if (data.rider_status != 'waiting' && data.rider_status != 'assigning' && data.rider_status != 'arrived' && data.rider_status != 'success' && data.rider_status != 'cancel') {
+          if (
+            data.rider_status != 'waiting' &&
+            data.rider_status != 'assigning' &&
+            data.rider_status != 'arrived' &&
+            data.rider_status != 'success' &&
+            data.rider_status != 'cancel'
+          ) {
             setIsCancelRider(false)
           }
         }
@@ -439,7 +452,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                               <Row gutter={16}>
                                 <Col className="gutter-row" span={1}></Col>
                                 <Col className="gutter-row" span={8}>
-                                  รวม
+                                  <Text strong>รวม</Text>
                                 </Col>
                                 <Col className="gutter-row" span={3}></Col>
                                 <Col className="gutter-row" span={3}></Col>
@@ -455,196 +468,126 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       )
                     })}
                   </div>
-                </Col>
 
-                <Col className="gutter-row order-menu-background" span={6}>
                   <div>
+                    <br />
                     <Row gutter={16}>
-                      <Col span={12} style={{ textAlign: 'center' }}>
-                        <Text>คะแนนที่ได้รับ </Text>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>100 point</Text>
-                      </Col>
-                    </Row>
-                  </div>
+                      <Col span={12}>
+                        <Row gutter={16} className="mb-6">
+                          <Col span={12} className="pull-left">
+                            <Text>ยอดรวม </Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.total_amount || 0)}</Text>
+                          </Col>
+                        </Row>
 
-                  <Divider />
-                  <div style={{ marginBottom: '6px' }}>
-                    <Text></Text>
-                    <Row gutter={16}>
-                      <Col span={12} style={{ textAlign: 'left' }}>
-                        <Text>ยอดรวม </Text>
+                        <Row gutter={16} className="mb-6">
+                          <Col span={24} className="pull-left">
+                            <Text>ส่วนลด</Text>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16} className="mb-6">
+                          <Col span={1}></Col>
+                          <Col span={11} className="pull-left">
+                            <Text>ส่วนลดยำ</Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>0.00</Text>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16} className="mb-6 mt-16">
+                          <Col span={24} className="pull-left">
+                            <Text>โค้ดส่วนลด</Text>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16} className="mt-16">
+                          <Col span={1}></Col>
+                          <Col span={11} className="pull-left">
+                            <Text>welcomekh100</Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.total_discount || 0)}</Text>
+                          </Col>
+                        </Row>
                       </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total_amount || 0)}</Text>
+
+                      <Col span={3}></Col>
+
+                      <Col span={9}>
+                        <Row gutter={16} className="mb-6">
+                          <Col span={12} className="pull-left">
+                            <Text>ค่าจัดส่ง </Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.delivery_fee || 0)}</Text>
+                          </Col>
+                        </Row>
+                        <Row gutter={16} className="mb-6">
+                          <Col span={12} className="pull-left">
+                            <Text>ยอดรวมสุทธิ</Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.total_amount || 0)}</Text>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16}>
+                          <Col span={14} className="pull-left">
+                            <Text>ภาษีมูลค่าเพิ่ม (vat 7%)</Text>
+                          </Col>
+                          <Col span={10} className="pull-right">
+                            <Text>{numberFormat(orderData?.total_vat || 0)}</Text>
+                          </Col>
+                        </Row>
+
+                        <Divider />
+
+                        <Row gutter={16}>
+                          <Col span={12} className="center">
+                            <Title level={5}>รวมมูลค่าสินค้า</Title>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.total || 0)}</Text>
+                          </Col>
+                        </Row>
                       </Col>
                     </Row>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Text>ส่วนลด</Text>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Text>โค้ดส่วนลด</Text>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
+
+                    <Divider />
+
                     <Row gutter={16}>
-                      <Col span={12} style={{ textAlign: 'center' }}>
-                        <Text>welcomekh100 </Text>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total_discount || 0)}</Text>
+                      <Col span={12}></Col>
+
+                      <Col span={3}></Col>
+
+                      <Col span={9}>
+                        <Row gutter={16}>
+                          <Col span={12}>
+                            <Text strong>คะแนนที่ได้รับ </Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>0 point</Text>
+                          </Col>
+                        </Row>
                       </Col>
                     </Row>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Row gutter={16}>
-                      <Col span={12}>
-                        <Text>ค่าจัดส่ง </Text>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.delivery_fee || 0)}</Text>
-                      </Col>
-                    </Row>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Row gutter={16}>
-                      <Col span={12}>
-                        <Text>ยอดรวมสุทธิ</Text>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total_amount || 0)}</Text>
-                      </Col>
-                    </Row>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Row gutter={16}>
-                      <Col span={14}>
-                        <Text>มูลค่าภาษีเพิ่ม (vat 7%)</Text>
-                      </Col>
-                      <Col span={10} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total_vat || 0)}</Text>
-                      </Col>
-                    </Row>
-                  </div>
-                  <Divider />
-                  <div style={{ marginBottom: '6px' }}>
-                    <Row gutter={16}>
-                      <Col span={12} style={{ textAlign: 'center' }}>
-                        <Title level={5}>รวมมูลค่าสินค้า</Title>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total || 0)}</Text>
-                      </Col>
-                    </Row>
+
+                    <br />
                   </div>
                 </Col>
 
-                {/* <Col className="gutter-row" span={6}>
-                  <Title level={5}>ติดตามออเดอร์</Title>
-                  {!isUndefined(orderStatusHistory) ? (
-                    <Steps direction="vertical" size="small" current={orderStatusHistory?.length}>
-                      <Step
-                        title={determineTrackingOrderStatus(Constant.WAITING).status}
-                        description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
-                        icon={
-                          <Image
-                            width={24}
-                            height={24}
-                            style={{
-                              backgroundColor: '#69d1e1',
-                              borderRadius: '50%',
-                              border: 'solid 2px',
-                            }}
-                            preview={false}
-                            src={determineTrackingOrderStatus(Constant.WAITING).imagePath}
-                          />
-                        }
-                      />
-
-                      {orderStatusHistory?.map((val: OrderStatusHistoryDetail, index: number) => {
-                        return (
-                          <Step
-                            key={val.order_no}
-                            title={
-                              determineTrackingOrderStatus(
-                                val?.current_status_info?.order_status,
-                                val?.current_status_info?.merchant_status,
-                                val?.current_status_info?.rider_status
-                              ).status
-                            }
-                            description={Moment(val.created_at).format(Constant.DATE_FORMAT)}
-                            icon={
-                              <Image
-                                width={24}
-                                height={24}
-                                style={{
-                                  backgroundColor: '#69d1e1',
-                                  borderRadius: '50%',
-                                  border: 'solid 2px',
-                                }}
-                                preview={false}
-                                src={
-                                  determineTrackingOrderStatus(
-                                    val?.current_status_info?.order_status,
-                                    val?.current_status_info?.merchant_status,
-                                    val?.current_status_info?.rider_status
-                                  ).imagePath
-                                }
-                              />
-                            }
-                          />
-                        )
-                      })}
-                    </Steps>
-                  ) : (
-                    <Steps direction="vertical" size="small" current={1}>
-                      <Step
-                        key={orderData?.order_no}
-                        title={
-                          determineTrackingOrderStatus(
-                            orderData?.status,
-                            orderData?.merchant_status,
-                            orderData?.rider_status
-                          ).status
-                        }
-                        description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
-                        icon={
-                          <Image
-                            width={24}
-                            height={24}
-                            style={{
-                              backgroundColor: '#69d1e1',
-                              borderRadius: '50%',
-                              border: 'solid 2px',
-                            }}
-                            preview={false}
-                            src={
-                              determineTrackingOrderStatus(
-                                orderData?.status,
-                                orderData?.merchant_status,
-                                orderData?.rider_status
-                              ).imagePath
-                            }
-                          />
-                        }
-                      />
-                    </Steps>
-                  )}
-                </Col> */}
-              </Row>
-
-              <Row gutter={16}>
                 <Col
                   className={`gutter-row ${orderStatusHistory?.length > 5 ? 'order-tracking' : ''}`}
-                  span={24}
+                  span={6}
                 >
-                  <br />
                   <Title level={5}>ติดตามออเดอร์</Title>
                   {!isUndefined(orderStatusHistory) ? (
                     <Steps
-                      className={`${orderStatusHistory?.length > 5 ? 'width-140' : ''}`}
-                      direction="horizontal"
+                      direction="vertical"
                       size="small"
                       current={orderStatusHistory?.length}
                       status={orderData?.status === Constant.CANCEL ? 'error' : 'process'}
@@ -654,13 +597,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
                         icon={
                           <Image
+                            className="order-tracking-icon"
                             width={24}
                             height={24}
-                            style={{
-                              backgroundColor: '#69d1e1',
-                              borderRadius: '50%',
-                              border: 'solid 2px',
-                            }}
                             preview={false}
                             src={determineTrackingOrderStatus(Constant.WAITING).imagePath}
                           />
@@ -681,13 +620,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             description={Moment(val.created_at).format(Constant.DATE_FORMAT)}
                             icon={
                               <Image
+                                className="order-tracking-icon"
                                 width={24}
                                 height={24}
-                                style={{
-                                  backgroundColor: '#69d1e1',
-                                  borderRadius: '50%',
-                                  border: 'solid 2px',
-                                }}
                                 preview={false}
                                 src={
                                   determineTrackingOrderStatus(
@@ -716,13 +651,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
                         icon={
                           <Image
+                            className="order-tracking-icon"
                             width={24}
                             height={24}
-                            style={{
-                              backgroundColor: '#69d1e1',
-                              borderRadius: '50%',
-                              border: 'solid 2px',
-                            }}
                             preview={false}
                             src={
                               determineTrackingOrderStatus(
@@ -738,6 +669,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   )}
                 </Col>
               </Row>
+
               <br />
               <Title level={5}>การชำระเงิน</Title>
               <Row gutter={16}>

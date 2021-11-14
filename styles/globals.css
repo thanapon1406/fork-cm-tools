@@ -36,10 +36,32 @@
 }
 
 .order-tracking {
-  width: 150%;
+  height: 100%;
   overflow: scroll;
 }
 
-.width-140 {
-  width: 140% !important;
+.order-tracking-icon {
+  background-color: #69d1e1;
+  border-radius: 50%;
+  border: solid 2px;
+}
+
+.pull-right {
+  text-align: right;
+}
+
+.pull-left {
+  text-align: left;
+}
+
+.mb-6 {
+  margin-bottom: 6px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.center {
+  text-align: center;
 }

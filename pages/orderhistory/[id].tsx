@@ -9,7 +9,7 @@ import MainLayout from '@/layout/MainLayout'
 import { consumerList, queryList } from '@/services/consumer'
 import { findOrdersStatusHistory, orderStatusInterface } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
-import { cancelRider } from '@/services/rider'
+import { cancelRider, getRiderDetail } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
@@ -38,10 +38,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   let [orderStatusHistory, setOrderStatusHistory] = useState<Array<OrderStatusHistoryDetail>>([])
 
   let [riderInitialValues, setRiderInitialValues] = useState({
-    rider_name: '',
-    rider_id: '',
-    rider_phone: '',
-    rider_partner: '',
+    rider_name: '-',
+    rider_id: '-',
+    rider_phone: '-',
+    rider_partner: '-',
   })
 
   let [riderImages, setRiderImages] = useState('')
@@ -113,10 +113,33 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           })
         }
 
-        if (!isUndefined(rider_info)) {
+        if (!isUndefined(rider_info) && !isEmpty(rider_info)) {
+          var riderId = '-'
+          if (isEmpty(rider_info.partner_name)) {
+            const request = {
+              id: rider_info.id,
+            }
+
+            const { result, success } = await getRiderDetail(request)
+            if (success) {
+              const { meta, data } = result
+              riderId = data.code
+            }
+          } else {
+            riderId = rider_info.id
+          }
+
+          var riderName = ''
+          if (!isUndefined(rider_info.first_name)) {
+            riderName += rider_info.first_name + ' '
+          }
+          if (!isUndefined(rider_info.last_name)) {
+            riderName += rider_info.last_name
+          }
+
           setRiderInitialValues({
-            rider_name: rider_info.first_name + rider_info.last_name || '-',
-            rider_id: rider_info.id || '-',
+            rider_name: riderName || '-',
+            rider_id: riderId || '-',
             rider_partner: rider_info.partner_name || '-',
             rider_phone: rider_info.phone || '-',
           })

@@ -21,7 +21,7 @@ export const creditPaymentChanel: any = {
 }
 
 export const creditStatus: any = {
-  progressing: {
+  processing: {
     text: 'รอการยืนยัน',
     status: 'waiting',
   },

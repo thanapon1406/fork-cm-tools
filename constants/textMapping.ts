@@ -16,7 +16,7 @@ export const outletStatus: any = {
 
 export const creditPaymentChanel: any = {
   qr_payment: 'QR Code',
-  bank_tranfer: 'บัญชีธนาคาร',
+  bank_transfer: 'บัญชีธนาคาร',
   credit_card: 'บัตรเครดิต',
 }
 

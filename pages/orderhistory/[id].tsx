@@ -9,7 +9,7 @@ import MainLayout from '@/layout/MainLayout'
 import { consumerList, queryList } from '@/services/consumer'
 import { findOrdersStatusHistory, orderStatusInterface } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
-import { cancelRider } from '@/services/rider'
+import { cancelRider, getRiderDetail } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
@@ -38,10 +38,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   let [orderStatusHistory, setOrderStatusHistory] = useState<Array<OrderStatusHistoryDetail>>([])
 
   let [riderInitialValues, setRiderInitialValues] = useState({
-    rider_name: '',
-    rider_id: '',
-    rider_phone: '',
-    rider_partner: '',
+    rider_name: '-',
+    rider_id: '-',
+    rider_phone: '-',
+    rider_partner: '-',
   })
 
   let [riderImages, setRiderImages] = useState('')
@@ -75,15 +75,18 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     imagePath_2: '',
     imagePath_3: '',
     imagePath_4: '',
+    return_image_path: '',
   })
 
   let [isCancelRider, setIsCancelRider] = useState(true)
   let [isOrderStatus, setIsOrderStatus] = useState(true)
+  let [isLoading, setIsLoading] = useState(true)
 
   const fetchOrderTransaction = async (params: requestReportInterface) => {
     const { result, success } = await findOrder(params)
 
     if (success) {
+      setIsLoading(false)
       const { meta, data } = result
 
       setOrderData(data)
@@ -113,10 +116,33 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           })
         }
 
-        if (!isUndefined(rider_info)) {
+        if (!isUndefined(rider_info) && !isEmpty(rider_info)) {
+          var riderId = '-'
+          if (isEmpty(rider_info.partner_name)) {
+            const request = {
+              id: rider_info.id,
+            }
+
+            const { result, success } = await getRiderDetail(request)
+            if (success) {
+              const { meta, data } = result
+              riderId = data.code
+            }
+          } else {
+            riderId = rider_info.id
+          }
+
+          var riderName = ''
+          if (!isUndefined(rider_info.first_name)) {
+            riderName += rider_info.first_name + ' '
+          }
+          if (!isUndefined(rider_info.last_name)) {
+            riderName += rider_info.last_name
+          }
+
           setRiderInitialValues({
-            rider_name: rider_info.first_name + rider_info.last_name || '-',
-            rider_id: rider_info.id || '-',
+            rider_name: riderName || '-',
+            rider_id: riderId || '-',
             rider_partner: rider_info.partner_name || '-',
             rider_phone: rider_info.phone || '-',
           })
@@ -167,11 +193,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             }
           })
 
+          const mockReturnImage =
+            'https://ft-pos-dev.s3-ap-southeast-1.amazonaws.com/document/4726bf3c-b2d5-437e-9b90-f40a16930119/IMG_20211018_115226062.jpg'
           setImagesInitialValues({
             imagePath_1: image1,
             imagePath_2: image2,
             imagePath_3: image3,
             imagePath_4: image4,
+            return_image_path: mockReturnImage,
           })
         }
 
@@ -314,7 +343,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   }, [id])
 
   return (
-    <MainLayout>
+    <MainLayout isLoading={isLoading}>
       <Row justify="space-around" align="middle">
         <Col span={8}>
           <Title level={4}>บัญชีผู้ใช้งาน</Title>
@@ -714,6 +743,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     <Text>สลิป 4</Text>
                   </div>
                   <ImgButton url={imagesInitialValues.imagePath_4} />
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginTop: '20px' }}>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>สลิปการโอนเงินคืน</Text>
+                  </div>
+                  <ImgButton url={imagesInitialValues.return_image_path} />
                 </Col>
               </Row>
             </Form>

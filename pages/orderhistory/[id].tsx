@@ -75,15 +75,18 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     imagePath_2: '',
     imagePath_3: '',
     imagePath_4: '',
+    return_image_path: '',
   })
 
   let [isCancelRider, setIsCancelRider] = useState(true)
   let [isOrderStatus, setIsOrderStatus] = useState(true)
+  let [isLoading, setIsLoading] = useState(true)
 
   const fetchOrderTransaction = async (params: requestReportInterface) => {
     const { result, success } = await findOrder(params)
 
     if (success) {
+      setIsLoading(false)
       const { meta, data } = result
 
       setOrderData(data)
@@ -167,11 +170,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             }
           })
 
+          const mockReturnImage =
+            'https://ft-pos-dev.s3-ap-southeast-1.amazonaws.com/document/4726bf3c-b2d5-437e-9b90-f40a16930119/IMG_20211018_115226062.jpg'
           setImagesInitialValues({
             imagePath_1: image1,
             imagePath_2: image2,
             imagePath_3: image3,
             imagePath_4: image4,
+            return_image_path: mockReturnImage,
           })
         }
 
@@ -314,7 +320,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   }, [id])
 
   return (
-    <MainLayout>
+    <MainLayout isLoading={isLoading}>
       <Row justify="space-around" align="middle">
         <Col span={8}>
           <Title level={4}>บัญชีผู้ใช้งาน</Title>
@@ -714,6 +720,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     <Text>สลิป 4</Text>
                   </div>
                   <ImgButton url={imagesInitialValues.imagePath_4} />
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginTop: '20px' }}>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>สลิปการโอนเงินคืน</Text>
+                  </div>
+                  <ImgButton url={imagesInitialValues.return_image_path} />
                 </Col>
               </Row>
             </Form>

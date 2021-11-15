@@ -75,7 +75,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     imagePath_2: '',
     imagePath_3: '',
     imagePath_4: '',
-    return_image_path: '',
+    image_merchant: '',
   })
 
   let [isCancelRider, setIsCancelRider] = useState(true)
@@ -98,6 +98,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         images = '',
         rider_images = '',
         status,
+        image_merchant,
       } = data
 
       if (!isUndefined(data) && !isEmpty(data)) {
@@ -178,7 +179,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           let image1 = '',
             image2 = '',
             image3 = '',
-            image4 = ''
+            image4 = '',
+            imageMerchant = ''
 
           forEach(images, (item, index: number) => {
             switch (index) {
@@ -192,15 +194,16 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                 return (image4 = item.path)
             }
           })
+          if (!isUndefined(image_merchant)) {
+            imageMerchant = image_merchant
+          }
 
-          const mockReturnImage =
-            'https://ft-pos-dev.s3-ap-southeast-1.amazonaws.com/document/4726bf3c-b2d5-437e-9b90-f40a16930119/IMG_20211018_115226062.jpg'
           setImagesInitialValues({
             imagePath_1: image1,
             imagePath_2: image2,
             imagePath_3: image3,
             imagePath_4: image4,
-            return_image_path: mockReturnImage,
+            image_merchant: imageMerchant,
           })
         }
 
@@ -750,7 +753,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   <div style={{ marginBottom: '6px' }}>
                     <Text>สลิปการโอนเงินคืน</Text>
                   </div>
-                  <ImgButton url={imagesInitialValues.return_image_path} />
+                  <ImgButton url={imagesInitialValues.image_merchant} />
                 </Col>
               </Row>
             </Form>

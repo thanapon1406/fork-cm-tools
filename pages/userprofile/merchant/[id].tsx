@@ -29,6 +29,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     user_id: '',
     user_phone: '',
     user_email: '',
+    nation_id: '',
   })
 
   let [outletInitialValues, setOutletInitialValues] = useState({
@@ -76,7 +77,14 @@ export default function MerchantUserView({}: Props): ReactElement {
       const { data = [] } = result
       if (data[0]) {
         const { user = {} } = data[0]
-        const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
+        const {
+          email = '',
+          first_name = '',
+          last_name = '',
+          tel = '',
+          ssoid = '',
+          nation_id = '',
+        } = user
         if (ssoid) {
           setSsoid(ssoid)
         }
@@ -86,6 +94,7 @@ export default function MerchantUserView({}: Props): ReactElement {
           user_id: '',
           user_phone: tel,
           user_email: email,
+          nation_id: nation_id,
         })
       }
     }
@@ -275,11 +284,11 @@ export default function MerchantUserView({}: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'เลขบัตรประชาชน' }}
-                    name="user_id"
+                    name="nation_id"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="user_id"
+                    id="nation_id"
                     placeholder="เลขบัตรประชาชน"
                     disabled={true}
                   />

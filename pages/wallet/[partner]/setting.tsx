@@ -177,6 +177,9 @@ export default function WalletSetting({ }: Props): ReactElement {
                         placeholder=""
                       />
                     </Col>
+                    <Col style={{ marginTop: 5 }} span={1}>
+                      <span>บาท</span>
+                    </Col>
                   </Row>
                   <Row gutter={16} style={{ paddingTop: 5 }}>
                     <Col span={16} offset={6}>

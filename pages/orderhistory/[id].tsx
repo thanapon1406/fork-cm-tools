@@ -159,7 +159,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           setRiderImages(rider_image)
         }
 
-
         if (!isUndefined(buyer_info)) {
           let consumerData = await getConsumerList(data.sso_id)
           let socialName = '-'
@@ -284,6 +283,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       } else if (rider_status === Constant.ASSIGNING) {
         respObj.status = 'กำลังหาไรเดอร์'
         respObj.imagePath = '/asset/images/delivery.png'
+      } else if (rider_status === Constant.ASSIGNED) {
+        respObj.status = 'ไรเดอร์รับออเดอร์'
+        respObj.imagePath = '/asset/images/delivery.png'
       } else if (merchant_status === Constant.COOKING || merchant_status === Constant.COOKED) {
         respObj.status = 'กำลังปรุง'
         respObj.imagePath = '/asset/images/cook.png'
@@ -391,7 +393,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -772,7 +774,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -855,7 +857,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -992,7 +994,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (

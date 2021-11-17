@@ -42,6 +42,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     rider_id: '-',
     rider_phone: '-',
     rider_partner: '-',
+    rider_remark: '-',
   })
 
   let [riderImages, setRiderImages] = useState('')
@@ -97,6 +98,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         rider_info = '',
         images = '',
         rider_images = '',
+        rider_remark = '',
         status,
         image_merchant,
       } = data
@@ -140,18 +142,23 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (!isUndefined(rider_info.last_name)) {
             riderName += rider_info.last_name
           }
-
+          var riderRemark = ''
+          if (!isUndefined(rider_remark)) {
+            riderRemark = rider_remark
+          }
           setRiderInitialValues({
             rider_name: riderName || '-',
             rider_id: riderId || '-',
             rider_partner: rider_info.partner_name || '-',
             rider_phone: rider_info.phone || '-',
+            rider_remark: riderRemark || '-',
           })
         }
         if (!isUndefined(rider_images) && rider_images.length > 0) {
           let rider_image = rider_images.pop().path
           setRiderImages(rider_image)
         }
+
 
         if (!isUndefined(buyer_info)) {
           let consumerData = await getConsumerList(data.sso_id)
@@ -384,7 +391,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -765,7 +772,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -848,7 +855,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -985,7 +992,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1051,6 +1058,22 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     <Text>รูปหลักฐานการส่ง</Text>
                   </div>
                   <ImgButton url={riderImages} />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginTop: '8px' }}>
+                    <Field
+                      label={{ text: 'Remark' }}
+                      name="rider_remark"
+                      type="text"
+                      component={Input}
+                      className="form-control round"
+                      id="rider_remark"
+                      placeholder="Remark"
+                      disabled={true}
+                    />
+                  </div>
                 </Col>
               </Row>
             </Form>

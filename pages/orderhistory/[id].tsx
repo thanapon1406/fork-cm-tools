@@ -277,31 +277,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       imagePath: '/asset/images/cook.png',
     }
     if (!isUndefined(orderData)) {
-      if (order_status === Constant.WAITING || rider_status === Constant.WAITING) {
-        respObj.status = 'ออเดอร์ใหม่'
-        respObj.imagePath = '/asset/images/new-order.png'
-      } else if (rider_status === Constant.ASSIGNING) {
-        respObj.status = 'กำลังหาไรเดอร์'
-        respObj.imagePath = '/asset/images/delivery.png'
-      } else if (rider_status === Constant.ASSIGNED) {
-        respObj.status = 'ไรเดอร์รับออเดอร์'
-        respObj.imagePath = '/asset/images/delivery.png'
-      } else if (merchant_status === Constant.COOKING || merchant_status === Constant.COOKED) {
-        respObj.status = 'กำลังปรุง'
-        respObj.imagePath = '/asset/images/cook.png'
-      } else if (rider_status === Constant.GOING_MERCHANT) {
-        respObj.status = 'ไรเดอร์กำลังไปที่ร้าน'
-        respObj.imagePath = '/asset/images/delivery.png'
-      } else if (rider_status === Constant.PICKING_UP) {
-        respObj.status = 'ไรเดอร์มาถึงร้าน'
-        respObj.imagePath = '/asset/images/store.png'
-      } else if (rider_status === Constant.PICKED_UP) {
-        respObj.status = 'ไรเดอร์รับอาหารและกำลังจัดส่ง '
-        respObj.imagePath = '/asset/images/shopping-bag.png'
-      } else if (rider_status === Constant.ARRIVED) {
-        respObj.status = 'ไรเดอร์ถึงจุดหมาย'
-        respObj.imagePath = '/asset/images/placeholder.png'
-      } else if (
+      if (
         order_status === Constant.SUCCESS ||
         merchant_status === Constant.SUCCESS ||
         rider_status === Constant.SUCCESS
@@ -315,6 +291,33 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       ) {
         respObj.status = 'ยกเลิกออเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
+      } else if (order_status === Constant.WAITING || rider_status === Constant.WAITING) {
+        respObj.status = 'ออเดอร์ใหม่'
+        respObj.imagePath = '/asset/images/new-order.png'
+      } else if (merchant_status === Constant.COOKING) {
+        respObj.status = 'กำลังปรุง'
+        respObj.imagePath = '/asset/images/cook.png'
+      } else if (merchant_status === Constant.COOKED) {
+        respObj.status = 'ปรุงสำเร็จ'
+        respObj.imagePath = '/asset/images/cook.png'
+      } else if (rider_status === Constant.ASSIGNING) {
+        respObj.status = 'กำลังหาไรเดอร์'
+        respObj.imagePath = '/asset/images/delivery.png'
+      } else if (rider_status === Constant.ASSIGNED) {
+        respObj.status = 'ไรเดอร์รับออเดอร์'
+        respObj.imagePath = '/asset/images/delivery.png'
+      } else if (rider_status === Constant.GOING_MERCHANT) {
+        respObj.status = 'ไรเดอร์กำลังไปที่ร้าน'
+        respObj.imagePath = '/asset/images/delivery.png'
+      } else if (rider_status === Constant.PICKING_UP) {
+        respObj.status = 'ไรเดอร์มาถึงร้าน'
+        respObj.imagePath = '/asset/images/store.png'
+      } else if (rider_status === Constant.PICKED_UP) {
+        respObj.status = 'ไรเดอร์รับอาหารและกำลังจัดส่ง '
+        respObj.imagePath = '/asset/images/shopping-bag.png'
+      } else if (rider_status === Constant.ARRIVED) {
+        respObj.status = 'ไรเดอร์ถึงจุดหมาย'
+        respObj.imagePath = '/asset/images/placeholder.png'
       }
     }
 

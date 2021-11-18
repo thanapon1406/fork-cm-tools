@@ -98,7 +98,7 @@ export default function RiderBan({ }: Props): ReactElement {
           const riderJobCount = _.get(data[0], 'job_count') ? _.get(data[0], 'job_count') : 0
           if (riderJobCount > 0) {
             notification.error({
-              message: `ไม่สามารถทำการ inactive`,
+              message: `ไม่สามารถทำการแบนไรเดอร์นี้ได้`,
               description: "ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ",
             });
           } else {

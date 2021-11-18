@@ -5,7 +5,8 @@ import MainLayout from "@/layout/MainLayout";
 import { downloadImage } from '@/services/cdn';
 import { outletListById } from '@/services/merchant';
 import { getRider, getRiderDetail, updateRider } from '@/services/rider';
-import { Breadcrumb, Col, Empty, Form as antForm, Modal, notification, Row, Switch, Typography } from "antd";
+import { StopOutlined } from '@ant-design/icons';
+import { Badge, Breadcrumb, Col, Empty, Form as antForm, Modal, notification, Row, Switch, Typography } from "antd";
 import { Field, Form, Formik } from "formik";
 import _, { isUndefined } from 'lodash';
 import Image from 'next/image';
@@ -63,6 +64,8 @@ interface riderDetail {
   car_tax_photo?: string;
   disable_photo?: string;
   outlets?: any;
+  banned_status?: boolean;
+  banned_reason?: string;
 }
 
 
@@ -101,6 +104,8 @@ export default function RiderDetail({ }: Props): ReactElement {
       data.name = data.first_name + " " + data.last_name
       data.phone = data.country_code + data.phone
       data.reason = []
+      data.banned_status = _.get(data, 'banned_status', false)
+      data.banned_reason = _.get(data, 'banned_reason', "")
       setActive(data.active_status)
       if (isUndefined(data.pdpa)) {
         data.contact_emergency = ""
@@ -128,7 +133,6 @@ export default function RiderDetail({ }: Props): ReactElement {
         data.car_photo = _.get(data.pdpa, 'car_info[0].photo', '')
         data.car_tax_photo = _.get(data.pdpa, 'car_info[0].tax_photo', '')
         data.disable_photo = _.get(data.pdpa, 'disable_person[0].photo', '')
-
       }
 
       if (!isUndefined(data.outlets)) {
@@ -301,7 +305,28 @@ export default function RiderDetail({ }: Props): ReactElement {
                     </Col>
                   </Row>
                   <Row gutter={16} >
-                    <h3>ข้อมูลส่วนตัว</h3>
+                    <Col span={2} style={{ paddingLeft: 0 }}>
+                      <h3>ข้อมูลส่วนตัว</h3>
+                    </Col>
+                    <Col span={4}>
+                      <Button
+                        type="primary"
+                        size="small"
+                        disabled={!isEdit}
+                        onClick={() => {
+                          router.push('/userprofile/rider/[id]/ban', `/userprofile/rider/${id}/ban`);
+                        }}
+                        isDanger={true}
+                      >
+                        <StopOutlined />แบนผู้ใช้งาน
+                      </Button>
+                    </Col>
+                    <Col span={18} style={{ textAlign: "right" }}>
+                      {(riderDetail.banned_status) ?
+                        <Badge status="error" text="ถูกแบน" /> :
+                        <Badge status="success" text="ปกติ" />
+                      }
+                    </Col>
                   </Row>
                   <Row gutter={10} >
                     <Col className="gutter-row" span={6}>

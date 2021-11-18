@@ -82,6 +82,7 @@ export default function RiderBan({ }: Props): ReactElement {
       icon: <ExclamationCircleOutlined />,
       okText: "ยืนยัน",
       cancelText: "ยกเลิก",
+      okButtonProps: { style: { background: !riderDetail.banned_status ? `#EB5757` : `#28A745`, borderColor: !riderDetail.banned_status ? `#EB5757` : `#28A745` } },
       async onOk() {
         const riderBanData = {
           data: {

@@ -65,7 +65,7 @@ export default function RiderBan({ }: Props): ReactElement {
       setRiderDetail(RiderDetail)
       setIsLoading(false);
     } else {
-
+      router.push(`/userprofile/rider`)
     }
 
   }
@@ -170,6 +170,18 @@ export default function RiderBan({ }: Props): ReactElement {
                         {!riderDetail.banned_status ? `แบน` : `ยกเลิก`}
                       </Button>
                     </Col>
+                  </Row>
+                  <Row gutter={16} style={{ paddingTop: 10 }}>
+                    <Button
+                      onClick={() => {
+                        router.push(`/userprofile/rider/${id}`)
+                      }}
+                      style={{ width: '120px', background: "#96989C", borderColor: "#96989C" }}
+                      type="primary"
+                      size="middle"
+                    >
+                      ย้อนกลับ
+                    </Button>
                   </Row>
                 </Card>
               </Form>)}

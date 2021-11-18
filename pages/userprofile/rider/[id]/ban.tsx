@@ -96,7 +96,6 @@ export default function RiderBan({ }: Props): ReactElement {
         const { message, data } = result;
         if (success) {
           const riderJobCount = _.get(data[0], 'job_count') ? _.get(data[0], 'job_count') : 0
-          console.log("riderJobCount", riderJobCount)
           if (riderJobCount > 0) {
             notification.error({
               message: `ไม่สามารถทำการ inactive`,

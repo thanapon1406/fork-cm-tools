@@ -40,6 +40,16 @@ const consumerUpdate = async (option: update) => {
   }
 }
 
+
+const consumerBan = async (option: update) => {
+  try {
+    const result = await fetch.post(`/api/consumer/ban`, option)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 const getCustomer = async (params: queryList) => {
   try {
     const result = await fetch.get(`/api/consumer/get-customer`, { params: params })
@@ -49,4 +59,5 @@ const getCustomer = async (params: queryList) => {
   }
 }
 
-export { consumerList, consumerUpdate, getCustomer }
+export { consumerList, consumerUpdate, getCustomer, consumerBan }
+

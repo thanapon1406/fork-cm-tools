@@ -83,6 +83,12 @@ export interface OrderDetail {
       path: string
     }
   ]
+
+  cancellation_id: number
+  cancellation_reason: string
+  cancellation_remark: string
+  cancelled_at: Date
+  cancelled_by: CommonInfo
 }
 
 interface CommonInfo {
@@ -97,6 +103,11 @@ interface CommonInfo {
     latitude: number
     longitude: number
   }
+  sso_id: string
+  project_id: string
+  app_id: string
+  app_name: string
+  line_id: string
 }
 
 interface NameInfo {

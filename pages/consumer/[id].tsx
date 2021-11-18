@@ -137,7 +137,8 @@ export default function View({ }: Props): ReactElement {
       id: id,
       status: isActive,
       last_name: values.lastName,
-      first_name: values.firstName
+      first_name: values.firstName,
+      is_ban: values.isBan
     }
     const update = {
       data: request

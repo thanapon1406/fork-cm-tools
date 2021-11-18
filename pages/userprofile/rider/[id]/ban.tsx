@@ -1,6 +1,6 @@
 import Input from '@/components/Form/Input';
 import MainLayout from '@/layout/MainLayout';
-import { getRiderDetail, updateRider } from '@/services/rider';
+import { getRider, getRiderDetail, updateRider } from '@/services/rider';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Badge, Breadcrumb, Button, Card, Col, Modal, notification, Row, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
@@ -74,7 +74,6 @@ export default function RiderBan({ }: Props): ReactElement {
 
   const handleSubmit = async (values: IRiderDetail) => {
     openPopupBannedRider(values)
-
   }
 
   const openPopupBannedRider = async (values: IRiderDetail) => {
@@ -86,29 +85,51 @@ export default function RiderBan({ }: Props): ReactElement {
       cancelText: "ยกเลิก",
       okButtonProps: { style: { background: !riderDetail.banned_status ? `#EB5757` : `#28A745`, borderColor: !riderDetail.banned_status ? `#EB5757` : `#28A745` } },
       async onOk() {
-        const riderBanData = {
-          data: {
-            id: id,
-            banned_status: updateBannedStatus,
-            banned_reason: updateBannedStatus ? values.banned_reason : "",
-            active_status: updateBannedStatus ? "inactive" : values.active_status
-          }
-
+        // check job count
+        const riderQuery = {
+          id: id,
+          page: 1,
+          per_page: 1,
+          include: "job_count"
         }
-
-        const { result, success } = await updateRider(riderBanData)
+        const { result, success } = await getRider(riderQuery)
+        const { message, data } = result;
         if (success) {
-          notification.success({
-            message: `สำเร็จ`,
-            description: "",
-          });
-          router.reload()
+          const riderJobCount = _.get(data[0], 'job_count') ? _.get(data[0], 'job_count') : 0
+          console.log("riderJobCount", riderJobCount)
+          if (riderJobCount > 0) {
+            notification.error({
+              message: `ไม่สามารถทำการ inactive`,
+              description: "ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ",
+            });
+          } else {
+            // Update rider profile
+            const riderBanData = {
+              data: {
+                id: id,
+                banned_status: updateBannedStatus,
+                banned_reason: updateBannedStatus ? values.banned_reason : "",
+                active_status: updateBannedStatus ? "inactive" : values.active_status
+              }
+            }
+
+            const { result, success } = await updateRider(riderBanData)
+            if (success) {
+              notification.success({
+                message: `สำเร็จ`,
+                description: "",
+              });
+              router.reload()
+            } else {
+              // Handle Case : Not Success
+              notification.success({
+                message: `ไม่สำเร็จ`,
+                description: "",
+              });
+            }
+          }
         } else {
-          // Handle Case : Not Success
-          notification.success({
-            message: `ไม่สำเร็จ`,
-            description: "",
-          });
+          router.push(`/userprofile/rider`)
         }
       },
       async onCancel() {

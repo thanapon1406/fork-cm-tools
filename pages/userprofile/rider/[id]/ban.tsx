@@ -27,6 +27,7 @@ interface IRiderDetail {
   code?: string
   banned_status?: boolean
   banned_reason?: string
+  active_status?: string
 }
 
 export default function RiderBan({ }: Props): ReactElement {
@@ -61,6 +62,7 @@ export default function RiderBan({ }: Props): ReactElement {
         code: _.get(data, 'code') ? _.get(data, 'code') : "",
         banned_status: _.get(data, 'banned_status') ? _.get(data, 'banned_status') : false,
         banned_reason: _.get(data, 'banned_reason') ? _.get(data, 'banned_reason') : "",
+        active_status: _.get(data, 'active_status') ? _.get(data, 'active_status') : "",
       }
       setRiderDetail(RiderDetail)
       setIsLoading(false);
@@ -88,9 +90,12 @@ export default function RiderBan({ }: Props): ReactElement {
           data: {
             id: id,
             banned_status: updateBannedStatus,
-            banned_reason: updateBannedStatus ? values.banned_reason : ""
+            banned_reason: updateBannedStatus ? values.banned_reason : "",
+            active_status: updateBannedStatus ? "inactive" : values.active_status
           }
+
         }
+
         const { result, success } = await updateRider(riderBanData)
         if (success) {
           notification.success({

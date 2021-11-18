@@ -87,7 +87,7 @@ export default function RiderBan({ }: Props): ReactElement {
           data: {
             id: id,
             banned_status: updateBannedStatus,
-            banned_reason: updateBannedStatus ? values.banned_reason : "-"
+            banned_reason: updateBannedStatus ? values.banned_reason : ""
           }
         }
         const { result, success } = await updateRider(riderBanData)

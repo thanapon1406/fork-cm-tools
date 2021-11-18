@@ -6,7 +6,7 @@ type ButtonType = Parameters<typeof Buttons>[0]['type']
 interface Props {
   htmlType?: 'button' | 'submit' | 'reset' | undefined
   type?: ButtonType
-  children: string | ReactElement
+  children: any
   icon?: ReactElement
   size?: sizeType
   block?: any

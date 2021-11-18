@@ -1,5 +1,7 @@
+import * as Constant from '@/constants/common'
 import { isEmpty, join, map } from 'lodash'
 import moment from 'moment'
+
 const numberFormat = (x: string | number, minDigit = 2, maxDigit = 2) => {
   return Number(x).toLocaleString('th-TH', {
     minimumFractionDigits: minDigit,
@@ -33,10 +35,10 @@ const mapQueryParams = (params = {}): string => {
   return isEmpty(params)
     ? ''
     : '?' +
-    map(
-      params,
-      (param, key) => `${key}=${typeof param === 'object' ? join(param, ',') : param}`
-    ).join('&')
+        map(
+          params,
+          (param, key) => `${key}=${typeof param === 'object' ? join(param, ',') : param}`
+        ).join('&')
 }
 
 const convertDateToString = (date: string, format: string = 'YYYY-MM-DD HH:mm') => {
@@ -47,4 +49,25 @@ const currencyFormat = (num: number) => {
   return '฿' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
-export { numberFormat, uniqueId, convertJsonToParam, mapQueryParams, convertDateToString, currencyFormat }
+const determineAppId = (appId: string = '') => {
+  switch (appId) {
+    case '1':
+      return Constant.CONSUMER_TH
+    case '2':
+      return Constant.MERCHANT_TH
+    case '3':
+      return Constant.RIDER_TH
+    default:
+      return Constant.SYSTEM_TH
+  }
+}
+
+export {
+  numberFormat,
+  uniqueId,
+  convertJsonToParam,
+  mapQueryParams,
+  convertDateToString,
+  currencyFormat,
+  determineAppId,
+}

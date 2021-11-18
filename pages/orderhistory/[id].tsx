@@ -17,7 +17,7 @@ import { forEach, isEmpty, isUndefined } from 'lodash'
 import Moment from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
-import { numberFormat } from 'utils/helpers'
+import { determineAppId, numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
 
 const { confirm } = Modal
@@ -267,6 +267,26 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     }
   }
 
+  const determineDescription = (orderStatusHistoryData: OrderStatusHistoryDetail) => {
+    if (orderStatusHistoryData.current_status_info.order_status === Constant.CANCEL) {
+      return (
+        <>
+          <div>
+            ยกเลิกโดย{' '}
+            {orderData?.cancelled_by?.app_name || determineAppId(orderData?.cancelled_by?.app_id)}
+            <div>
+              - {orderData?.cancellation_reason}
+              {orderData?.cancellation_remark ? ': ' + orderData?.cancellation_remark : ''}
+            </div>
+            <div>{Moment(orderData?.cancelled_at).format(Constant.DATE_FORMAT)}</div>
+          </div>
+        </>
+      )
+    } else {
+      return Moment(orderStatusHistoryData.created_at).format(Constant.DATE_FORMAT)
+    }
+  }
+
   const determineTrackingOrderStatus = (
     order_status = '',
     merchant_status = '',
@@ -460,7 +480,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                               {numberFormat(val.price)}
                             </Col>
                             <Col className="gutter-row" span={3}>
-                              {numberFormat(val.total)}
+                              {numberFormat(val.price * val.quantity)}
                             </Col>
                             <Col className="gutter-row" span={5}>
                               {val.remark || '-'}
@@ -482,7 +502,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                     {numberFormat(choice.price)}
                                   </Col>
                                   <Col className="gutter-row" span={3}>
-                                    {numberFormat(choice.price)}
+                                    {numberFormat(choice.price * val.quantity)}
                                   </Col>
                                   <Col className="gutter-row" span={5}></Col>
                                 </Row>
@@ -661,7 +681,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 val?.current_status_info?.rider_status
                               ).status
                             }
-                            description={Moment(val.created_at).format(Constant.DATE_FORMAT)}
+                            description={determineDescription(val)}
                             icon={
                               <Image
                                 className="order-tracking-icon"

@@ -365,6 +365,7 @@ export default function View({ }: Props): ReactElement {
                     </Col>
                     <Col span={20}>
                       <Button
+                        disabled={(isEdit) ? false : true}
                         icon={<StopOutlined />}
                         size="small"
                         isDanger={initialValues.isBan}

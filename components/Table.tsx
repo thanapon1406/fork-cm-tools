@@ -69,7 +69,7 @@ export default function Table({ config }: Props): ReactElement {
     const Edit = () => {}
     const Delete = () => {}
     const actionElement = (rowData: any) => (
-      <Menu style={{ width: 130 }}>
+      <Menu style={{ border: 'none' }}>
         {action.map((action) => {
           if (action === 'view') {
             return (

@@ -1,3 +1,4 @@
+import CustomBadge from '@/components/Badge';
 import Button from "@/components/Button";
 import Card from '@/components/Card';
 import Input from "@/components/Form/Input";
@@ -7,7 +8,7 @@ import { consumerList, consumerUpdate } from '@/services/consumer';
 import { checkOutletBySsoId } from '@/services/merchant';
 import { requestReportInterface } from '@/services/report';
 import { getRiderDetail } from '@/services/rider';
-import { DoubleRightOutlined } from '@ant-design/icons';
+import { DoubleRightOutlined, StopOutlined } from '@ant-design/icons';
 import { Breadcrumb, Col, Image, notification, Row, Switch, Typography } from "antd";
 import { Field, FieldArray, Form, Formik } from "formik";
 import { isEmpty, map } from 'lodash';
@@ -42,7 +43,8 @@ export default function View({ }: Props): ReactElement {
     googleId: '',
     lineId: '',
     merchant: 'No',
-    rider: 'No'
+    rider: 'No',
+    isBan: false
   })
 
   let [paramsHistory, setparamsHistory] = useState<requestReportInterface>({
@@ -112,7 +114,8 @@ export default function View({ }: Props): ReactElement {
           appleId: data.apple_id,
           lineId: data.line_id,
           merchant: merchant,
-          rider: rider
+          rider: rider,
+          isBan: data.is_ban,
         })
 
         setparamsHistory({
@@ -134,7 +137,8 @@ export default function View({ }: Props): ReactElement {
       id: id,
       status: isActive,
       last_name: values.lastName,
-      first_name: values.firstName
+      first_name: values.firstName,
+      is_ban: values.isBan
     }
     const update = {
       data: request
@@ -333,10 +337,10 @@ export default function View({ }: Props): ReactElement {
                 </Row>
                 <Card>
                   <Row gutter={16} >
-                    <Col span={8} style={{ paddingLeft: 0 }}>
+                    <Col span={10} style={{ paddingLeft: 0 }}>
                       <h2>ข้อมูลบัญชีลูกค้า (Consumer Profile Details)</h2>
                     </Col>
-                    <Col span={16} style={{ textAlign: 'right' }}>
+                    <Col span={14} style={{ textAlign: 'right' }}>
                       {(isEdit) ?
                         <span >สถานะผู้ใช้งาน: <Switch
                           onClick={handleStatus}
@@ -353,6 +357,38 @@ export default function View({ }: Props): ReactElement {
                         />
                         </span>
                       }
+                    </Col>
+                  </Row>
+                  <Row gutter={10} style={{ marginBottom: '15px' }}>
+                    <Col span={2} >
+                      ข้อมูลส่วนตัว
+                    </Col>
+                    <Col span={20}>
+                      <Button
+                        icon={<StopOutlined />}
+                        size="small"
+                        isDanger={initialValues.isBan}
+                        type='primary'
+                        onClick={() => {
+                          router.push(`/consumer/ban/${id}`)
+                        }}
+                      >
+                        แบนผู้ใช้งาน
+                      </Button>
+                    </Col>
+                    <Col span={2}>
+                      {initialValues.isBan ? <CustomBadge
+                        customMapping={{
+                          status: "error",
+                          text: "ถูกแบนผู้ใช้งาน",
+                        }}
+                      ></CustomBadge> :
+                        <CustomBadge
+                          customMapping={{
+                            status: "success",
+                            text: "ปกติ",
+                          }}
+                        ></CustomBadge>}
                     </Col>
                   </Row>
                   <Row gutter={10} >

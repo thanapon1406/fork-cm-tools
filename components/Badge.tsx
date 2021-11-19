@@ -23,6 +23,7 @@ export default function CustomBadge({
     void: 'error',
     refund: 'error',
     failed: 'error',
+    error: 'error'
   }
   const orderStatusMapping: any = {
     waiting: 'ดำเนินการ',
@@ -30,6 +31,7 @@ export default function CustomBadge({
     cancel: 'ยกเลิก',
     void: 'ยกเลิก',
     refund: 'ยกเลิก',
+    error: 'ไม่สำเร็จ'
   }
 
   let status = badgeStatusMapping[badgeStatus] || 'warning'

@@ -1,7 +1,16 @@
 import { ScrollTable } from '@/interface/dataTable'
 import { uniqueId } from '@/utils/helpers'
 import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@ant-design/icons'
-import { Button, Col, Dropdown, Menu, PageHeader, Row, Table as Tables, TablePaginationConfig } from 'antd'
+import {
+  Button,
+  Col,
+  Dropdown,
+  Menu,
+  PageHeader,
+  Row,
+  Table as Tables,
+  TablePaginationConfig,
+} from 'antd'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
@@ -36,7 +45,7 @@ export default function Table({ config }: Props): ReactElement {
     scrollTable,
     mappingPath,
     isExport,
-    handelDataExport
+    handelDataExport,
   } = config
   let { tableColumns, pagination } = config
   if (pagination) {
@@ -57,10 +66,10 @@ export default function Table({ config }: Props): ReactElement {
       }
       Router.push(`/${tableName}/${path}`)
     }
-    const Edit = () => { }
-    const Delete = () => { }
+    const Edit = () => {}
+    const Delete = () => {}
     const actionElement = (rowData: any) => (
-      <Menu style={{ width: 130 }}>
+      <Menu style={{ border: 'none' }}>
         {action.map((action) => {
           if (action === 'view') {
             return (
@@ -123,24 +132,25 @@ export default function Table({ config }: Props): ReactElement {
 
   return (
     <>
-      {
-        isExport ?
-          (<Row gutter={16}>
-            <Col span={8}>
-              <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
-            </Col>
-            <Col span={16} style={{ textAlign: 'right' }}>
-              <Button
-                style={{ width: '120px' }}
-                type="primary"
-                size="middle"
-                onClick={handelDataExport}
-              >
-                ดาวน์โหลด
-              </Button>
-            </Col>
-          </Row>) : (<PageHeader title={dataTableTitle} ghost={false}></PageHeader>)
-      }
+      {isExport ? (
+        <Row gutter={16}>
+          <Col span={8}>
+            <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
+          </Col>
+          <Col span={16} style={{ textAlign: 'right' }}>
+            <Button
+              style={{ width: '120px' }}
+              type="primary"
+              size="middle"
+              onClick={handelDataExport}
+            >
+              ดาวน์โหลด
+            </Button>
+          </Col>
+        </Row>
+      ) : (
+        <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
+      )}
 
       <Tables
         scroll={scrollTable}
@@ -149,6 +159,7 @@ export default function Table({ config }: Props): ReactElement {
         dataSource={dataSource}
         pagination={pagination}
         loading={loading}
+        bordered
         onChange={handelDataTableLoad}
       />
     </>

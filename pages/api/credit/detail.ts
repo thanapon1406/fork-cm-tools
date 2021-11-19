@@ -5,7 +5,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body } = req
   if (method === 'POST') {
     try {
-      const url: string = `credit-service/transaction/find`
+      const url: string = `credit-service/topup/find`
       const { data, status } = await ServerFetch.post(url, body, headers)
       res.status(status).json(data)
     } catch (e: any) {

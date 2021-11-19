@@ -1,11 +1,11 @@
 import ServerFetch from '@/services/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const update = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body } = req
   if (method === 'POST') {
     try {
-      const url: string = `credit-service/topup/VerifyTransaction`
+      const url: string = `rider-service/wallet-balance/update`
       const { data, status } = await ServerFetch.post(url, body, headers)
       res.status(status).json(data)
     } catch (e: any) {
@@ -16,3 +16,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).end(`Method ${method} Not Allowed`)
   }
 }
+
+export default update

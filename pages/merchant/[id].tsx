@@ -34,6 +34,7 @@ export default function View({}: Props): ReactElement {
     outlet_type: '',
     tax_id: '',
     email: '',
+    tel: '',
     address: '',
     verify_status: '',
     verify_detail: [],
@@ -128,8 +129,8 @@ export default function View({}: Props): ReactElement {
       id: id,
     }
     const { result, success } = await outletDetail(request)
-    setIsLoading(false)
     if (success) {
+      setIsLoading(false)
       const { data } = result
       let verifyDetail = []
       if (data.verify_detail) {
@@ -138,13 +139,14 @@ export default function View({}: Props): ReactElement {
 
       setOutletInitialValues({
         ...outletInitialValues,
-        outlet_name: data.name.th,
-        outlet_type: mapBranchType[data.branch_type],
-        tax_id: data.tax_id,
-        email: data.email,
-        address: data.address,
-        verify_status: data.verify_status,
+        outlet_name: data?.name.th,
+        outlet_type: mapBranchType[data?.branch_type],
+        tax_id: data?.tax_id,
+        email: data?.email,
+        address: data?.address,
+        verify_status: data?.verify_status,
         verify_detail: verifyDetail,
+        tel: data?.tel,
       })
     }
   }
@@ -331,6 +333,18 @@ export default function View({}: Props): ReactElement {
                     className="form-control round"
                     id="address"
                     placeholder="ที่อยู่"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'เบอร์โทรศัพท์' }}
+                    name="tel"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="tel"
+                    placeholder="อีเมล์"
                     disabled={true}
                   />
                 </Col>

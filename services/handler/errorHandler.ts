@@ -19,6 +19,7 @@ const errorHandler = (error: any, emptyResult = null) => {
       logout()
       setTimeout(() => {
         Router.replace('/login')
+        Router.reload()
       }, 2000)
       return response.data
     }

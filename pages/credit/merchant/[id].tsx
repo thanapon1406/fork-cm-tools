@@ -18,9 +18,9 @@ import { useRecoilState } from 'recoil'
 import * as Yup from 'yup'
 
 const { Title, Text } = Typography
-interface Props {}
+interface Props { }
 
-export default function MerchantCreditDetail({}: Props): ReactElement {
+export default function MerchantCreditDetail({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [isLoading, setIsLoading] = useState(true)
@@ -30,7 +30,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
     amount: '',
     type: '',
     created_at: '',
-    status: 'progressing',
+    status: 'processing',
     slip_1: '',
     slip_2: '',
     slip_3: '',
@@ -39,8 +39,9 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
     verify_date: '',
     verify_detail: [],
     verify_user: '',
+    outlet_id: 0,
+    order_no: '',
   })
-
   const [userObject, setUserState] = useRecoilState(personState)
   const [approveStatus, setApproveStatus] = useState('default')
 
@@ -85,8 +86,8 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
     }
 
     const { result, success } = await transactionDetail(request)
-    setIsLoading(false)
     if (success) {
+      setIsLoading(false)
       const { data } = result
       const status = get(data, 'status', '')
       const verify_status = get(data, 'verify_status', '')
@@ -107,7 +108,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
 
       setInitialValues({
         ...initialValues,
-        ref_id: get(data, 'id', ''),
+        ref_id: get(data, 'transaction_id', ''),
         outlet_name: get(data, 'outlet_name.th', ''),
         amount: get(data, 'amount', ''),
         type: creditPaymentChanel[get(data, 'type', '')],
@@ -121,6 +122,8 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
         verify_date: convertDateToString(get(data, 'verify_date', '')),
         verify_detail: verifyDetail,
         verify_user: get(data, 'verify_user.name', ''),
+        outlet_id: get(data, 'outlet_id', ''),
+        order_no: get(data, 'order_no', ''),
       })
     }
   }
@@ -149,6 +152,7 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
     let { verify_detail } = values
     const reqBody: any = {
       id: id,
+      outlet_id: values.outlet_id,
       verify_status: values.verify_status,
       verify_detail: [],
       verify_user: {
@@ -262,12 +266,12 @@ export default function MerchantCreditDetail({}: Props): ReactElement {
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'Ref Id' }}
-                    name="ref_id"
+                    label={{ text: 'Order No.' }}
+                    name="order_no"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="ref_id"
+                    id="order_no"
                     placeholder="Ref Id"
                     disabled={true}
                   />

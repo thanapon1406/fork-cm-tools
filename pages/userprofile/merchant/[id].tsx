@@ -3,8 +3,8 @@ import Card from '@/components/Card'
 import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
-import Tag from '@/components/Tag'
-import { days, outletStatus } from '@/constants/textMapping'
+import { StatusMapping } from '@/components/outlet/Status'
+import { days } from '@/constants/textMapping'
 import MainLayout from '@/layout/MainLayout'
 import { outletDetail, personalData, updateOutlet } from '@/services/merchant'
 import { Breadcrumb, Col, Divider, Modal, Row, Space, Switch, Typography } from 'antd'
@@ -29,6 +29,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     user_id: '',
     user_phone: '',
     user_email: '',
+    nation_id: '',
   })
 
   let [outletInitialValues, setOutletInitialValues] = useState({
@@ -71,12 +72,19 @@ export default function MerchantUserView({}: Props): ReactElement {
       id: id,
     }
     const { result, success } = await personalData(request)
-    setIsLoading(false)
     if (success) {
+      setIsLoading(false)
       const { data = [] } = result
       if (data[0]) {
         const { user = {} } = data[0]
-        const { email = '', first_name = '', last_name = '', tel = '', ssoid = '' } = user
+        const {
+          email = '',
+          first_name = '',
+          last_name = '',
+          tel = '',
+          ssoid = '',
+          nation_id = '',
+        } = user
         if (ssoid) {
           setSsoid(ssoid)
         }
@@ -86,6 +94,7 @@ export default function MerchantUserView({}: Props): ReactElement {
           user_id: '',
           user_phone: tel,
           user_email: email,
+          nation_id: nation_id,
         })
       }
     }
@@ -170,11 +179,7 @@ export default function MerchantUserView({}: Props): ReactElement {
   }
 
   const outletStatusRender = (status: string) => {
-    const statusSet: any = {
-      active: <Tag type="primary">{outletStatus[status]}</Tag>,
-      inactive: <Tag type="default">{outletStatus[status]}</Tag>,
-    }
-    return statusSet[status] || <Tag type="error">{status}</Tag>
+    return StatusMapping[status]
   }
 
   const statusEditForm = (status: string) => {
@@ -255,7 +260,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={8} offset={8}>
                   <Title style={{ textAlign: 'end' }} level={5}>
-                    สถานะผู้ใช้งาน :{' '}
+                    สถานะร้านค้า :{' '}
                     {isEdit
                       ? statusEditForm(outletInitialValues.status)
                       : outletStatusRender(outletInitialValues.status)}
@@ -279,11 +284,11 @@ export default function MerchantUserView({}: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'เลขบัตรประชาชน' }}
-                    name="user_id"
+                    name="nation_id"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="user_id"
+                    id="nation_id"
                     placeholder="เลขบัตรประชาชน"
                     disabled={true}
                   />

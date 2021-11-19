@@ -9,15 +9,18 @@ import MainLayout from '@/layout/MainLayout'
 import { consumerList, queryList } from '@/services/consumer'
 import { findOrdersStatusHistory, orderStatusInterface } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
-import { Breadcrumb, Col, Divider, Image, Row, Steps, Typography } from 'antd'
+import { cancelRider, getRiderDetail } from '@/services/rider'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { forEach, isEmpty, isUndefined } from 'lodash'
 import Moment from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
-import { numberFormat } from 'utils/helpers'
+import { determineAppId, numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
 
+const { confirm } = Modal
 const { Title, Text } = Typography
 const { Step } = Steps
 interface Props {
@@ -35,11 +38,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   let [orderStatusHistory, setOrderStatusHistory] = useState<Array<OrderStatusHistoryDetail>>([])
 
   let [riderInitialValues, setRiderInitialValues] = useState({
-    rider_name: '',
-    rider_id: '',
-    rider_phone: '',
-    rider_partner: '',
+    rider_name: '-',
+    rider_id: '-',
+    rider_phone: '-',
+    rider_partner: '-',
+    rider_remark: '-',
   })
+
+  let [riderImages, setRiderImages] = useState('')
 
   let [outletInitialValues, setOutletInitialValues] = useState({
     outlet_name: '',
@@ -70,17 +76,32 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     imagePath_2: '',
     imagePath_3: '',
     imagePath_4: '',
+    image_merchant: '',
   })
+
+  let [isCancelRider, setIsCancelRider] = useState(true)
+  let [isOrderStatus, setIsOrderStatus] = useState(true)
+  let [isLoading, setIsLoading] = useState(true)
 
   const fetchOrderTransaction = async (params: requestReportInterface) => {
     const { result, success } = await findOrder(params)
 
     if (success) {
+      setIsLoading(false)
       const { meta, data } = result
 
       setOrderData(data)
 
-      const { buyer_info = '', outlet_info = '', rider_info = '', images = '' } = data
+      const {
+        buyer_info = '',
+        outlet_info = '',
+        rider_info = '',
+        images = '',
+        rider_images = '',
+        rider_remark = '',
+        status,
+        image_merchant,
+      } = data
 
       if (!isUndefined(data) && !isEmpty(data)) {
         setOrderInitialValues({
@@ -98,13 +119,44 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           })
         }
 
-        if (!isUndefined(rider_info)) {
+        if (!isUndefined(rider_info) && !isEmpty(rider_info)) {
+          var riderId = '-'
+          if (isEmpty(rider_info.partner_name)) {
+            const request = {
+              id: rider_info.id,
+            }
+
+            const { result, success } = await getRiderDetail(request)
+            if (success) {
+              const { meta, data } = result
+              riderId = data.code
+            }
+          } else {
+            riderId = rider_info.id
+          }
+
+          var riderName = ''
+          if (!isUndefined(rider_info.first_name)) {
+            riderName += rider_info.first_name + ' '
+          }
+          if (!isUndefined(rider_info.last_name)) {
+            riderName += rider_info.last_name
+          }
+          var riderRemark = ''
+          if (!isUndefined(rider_remark)) {
+            riderRemark = rider_remark
+          }
           setRiderInitialValues({
-            rider_name: rider_info.first_name + rider_info.last_name || '-',
-            rider_id: rider_info.id || '-',
+            rider_name: riderName || '-',
+            rider_id: riderId || '-',
             rider_partner: rider_info.partner_name || '-',
             rider_phone: rider_info.phone || '-',
+            rider_remark: riderRemark || '-',
           })
+        }
+        if (!isUndefined(rider_images) && rider_images.length > 0) {
+          let rider_image = rider_images.pop().path
+          setRiderImages(rider_image)
         }
 
         if (!isUndefined(buyer_info)) {
@@ -133,7 +185,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           let image1 = '',
             image2 = '',
             image3 = '',
-            image4 = ''
+            image4 = '',
+            imageMerchant = ''
 
           forEach(images, (item, index: number) => {
             switch (index) {
@@ -147,13 +200,35 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                 return (image4 = item.path)
             }
           })
+          if (!isUndefined(image_merchant)) {
+            imageMerchant = image_merchant
+          }
 
           setImagesInitialValues({
             imagePath_1: image1,
             imagePath_2: image2,
             imagePath_3: image3,
             imagePath_4: image4,
+            image_merchant: imageMerchant,
           })
+        }
+
+        if (!isUndefined(rider_info) && data.rider_type == 'outlet') {
+          if (
+            data.rider_status != 'waiting' &&
+            data.rider_status != 'assigning' &&
+            data.rider_status != 'arrived' &&
+            data.rider_status != 'success' &&
+            data.rider_status != 'cancel'
+          ) {
+            setIsCancelRider(false)
+          }
+        }
+
+        if (!isUndefined(status)) {
+          if (status != 'cancel' && status != 'success') {
+            setIsOrderStatus(false)
+          }
         }
       }
     }
@@ -178,7 +253,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     const query: orderStatusInterface = {
       order_no: String(id),
       page: 1,
-      per_page: 20,
+      per_page: 100,
       sort_by: 'created_at',
       sort_type: 'asc',
     }
@@ -192,6 +267,26 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     }
   }
 
+  const determineDescription = (orderStatusHistoryData: OrderStatusHistoryDetail) => {
+    if (orderStatusHistoryData.current_status_info.order_status === Constant.CANCEL) {
+      return (
+        <>
+          <div>
+            ยกเลิกโดย{' '}
+            {orderData?.cancelled_by?.app_name || determineAppId(orderData?.cancelled_by?.app_id)}
+            <div>
+              - {orderData?.cancellation_reason}
+              {orderData?.cancellation_remark ? ': ' + orderData?.cancellation_remark : ''}
+            </div>
+            <div>{Moment(orderData?.cancelled_at).format(Constant.DATE_FORMAT)}</div>
+          </div>
+        </>
+      )
+    } else {
+      return Moment(orderStatusHistoryData.created_at).format(Constant.DATE_FORMAT)
+    }
+  }
+
   const determineTrackingOrderStatus = (
     order_status = '',
     merchant_status = '',
@@ -202,38 +297,71 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       imagePath: '/asset/images/cook.png',
     }
     if (!isUndefined(orderData)) {
-      if (order_status === Constant.WAITING || rider_status === Constant.WAITING) {
-        respObj.status = 'ออเดอร์ใหม่'
-        respObj.imagePath = '/asset/images/new-order.png'
-      } else if (
-        order_status === Constant.COOKING &&
-        (merchant_status === Constant.COOKING || merchant_status === Constant.COOKED)
-      ) {
-        respObj.status = 'กำลังปรุง'
-        respObj.imagePath = '/asset/images/cook.png'
-      } else if (order_status === Constant.COOKING && rider_status === Constant.GOING_MERCHANT) {
-        respObj.status = 'ไรเดอร์กำลังไปที่ร้าน'
-        respObj.imagePath = '/asset/images/delivery.png'
-      } else if (order_status === Constant.COOKING && rider_status === Constant.PICKING_UP) {
-        respObj.status = 'ไรเดอร์มาถึงร้าน'
-        respObj.imagePath = '/asset/images/store.png'
-      } else if (order_status === Constant.PICKED_UP && rider_status === Constant.PICKED_UP) {
-        respObj.status = 'ไรเดอร์รับอาหารและกำลังจัดส่ง '
-        respObj.imagePath = '/asset/images/shopping-bag.png'
-      } else if (order_status === Constant.ARRIVED && rider_status === Constant.ARRIVED) {
-        respObj.status = 'ไรเดอร์ถึงจุดหมาย'
-        respObj.imagePath = '/asset/images/placeholder.png'
-      } else if (
+      if (
         order_status === Constant.SUCCESS ||
         merchant_status === Constant.SUCCESS ||
         rider_status === Constant.SUCCESS
       ) {
         respObj.status = 'จัดส่งสำเร็จ'
         respObj.imagePath = '/asset/images/success.png'
+      } else if (
+        order_status === Constant.CANCEL ||
+        merchant_status === Constant.CANCEL ||
+        rider_status === Constant.CANCEL
+      ) {
+        respObj.status = 'ยกเลิกออเดอร์'
+        respObj.imagePath = '/asset/images/cancel.png'
+      } else if (order_status === Constant.WAITING || rider_status === Constant.WAITING) {
+        respObj.status = 'ออเดอร์ใหม่'
+        respObj.imagePath = '/asset/images/new-order.png'
+      } else if (merchant_status === Constant.COOKING) {
+        respObj.status = 'กำลังปรุง'
+        respObj.imagePath = '/asset/images/cook.png'
+      } else if (merchant_status === Constant.COOKED) {
+        respObj.status = 'ปรุงสำเร็จ'
+        respObj.imagePath = '/asset/images/cook.png'
+      } else if (rider_status === Constant.ASSIGNING) {
+        respObj.status = 'กำลังหาไรเดอร์'
+        respObj.imagePath = '/asset/images/delivery.png'
+      } else if (rider_status === Constant.ASSIGNED) {
+        respObj.status = 'ไรเดอร์รับออเดอร์'
+        respObj.imagePath = '/asset/images/delivery.png'
+      } else if (rider_status === Constant.GOING_MERCHANT) {
+        respObj.status = 'ไรเดอร์กำลังไปที่ร้าน'
+        respObj.imagePath = '/asset/images/delivery.png'
+      } else if (rider_status === Constant.PICKING_UP) {
+        respObj.status = 'ไรเดอร์มาถึงร้าน'
+        respObj.imagePath = '/asset/images/store.png'
+      } else if (rider_status === Constant.PICKED_UP) {
+        respObj.status = 'ไรเดอร์รับอาหารและกำลังจัดส่ง '
+        respObj.imagePath = '/asset/images/shopping-bag.png'
+      } else if (rider_status === Constant.ARRIVED) {
+        respObj.status = 'ไรเดอร์ถึงจุดหมาย'
+        respObj.imagePath = '/asset/images/placeholder.png'
       }
     }
 
     return respObj
+  }
+
+  const fetchcancelRider = async (order_no: any) => {
+    confirm({
+      title: 'ยืนยันการยกเลิกไรเดอร์ ?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'หลังจากยกเลิกต้องดำเนินจากร้านค้า เพื่อเรียกไรเดอร์ใหม่อีกครั้ง',
+      async onOk() {
+        const body = {
+          order_no: String(order_no),
+        }
+        const { result, success } = await cancelRider(body)
+        if (success) {
+          setIsCancelRider(true)
+        }
+      },
+      // onCancel() {
+      //   console.log('Cancel');
+      // },
+    })
   }
 
   useEffect(() => {
@@ -250,7 +378,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   }, [id])
 
   return (
-    <MainLayout>
+    <MainLayout isLoading={isLoading}>
       <Row justify="space-around" align="middle">
         <Col span={8}>
           <Title level={4}>บัญชีผู้ใช้งาน</Title>
@@ -266,6 +394,18 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             type="primary"
             isDanger={true}
             size="middle"
+            // orderStatusHistory
+            disabled={isCancelRider}
+            onClick={() => fetchcancelRider(id)}
+          >
+            ยกเลิกไรเดอร์
+          </Button>
+          <Button
+            style={{ width: '120px', marginLeft: '10px' }}
+            type="primary"
+            isDanger={true}
+            size="middle"
+            disabled={isOrderStatus}
           >
             ยกเลิก
           </Button>
@@ -340,7 +480,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                               {numberFormat(val.price)}
                             </Col>
                             <Col className="gutter-row" span={3}>
-                              {numberFormat(val.total)}
+                              {numberFormat(val.price * val.quantity)}
                             </Col>
                             <Col className="gutter-row" span={5}>
                               {val.remark || '-'}
@@ -362,7 +502,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                     {numberFormat(choice.price)}
                                   </Col>
                                   <Col className="gutter-row" span={3}>
-                                    {numberFormat(choice.price)}
+                                    {numberFormat(choice.price * val.quantity)}
                                   </Col>
                                   <Col className="gutter-row" span={5}></Col>
                                 </Row>
@@ -376,7 +516,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                               <Row gutter={16}>
                                 <Col className="gutter-row" span={1}></Col>
                                 <Col className="gutter-row" span={8}>
-                                  รวม
+                                  <Text strong>รวม</Text>
                                 </Col>
                                 <Col className="gutter-row" span={3}></Col>
                                 <Col className="gutter-row" span={3}></Col>
@@ -392,211 +532,138 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       )
                     })}
                   </div>
-                </Col>
 
-                <Col className="gutter-row order-menu-background" span={6}>
                   <div>
+                    <br />
                     <Row gutter={16}>
-                      <Col span={12} style={{ textAlign: 'center' }}>
-                        <Text>คะแนนที่ได้รับ </Text>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>100 point</Text>
-                      </Col>
-                    </Row>
-                  </div>
+                      <Col span={12}>
+                        <Row gutter={16} className="mb-6">
+                          <Col span={12} className="pull-left">
+                            <Text>ยอดรวม </Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.total_amount || 0)}</Text>
+                          </Col>
+                        </Row>
 
-                  <Divider />
-                  <div style={{ marginBottom: '6px' }}>
-                    <Text></Text>
-                    <Row gutter={16}>
-                      <Col span={12} style={{ textAlign: 'left' }}>
-                        <Text>ยอดรวม </Text>
+                        <Row gutter={16} className="mb-6">
+                          <Col span={24} className="pull-left">
+                            <Text>ส่วนลด</Text>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16} className="mb-6">
+                          <Col span={1}></Col>
+                          <Col span={11} className="pull-left">
+                            <Text>ส่วนลดยำ</Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>0.00</Text>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16} className="mb-6 mt-16">
+                          <Col span={24} className="pull-left">
+                            <Text>โค้ดส่วนลด</Text>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16} className="mt-16">
+                          <Col span={1}></Col>
+                          <Col span={11} className="pull-left">
+                            <Text>welcomekh100</Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.total_discount || 0)}</Text>
+                          </Col>
+                        </Row>
                       </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total_amount || 0)}</Text>
+
+                      <Col span={3}></Col>
+
+                      <Col span={9}>
+                        <Row gutter={16} className="mb-6">
+                          <Col span={12} className="pull-left">
+                            <Text>ค่าจัดส่ง </Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.delivery_fee || 0)}</Text>
+                          </Col>
+                        </Row>
+                        <Row gutter={16} className="mb-6">
+                          <Col span={12} className="pull-left">
+                            <Text>ยอดรวมสุทธิ</Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.total_amount || 0)}</Text>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16}>
+                          <Col span={14} className="pull-left">
+                            <Text>ภาษีมูลค่าเพิ่ม (vat 7%)</Text>
+                          </Col>
+                          <Col span={10} className="pull-right">
+                            <Text>{numberFormat(orderData?.total_vat || 0)}</Text>
+                          </Col>
+                        </Row>
+
+                        <Divider />
+
+                        <Row gutter={16}>
+                          <Col span={12} className="center">
+                            <Title level={5}>รวมมูลค่าสินค้า</Title>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>{numberFormat(orderData?.total || 0)}</Text>
+                          </Col>
+                        </Row>
                       </Col>
                     </Row>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Text>ส่วนลด</Text>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Text>โค้ดส่วนลด</Text>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
+
+                    <Divider />
+
                     <Row gutter={16}>
-                      <Col span={12} style={{ textAlign: 'center' }}>
-                        <Text>welcomekh100 </Text>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total_discount || 0)}</Text>
+                      <Col span={12}></Col>
+
+                      <Col span={3}></Col>
+
+                      <Col span={9}>
+                        <Row gutter={16}>
+                          <Col span={12}>
+                            <Text strong>คะแนนที่ได้รับ </Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>0 point</Text>
+                          </Col>
+                        </Row>
                       </Col>
                     </Row>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Row gutter={16}>
-                      <Col span={12}>
-                        <Text>ค่าจัดส่ง </Text>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.delivery_fee || 0)}</Text>
-                      </Col>
-                    </Row>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Row gutter={16}>
-                      <Col span={12}>
-                        <Text>ยอดรวมสุทธิ</Text>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total_amount || 0)}</Text>
-                      </Col>
-                    </Row>
-                  </div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Row gutter={16}>
-                      <Col span={14}>
-                        <Text>มูลค่าภาษีเพิ่ม (vat 7%)</Text>
-                      </Col>
-                      <Col span={10} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total_vat || 0)}</Text>
-                      </Col>
-                    </Row>
-                  </div>
-                  <Divider />
-                  <div style={{ marginBottom: '6px' }}>
-                    <Row gutter={16}>
-                      <Col span={12} style={{ textAlign: 'center' }}>
-                        <Title level={5}>รวมมูลค่าสินค้า</Title>
-                      </Col>
-                      <Col span={12} style={{ textAlign: 'right' }}>
-                        <Text>{numberFormat(orderData?.total || 0)}</Text>
-                      </Col>
-                    </Row>
+
+                    <br />
                   </div>
                 </Col>
 
-                {/* <Col className="gutter-row" span={6}>
-                  <Title level={5}>ติดตามออเดอร์</Title>
-                  {!isUndefined(orderStatusHistory) ? (
-                    <Steps direction="vertical" size="small" current={orderStatusHistory?.length}>
-                      <Step
-                        title={determineTrackingOrderStatus(Constant.WAITING).status}
-                        description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
-                        icon={
-                          <Image
-                            width={24}
-                            height={24}
-                            style={{
-                              backgroundColor: '#69d1e1',
-                              borderRadius: '50%',
-                              border: 'solid 2px',
-                            }}
-                            preview={false}
-                            src={determineTrackingOrderStatus(Constant.WAITING).imagePath}
-                          />
-                        }
-                      />
-
-                      {orderStatusHistory?.map((val: OrderStatusHistoryDetail, index: number) => {
-                        return (
-                          <Step
-                            key={val.order_no}
-                            title={
-                              determineTrackingOrderStatus(
-                                val?.current_status_info?.order_status,
-                                val?.current_status_info?.merchant_status,
-                                val?.current_status_info?.rider_status
-                              ).status
-                            }
-                            description={Moment(val.created_at).format(Constant.DATE_FORMAT)}
-                            icon={
-                              <Image
-                                width={24}
-                                height={24}
-                                style={{
-                                  backgroundColor: '#69d1e1',
-                                  borderRadius: '50%',
-                                  border: 'solid 2px',
-                                }}
-                                preview={false}
-                                src={
-                                  determineTrackingOrderStatus(
-                                    val?.current_status_info?.order_status,
-                                    val?.current_status_info?.merchant_status,
-                                    val?.current_status_info?.rider_status
-                                  ).imagePath
-                                }
-                              />
-                            }
-                          />
-                        )
-                      })}
-                    </Steps>
-                  ) : (
-                    <Steps direction="vertical" size="small" current={1}>
-                      <Step
-                        key={orderData?.order_no}
-                        title={
-                          determineTrackingOrderStatus(
-                            orderData?.status,
-                            orderData?.merchant_status,
-                            orderData?.rider_status
-                          ).status
-                        }
-                        description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
-                        icon={
-                          <Image
-                            width={24}
-                            height={24}
-                            style={{
-                              backgroundColor: '#69d1e1',
-                              borderRadius: '50%',
-                              border: 'solid 2px',
-                            }}
-                            preview={false}
-                            src={
-                              determineTrackingOrderStatus(
-                                orderData?.status,
-                                orderData?.merchant_status,
-                                orderData?.rider_status
-                              ).imagePath
-                            }
-                          />
-                        }
-                      />
-                    </Steps>
-                  )}
-                </Col> */}
-              </Row>
-
-              <Row gutter={16}>
                 <Col
                   className={`gutter-row ${orderStatusHistory?.length > 5 ? 'order-tracking' : ''}`}
-                  span={24}
+                  span={6}
                 >
-                  <br />
                   <Title level={5}>ติดตามออเดอร์</Title>
                   {!isUndefined(orderStatusHistory) ? (
                     <Steps
-                      className={`${orderStatusHistory?.length > 5 ? 'width-140' : ''}`}
-                      direction="horizontal"
+                      direction="vertical"
                       size="small"
                       current={orderStatusHistory?.length}
+                      status={orderData?.status === Constant.CANCEL ? 'error' : 'process'}
                     >
                       <Step
                         title={determineTrackingOrderStatus(Constant.WAITING).status}
                         description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
                         icon={
                           <Image
+                            className="order-tracking-icon"
                             width={24}
                             height={24}
-                            style={{
-                              backgroundColor: '#69d1e1',
-                              borderRadius: '50%',
-                              border: 'solid 2px',
-                            }}
                             preview={false}
                             src={determineTrackingOrderStatus(Constant.WAITING).imagePath}
                           />
@@ -614,16 +681,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 val?.current_status_info?.rider_status
                               ).status
                             }
-                            description={Moment(val.created_at).format(Constant.DATE_FORMAT)}
+                            description={determineDescription(val)}
                             icon={
                               <Image
+                                className="order-tracking-icon"
                                 width={24}
                                 height={24}
-                                style={{
-                                  backgroundColor: '#69d1e1',
-                                  borderRadius: '50%',
-                                  border: 'solid 2px',
-                                }}
                                 preview={false}
                                 src={
                                   determineTrackingOrderStatus(
@@ -652,13 +715,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
                         icon={
                           <Image
+                            className="order-tracking-icon"
                             width={24}
                             height={24}
-                            style={{
-                              backgroundColor: '#69d1e1',
-                              borderRadius: '50%',
-                              border: 'solid 2px',
-                            }}
                             preview={false}
                             src={
                               determineTrackingOrderStatus(
@@ -674,6 +733,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   )}
                 </Col>
               </Row>
+
               <br />
               <Title level={5}>การชำระเงิน</Title>
               <Row gutter={16}>
@@ -718,6 +778,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     <Text>สลิป 4</Text>
                   </div>
                   <ImgButton url={imagesInitialValues.imagePath_4} />
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginTop: '20px' }}>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>สลิปการโอนเงินคืน</Text>
+                  </div>
+                  <ImgButton url={imagesInitialValues.image_merchant} />
                 </Col>
               </Row>
             </Form>
@@ -954,12 +1022,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         >
           {(values) => (
             <Form>
-              <Title level={5}>
-                ข้อมูลไรเดอร์{' '}
-                <Button style={{ width: '120px', marginLeft: '10px' }} type="primary" size="middle">
-                  เปลี่ยนไรเดอร์
-                </Button>
-              </Title>
+              <Title level={5}>ข้อมูลไรเดอร์ </Title>
 
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -1012,6 +1075,30 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     placeholder="พาร์ทเนอร์"
                     disabled={true}
                   />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>รูปหลักฐานการส่ง</Text>
+                  </div>
+                  <ImgButton url={riderImages} />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginTop: '8px' }}>
+                    <Field
+                      label={{ text: 'Remark' }}
+                      name="rider_remark"
+                      type="text"
+                      component={Input}
+                      className="form-control round"
+                      id="rider_remark"
+                      placeholder="Remark"
+                      disabled={true}
+                    />
+                  </div>
                 </Col>
               </Row>
             </Form>

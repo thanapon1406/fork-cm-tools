@@ -17,6 +17,7 @@
     "babel-plugin-import": "1.13.3",
     "browser-deeplink": "^1.0.1",
     "dotenv": "10.0.0",
+    "file-saver": "^2.0.5",
     "formik": "2.2.9",
     "jwt-decode": "3.1.2",
     "less": "4.1.1",
@@ -36,6 +37,7 @@
     "yup": "0.32.9"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.3",
     "@types/lodash": "4.14.173",
     "@types/nprogress": "^0.2.0",
     "@types/qs": "6.9.7",

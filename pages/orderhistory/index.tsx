@@ -81,15 +81,15 @@ const OrderHistory = (): ReactElement => {
       value: '',
     },
     {
-      name: 'waiting',
+      name: 'ดำเนินการ',
       value: 'waiting',
     },
     {
-      name: 'success',
+      name: 'สำเร็จ',
       value: 'success',
     },
     {
-      name: 'cancel',
+      name: 'ยกเลิก',
       value: 'cancel',
     },
   ]

@@ -7,6 +7,7 @@ import {
   SolutionOutlined,
   TeamOutlined,
   UserOutlined,
+  WalletOutlined
 } from '@ant-design/icons'
 import { Avatar, Dropdown, Layout, Menu, Space, Typography } from 'antd'
 import Link from 'next/link'
@@ -19,7 +20,7 @@ const { Text } = Typography
 
 const { Sider } = Layout
 const { SubMenu } = Menu
-interface Props {}
+interface Props { }
 
 interface MenuItem {
   index: number
@@ -36,7 +37,7 @@ interface SubMenuItem {
   title: string
 }
 
-export default function Sidebar({}: Props): ReactElement {
+export default function Sidebar({ }: Props): ReactElement {
   const Router = useRouter()
   const [userObject, setUserState] = useRecoilState(personState)
   const { asPath, pathname, query } = Router
@@ -163,6 +164,20 @@ export default function Sidebar({}: Props): ReactElement {
           title: 'เครดิตร้านค้าทั้งหมด',
           link: '/credit/merchant',
           key: '/credit/merchant',
+        },
+      ],
+    },
+    {
+      index: 6,
+      title: 'กระเป๋าตังค์',
+      icon: <WalletOutlined />,
+      key: 'wallet',
+      link: '/wallet',
+      sub: [
+        {
+          title: 'LALAMOVE',
+          link: '/wallet/lalamove',
+          key: '/wallet/lalamove',
         },
       ],
     },

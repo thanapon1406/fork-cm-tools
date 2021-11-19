@@ -11,16 +11,17 @@ export const days: any = {
 export const outletStatus: any = {
   active: 'Active',
   inactive: 'In-active',
+  closed: 'Closed',
 }
 
 export const creditPaymentChanel: any = {
   qr_payment: 'QR Code',
-  bank_tranfer: 'บัญชีธนาคาร',
+  bank_transfer: 'บัญชีธนาคาร',
   credit_card: 'บัตรเครดิต',
 }
 
 export const creditStatus: any = {
-  progressing: {
+  processing: {
     text: 'รอการยืนยัน',
     status: 'waiting',
   },
@@ -37,4 +38,14 @@ export const creditStatus: any = {
 export const verifyStatusMapping: any = {
   approved: 'อนุมัติ',
   rejected: 'ไม่อนุมัติ',
+}
+
+export const deliveryInfo: any = {
+  outlet: 'Default rider',
+  partner: 'Partner',
+}
+
+export const onlineStatus: any = {
+  online: 'ร้านเปิด',
+  offline: 'ร้านปิด',
 }

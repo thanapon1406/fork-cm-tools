@@ -1,21 +1,20 @@
-
-import CustomBadge from '@/components/Badge';
-import Card from '@/components/Card';
-import Input from "@/components/Form/Input";
-import MainLayout from '@/layout/MainLayout';
-import { consumerBan, consumerList } from '@/services/consumer';
-import { Breadcrumb, Button, Col, Modal, notification, Row, Typography } from "antd";
-import { Field, Form, Formik } from "formik";
-import { useRouter } from 'next/router';
-import { default as React, ReactElement, useEffect, useState } from 'react';
+import CustomBadge from '@/components/Badge'
+import Card from '@/components/Card'
+import Input from '@/components/Form/Input'
+import MainLayout from '@/layout/MainLayout'
+import { consumerBan, consumerList } from '@/services/consumer'
+import { Breadcrumb, Button, Col, Modal, notification, Row, Typography } from 'antd'
+import { Field, Form, Formik } from 'formik'
+import { useRouter } from 'next/router'
+import { default as React, ReactElement, useEffect, useState } from 'react'
 const { Title } = Typography
 
-interface Props { }
+interface Props {}
 
-export default function BanConsumer({ }: Props): ReactElement {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isBanConsumer, setIsBanConsumer] = useState(false);
-  const [remark, setRemark] = useState('');
+export default function BanConsumer({}: Props): ReactElement {
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isBanConsumer, setIsBanConsumer] = useState(false)
+  const [remark, setRemark] = useState('')
 
   const [isEdit, setIsEdit] = useState(false)
   const router = useRouter()
@@ -34,23 +33,23 @@ export default function BanConsumer({ }: Props): ReactElement {
     appleId: '',
     googleId: '',
     lineId: '',
-    isBan: false
+    isBan: false,
   })
 
   const showModal = (values: any, ban: boolean) => {
     setIsModalVisible(true)
     setIsBanConsumer(ban)
     setRemark(values.remark)
-  };
+  }
 
   const handleCancel = () => {
-    setIsModalVisible(false);
-  };
+    setIsModalVisible(false)
+  }
 
   const handleOk = () => {
     handleSubmit()
-    setIsModalVisible(false);
-  };
+    setIsModalVisible(false)
+  }
 
   useEffect(() => {
     console.log(`useEffect`, id)
@@ -66,14 +65,16 @@ export default function BanConsumer({ }: Props): ReactElement {
 
     const { result, success } = await consumerList(request)
     if (success) {
-      const { data: [data] } = result
+      const {
+        data: [data],
+      } = result
       if (data) {
         setInitialValues({
           ...initialValues,
           email: data.email,
           ssoId: data.sso_id,
           tel: data.tel,
-          socialName: data.social_login_first_name + " " + data.social_login_last_name,
+          socialName: data.social_login_first_name + ' ' + data.social_login_last_name,
           point: data.point,
           rank: data.ranking,
           confirmEKYC: data.confirm_e_kyc,
@@ -89,28 +90,27 @@ export default function BanConsumer({ }: Props): ReactElement {
     }
   }
 
-
   const handleSubmit = async () => {
     const request = {
       id: id,
       remark: remark,
-      is_ban: isBanConsumer
+      is_ban: isBanConsumer,
     }
     const update = {
-      data: request
+      data: request,
     }
     const { result, success } = await consumerBan(update)
     if (success) {
       notification.success({
         message: `ดำเนินการแบนสำเร็จ`,
-        description: "",
-      });
+        description: '',
+      })
       router.back()
     } else {
       notification.error({
         message: `ไม่สามารถทำการ แบนได้`,
-        description: "",
-      });
+        description: '',
+      })
     }
     setIsEdit(!isEdit)
   }
@@ -118,11 +118,7 @@ export default function BanConsumer({ }: Props): ReactElement {
   return (
     <MainLayout>
       <>
-        <Formik
-          enableReinitialize={true}
-          initialValues={initialValues}
-          onSubmit={() => { }}
-        >
+        <Formik enableReinitialize={true} initialValues={initialValues} onSubmit={() => {}}>
           {({ values }: any) => (
             <Form>
               <Row gutter={16}>
@@ -137,34 +133,42 @@ export default function BanConsumer({ }: Props): ReactElement {
                 </Col>
               </Row>
               <Card>
-                <Row gutter={16} >
+                <Row gutter={16}>
                   <Col span={8} style={{ paddingLeft: 0 }}>
                     <h2>แบนบัญชีลูกค้า (Ban Consumer Profile)</h2>
                   </Col>
                 </Row>
-                <Row gutter={16} >
+                <Row gutter={16}>
                   <Col span={8}>
-                    <Row gutter={16} >
-                      {initialValues.firstName + " " + initialValues.lastName + " (Consumer ID: " + initialValues.ssoId + ")"}
+                    <Row gutter={16}>
+                      {initialValues.firstName +
+                        ' ' +
+                        initialValues.lastName +
+                        ' (Consumer ID: ' +
+                        initialValues.ssoId +
+                        ')'}
                     </Row>
-                    <Row gutter={16} >
-                      {initialValues.isBan ? <CustomBadge
-                        customMapping={{
-                          status: "error",
-                          text: "ถูกแบนผู้ใช้งาน",
-                        }}
-                      ></CustomBadge> :
+                    <Row gutter={16}>
+                      {initialValues.isBan ? (
                         <CustomBadge
                           customMapping={{
-                            status: "success",
-                            text: "ปกติ",
+                            status: 'error',
+                            text: 'ถูกแบนผู้ใช้งาน',
                           }}
-                        ></CustomBadge>}
+                        ></CustomBadge>
+                      ) : (
+                        <CustomBadge
+                          customMapping={{
+                            status: 'success',
+                            text: 'ปกติ',
+                          }}
+                        ></CustomBadge>
+                      )}
                     </Row>
                   </Col>
                   <Col span={14}>
                     <Field
-                      label={{ text: "เหตุผล" }}
+                      label={{ text: 'เหตุผล' }}
                       name="remark"
                       type="text"
                       component={Input}
@@ -174,27 +178,33 @@ export default function BanConsumer({ }: Props): ReactElement {
                     />
                   </Col>
                   <Col span={2}>
-                    {
-                      initialValues.isBan ?
-                        <Button style={{ marginTop: '25px' }}
-                          onClick={() => {
-                            showModal(values, false)
-                          }}
-                        >
-                          ยกเลิก</Button> :
-                        <Button
-                          style={{ marginTop: '25px' }}
-                          type="primary"
-                          danger
-                          onClick={() => {
-                            showModal(values, true)
-                          }}
-                        >แบน</Button>
-                    }
+                    {initialValues.isBan ? (
+                      <Button
+                        type="primary"
+                        style={{ marginTop: '25px' }}
+                        className="confirm-button"
+                        onClick={() => {
+                          showModal(values, false)
+                        }}
+                      >
+                        ยกเลิกการแบน
+                      </Button>
+                    ) : (
+                      <Button
+                        style={{ marginTop: '25px' }}
+                        type="primary"
+                        danger
+                        onClick={() => {
+                          showModal(values, true)
+                        }}
+                      >
+                        แบน
+                      </Button>
+                    )}
                   </Col>
                 </Row>
                 <Button
-                  type='default'
+                  type="default"
                   style={{ float: 'left' }}
                   onClick={() => {
                     router.back()
@@ -213,13 +223,9 @@ export default function BanConsumer({ }: Props): ReactElement {
           onOk={handleOk}
           onCancel={handleCancel}
         >
-          {isBanConsumer ?
-            <p>ยืนยันการแบนผู้ใช้งาน?</p> :
-            <p>ยืนยันการยกเลิกแบนผู้ใช้งาน?</p>
-          }
+          {isBanConsumer ? <p>ยืนยันการแบนผู้ใช้งาน?</p> : <p>ยืนยันการยกเลิกแบนผู้ใช้งาน?</p>}
         </Modal>
       </>
-    </MainLayout >
-
+    </MainLayout>
   )
 }

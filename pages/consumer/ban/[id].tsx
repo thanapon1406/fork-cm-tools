@@ -1,21 +1,19 @@
-import CustomBadge from '@/components/Badge'
-import Card from '@/components/Card'
-import Input from '@/components/Form/Input'
-import MainLayout from '@/layout/MainLayout'
-import { consumerBan, consumerList } from '@/services/consumer'
-import { Breadcrumb, Button, Col, Modal, notification, Row, Typography } from 'antd'
-import { Field, Form, Formik } from 'formik'
-import { useRouter } from 'next/router'
-import { default as React, ReactElement, useEffect, useState } from 'react'
+import CustomBadge from '@/components/Badge';
+import Card from '@/components/Card';
+import Input from '@/components/Form/Input';
+import MainLayout from '@/layout/MainLayout';
+import { consumerBan, consumerList } from '@/services/consumer';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, Modal, notification, Row, Typography } from 'antd';
+import { Field, Form, Formik } from 'formik';
+import { useRouter } from 'next/router';
+import { default as React, ReactElement, useEffect, useState } from 'react';
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
+const { confirm } = Modal
 
-export default function BanConsumer({}: Props): ReactElement {
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [isBanConsumer, setIsBanConsumer] = useState(false)
-  const [remark, setRemark] = useState('')
-
+export default function BanConsumer({ }: Props): ReactElement {
   const [isEdit, setIsEdit] = useState(false)
   const router = useRouter()
   const id = router.query.id as string
@@ -37,18 +35,8 @@ export default function BanConsumer({}: Props): ReactElement {
   })
 
   const showModal = (values: any, ban: boolean) => {
-    setIsModalVisible(true)
-    setIsBanConsumer(ban)
-    setRemark(values.remark)
-  }
-
-  const handleCancel = () => {
-    setIsModalVisible(false)
-  }
-
-  const handleOk = () => {
-    handleSubmit()
-    setIsModalVisible(false)
+    values.isBan = ban
+    openPopupBannedRider(values)
   }
 
   useEffect(() => {
@@ -90,11 +78,11 @@ export default function BanConsumer({}: Props): ReactElement {
     }
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (values: any) => {
     const request = {
       id: id,
-      remark: remark,
-      is_ban: isBanConsumer,
+      remark: values.remark,
+      is_ban: values.isBan,
     }
     const update = {
       data: request,
@@ -115,10 +103,26 @@ export default function BanConsumer({}: Props): ReactElement {
     setIsEdit(!isEdit)
   }
 
+  const openPopupBannedRider = async (values: any) => {
+    confirm({
+      title: values.isBan ? 'ยืนยันการแบนผู้ใช้งาน?' : 'ยืนยันการยกเลิกแบนผู้ใช้งาน?',
+      icon: <ExclamationCircleOutlined />,
+      okText: "ยืนยัน",
+      cancelText: "ยกเลิก",
+      okButtonProps: { style: { background: !values.isBan ? `#EB5757` : `#28A745`, borderColor: !values.isBan ? `#EB5757` : `#28A745` } },
+      async onOk() {
+        handleSubmit(values)
+      },
+      async onCancel() {
+        console.log('Closed!');
+      },
+    })
+  }
+
   return (
     <MainLayout>
       <>
-        <Formik enableReinitialize={true} initialValues={initialValues} onSubmit={() => {}}>
+        <Formik enableReinitialize={true} initialValues={initialValues} onSubmit={() => { }}>
           {({ values }: any) => (
             <Form>
               <Row gutter={16}>
@@ -216,15 +220,6 @@ export default function BanConsumer({}: Props): ReactElement {
             </Form>
           )}
         </Formik>
-        <Modal
-          okText="ยืนยัน"
-          cancelText="ยกเลิก"
-          visible={isModalVisible}
-          onOk={handleOk}
-          onCancel={handleCancel}
-        >
-          {isBanConsumer ? <p>ยืนยันการแบนผู้ใช้งาน?</p> : <p>ยืนยันการยกเลิกแบนผู้ใช้งาน?</p>}
-        </Modal>
       </>
     </MainLayout>
   )

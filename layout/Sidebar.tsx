@@ -1,14 +1,6 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
-import {
-  FileTextOutlined,
-  LogoutOutlined,
-  SettingOutlined,
-  SolutionOutlined,
-  TeamOutlined,
-  UserOutlined,
-  WalletOutlined
-} from '@ant-design/icons'
+import { LogoutOutlined, SettingOutlined, SolutionOutlined, TeamOutlined } from '@ant-design/icons'
 import { Avatar, Dropdown, Layout, Menu, Space, Typography } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -20,7 +12,7 @@ const { Text } = Typography
 
 const { Sider } = Layout
 const { SubMenu } = Menu
-interface Props { }
+interface Props {}
 
 interface MenuItem {
   index: number
@@ -37,7 +29,7 @@ interface SubMenuItem {
   title: string
 }
 
-export default function Sidebar({ }: Props): ReactElement {
+export default function Sidebar({}: Props): ReactElement {
   const Router = useRouter()
   const [userObject, setUserState] = useRecoilState(personState)
   const { asPath, pathname, query } = Router
@@ -71,10 +63,10 @@ export default function Sidebar({ }: Props): ReactElement {
 
   const profileMenu = (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <UserOutlined />
         Profile
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item onClick={() => logoutClick()}>
         <LogoutOutlined />
         logout
@@ -82,15 +74,107 @@ export default function Sidebar({ }: Props): ReactElement {
     </Menu>
   )
 
+  // const routingPath: Array<MenuItem> = [
+  //   {
+  //     index: 1,
+  //     title: 'Dashboard',
+  //     icon: <SolutionOutlined />,
+  //     key: 'dashboard',
+  //     link: '/',
+  //     sub: [],
+  //   },
+  //   {
+  //     index: 2,
+  //     title: 'อนุมัติผลการลงทะเบียน',
+  //     icon: <SolutionOutlined />,
+  //     key: 'register',
+  //     link: '/',
+  //     sub: [
+  //       {
+  //         title: 'ลงทะเบียนร้านค้า',
+  //         link: '/merchant',
+  //         key: '/merchant',
+  //       },
+  //       {
+  //         title: 'ลงทะเบียนคนขับ',
+  //         link: '/rider',
+  //         key: '/rider',
+  //       },
+  //       {
+  //         title: 'ลงทะเบียน E-KYC',
+  //         link: '/ekyc',
+  //         key: '/ekyc',
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     index: 3,
+  //     title: 'User Profile',
+  //     icon: <TeamOutlined />,
+  //     key: 'userProfile',
+  //     link: '/userprofile',
+  //     sub: [
+  //       {
+  //         title: 'Consumer Profile',
+  //         link: '/consumer',
+  //         key: '/consumer',
+  //       },
+  //       {
+  //         title: 'Rider Profile',
+  //         link: '/userprofile/rider',
+  //         key: '/userprofile/rider',
+  //       },
+  //       {
+  //         title: 'Merchant Profile',
+  //         link: '/userprofile/merchant',
+  //         key: '/userprofile/merchant',
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     index: 4,
+  //     title: 'การจัดการออเดอร์',
+  //     icon: <FileTextOutlined />,
+  //     key: 'order',
+  //     link: '/order',
+  //     sub: [
+  //       {
+  //         title: 'ออเดอร์ทั้งหมด',
+  //         link: '/orderhistory',
+  //         key: '/orderhistory',
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     index: 5,
+  //     title: 'การจัดการเครดิตร้านค้า',
+  //     icon: <TeamOutlined />,
+  //     key: 'credit',
+  //     link: '/credit',
+  //     sub: [
+  //       {
+  //         title: 'เครดิตร้านค้าทั้งหมด',
+  //         link: '/credit/merchant',
+  //         key: '/credit/merchant',
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     index: 6,
+  //     title: 'กระเป๋าตังค์',
+  //     icon: <WalletOutlined />,
+  //     key: 'wallet',
+  //     link: '/wallet',
+  //     sub: [
+  //       {
+  //         title: 'LALAMOVE',
+  //         link: '/wallet/lalamove',
+  //         key: '/wallet/lalamove',
+  //       },
+  //     ],
+  //   },
+  // ]
   const routingPath: Array<MenuItem> = [
-    {
-      index: 1,
-      title: 'Dashboard',
-      icon: <SolutionOutlined />,
-      key: 'dashboard',
-      link: '/',
-      sub: [],
-    },
     {
       index: 2,
       title: 'อนุมัติผลการลงทะเบียน',
@@ -102,11 +186,6 @@ export default function Sidebar({ }: Props): ReactElement {
           title: 'ลงทะเบียนร้านค้า',
           link: '/merchant',
           key: '/merchant',
-        },
-        {
-          title: 'ลงทะเบียนคนขับ',
-          link: '/rider',
-          key: '/rider',
         },
         {
           title: 'ลงทะเบียน E-KYC',
@@ -123,61 +202,9 @@ export default function Sidebar({ }: Props): ReactElement {
       link: '/userprofile',
       sub: [
         {
-          title: 'Consumer Profile',
-          link: '/consumer',
-          key: '/consumer',
-        },
-        {
-          title: 'Rider Profile',
-          link: '/userprofile/rider',
-          key: '/userprofile/rider',
-        },
-        {
           title: 'Merchant Profile',
           link: '/userprofile/merchant',
           key: '/userprofile/merchant',
-        },
-      ],
-    },
-    {
-      index: 4,
-      title: 'การจัดการออเดอร์',
-      icon: <FileTextOutlined />,
-      key: 'order',
-      link: '/order',
-      sub: [
-        {
-          title: 'ออเดอร์ทั้งหมด',
-          link: '/orderhistory',
-          key: '/orderhistory',
-        },
-      ],
-    },
-    {
-      index: 5,
-      title: 'การจัดการเครดิตร้านค้า',
-      icon: <TeamOutlined />,
-      key: 'credit',
-      link: '/credit',
-      sub: [
-        {
-          title: 'เครดิตร้านค้าทั้งหมด',
-          link: '/credit/merchant',
-          key: '/credit/merchant',
-        },
-      ],
-    },
-    {
-      index: 6,
-      title: 'กระเป๋าตังค์',
-      icon: <WalletOutlined />,
-      key: 'wallet',
-      link: '/wallet',
-      sub: [
-        {
-          title: 'LALAMOVE',
-          link: '/wallet/lalamove',
-          key: '/wallet/lalamove',
         },
       ],
     },

@@ -45,7 +45,7 @@ const Schema = Yup.object().shape({})
 
 const appIdMapping: any = {
   '1': 'Consumer',
-  '2': 'Marchart',
+  '2': 'Merchart',
   '3': 'Rider',
 }
 

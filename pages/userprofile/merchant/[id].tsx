@@ -30,6 +30,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     user_phone: '',
     user_email: '',
     nation_id: '',
+    verify_email: '',
   })
 
   let [outletInitialValues, setOutletInitialValues] = useState({
@@ -142,6 +143,10 @@ export default function MerchantUserView({}: Props): ReactElement {
         status: data?.status,
         opening_time: data?.opening_time,
         closed_time: data?.closed_time,
+      })
+      setUserInitialValues({
+        ...userInitialValues,
+        verify_email: data?.email,
       })
     }
   }
@@ -307,13 +312,27 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'อีเมล์' }}
+                    label={{ text: 'อีเมลที่ลงทะเบียน' }}
                     name="user_email"
                     type="text"
                     component={Input}
                     className="form-control round"
                     id="user_email"
-                    placeholder="อีเมล์"
+                    placeholder="อีเมลที่ลงทะเบียน"
+                    disabled={true}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" offset={18} span={6}>
+                  <Field
+                    label={{ text: 'อีเมลที่ยืนยัน' }}
+                    name="verify_email"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="verify_email"
+                    placeholder="อีเมลที่ยืนยัน"
                     disabled={true}
                   />
                 </Col>

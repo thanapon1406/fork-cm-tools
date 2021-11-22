@@ -27,6 +27,7 @@ export default function View({}: Props): ReactElement {
     user_phone: '',
     user_email: '',
     nation_id: '',
+    verify_email: '',
   })
 
   let [outletInitialValues, setOutletInitialValues] = useState({
@@ -106,7 +107,6 @@ export default function View({}: Props): ReactElement {
           ssoid = '',
           nation_id = '',
         } = user
-        console.log(`nation_id`, nation_id)
         if (ssoid) {
           setSsoid(ssoid)
         }
@@ -147,6 +147,11 @@ export default function View({}: Props): ReactElement {
         verify_status: data?.verify_status,
         verify_detail: verifyDetail,
         tel: data?.tel,
+      })
+
+      setUserInitialValues({
+        ...userInitialValues,
+        verify_email: data?.email,
       })
     }
   }
@@ -248,13 +253,27 @@ export default function View({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'อีเมล์' }}
+                    label={{ text: 'อีเมลที่ลงทะเบียน' }}
                     name="user_email"
                     type="text"
                     component={Input}
                     className="form-control round"
                     id="user_email"
-                    placeholder="อีเมล์"
+                    placeholder="อีเมล"
+                    disabled={true}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" offset={18} span={6}>
+                  <Field
+                    label={{ text: 'อีเมลที่ยืนยัน' }}
+                    name="verify_email"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="verify_email"
+                    placeholder="อีเมล"
                     disabled={true}
                   />
                 </Col>
@@ -312,13 +331,13 @@ export default function View({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'อีเมล์' }}
+                    label={{ text: 'อีเมล' }}
                     name="email"
                     type="text"
                     component={Input}
                     className="form-control round"
                     id="email"
-                    placeholder="อีเมล์"
+                    placeholder="อีเมล"
                     disabled={true}
                   />
                 </Col>
@@ -344,7 +363,7 @@ export default function View({}: Props): ReactElement {
                     component={Input}
                     className="form-control round"
                     id="tel"
-                    placeholder="อีเมล์"
+                    placeholder="อีเมล"
                     disabled={true}
                   />
                 </Col>

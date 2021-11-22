@@ -2,16 +2,17 @@ import Input from '@/components/Form/Input'
 import MainLayout from '@/layout/MainLayout'
 import { getRider, getRiderDetail, updateRider } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
-import { Badge, Breadcrumb, Button, Card, Col, Modal, notification, Row, Typography } from 'antd'
+import { Breadcrumb, Button, Card, Col, Modal, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _ from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
+import CustomBadge from './style'
 
 const { Title } = Typography
 const { confirm } = Modal
-interface Props {}
+interface Props { }
 
 interface IQueryRider {
   id?: string | string[] | undefined
@@ -27,7 +28,7 @@ interface IRiderDetail {
   active_status?: string
 }
 
-export default function RiderBan({}: Props): ReactElement {
+export default function RiderBan({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   let [_isLoading, setIsLoading] = useState(true)
@@ -169,9 +170,9 @@ export default function RiderBan({}: Props): ReactElement {
                   <Row gutter={16} style={{ paddingTop: 10 }}>
                     <Col span={8}>
                       {riderDetail.banned_status ? (
-                        <Badge status="error" text={`ถูกแบนผู้ใช้งาน`} />
+                        <CustomBadge status="error" text={`ถูกแบนผู้ใช้งาน`} />
                       ) : (
-                        <Badge status="success" text={`ปกติ`} />
+                        <CustomBadge status="success" text={`ปกติ`} />
                       )}
                     </Col>
                     <Col span={10}>

@@ -196,9 +196,9 @@ export default function View({}: Props): ReactElement {
 
   return (
     <MainLayout isLoading={isLoading}>
-      <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+      <Title level={4}>อนุมัติผลการลงทะเบียนเข้าใช้ระบบ</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
+        <Breadcrumb.Item>อนุมัติผลการลงทะเบียน</Breadcrumb.Item>
         <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
         <Breadcrumb.Item>ข้อมูลร้านค้า</Breadcrumb.Item>
       </Breadcrumb>

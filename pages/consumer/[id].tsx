@@ -288,7 +288,7 @@ export default function View({}: Props): ReactElement {
               <Form>
                 <Row gutter={16}>
                   <Col span={20}>
-                    <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+                    <Title level={4}>อนุมัติผลการลงทะเบียนเข้าใช้ระบบ</Title>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                       <Breadcrumb.Item>User Consumer</Breadcrumb.Item>
                       <Breadcrumb.Item>Consumer Profile</Breadcrumb.Item>

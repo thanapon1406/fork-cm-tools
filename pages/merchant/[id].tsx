@@ -83,22 +83,47 @@ export default function View({}: Props): ReactElement {
   useEffect(() => {
     if (id) {
       getOutlet()
-      getPersonal()
     }
   }, [id])
 
-  const getPersonal = async () => {
-    const request: any = {
+  const getOutlet = async () => {
+    const request = {
+      id: id,
+    }
+    const { result, success } = await outletDetail(request)
+    let verify_email = ''
+    if (success) {
+      setIsLoading(false)
+      const { data } = result
+      let verifyDetail = []
+      if (data.verify_detail) {
+        verifyDetail = data.verify_detail.map((d: any) => d.id)
+      }
+      ;(verify_email = data?.email),
+        setOutletInitialValues({
+          ...outletInitialValues,
+          outlet_name: data?.name.th,
+          outlet_type: mapBranchType[data?.branch_type],
+          tax_id: data?.tax_id,
+          email: data?.email,
+          address: data?.address,
+          verify_status: data?.verify_status,
+          verify_detail: verifyDetail,
+          tel: data?.tel,
+        })
+    }
+
+    const userRequest: any = {
       page: 1,
       per_page: 10,
       id: id,
     }
-    const { result, success } = await personalData(request)
-    if (success) {
-      const { data = [] } = result
+    const { result: userResult, success: userSuccess } = await personalData(userRequest)
+    if (userSuccess) {
+      const { data: userData = [] } = userResult
 
-      if (data.length > 0 && data[0]) {
-        const { user = {} } = data[0]
+      if (userData.length > 0 && userData[0]) {
+        const { user = {} } = userData[0]
         const {
           email = '',
           first_name = '',
@@ -117,42 +142,11 @@ export default function View({}: Props): ReactElement {
           user_phone: tel,
           user_email: email,
           nation_id: nation_id,
+          verify_email: verify_email,
         })
       } else {
         router.replace('/merchant')
       }
-    }
-  }
-
-  const getOutlet = async () => {
-    const request = {
-      id: id,
-    }
-    const { result, success } = await outletDetail(request)
-    if (success) {
-      setIsLoading(false)
-      const { data } = result
-      let verifyDetail = []
-      if (data.verify_detail) {
-        verifyDetail = data.verify_detail.map((d: any) => d.id)
-      }
-
-      setOutletInitialValues({
-        ...outletInitialValues,
-        outlet_name: data?.name.th,
-        outlet_type: mapBranchType[data?.branch_type],
-        tax_id: data?.tax_id,
-        email: data?.email,
-        address: data?.address,
-        verify_status: data?.verify_status,
-        verify_detail: verifyDetail,
-        tel: data?.tel,
-      })
-
-      setUserInitialValues({
-        ...userInitialValues,
-        verify_email: data?.email,
-      })
     }
   }
 

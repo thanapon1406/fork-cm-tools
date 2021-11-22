@@ -106,6 +106,7 @@ export default function MerchantUserView({}: Props): ReactElement {
       id: id,
     }
     const { result, success } = await outletDetail(request)
+    let verify_email = ''
     if (success) {
       const { data } = result
       let business_times_Set: any
@@ -122,32 +123,62 @@ export default function MerchantUserView({}: Props): ReactElement {
         business_extra_times_Set = business_extra_times_Set.map(convertStatus)
         business_times_Set = business_times_Set.map(convertStatus)
       }
+      ;(verify_email = data?.email),
+        setOutletInitialValues({
+          ...outletInitialValues,
+          outlet_name: data?.name.th,
+          outlet_type: mapBranchType[data.branch_type],
+          tax_id: data?.tax_id,
+          email: data?.email,
+          full_address: data.full_address,
+          address: data.address,
+          verify_status: data.verify_status,
+          photo: data?.photo,
+          banner_photo: data?.banner_photo,
+          latitude: data?.latitude,
+          longitude: data?.longitude,
+          tel: data?.tel,
+          rating: data?.rating,
+          business_times: business_times_Set,
+          business_extra_times: business_extra_times_Set,
+          status: data?.status,
+          opening_time: data?.opening_time,
+          closed_time: data?.closed_time,
+        })
 
-      setOutletInitialValues({
-        ...outletInitialValues,
-        outlet_name: data?.name.th,
-        outlet_type: mapBranchType[data.branch_type],
-        tax_id: data?.tax_id,
-        email: data?.email,
-        full_address: data.full_address,
-        address: data.address,
-        verify_status: data.verify_status,
-        photo: data?.photo,
-        banner_photo: data?.banner_photo,
-        latitude: data?.latitude,
-        longitude: data?.longitude,
-        tel: data?.tel,
-        rating: data?.rating,
-        business_times: business_times_Set,
-        business_extra_times: business_extra_times_Set,
-        status: data?.status,
-        opening_time: data?.opening_time,
-        closed_time: data?.closed_time,
-      })
-      setUserInitialValues({
-        ...userInitialValues,
-        verify_email: data?.email,
-      })
+      const userRequest: any = {
+        page: 1,
+        per_page: 10,
+        id: id,
+      }
+      const { result: userResult, success: userSuccess } = await personalData(userRequest)
+      if (userSuccess) {
+        setIsLoading(false)
+        const { data = [] } = userResult
+        if (data[0]) {
+          const { user = {} } = data[0]
+          const {
+            email = '',
+            first_name = '',
+            last_name = '',
+            tel = '',
+            ssoid = '',
+            nation_id = '',
+          } = user
+          if (ssoid) {
+            setSsoid(ssoid)
+          }
+          setUserInitialValues({
+            ...userInitialValues,
+            user_name: `${first_name} ${last_name}`,
+            user_id: '',
+            user_phone: tel,
+            user_email: email,
+            nation_id: nation_id,
+            verify_email: verify_email,
+          })
+        }
+      }
     }
   }
 

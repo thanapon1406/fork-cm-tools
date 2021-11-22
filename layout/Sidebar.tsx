@@ -1,15 +1,15 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
-import { LogoutOutlined, SettingOutlined, SolutionOutlined, TeamOutlined } from '@ant-design/icons'
-import { Avatar, Dropdown, Layout, Menu, Space, Typography } from 'antd'
+import { LogoutOutlined, SolutionOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
+import { Layout, Menu, Typography } from 'antd'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect } from 'react'
 import { useRecoilState } from 'recoil'
+import logoImg from '../public/cmt_logo.png'
 const profileColor: Array<string> = ['87d068', 'd06868', 'c068d0', '6897d0', 'cad068', 'd09d68']
-
 const { Text } = Typography
-
 const { Sider } = Layout
 const { SubMenu } = Menu
 interface Props {}
@@ -63,10 +63,10 @@ export default function Sidebar({}: Props): ReactElement {
 
   const profileMenu = (
     <Menu>
-      {/* <Menu.Item>
+      <Menu.Item>
         <UserOutlined />
         Profile
-      </Menu.Item> */}
+      </Menu.Item>
       <Menu.Item onClick={() => logoutClick()}>
         <LogoutOutlined />
         logout
@@ -174,6 +174,7 @@ export default function Sidebar({}: Props): ReactElement {
   //     ],
   //   },
   // ]
+
   const routingPath: Array<MenuItem> = [
     {
       index: 2,
@@ -222,8 +223,11 @@ export default function Sidebar({}: Props): ReactElement {
       collapsedWidth="0"
       width="220px"
     >
-      <div className="logo" />
-      <Space style={{ padding: '15px' }} size="middle">
+      <div className="logo">
+        <Image src={logoImg} alt="" />
+      </div>
+      <br />
+      {/* <Space style={{ padding: '15px' }} size="middle">
         <Avatar shape="square" style={{ backgroundColor: `#87d068` }}>
           {' '}
           {userObject.username[0]?.toUpperCase()}
@@ -236,7 +240,7 @@ export default function Sidebar({}: Props): ReactElement {
             </Space>
           </Text>
         </Dropdown>
-      </Space>
+      </Space> */}
       <Menu
         theme="dark"
         mode="inline"

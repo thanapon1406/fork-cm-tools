@@ -106,7 +106,7 @@ export default function View({}: Props): ReactElement {
           ssoid = '',
           nation_id = '',
         } = user
-        console.log(`nation_id`, nation_id)
+
         if (ssoid) {
           setSsoid(ssoid)
         }

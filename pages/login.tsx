@@ -9,7 +9,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
-import logoImg from '../public/logo-kittchenhub.png'
+// import logoImg from '../public/logo-kittchenhub.png'
+import logoImg from '../public/cmt_logo_light.png'
 const { Title } = Typography
 
 const Login: NextPage = () => {
@@ -51,10 +52,7 @@ const Login: NextPage = () => {
               {(values) => (
                 <Form>
                   <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                    <Image src={logoImg} width={60} height={60} />
-                    <Title level={5} style={{ color: '#dc1e24' }}>
-                      KITCHEN HUB ADMIN
-                    </Title>
+                    <Image src={logoImg} />
                   </div>
                   <Field
                     name="username"

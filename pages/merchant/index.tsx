@@ -161,9 +161,9 @@ export default function Merchant({}: Props): ReactElement {
 
   return (
     <MainLayout>
-      <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+      <Title level={4}>อนุมัติผลการลงทะเบียนเข้าใช้ระบบ</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
+        <Breadcrumb.Item>อนุมัติผลการลงทะเบียน</Breadcrumb.Item>
         <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
       </Breadcrumb>
       <Card>

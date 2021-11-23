@@ -18,9 +18,10 @@ const errorHandler = (error: any, emptyResult = null) => {
     if (error.response.data.jwtExpired || `${status}` === '401') {
       logout()
       setTimeout(() => {
-        Router.replace('/login')
-        Router.reload()
-      }, 2000)
+        Router.replace('/login').then(() => {
+          logout()
+        })
+      }, 1000)
       return response.data
     }
 

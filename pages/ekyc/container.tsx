@@ -109,9 +109,11 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
   const onClickViewMedia = async (type: string) => {
     setIsLoadingMedia(true)
     setMediaType(type)
+
+    const ekycId = id || ekycDetail?.id
+
     const payload = {
-      id: id || '',
-      sso_id: sso_id || '',
+      id: ekycId,
       media_type: type,
     }
     const { result, success } = await getPresignUrl(omitBy(payload, isEmpty))

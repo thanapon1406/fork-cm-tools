@@ -76,7 +76,16 @@ export default function Wallet({ }: Props): ReactElement {
   let [spendingLastestAmount, SetSpendingLastestAmount] = useState(0)
   let [topUpLastestAmount, SetTopUpLastestAmount] = useState(0)
   let [minimumBalanceAmount, SetMinimumBalanceAmount] = useState(0)
-  let [paramExport, SetparamExport] = useState<filterObject>()
+  let [paramExport, SetparamExport] = useState<filterObject>(
+    {
+      id: "",
+      rider_name: "",
+      type: "",
+      created_at: {},
+      partner_order_id: "",
+      partner_name: ""
+    }
+  )
 
 
   useEffect(() => {

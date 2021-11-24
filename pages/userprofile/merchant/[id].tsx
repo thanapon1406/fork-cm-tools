@@ -634,8 +634,12 @@ export default function MerchantUserView({}: Props): ReactElement {
           )}
         </Formik>
         <Tab defaultActiveKey="1">
-          <Tab.TabPane tab="ยอดใข้" key="1"></Tab.TabPane>
-          <Tab.TabPane tab="ยอดซื้อ" key="2"></Tab.TabPane>
+          <Tab.TabPane tab="ยอดใข้" key="1">
+            Tab 1 Content
+          </Tab.TabPane>
+          <Tab.TabPane tab="ยอดซื้อ" key="2">
+            Tab 2 Content
+          </Tab.TabPane>
         </Tab>
       </Card>
     </MainLayout>

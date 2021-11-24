@@ -4,6 +4,7 @@ import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
 import { StatusMapping } from '@/components/outlet/Status'
+import Tab from '@/components/Tab'
 import { days } from '@/constants/textMapping'
 import MainLayout from '@/layout/MainLayout'
 import { outletDetail, personalData, updateOutlet } from '@/services/merchant'
@@ -632,6 +633,10 @@ export default function MerchantUserView({}: Props): ReactElement {
             </Form>
           )}
         </Formik>
+        <Tab defaultActiveKey="1">
+          <Tab.TabPane tab="ยอดใข้" key="1"></Tab.TabPane>
+          <Tab.TabPane tab="ยอดซื้อ" key="2"></Tab.TabPane>
+        </Tab>
       </Card>
     </MainLayout>
   )

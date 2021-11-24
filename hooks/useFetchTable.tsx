@@ -38,7 +38,7 @@ export default function useFetchTable(FetchFunc: Function, FilterObj: any) {
   }
 
   const handelDataTableChange = (pagination: any) => {
-    fetchData(null, pagination)
+    fetchData(filter, pagination)
   }
 
   const handleFetchData = (filterReq: any) => {

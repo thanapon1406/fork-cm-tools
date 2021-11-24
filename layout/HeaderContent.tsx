@@ -103,7 +103,7 @@ export default function HeaderContent() {
           </Option>
         ))}
       </Select> */}
-      <div>
+      <>
         <Row>
           <Col span="12">{appendBadgeRender()}</Col>
           <Col span="12" style={{ textAlign: 'end' }}>
@@ -129,7 +129,7 @@ export default function HeaderContent() {
             </Space>
           </Col>
         </Row>
-      </div>
+      </>
     </Header>
   )
 }

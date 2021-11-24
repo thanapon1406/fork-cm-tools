@@ -9,7 +9,7 @@ import {
 } from '@/services/ekyc'
 import { Col, Empty, Image, message, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { isEmpty, isUndefined, omitBy } from 'lodash'
+import { isEmpty, isUndefined } from 'lodash'
 // import Image from 'next/image'
 import { ReactElement, useEffect, useRef, useState } from 'react'
 
@@ -116,7 +116,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
       id: ekycId,
       media_type: type,
     }
-    const { result, success } = await getPresignUrl(omitBy(payload, isEmpty))
+    const { result, success } = await getPresignUrl(payload)
     if (success) {
       const { url } = result
       setMediaUrl(url)

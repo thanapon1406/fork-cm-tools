@@ -76,7 +76,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     imagePath_2: '',
     imagePath_3: '',
     imagePath_4: '',
-    image_merchant: '',
+  })
+
+  let [merchantImagesInitialValues, setMerchantImagesInitialValues] = useState({
+    merchant_image_1: '',
+    merchant_image_2: '',
+    merchant_image_3: '',
+    merchant_image_4: '',
   })
 
   let [isCancelRider, setIsCancelRider] = useState(true)
@@ -100,7 +106,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         rider_images = '',
         rider_remark = '',
         status,
-        image_merchant,
+        merchant_images,
       } = data
 
       if (!isUndefined(data) && !isEmpty(data)) {
@@ -185,8 +191,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           let image1 = '',
             image2 = '',
             image3 = '',
-            image4 = '',
-            imageMerchant = ''
+            image4 = ''
 
           forEach(images, (item, index: number) => {
             switch (index) {
@@ -200,16 +205,39 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                 return (image4 = item.path)
             }
           })
-          if (!isUndefined(image_merchant)) {
-            imageMerchant = image_merchant
-          }
 
           setImagesInitialValues({
             imagePath_1: image1,
             imagePath_2: image2,
             imagePath_3: image3,
             imagePath_4: image4,
-            image_merchant: imageMerchant,
+          })
+        }
+
+        if (!isUndefined(merchant_images)) {
+          let image1 = '',
+            image2 = '',
+            image3 = '',
+            image4 = ''
+
+          forEach(merchant_images, (item, index: number) => {
+            switch (index) {
+              case 0:
+                return (image1 = item.path)
+              case 1:
+                return (image2 = item.path)
+              case 2:
+                return (image3 = item.path)
+              case 3:
+                return (image4 = item.path)
+            }
+          })
+
+          setMerchantImagesInitialValues({
+            merchant_image_1: image1,
+            merchant_image_2: image2,
+            merchant_image_3: image3,
+            merchant_image_4: image4,
           })
         }
 
@@ -783,9 +811,27 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
               <Row gutter={16} style={{ marginTop: '20px' }}>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
-                    <Text>สลิปการโอนเงินคืน</Text>
+                    <Text>สลิปการโอนเงินคืน 1</Text>
                   </div>
-                  <ImgButton url={imagesInitialValues.image_merchant} />
+                  <ImgButton url={merchantImagesInitialValues.merchant_image_1} />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>สลิปการโอนเงินคืน 2</Text>
+                  </div>
+                  <ImgButton url={merchantImagesInitialValues.merchant_image_2} />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>สลิปการโอนเงินคืน 3</Text>
+                  </div>
+                  <ImgButton url={merchantImagesInitialValues.merchant_image_3} />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>สลิปการโอนเงินคืน 4</Text>
+                  </div>
+                  <ImgButton url={merchantImagesInitialValues.merchant_image_4} />
                 </Col>
               </Row>
             </Form>

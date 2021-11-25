@@ -19,7 +19,7 @@ interface Props {
 }
 
 interface Config {
-  dataTableTitle: string
+  dataTableTitle?: string
   tableColumns: Array<any>
   dataSource: Array<any>
   tableName: string
@@ -135,7 +135,7 @@ export default function Table({ config }: Props): ReactElement {
       {isExport ? (
         <Row gutter={16}>
           <Col span={8}>
-            <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
+            {dataTableTitle && <PageHeader title={dataTableTitle} ghost={false}></PageHeader>}
           </Col>
           <Col span={16} style={{ textAlign: 'right' }}>
             <Button
@@ -149,7 +149,7 @@ export default function Table({ config }: Props): ReactElement {
           </Col>
         </Row>
       ) : (
-        <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
+        dataTableTitle && <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
       )}
 
       <Tables

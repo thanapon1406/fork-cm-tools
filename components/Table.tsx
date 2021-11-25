@@ -26,12 +26,13 @@ interface Config {
   action?: Array<'view' | 'edit' | 'delete'>
   loading: boolean
   handelDataTableLoad: any
-  pagination: TablePaginationConfig | false
+  pagination: TablePaginationConfig
   customAction?: any
   scrollTable?: ScrollTable
   mappingPath?: (rowData: any) => string
   isExport?: boolean
   handelDataExport?: any
+  isShowRowNumber?: boolean
 }
 
 export default function Table({ config }: Props): ReactElement {
@@ -46,6 +47,7 @@ export default function Table({ config }: Props): ReactElement {
     mappingPath,
     isExport,
     handelDataExport,
+    isShowRowNumber = false,
   } = config
   let { tableColumns, pagination } = config
   if (pagination) {
@@ -120,6 +122,21 @@ export default function Table({ config }: Props): ReactElement {
         },
       ]
     }
+  }
+
+  if (isShowRowNumber) {
+    tableColumns = [
+      {
+        title: 'No.',
+        key: 'index',
+        align: 'center',
+        render: (row: any, data: any, index: any) => {
+          const current = pagination.current || 1
+          return (current - 1) * 10 + (index + 1)
+        },
+      },
+      ...tableColumns,
+    ]
   }
 
   const determineRowKey = (item: any) => {

@@ -11,7 +11,7 @@ import {
   Table as Tables,
   TablePaginationConfig,
 } from 'antd'
-import lodash from 'lodash'
+import lodash, { get } from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
 interface Props {
@@ -26,7 +26,7 @@ interface Config {
   action?: Array<'view' | 'edit' | 'delete'>
   loading: boolean
   handelDataTableLoad: any
-  pagination: TablePaginationConfig
+  pagination: TablePaginationConfig | false
   customAction?: any
   scrollTable?: ScrollTable
   mappingPath?: (rowData: any) => string
@@ -131,7 +131,7 @@ export default function Table({ config }: Props): ReactElement {
         key: 'index',
         align: 'center',
         render: (row: any, data: any, index: any) => {
-          const current = pagination.current || 1
+          const current = get(pagination, 'current', 1)
           return (current - 1) * 10 + (index + 1)
         },
       },

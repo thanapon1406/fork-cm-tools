@@ -310,6 +310,43 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           </div>
         </>
       )
+    } else if (orderStatusHistoryData.current_status_info.rider_status === Constant.ASSIGNED) {
+      let data = orderStatusHistoryData
+      if (!isUndefined(data.current_rider_info) && !isUndefined(data.previous_rider_info)) {
+        if (
+          !isEmpty(data.current_rider_info.first_name) &&
+          !isEmpty(data.previous_rider_info.first_name)
+        ) {
+          return (
+            <>
+              <div>
+                Rider 1:{' '}
+                {data.previous_rider_info.first_name + ' ' + data.previous_rider_info.last_name}
+                <div>
+                  Rider 2:{' '}
+                  {data.current_rider_info.first_name + ' ' + data.current_rider_info.last_name}
+                </div>
+                <div>
+                  {Moment(data.current_rider_info?.assigned_time).format(Constant.DATE_FORMAT)}
+                </div>
+              </div>
+            </>
+          )
+        } else {
+          return (
+            <>
+              <div>
+                <div>
+                  {data.current_rider_info.first_name + ' ' + data.current_rider_info.last_name}
+                </div>
+                <div>
+                  {Moment(data.current_rider_info?.assigned_time).format(Constant.DATE_FORMAT)}
+                </div>
+              </div>
+            </>
+          )
+        }
+      }
     } else {
       return Moment(orderStatusHistoryData.created_at).format(Constant.DATE_FORMAT)
     }
@@ -318,7 +355,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   const determineTrackingOrderStatus = (
     order_status = '',
     merchant_status = '',
-    rider_status = ''
+    rider_status = '',
+    orderHistoryData: any = {}
   ) => {
     let respObj = {
       status: 'กำลังปรุง',
@@ -339,7 +377,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       ) {
         respObj.status = 'ยกเลิกออเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
-      } else if (order_status === Constant.WAITING || rider_status === Constant.WAITING) {
+      } else if (order_status === Constant.WAITING) {
         respObj.status = 'ออเดอร์ใหม่'
         respObj.imagePath = '/asset/images/new-order.png'
       } else if (merchant_status === Constant.COOKING) {
@@ -348,11 +386,26 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       } else if (merchant_status === Constant.COOKED) {
         respObj.status = 'ปรุงสำเร็จ'
         respObj.imagePath = '/asset/images/cook.png'
+      } else if (order_status === '' && rider_status === Constant.WAITING) {
+        respObj.status = 'กำลังหาไรเดอร์ใหม่'
+        respObj.imagePath = '/asset/images/delivery.png'
       } else if (rider_status === Constant.ASSIGNING) {
         respObj.status = 'กำลังหาไรเดอร์'
         respObj.imagePath = '/asset/images/delivery.png'
       } else if (rider_status === Constant.ASSIGNED) {
         respObj.status = 'ไรเดอร์รับออเดอร์'
+
+        if (!isUndefined(orderHistoryData)) {
+          let data = orderHistoryData as OrderStatusHistoryDetail
+          if (!isUndefined(data.current_rider_info) && !isUndefined(data.previous_rider_info)) {
+            if (
+              !isEmpty(data.current_rider_info.first_name) &&
+              !isEmpty(data.previous_rider_info.first_name)
+            ) {
+              respObj.status = 'เปลี่ยนไรเดอร์'
+            }
+          }
+        }
         respObj.imagePath = '/asset/images/delivery.png'
       } else if (rider_status === Constant.GOING_MERCHANT) {
         respObj.status = 'ไรเดอร์กำลังไปที่ร้าน'
@@ -699,16 +752,16 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       />
 
                       {orderStatusHistory?.map((val: OrderStatusHistoryDetail, index: number) => {
+                        var determineTrackingResult = determineTrackingOrderStatus(
+                          val?.current_status_info?.order_status,
+                          val?.current_status_info?.merchant_status,
+                          val?.current_status_info?.rider_status,
+                          val
+                        )
                         return (
                           <Step
                             key={val.order_no}
-                            title={
-                              determineTrackingOrderStatus(
-                                val?.current_status_info?.order_status,
-                                val?.current_status_info?.merchant_status,
-                                val?.current_status_info?.rider_status
-                              ).status
-                            }
+                            title={determineTrackingResult.status}
                             description={determineDescription(val)}
                             icon={
                               <Image
@@ -716,13 +769,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 width={24}
                                 height={24}
                                 preview={false}
-                                src={
-                                  determineTrackingOrderStatus(
-                                    val?.current_status_info?.order_status,
-                                    val?.current_status_info?.merchant_status,
-                                    val?.current_status_info?.rider_status
-                                  ).imagePath
-                                }
+                                src={determineTrackingResult.imagePath}
                               />
                             }
                           />

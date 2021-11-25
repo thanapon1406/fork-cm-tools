@@ -262,6 +262,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
             dataSource: dataTable,
             handelDataTableLoad: handelDataTableChange,
             pagination: pagination,
+            isShowRowNumber: true,
           }}
         />
       </Card>

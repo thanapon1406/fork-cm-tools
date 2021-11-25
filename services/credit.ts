@@ -9,6 +9,8 @@ interface queryList {
   start_date?: string
   end_date?: string
   status?: string
+  outlet_id?: string
+  is_preload_credit?: boolean
 }
 
 interface queryById {
@@ -47,4 +49,34 @@ const verifyTransaction = async (body: any) => {
   }
 }
 
-export { creditTransaction, transactionDetail, verifyTransaction }
+const creditList = async (body: queryList) => {
+  try {
+    const result = await fetch.post(`/api/credit/find-credits`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const transactionList = async (body: queryList) => {
+  try {
+    const result = await fetch.post(`/api/credit/find-transactions`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const topupList = async (body: queryList) => {
+  try {
+    const result = await fetch.post(`/api/credit/find-topups`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+
+
+export { creditTransaction, transactionDetail, verifyTransaction, creditList, transactionList, topupList }
+

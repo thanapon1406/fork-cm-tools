@@ -9,7 +9,7 @@ import {
   PageHeader,
   Row,
   Table as Tables,
-  TablePaginationConfig,
+  TablePaginationConfig
 } from 'antd'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
@@ -31,6 +31,7 @@ interface Config {
   scrollTable?: ScrollTable
   mappingPath?: (rowData: any) => string
   isExport?: boolean
+  isTableTitle?: boolean
   handelDataExport?: any
   isShowRowNumber?: boolean
 }
@@ -68,8 +69,8 @@ export default function Table({ config }: Props): ReactElement {
       }
       Router.push(`/${tableName}/${path}`)
     }
-    const Edit = () => {}
-    const Delete = () => {}
+    const Edit = () => { }
+    const Delete = () => { }
     const actionElement = (rowData: any) => (
       <Menu style={{ border: 'none' }}>
         {action.map((action) => {

@@ -9,9 +9,9 @@ import {
   PageHeader,
   Row,
   Table as Tables,
-  TablePaginationConfig,
+  TablePaginationConfig
 } from 'antd'
-import lodash from 'lodash'
+import lodash, { get } from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 }
 
 interface Config {
-  dataTableTitle: string
+  dataTableTitle?: string
   tableColumns: Array<any>
   dataSource: Array<any>
   tableName: string
@@ -31,7 +31,9 @@ interface Config {
   scrollTable?: ScrollTable
   mappingPath?: (rowData: any) => string
   isExport?: boolean
+  isTableTitle?: boolean
   handelDataExport?: any
+  isShowRowNumber?: boolean
 }
 
 export default function Table({ config }: Props): ReactElement {
@@ -46,6 +48,7 @@ export default function Table({ config }: Props): ReactElement {
     mappingPath,
     isExport,
     handelDataExport,
+    isShowRowNumber = false,
   } = config
   let { tableColumns, pagination } = config
   if (pagination) {
@@ -66,8 +69,8 @@ export default function Table({ config }: Props): ReactElement {
       }
       Router.push(`/${tableName}/${path}`)
     }
-    const Edit = () => {}
-    const Delete = () => {}
+    const Edit = () => { }
+    const Delete = () => { }
     const actionElement = (rowData: any) => (
       <Menu style={{ border: 'none' }}>
         {action.map((action) => {
@@ -122,6 +125,21 @@ export default function Table({ config }: Props): ReactElement {
     }
   }
 
+  if (isShowRowNumber) {
+    tableColumns = [
+      {
+        title: 'No.',
+        key: 'index',
+        align: 'center',
+        render: (row: any, data: any, index: any) => {
+          const current = get(pagination, 'current', 1)
+          return (current - 1) * 10 + (index + 1)
+        },
+      },
+      ...tableColumns,
+    ]
+  }
+
   const determineRowKey = (item: any) => {
     if (mappingPath) {
       return mappingPath(item)
@@ -135,7 +153,7 @@ export default function Table({ config }: Props): ReactElement {
       {isExport ? (
         <Row gutter={16}>
           <Col span={8}>
-            <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
+            {dataTableTitle && <PageHeader title={dataTableTitle} ghost={false}></PageHeader>}
           </Col>
           <Col span={16} style={{ textAlign: 'right' }}>
             <Button
@@ -149,7 +167,7 @@ export default function Table({ config }: Props): ReactElement {
           </Col>
         </Row>
       ) : (
-        <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
+        dataTableTitle && <PageHeader title={dataTableTitle} ghost={false}></PageHeader>
       )}
 
       <Tables

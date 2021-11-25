@@ -4,25 +4,160 @@ import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
 import { StatusMapping } from '@/components/outlet/Status'
+import Tab from '@/components/Tab'
+import Table from '@/components/Table'
 import { days } from '@/constants/textMapping'
+import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
+import { topupList, transactionList } from '@/services/credit'
 import { outletDetail, personalData, updateOutlet } from '@/services/merchant'
-import { Breadcrumb, Col, Divider, Modal, Row, Space, Switch, Typography } from 'antd'
+import { Badge, Breadcrumb, Col, Divider, Modal, Row, Space, Switch, Typography } from 'antd'
 import { Field, FieldArray, Form, Formik } from 'formik'
 import _ from 'lodash'
+import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
+
 const { Title, Text } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function MerchantUserView({}: Props): ReactElement {
+export default function MerchantUserView({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoid, setSsoid] = useState('')
   const [isEdit, setIsEdit] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingPage, setIsLoading] = useState(true)
+  // Create our number formatter.
+  var formatter = new Intl.NumberFormat('th-TH', {
+    style: 'currency',
+    currency: 'THB',
+  });
+  // credit list
+  const requestTransactionApi: Function = transactionList
+  const credit = useFetchTable(requestTransactionApi, {})
+  const columnCredit = [
+    {
+      title: 'Transaction ID',
+      dataIndex: 'transaction_id',
+      align: 'center',
+      render: (row: string) => {
+        return row ? row : "-"
+      },
+    },
+    {
+      title: 'รายการ',
+      dataIndex: '',
+      align: 'center',
+      render: (row: string) => {
+        return row ? "ใช้เครดิต" : "เติมเงิน"
+      },
+    },
+    {
+      title: 'จำนวนเงิน',
+      dataIndex: 'amount',
+      align: 'center',
+      render: (row: number) => {
+        return formatter.format(row)
+      }
+    },
+    {
+      title: 'หมายเหตุ',
+      dataIndex: '',
+      align: 'center',
+      render: (row: string) => {
+        return row && "test note"
+      },
+    },
+    {
+      title: 'เลขออเดอร์',
+      dataIndex: 'credit_no',
+      align: 'center',
+    },
+    {
+      title: 'เวลา',
+      dataIndex: 'created_at',
+      align: 'center',
+      render: (row: any) => {
+        return row ? moment(row).format('YYYY-MM-DD HH:mm') : '-'
+      },
+    },
+    {
+      title: 'สถานะ',
+      dataIndex: 'status',
+      align: 'center',
+      render: (row: any) => {
+        return (
+          <>
+            <Badge status={row == "processing" ? "warning" : row == "success" ? row : "error"} text={row} />
+          </>
+        )
+      }
+    },
+  ]
+  // end credit list
+
+  // topup list
+  const requestTopupApi: Function = topupList
+  const topup = useFetchTable(requestTopupApi, {})
+  const columnTopup = [
+    {
+      title: 'Transaction ID',
+      dataIndex: 'transaction_id',
+      align: 'center',
+    },
+    {
+      title: 'รายการ',
+      dataIndex: '',
+      align: 'center',
+      render: (row: string) => {
+        return row ? "เติมเงิน" : "ใช้เครดิต"
+      },
+    },
+    {
+      title: 'จำนวนเงิน',
+      dataIndex: 'amount',
+      align: 'center',
+      render: (row: number) => {
+        return formatter.format(row)
+      }
+    },
+    {
+      title: 'หมายเหตุ',
+      dataIndex: '',
+      align: 'center',
+      render: (row: string) => {
+        return row && "test note"
+      },
+    },
+    {
+      title: 'เลขออเดอร์',
+      dataIndex: 'order_no',
+      align: 'center',
+    },
+    {
+      title: 'เวลา',
+      dataIndex: 'created_at',
+      align: 'center',
+      render: (row: any) => {
+        return row ? moment(row).format('YYYY-MM-DD HH:mm') : '-'
+      },
+    },
+    {
+      title: 'สถานะ',
+      dataIndex: 'status',
+      align: 'center',
+      render: (row: any) => {
+        return (
+          <>
+            <Badge status={row == "processing" ? "warning" : row == "success" ? row : "error"} text={row} />
+          </>
+        )
+      }
+    },
+  ]
+  // end topup list
 
   let [userInitialValues, setUserInitialValues] = useState({
     user_name: '',
@@ -52,6 +187,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     status: '',
     opening_time: '',
     closed_time: '',
+    available_credit: 0,
   })
 
   const mapBranchType: any = {
@@ -63,6 +199,13 @@ export default function MerchantUserView({}: Props): ReactElement {
     if (id) {
       getOutlet()
       getPersonal()
+      credit.handleFetchData({
+        outlet_id: id,
+        is_preload_credit: true
+      })
+      topup.handleFetchData({
+        outlet_id: id
+      })
     }
   }, [id])
 
@@ -123,7 +266,7 @@ export default function MerchantUserView({}: Props): ReactElement {
         business_extra_times_Set = business_extra_times_Set.map(convertStatus)
         business_times_Set = business_times_Set.map(convertStatus)
       }
-      ;(verify_email = data?.email),
+      ; (verify_email = data?.email),
         setOutletInitialValues({
           ...outletInitialValues,
           outlet_name: data?.name.th,
@@ -144,6 +287,7 @@ export default function MerchantUserView({}: Props): ReactElement {
           status: data?.status,
           opening_time: data?.opening_time,
           closed_time: data?.closed_time,
+          available_credit: data?.available_credit,
         })
 
       const userRequest: any = {
@@ -194,7 +338,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     }),
   })
 
-  const handleSubmit = async (values: any) => {}
+  const handleSubmit = async (values: any) => { }
   const handleSubmitStatus = async () => {
     const body = {
       data: {
@@ -236,7 +380,7 @@ export default function MerchantUserView({}: Props): ReactElement {
   }
 
   return (
-    <MainLayout isLoading={isLoading}>
+    <MainLayout isLoading={isLoadingPage}>
       <Row justify="space-around" align="middle">
         <Col span={8}>
           <Title level={4}>บัญชีผู้ใช้งาน</Title>
@@ -285,7 +429,7 @@ export default function MerchantUserView({}: Props): ReactElement {
         <Formik
           enableReinitialize={true}
           initialValues={userInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -513,6 +657,41 @@ export default function MerchantUserView({}: Props): ReactElement {
                   />
                 </Col>
               </Row>
+              <Row>
+                <Col span={8}>
+                  <Title level={5}>เครดิตร้านค้า</Title>
+                </Col>
+                <Col span={8} offset={8} style={{ textAlign: 'end' }}><Title level={5}>{formatter.format(outletInitialValues.available_credit)}</Title></Col>
+              </Row>
+              <Tab defaultActiveKey="1">
+                <Tab.TabPane tab="เติมเงิน" key="1">
+                  <Table
+                    config={{
+                      loading: topup.isLoading,
+                      tableName: 'userprofile/merchant',
+                      tableColumns: columnTopup,
+                      dataSource: topup.dataTable,
+                      handelDataTableLoad: topup.handelDataTableChange,
+                      pagination: topup.pagination,
+                      isShowRowNumber: true,
+                    }}
+                  />
+                </Tab.TabPane>
+                <Tab.TabPane tab="ถอนเงิน" key="2">
+                  <Table
+                    config={{
+                      loading: credit.isLoading,
+                      tableName: 'userprofile/merchant',
+                      tableColumns: columnCredit,
+                      dataSource: credit.dataTable,
+                      handelDataTableLoad: credit.handelDataTableChange,
+                      pagination: credit.pagination,
+                      isShowRowNumber: true,
+                    }}
+                  />
+                </Tab.TabPane>
+              </Tab>
+
 
               <Title level={5}>ข้อมูลการเปิด-ปิดร้าน</Title>
               <br />

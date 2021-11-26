@@ -39,14 +39,6 @@ export default function MerchantUserView({ }: Props): ReactElement {
   const credit = useFetchTable(requestTransactionApi, {})
   const columnCredit = [
     {
-      title: 'Transaction ID',
-      dataIndex: 'transaction_id',
-      align: 'center',
-      render: (row: string) => {
-        return row ? row : "-"
-      },
-    },
-    {
       title: 'รายการ',
       dataIndex: '',
       align: 'center',
@@ -125,10 +117,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
     },
     {
       title: 'หมายเหตุ',
-      dataIndex: '',
+      dataIndex: 'type',
       align: 'center',
       render: (row: string) => {
-        return row && "test note"
+        return row == "bank_transfer" ? "เติมเงินผ่านธนาคาร" : "เติมเงินผ่านบาร์โค้ด"
       },
     },
     {

@@ -82,7 +82,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
       render: (row: any) => {
         return (
           <>
-            <Badge status={row == "processing" ? "warning" : row == "success" ? row : "error"} text={row} />
+            <Badge status={row == "processing" ? "warning" : row == "success" ? row : "error"} text={row == "processing" ? "ดำเนินการ" : row == "success" ? "สำเร็จ" : row == "refund" ? "คืนเงิน" : "ยกเลิก"} />
           </>
         )
       }
@@ -143,7 +143,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
       render: (row: any) => {
         return (
           <>
-            <Badge status={row == "processing" ? "warning" : row == "success" ? row : "error"} text={row} />
+            <Badge status={row == "processing" ? "warning" : row == "success" ? row : "error"} text={row == "processing" ? "ดำเนินการ" : row == "success" ? "สำเร็จ" : row == "refund" ? "คืนเงิน" : "ยกเลิก"} />
           </>
         )
       }

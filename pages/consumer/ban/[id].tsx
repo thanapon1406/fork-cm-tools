@@ -1,4 +1,3 @@
-import CustomBadge from '@/components/Badge';
 import Card from '@/components/Card';
 import Input from '@/components/Form/Input';
 import MainLayout from '@/layout/MainLayout';
@@ -8,13 +7,13 @@ import { Breadcrumb, Button, Col, Modal, notification, Row, Typography } from 'a
 import { Field, Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
 import { default as React, ReactElement, useEffect, useState } from 'react';
+import CustomBadge from '../../userprofile/rider/[id]/style';
 const { Title } = Typography
 
 interface Props { }
 const { confirm } = Modal
 
 export default function BanConsumer({ }: Props): ReactElement {
-  const [isEdit, setIsEdit] = useState(false)
   const router = useRouter()
   const id = router.query.id as string
   let [initialValues, setInitialValues] = useState({
@@ -32,6 +31,7 @@ export default function BanConsumer({ }: Props): ReactElement {
     googleId: '',
     lineId: '',
     isBan: false,
+    remark: '',
   })
 
   const showModal = (values: any, ban: boolean) => {
@@ -73,6 +73,7 @@ export default function BanConsumer({ }: Props): ReactElement {
           appleId: data.apple_id,
           lineId: data.line_id,
           isBan: data.is_ban,
+          remark: data.remark,
         })
       }
     }
@@ -93,14 +94,13 @@ export default function BanConsumer({ }: Props): ReactElement {
         message: `ดำเนินการแบนสำเร็จ`,
         description: '',
       })
-      router.back()
     } else {
       notification.error({
         message: `ไม่สามารถทำการ แบนได้`,
         description: '',
       })
     }
-    setIsEdit(!isEdit)
+    router.reload()
   }
 
   const openPopupBannedRider = async (values: any) => {
@@ -148,25 +148,15 @@ export default function BanConsumer({ }: Props): ReactElement {
                       {initialValues.firstName +
                         ' ' +
                         initialValues.lastName +
-                        ' (Consumer ID: ' +
+                        ' (SSO ID: ' +
                         initialValues.ssoId +
                         ')'}
                     </Row>
                     <Row gutter={16}>
                       {initialValues.isBan ? (
-                        <CustomBadge
-                          customMapping={{
-                            status: 'error',
-                            text: 'ถูกแบนผู้ใช้งาน',
-                          }}
-                        ></CustomBadge>
+                        <CustomBadge status="error" text="ถูกแบนผู้ใช้งาน" />
                       ) : (
-                        <CustomBadge
-                          customMapping={{
-                            status: 'success',
-                            text: 'ปกติ',
-                          }}
-                        ></CustomBadge>
+                        <CustomBadge status="success" text="ปกติ" />
                       )}
                     </Row>
                   </Col>

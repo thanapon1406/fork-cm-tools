@@ -16,7 +16,7 @@ import * as Yup from 'yup'
 
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
 
 interface Pagination {
   total: number
@@ -33,7 +33,7 @@ interface filterObject {
   update_end_date?: string
 }
 
-export default function Merchant({}: Props): ReactElement {
+export default function Merchant({ }: Props): ReactElement {
   const [userObj, setUserObj] = useRecoilState(personState)
   const initialValues = {
     keyword: '',
@@ -263,7 +263,7 @@ export default function Merchant({}: Props): ReactElement {
       <Card>
         <Table
           config={{
-            dataTableTitle: 'รายการรอตรวจสอบ',
+            dataTableTitle: 'บัชชีลูกค้า',
             loading: _isLoading,
             tableName: 'consumer',
             tableColumns: column,

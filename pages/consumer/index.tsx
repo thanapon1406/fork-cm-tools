@@ -137,14 +137,14 @@ export default function Merchant({ }: Props): ReactElement {
       title: 'Social login name',
       align: 'center',
       render: (row: any) => {
-        return row['social_login_first_name'] + ' ' + row['social_login_last_name']
+        return row['social_login_first_name'] != undefined ? row['social_login_first_name'] : '' + ' ' + row['social_login_last_name'] != undefined ? row['social_login_last_name'] : ''
       },
     },
     {
       title: 'ชื่อและนามสกุล',
       align: 'center',
       render: (row: any) => {
-        return row['first_name'] + ' ' + row['last_name']
+        return row['first_name'] != undefined ? row['first_name'] : '' + ' ' + row['last_name'] != undefined ? row['last_name'] : ''
       },
     },
     {

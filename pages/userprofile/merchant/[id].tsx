@@ -21,9 +21,9 @@ import * as Yup from 'yup'
 
 const { Title, Text } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function MerchantUserView({}: Props): ReactElement {
+export default function MerchantUserView({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoid, setSsoid] = useState('')
@@ -36,7 +36,10 @@ export default function MerchantUserView({}: Props): ReactElement {
   })
   // credit list
   const requestTransactionApi: Function = transactionList
-  const credit = useFetchTable(requestTransactionApi, {})
+  const credit = useFetchTable(requestTransactionApi, {
+    outlet_id: id,
+    is_preload_credit: true,
+  })
   const columnCredit = [
     {
       title: 'รายการ',
@@ -88,10 +91,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -103,7 +106,9 @@ export default function MerchantUserView({}: Props): ReactElement {
 
   // topup list
   const requestTopupApi: Function = topupList
-  const topup = useFetchTable(requestTopupApi, {})
+  const topup = useFetchTable(requestTopupApi, {
+    outlet_id: id,
+  })
   const columnTopup = [
     {
       title: 'Transaction ID',
@@ -160,10 +165,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -280,7 +285,7 @@ export default function MerchantUserView({}: Props): ReactElement {
         business_extra_times_Set = business_extra_times_Set.map(convertStatus)
         business_times_Set = business_times_Set.map(convertStatus)
       }
-      ;(verify_email = data?.email),
+      ; (verify_email = data?.email),
         setOutletInitialValues({
           ...outletInitialValues,
           outlet_name: data?.name.th,
@@ -352,7 +357,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     }),
   })
 
-  const handleSubmit = async (values: any) => {}
+  const handleSubmit = async (values: any) => { }
   const handleSubmitStatus = async () => {
     const body = {
       data: {
@@ -443,7 +448,7 @@ export default function MerchantUserView({}: Props): ReactElement {
         <Formik
           enableReinitialize={true}
           initialValues={userInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (

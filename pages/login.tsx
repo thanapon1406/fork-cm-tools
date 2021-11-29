@@ -52,9 +52,9 @@ const Login: NextPage = () => {
                 <Form>
                   <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                     <Image src={logoImg} />
-                    <Title level={5} style={{ color: '#dc1e24' }}>
+                    {/* <Title level={5} style={{ color: '#dc1e24' }}>
                       KITCHEN HUB ADMIN
-                    </Title>
+                    </Title> */}
                   </div>
                   <Field
                     name="username"

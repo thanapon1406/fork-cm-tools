@@ -1,7 +1,15 @@
 import { Pagination } from '@/interface/dataTable'
 import { useEffect, useState } from 'react'
 
-export default function useFetchTable(FetchFunc: Function, FilterObj: any) {
+interface option {
+  isAutoFetch: boolean
+}
+
+export default function useFetchTable(
+  FetchFunc: Function,
+  FilterObj: any,
+  option: option = { isAutoFetch: true }
+) {
   const [isLoading, setIsLoading] = useState(false)
   const [dataTable, setDataTable] = useState([])
   let [pagination, setPagination] = useState<Pagination>({
@@ -13,7 +21,9 @@ export default function useFetchTable(FetchFunc: Function, FilterObj: any) {
   let [filter, setFilter] = useState<FilterType>(FilterObj)
 
   useEffect(() => {
-    fetchData()
+    if (option.isAutoFetch) {
+      fetchData()
+    }
   }, [])
 
   const fetchData = async (filterObj: any = filter, paging: Pagination = pagination) => {

@@ -15,6 +15,10 @@ export const retrieveRefreshToken = () => {
 }
 
 export const saveToken = (token: string, option = {}) => {
+  option = {
+    maxAge: 86400,
+    path: '/',
+  }
   setCookie(null, COOKIE_NAME, token, option)
 }
 export const saveRefreshToken = (refresh_token: string, option = {}) => {

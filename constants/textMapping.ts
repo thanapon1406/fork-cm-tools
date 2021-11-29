@@ -12,6 +12,7 @@ export const outletStatus: any = {
   active: 'Active',
   inactive: 'In-active',
   closed: 'Closed',
+  temporarily_closed: 'Temporarily closed',
 }
 
 export const creditPaymentChanel: any = {

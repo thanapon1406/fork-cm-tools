@@ -2,6 +2,7 @@ import axios from 'axios'
 import _ from 'lodash'
 const host = process.env.POS_GRPC_API
 const host_rest = process.env.POS_WAPI
+const host_sso = process.env.POS_APP_SSO
 
 const axiosInstance = axios.create({
   baseURL: host,
@@ -10,6 +11,11 @@ const axiosInstance = axios.create({
 
 const axiosRestInstance = axios.create({
   baseURL: host_rest,
+  timeout: 30000,
+})
+
+const axiosSsoInstance = axios.create({
+  baseURL: host_sso,
   timeout: 30000,
 })
 
@@ -91,6 +97,16 @@ const deleteServerSideRest = async (url: string, headers: any) => {
   return await axiosRestInstance.delete(url, options)
 }
 
+const postServerSideSso = async (url: string, body = {}, headers = {}) => {
+  const options = {
+    headers: {
+      Authorization: _.get(headers, 'authorization'),
+    },
+  }
+  let _body = _.pickBy(body, _.identity)
+  return await axiosSsoInstance.post(url, _body, options)
+}
+
 const apiFetch = {
   get: getServerSide,
   post: postServerSide,
@@ -100,6 +116,7 @@ const apiFetch = {
   postRest: postServerSideRest,
   putRest: putServerSideRest,
   deleteRest: deleteServerSideRest,
+  postSso: postServerSideSso,
 }
 
 export default apiFetch

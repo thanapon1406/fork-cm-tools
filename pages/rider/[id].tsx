@@ -9,8 +9,9 @@ import {
   getRejectReson,
   getRiderDetail,
   getStatusHistories,
-  updateRiderStatus,
+  updateRiderStatus
 } from '@/services/rider'
+import { getAccountCms } from '@/services/sso'
 import { Breadcrumb, Col, Form as antForm, Modal, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _, { isUndefined } from 'lodash'
@@ -21,7 +22,7 @@ import * as Yup from 'yup'
 import Ekyc from '../ekyc/component'
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
 
 interface queryListDetail {
   id?: string | string[] | undefined
@@ -64,9 +65,10 @@ interface riderDetail {
   car_photo?: string
   car_tax_photo?: string
   disable_photo?: string
+  register_email?: string
 }
 
-export default function RiderDetail({}: Props): ReactElement {
+export default function RiderDetail({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   let [_isLoading, setIsLoading] = useState(true)
@@ -104,6 +106,7 @@ export default function RiderDetail({}: Props): ReactElement {
       data.name = data.first_name + ' ' + data.last_name
       data.phone = data.country_code + data.phone
       data.reason = []
+
       if (isUndefined(data.pdpa)) {
         data.contact_emergency = ''
         data.contact_emergency_address = ''
@@ -185,6 +188,16 @@ export default function RiderDetail({}: Props): ReactElement {
       let reject_reason = _.filter(rejectReason, function (o) {
         return o.type == rider_status
       })
+      if (RiderDetail && RiderDetail.sso_id != undefined && RiderDetail.sso_id != "") {
+        let { status, result } = await getAccountCms({ id: RiderDetail.sso_id })
+        if (status === 200) {
+          let { data } = result
+          if (data && data[0] && data[0].email) {
+            RiderDetail.register_email = data[0].email
+          }
+        }
+      }
+
       setRejectReasonDropDown(reject_reason)
       setRiderDetail(RiderDetail)
       setIsLoading(false)
@@ -369,17 +382,17 @@ export default function RiderDetail({}: Props): ReactElement {
                     </Col>
                     <Col className="gutter-row" span={6}>
                       <Field
-                        label={{ text: 'อีเมล' }}
-                        name="email"
+                        label={{ text: 'อีเมลที่ลงทะเบียน' }}
+                        name="register_email"
                         type="text"
                         component={Input}
                         className="form-control round"
-                        placeholder="อีเมล"
+                        placeholder="อีเมลที่ลงทะเบียน"
                         isRange={true}
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={6}>
+                    {/* <Col className="gutter-row" span={6}>
                       <Field
                         label={{ text: 'SsoID' }}
                         name="sso_id"
@@ -390,6 +403,19 @@ export default function RiderDetail({}: Props): ReactElement {
                         isRange={true}
                         disabled={true}
                       />
+                    </Col> */}
+                    <Col className="gutter-row" span={6} offset={18}>
+                      <Field
+                        label={{ text: 'อีเมลที่ยืนยัน' }}
+                        name="email"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="อีเมลที่ยืนยัน"
+                        isRange={true}
+                        disabled={true}
+                      />
+
                     </Col>
                   </Row>
                   <Ekyc sso_id={riderDetail.sso_id} />

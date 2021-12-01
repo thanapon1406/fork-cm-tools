@@ -2,7 +2,7 @@ import Input from '@/components/Form/Input'
 import MainLayout from '@/layout/MainLayout'
 import { getRider, getRiderDetail, updateRider } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
-import { Breadcrumb, Button, Card, Col, Modal, notification, Row, Typography } from 'antd'
+import { Breadcrumb, Button, Card, Col, Modal, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _ from 'lodash'
 import { useRouter } from 'next/router'
@@ -68,7 +68,32 @@ export default function RiderBan({ }: Props): ReactElement {
   }
 
   const handleSubmit = async (values: IRiderDetail) => {
-    openPopupBannedRider(values)
+    // validate remark
+    // console.log("values", values)
+    const valid = await validateValue(values)
+    if (valid) {
+      openPopupBannedRider(values)
+    } else {
+      Modal.warning({
+        content: 'กรุณาระบุเหตุผล',
+        okText: 'ตกลง',
+        okButtonProps: {
+          style: {
+            background: "#28A745",
+            borderColor: "#28A745",
+          },
+        },
+      });
+    }
+    // openPopupBannedRider(values)
+  }
+
+  const validateValue = async (values: IRiderDetail) => {
+    let valid = true
+    if (values.banned_reason == "") {
+      valid = false
+    }
+    return valid
   }
 
   const openPopupBannedRider = async (values: IRiderDetail) => {
@@ -97,10 +122,21 @@ export default function RiderBan({ }: Props): ReactElement {
         if (success) {
           const riderJobCount = _.get(data[0], 'job_count') ? _.get(data[0], 'job_count') : 0
           if (riderJobCount > 0) {
-            notification.error({
-              message: `ไม่สามารถทำการแบนไรเดอร์นี้ได้`,
-              description: 'ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ',
-            })
+            // notification.error({
+            //   message: `ไม่สามารถทำการแบนไรเดอร์นี้ได้`,
+            //   description: 'ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ',
+            // })
+            Modal.warning({
+              title: 'ไม่สามารถทำการแบนไรเดอร์นี้ได้',
+              content: 'ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ',
+              okText: 'ตกลง',
+              okButtonProps: {
+                style: {
+                  background: "#28A745",
+                  borderColor: "#28A745",
+                },
+              },
+            });
           } else {
             // Update rider profile
             const riderBanData = {
@@ -114,17 +150,40 @@ export default function RiderBan({ }: Props): ReactElement {
 
             const { result, success } = await updateRider(riderBanData)
             if (success) {
-              notification.success({
-                message: `สำเร็จ`,
-                description: '',
-              })
-              router.reload()
+              // notification.success({
+              //   message: `สำเร็จ`,
+              //   description: '',
+              // })
+              Modal.success({
+                content: 'สำเร็จ',
+                async onOk() {
+                  router.reload()
+                },
+                okText: 'ตกลง',
+                okButtonProps: {
+                  style: {
+                    background: "#28A745",
+                    borderColor: "#28A745",
+                  },
+                },
+              });
+              // router.reload()
             } else {
               // Handle Case : Not Success
-              notification.success({
-                message: `ไม่สำเร็จ`,
-                description: '',
-              })
+              // notification.success({
+              //   message: `ไม่สำเร็จ`,
+              //   description: '',
+              // })
+              Modal.error({
+                content: 'ไม่สำเร็จ',
+                okText: 'ตกลง',
+                okButtonProps: {
+                  style: {
+                    background: "#28A745",
+                    borderColor: "#28A745",
+                  },
+                },
+              });
             }
           }
         } else {

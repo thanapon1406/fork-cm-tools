@@ -94,13 +94,13 @@ export default function BanConsumer({ }: Props): ReactElement {
         message: `ดำเนินการแบนสำเร็จ`,
         description: '',
       })
+      router.reload()
     } else {
       notification.error({
         message: `ไม่สามารถทำการ แบนได้`,
         description: '',
       })
     }
-    router.reload()
   }
 
   const openPopupBannedRider = async (values: any) => {

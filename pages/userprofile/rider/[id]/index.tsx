@@ -216,9 +216,20 @@ export default function RiderDetail({ }: Props): ReactElement {
         }
       } else if (data[0].job_count > 0 && isActive == "inactive") {
         setActive("active")
-        notification.error({
-          message: `ไม่สามารถทำการ inactive`,
-          description: "ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ",
+        // notification.error({
+        //   message: `ไม่สามารถทำการ inactive`,
+        //   description: "ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ",
+        // });
+        Modal.warning({
+          title: 'ไม่สามารถทำการแบนไรเดอร์นี้ได้',
+          content: 'ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ',
+          okText: 'ตกลง',
+          okButtonProps: {
+            style: {
+              background: "#28A745",
+              borderColor: "#28A745",
+            },
+          },
         });
       }
     }

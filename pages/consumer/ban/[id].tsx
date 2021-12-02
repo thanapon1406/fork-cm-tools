@@ -35,8 +35,21 @@ export default function BanConsumer({ }: Props): ReactElement {
   })
 
   const showModal = (values: any, ban: boolean) => {
-    values.isBan = ban
-    openPopupBannedRider(values)
+    if (values.remark == undefined || values.remark == "") {
+      Modal.warning({
+        content: 'กรุณาระบุเหตุผล',
+        okText: 'ตกลง',
+        okButtonProps: {
+          style: {
+            background: "#28A745",
+            borderColor: "#28A745",
+          },
+        },
+      });
+    } else {
+      values.isBan = ban
+      openPopupBannedRider(values)
+    }
   }
 
   useEffect(() => {

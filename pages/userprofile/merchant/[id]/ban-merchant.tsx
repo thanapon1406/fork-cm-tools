@@ -17,7 +17,7 @@ const { Title, Text } = Typography
 
 interface Props {}
 
-export default function ban({}: Props): ReactElement {
+export default function BanOutlet({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [isLoadingPage, setIsLoading] = useState(true)

@@ -40,7 +40,7 @@ interface Personal {
   default_value: Array<any>
 }
 
-export default function ban({}: Props): ReactElement {
+export default function BanUserOutlet({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [isLoadingPage, setIsLoading] = useState(true)

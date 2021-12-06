@@ -1,3 +1,4 @@
+import CustomBadge from '@/components/Badge'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import CheckBox from '@/components/Form/CheckBox'
@@ -11,9 +12,10 @@ import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { topupList, transactionList } from '@/services/credit'
 import { outletDetail, personalData, updateOutlet } from '@/services/merchant'
+import { StopOutlined } from '@ant-design/icons'
 import { Badge, Breadcrumb, Col, Divider, Modal, Row, Space, Switch, Typography } from 'antd'
 import { Field, FieldArray, Form, Formik } from 'formik'
-import _ from 'lodash'
+import _, { filter } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
@@ -193,6 +195,8 @@ export default function MerchantUserView({}: Props): ReactElement {
     user_email: '',
     nation_id: '',
     verify_email: '',
+    is_ban: false,
+    staff: [],
   })
 
   let [outletInitialValues, setOutletInitialValues] = useState({
@@ -215,6 +219,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     opening_time: '',
     closed_time: '',
     available_credit: 0,
+    isBan: false,
   })
 
   const mapBranchType: any = {
@@ -225,7 +230,7 @@ export default function MerchantUserView({}: Props): ReactElement {
   useEffect(() => {
     if (id) {
       getOutlet()
-      getPersonal()
+
       credit.handleFetchData({
         outlet_id: id,
         is_preload_credit: true,
@@ -235,41 +240,6 @@ export default function MerchantUserView({}: Props): ReactElement {
       })
     }
   }, [id])
-
-  const getPersonal = async () => {
-    const request: any = {
-      page: 1,
-      per_page: 10,
-      id: id,
-    }
-    const { result, success } = await personalData(request)
-    if (success) {
-      setIsLoading(false)
-      const { data = [] } = result
-      if (data[0]) {
-        const { user = {} } = data[0]
-        const {
-          email = '',
-          first_name = '',
-          last_name = '',
-          tel = '',
-          ssoid = '',
-          nation_id = '',
-        } = user
-        if (ssoid) {
-          setSsoid(ssoid)
-        }
-        setUserInitialValues({
-          ...userInitialValues,
-          user_name: `${first_name} ${last_name}`,
-          user_id: '',
-          user_phone: tel,
-          user_email: email,
-          nation_id: nation_id,
-        })
-      }
-    }
-  }
 
   const getOutlet = async () => {
     const request = {
@@ -315,19 +285,21 @@ export default function MerchantUserView({}: Props): ReactElement {
           opening_time: data?.opening_time,
           closed_time: data?.closed_time,
           available_credit: data?.available_credit,
+          isBan: data?.is_ban,
         })
 
       const userRequest: any = {
         page: 1,
         per_page: 10,
         id: id,
+        include_staff: true,
       }
       const { result: userResult, success: userSuccess } = await personalData(userRequest)
       if (userSuccess) {
         setIsLoading(false)
         const { data = [] } = userResult
         if (data[0]) {
-          const { user = {} } = data[0]
+          const { user = {}, staff = [] } = data[0]
           const {
             email = '',
             first_name = '',
@@ -335,7 +307,9 @@ export default function MerchantUserView({}: Props): ReactElement {
             tel = '',
             ssoid = '',
             nation_id = '',
+            is_ban = false,
           } = user
+
           if (ssoid) {
             setSsoid(ssoid)
           }
@@ -347,6 +321,8 @@ export default function MerchantUserView({}: Props): ReactElement {
             user_email: email,
             nation_id: nation_id,
             verify_email: verify_email,
+            is_ban: is_ban,
+            staff: staff,
           })
         }
       }
@@ -406,6 +382,40 @@ export default function MerchantUserView({}: Props): ReactElement {
     )
   }
 
+  const summaryBanStaff = (staffList: Array<any>) => {
+    const banList = filter(staffList, (value) => {
+      return value?.is_ban === true
+    })
+    if (staffList.length === 0) {
+      return banTextMapping(false, true)
+    }
+    if (banList.length === staffList.length) {
+      return banTextMapping(true)
+    }
+    return banTextMapping(false)
+  }
+
+  const banTextMapping = (
+    isBan: boolean,
+    inactive = false
+  ): { status: 'processing' | 'success' | 'error' | 'waiting'; text: string } => {
+    if (inactive) {
+      return {
+        status: 'waiting',
+        text: 'Inactive',
+      }
+    }
+    return isBan
+      ? {
+          status: 'error',
+          text: 'ถูกแบน',
+        }
+      : {
+          status: 'success',
+          text: 'ปกติ',
+        }
+  }
+
   return (
     <MainLayout isLoading={isLoadingPage}>
       <Row justify="space-around" align="middle">
@@ -418,36 +428,45 @@ export default function MerchantUserView({}: Props): ReactElement {
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}>
-          {isEdit ? (
-            <Space size="small">
+          <div>
+            {isEdit ? (
+              <Space size="small">
+                <Button
+                  type="default"
+                  onClick={() => {
+                    setIsEdit(false)
+                  }}
+                >
+                  ยกเลิก
+                </Button>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setIsEdit(false)
+                    handleSubmitStatus()
+                  }}
+                >
+                  บันทึก
+                </Button>
+              </Space>
+            ) : (
               <Button
                 type="default"
                 onClick={() => {
-                  setIsEdit(false)
+                  setIsEdit(true)
                 }}
               >
-                ยกเลิก
+                แก้ไข
               </Button>
-              <Button
-                type="primary"
-                onClick={() => {
-                  setIsEdit(false)
-                  handleSubmitStatus()
-                }}
-              >
-                บันทึก
-              </Button>
-            </Space>
-          ) : (
-            <Button
-              type="default"
-              onClick={() => {
-                setIsEdit(true)
-              }}
-            >
-              แก้ไข
-            </Button>
-          )}
+            )}
+          </div>
+
+          <Title style={{ textAlign: 'end', margin: '16px 0px' }} level={5}>
+            สถานะร้านค้า :{' '}
+            {isEdit
+              ? statusEditForm(outletInitialValues.status)
+              : outletStatusRender(outletInitialValues.status)}
+          </Title>
         </Col>
       </Row>
 
@@ -462,18 +481,33 @@ export default function MerchantUserView({}: Props): ReactElement {
           {(values) => (
             <Form>
               <Row gutter={16}>
-                <Col className="gutter-row" span={8}>
+                <Col className="gutter-row" span={4}>
                   <Title level={5}>ข้อมูลบัญชีร้านค้า</Title>
                 </Col>
-                <Col className="gutter-row" span={8} offset={8}>
-                  <Title style={{ textAlign: 'end' }} level={5}>
-                    สถานะร้านค้า :{' '}
-                    {isEdit
-                      ? statusEditForm(outletInitialValues.status)
-                      : outletStatusRender(outletInitialValues.status)}
-                  </Title>
+                <Col className="gutter-row" span={4}>
+                  <Button
+                    type="primary"
+                    size="small"
+                    disabled={!isEdit}
+                    onClick={() => {
+                      router.push(
+                        '/userprofile/merchant/[id]/ban-user',
+                        `/userprofile/merchant/${id}/ban-user`
+                      )
+                    }}
+                    isDanger={true}
+                  >
+                    <StopOutlined />
+                    แบนผู้ใช้งาน
+                  </Button>
+                </Col>
+                <Col className="gutter-row" span={8} style={{ textAlign: 'end' }} offset={8}>
+                  <CustomBadge
+                    customMapping={summaryBanStaff(userInitialValues.staff)}
+                  ></CustomBadge>
                 </Col>
               </Row>
+              <br />
               <Title level={5}>ข้อมูลส่วนบุคคล</Title>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -552,7 +586,35 @@ export default function MerchantUserView({}: Props): ReactElement {
           {({ values }) => (
             <Form>
               <Divider />
-              <Title level={5}>ข้อมูลร้านค้า</Title>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={3}>
+                  <Title level={5}>ข้อมูลร้านค้า</Title>
+                </Col>
+                <Col className="gutter-row" span={4}>
+                  <Button
+                    type="primary"
+                    size="small"
+                    disabled={!isEdit}
+                    onClick={() => {
+                      router.push(
+                        '/userprofile/merchant/[id]/ban-merchant',
+                        `/userprofile/merchant/${id}/ban-merchant`
+                      )
+                    }}
+                    isDanger={true}
+                  >
+                    <StopOutlined />
+                    แบนร้านค้า
+                  </Button>
+                </Col>
+                <Col className="gutter-row" style={{ textAlign: 'end' }} offset={13} span={4}>
+                  <CustomBadge
+                    customMapping={banTextMapping(outletInitialValues.isBan)}
+                  ></CustomBadge>
+                </Col>
+              </Row>
+              <br />
+
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>

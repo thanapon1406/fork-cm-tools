@@ -263,7 +263,7 @@ export default function Merchant({ }: Props): ReactElement {
       <Card>
         <Table
           config={{
-            dataTableTitle: 'บัชชีลูกค้า',
+            dataTableTitle: 'บัญชีลูกค้า',
             loading: _isLoading,
             tableName: 'consumer',
             tableColumns: column,

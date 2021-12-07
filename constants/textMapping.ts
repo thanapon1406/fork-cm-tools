@@ -50,3 +50,8 @@ export const onlineStatus: any = {
   online: 'ร้านเปิด',
   offline: 'ร้านปิด',
 }
+
+export const userServiceType: any = {
+  pos: 'CMS',
+  delivery: 'Merchant App',
+}

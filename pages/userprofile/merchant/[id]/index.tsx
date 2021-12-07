@@ -7,7 +7,7 @@ import ImgButton from '@/components/ImgButton'
 import { StatusMapping } from '@/components/outlet/Status'
 import Tab from '@/components/Tab'
 import Table from '@/components/Table'
-import { days } from '@/constants/textMapping'
+import { days, userServiceType } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { topupList, transactionList } from '@/services/credit'
@@ -197,6 +197,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     verify_email: '',
     is_ban: false,
     staff: [],
+    line_id: '',
   })
 
   let [outletInitialValues, setOutletInitialValues] = useState({
@@ -220,6 +221,8 @@ export default function MerchantUserView({}: Props): ReactElement {
     closed_time: '',
     available_credit: 0,
     isBan: false,
+    user_service_type: '',
+    brand_name: '',
   })
 
   const mapBranchType: any = {
@@ -248,45 +251,22 @@ export default function MerchantUserView({}: Props): ReactElement {
     const { result, success } = await outletDetail(request)
     let verify_email = ''
     if (success) {
-      const { data } = result
+      const { data: outletData } = result
       let business_times_Set: any
       let business_extra_times_Set: any
-      if (data?.business_times) {
+      if (outletData?.business_times) {
         const convertStatus = (d: any) => {
           return {
             ...d,
             status: d.status === 'open' ? true : false,
           }
         }
-        business_extra_times_Set = _.filter(data.business_times, { day: 'extra' })
-        business_times_Set = _.filter(data.business_times, (d: any) => d.day !== 'extra')
+        business_extra_times_Set = _.filter(outletData.business_times, { day: 'extra' })
+        business_times_Set = _.filter(outletData.business_times, (d: any) => d.day !== 'extra')
         business_extra_times_Set = business_extra_times_Set.map(convertStatus)
         business_times_Set = business_times_Set.map(convertStatus)
       }
-      ;(verify_email = data?.email),
-        setOutletInitialValues({
-          ...outletInitialValues,
-          outlet_name: data?.name.th,
-          outlet_type: mapBranchType[data.branch_type],
-          tax_id: data?.tax_id,
-          email: data?.email,
-          full_address: data.full_address,
-          address: data.address,
-          verify_status: data.verify_status,
-          photo: data?.photo,
-          banner_photo: data?.banner_photo,
-          latitude: data?.latitude,
-          longitude: data?.longitude,
-          tel: data?.tel,
-          rating: data?.rating,
-          business_times: business_times_Set,
-          business_extra_times: business_extra_times_Set,
-          status: data?.status,
-          opening_time: data?.opening_time,
-          closed_time: data?.closed_time,
-          available_credit: data?.available_credit,
-          isBan: data?.is_ban,
-        })
+      verify_email = outletData?.email
 
       const userRequest: any = {
         page: 1,
@@ -299,7 +279,7 @@ export default function MerchantUserView({}: Props): ReactElement {
         setIsLoading(false)
         const { data = [] } = userResult
         if (data[0]) {
-          const { user = {}, staff = [] } = data[0]
+          const { user = {}, staff = [], brand_name = {} } = data[0]
           const {
             email = '',
             first_name = '',
@@ -308,8 +288,9 @@ export default function MerchantUserView({}: Props): ReactElement {
             ssoid = '',
             nation_id = '',
             is_ban = false,
+            line_id = '',
+            user_service_type = '',
           } = user
-
           if (ssoid) {
             setSsoid(ssoid)
           }
@@ -323,6 +304,33 @@ export default function MerchantUserView({}: Props): ReactElement {
             verify_email: verify_email,
             is_ban: is_ban,
             staff: staff,
+            line_id: line_id,
+          })
+
+          setOutletInitialValues({
+            ...outletInitialValues,
+            outlet_name: outletData?.name.th,
+            outlet_type: mapBranchType[outletData.branch_type],
+            tax_id: outletData?.tax_id,
+            email: outletData?.email,
+            full_address: outletData.full_address,
+            address: outletData.address,
+            verify_status: outletData.verify_status,
+            photo: outletData?.photo,
+            banner_photo: outletData?.banner_photo,
+            latitude: outletData?.latitude,
+            longitude: outletData?.longitude,
+            tel: outletData?.tel,
+            rating: outletData?.rating,
+            business_times: business_times_Set,
+            business_extra_times: business_extra_times_Set,
+            status: outletData?.status,
+            opening_time: outletData?.opening_time,
+            closed_time: outletData?.closed_time,
+            available_credit: outletData?.available_credit,
+            isBan: outletData?.is_ban,
+            user_service_type: user_service_type ? userServiceType[user_service_type] : '-',
+            brand_name: brand_name?.th,
           })
         }
       }
@@ -560,7 +568,19 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
               </Row>
               <Row gutter={16}>
-                <Col className="gutter-row" offset={18} span={6}>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'LINE ID' }}
+                    name="line_id"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="line_id"
+                    placeholder="LINE ID"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" offset={12} span={6}>
                   <Field
                     label={{ text: 'อีเมลที่ยืนยัน' }}
                     name="verify_email"
@@ -627,6 +647,30 @@ export default function MerchantUserView({}: Props): ReactElement {
                     <Text>รูปภาพปกร้านค้า</Text>
                   </div>
                   <ImgButton url={values.banner_photo} />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'ชื่อแบรนด์' }}
+                    name="brand_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="brand_name"
+                    placeholder="ชื่อแบรนด์"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'ช่องทางลงทะเบียน' }}
+                    name="user_service_type"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="user_service_type"
+                    placeholder="ช่องทางลงทะเบียน"
+                    disabled={true}
+                  />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field

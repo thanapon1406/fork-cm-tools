@@ -217,6 +217,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     business_times: [],
     business_extra_times: [],
     status: '',
+    default_status: '',
     opening_time: '',
     closed_time: '',
     available_credit: 0,
@@ -325,6 +326,7 @@ export default function MerchantUserView({}: Props): ReactElement {
             business_times: business_times_Set,
             business_extra_times: business_extra_times_Set,
             status: outletData?.status,
+            default_status: outletData?.status,
             opening_time: outletData?.opening_time,
             closed_time: outletData?.closed_time,
             available_credit: outletData?.available_credit,
@@ -443,6 +445,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                   type="default"
                   onClick={() => {
                     setIsEdit(false)
+                    setOutletInitialValues({
+                      ...outletInitialValues,
+                      status: outletInitialValues.default_status,
+                    })
                   }}
                 >
                   ยกเลิก
@@ -492,6 +498,12 @@ export default function MerchantUserView({}: Props): ReactElement {
                 <Col className="gutter-row" span={4}>
                   <Title level={5}>ข้อมูลบัญชีร้านค้า</Title>
                 </Col>
+              </Row>
+              <br />
+              <Row gutter={16}>
+                <Col className="gutter-row" span={4}>
+                  <Title level={5}>ข้อมูลส่วนบุคคล</Title>
+                </Col>
                 <Col className="gutter-row" span={4}>
                   <Button
                     type="primary"
@@ -515,8 +527,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                   ></CustomBadge>
                 </Col>
               </Row>
-              <br />
-              <Title level={5}>ข้อมูลส่วนบุคคล</Title>
+
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field

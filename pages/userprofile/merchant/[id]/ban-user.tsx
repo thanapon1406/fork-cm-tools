@@ -81,7 +81,7 @@ export default function BanUserOutlet({}: Props): ReactElement {
           ban_detail,
         }
       })
-      console.log(`staffs`, staffs)
+
       setOutletInitialValues({ staff: staffs, default_value: staff })
     } else {
       router.push(`/userprofile/merchant/${id}`)

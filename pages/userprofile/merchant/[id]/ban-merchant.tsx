@@ -50,7 +50,7 @@ export default function BanOutlet({}: Props): ReactElement {
       if (isBan) {
         ban_detail = get(data, 'ban_detail')
       }
-      console.log(`ban_detail`, ban_detail)
+
       setOutletInitialValues({
         ...outletInitialValues,
         outlet_name: get(data, 'name.th'),

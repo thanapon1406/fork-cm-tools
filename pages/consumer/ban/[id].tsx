@@ -35,9 +35,9 @@ export default function BanConsumer({ }: Props): ReactElement {
   })
 
   const showModal = (values: any, ban: boolean) => {
-    if (values.remark == undefined || values.remark == "") {
+    if (values.remark == undefined || values.remark == "" && values.isBan == false) {
       Modal.warning({
-        content: 'กรุณาระบุเหตุผล',
+        content: 'กรุณาใส่เหตุผล เพื่อยืนยันการแบนผู้ใช้งาน',
         okText: 'ตกลง',
         okButtonProps: {
           style: {
@@ -47,8 +47,7 @@ export default function BanConsumer({ }: Props): ReactElement {
         },
       });
     } else {
-      values.isBan = ban
-      openPopupBannedRider(values)
+      openPopupBannedRider(values, ban)
     }
   }
 
@@ -75,28 +74,28 @@ export default function BanConsumer({ }: Props): ReactElement {
           email: data.email,
           ssoId: data.sso_id,
           tel: data.tel,
-          socialName: data.social_login_first_name + ' ' + data.social_login_last_name,
+          socialName: (data.social_login_first_name == undefined ? '' : data.social_login_first_name) + ' ' + (data.social_login_last_name == undefined ? '' : data.social_login_last_name),
           point: data.point,
           rank: data.ranking,
           confirmEKYC: data.confirm_e_kyc,
-          firstName: data.first_name,
-          lastName: data.last_name,
+          firstName: data.first_name == undefined ? '' : data.first_name,
+          lastName: data.last_name == undefined ? '' : data.last_name,
           googleId: data.google_id,
           facebookId: data.facebook_id,
           appleId: data.apple_id,
           lineId: data.line_id,
           isBan: data.is_ban,
-          remark: data.remark,
+          remark: data.is_ban ? data.remark : "",
         })
       }
     }
   }
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: any, ban: boolean) => {
     const request = {
       id: id,
       remark: values.remark,
-      is_ban: values.isBan,
+      is_ban: ban,
     }
     const update = {
       data: request,
@@ -116,15 +115,15 @@ export default function BanConsumer({ }: Props): ReactElement {
     }
   }
 
-  const openPopupBannedRider = async (values: any) => {
+  const openPopupBannedRider = async (values: any, ban: boolean) => {
     confirm({
-      title: values.isBan ? 'ยืนยันการแบนผู้ใช้งาน?' : 'ยืนยันการยกเลิกแบนผู้ใช้งาน?',
+      title: ban ? 'ยืนยันการแบนผู้ใช้งาน?' : 'ยืนยันการยกเลิกแบนผู้ใช้งาน?',
       icon: <ExclamationCircleOutlined />,
       okText: "ยืนยัน",
       cancelText: "ยกเลิก",
-      okButtonProps: { style: { background: !values.isBan ? `#EB5757` : `#28A745`, borderColor: !values.isBan ? `#EB5757` : `#28A745` } },
+      okButtonProps: { style: { background: !ban ? `#EB5757` : `#28A745`, borderColor: !ban ? `#EB5757` : `#28A745` } },
       async onOk() {
-        handleSubmit(values)
+        handleSubmit(values, ban)
       },
       async onCancel() {
         console.log('Closed!');

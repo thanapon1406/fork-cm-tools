@@ -223,7 +223,7 @@ export default function BanUserOutlet({}: Props): ReactElement {
                                 {`${staff?.firstname} ${staff?.lastname}`} (รหัสพนักงาน : -)
                               </Text>
                               <CustomBadge
-                                size="large"
+                                size="default"
                                 customMapping={banTextMapping(staff.is_ban)}
                               ></CustomBadge>
                             </Space>

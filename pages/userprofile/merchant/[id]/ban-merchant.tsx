@@ -184,7 +184,7 @@ export default function BanOutlet({}: Props): ReactElement {
                       1.{values.outlet_name} (MerchantId : {values.shop_id})
                     </Text>
                     <CustomBadge
-                      size="large"
+                      size="default"
                       customMapping={banTextMapping(values.is_ban)}
                     ></CustomBadge>
                   </Space>

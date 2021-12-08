@@ -75,7 +75,7 @@ export default function RiderBan({ }: Props): ReactElement {
       openPopupBannedRider(values)
     } else {
       Modal.warning({
-        content: 'กรุณาระบุเหตุผล',
+        content: 'กรุณาใส่เหตุผล เพื่อยืนยันการแบนผู้ใช้งาน',
         okText: 'ตกลง',
         okButtonProps: {
           style: {
@@ -89,8 +89,9 @@ export default function RiderBan({ }: Props): ReactElement {
   }
 
   const validateValue = async (values: IRiderDetail) => {
+    const updateBannedStatus = !values.banned_status
     let valid = true
-    if (values.banned_reason == "") {
+    if (updateBannedStatus && values.banned_reason == "") {
       valid = false
     }
     return valid
@@ -136,6 +137,9 @@ export default function RiderBan({ }: Props): ReactElement {
                   borderColor: "#28A745",
                 },
               },
+              async onOk() {
+                router.reload()
+              },
             });
           } else {
             // Update rider profile
@@ -143,7 +147,7 @@ export default function RiderBan({ }: Props): ReactElement {
               data: {
                 id: id,
                 banned_status: updateBannedStatus,
-                banned_reason: updateBannedStatus ? values.banned_reason : values.banned_reason,
+                banned_reason: updateBannedStatus ? values.banned_reason : "",
                 active_status: updateBannedStatus ? 'inactive' : values.active_status,
               },
             }

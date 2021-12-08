@@ -5,19 +5,36 @@ interface Props {
   badgeStatus?: string
   badgeText?: string
   customMapping?: CustomMapping | undefined
-  size?: 'small' | 'large'
+  size?: 'small' | 'default'
 }
+
+const Badges = styled(Badge)`
+  .ant-badge-status-dot {
+    position: relative;
+    top: -1px;
+    display: inline-block;
+    width: ${(props) => {
+      return props.size === 'small' ? '6px' : '12px !important'
+    }};
+    height: ${(props) => {
+      return props.size === 'small' ? '6px' : '12px !important'
+    }};
+    vertical-align: middle;
+    border-radius: 50%;
+  }
+`
 
 interface CustomMapping {
   status: 'success' | 'waiting' | 'error' | 'processing'
   text: string
 }
 
-function CustomBadge({
+const CustomBadge = ({
   badgeStatus = 'warning',
   badgeText = 'ดำเนินการ',
   customMapping = undefined,
-}: Props): any {
+  size = 'small',
+}: Props): any => {
   const badgeStatusMapping: any = {
     waiting: 'warning',
     success: 'success',
@@ -44,19 +61,7 @@ function CustomBadge({
     text = customMapping.text
   }
 
-  return <Badge status={status} text={text}></Badge>
+  return <Badges status={status} text={text} size={size}></Badges>
 }
 
-export default styled(CustomBadge)`
-  .ant-badge-status-dot {
-    position: relative;
-    top: -1px;
-    display: inline-block;
-    width: ${(props) => (props.size === 'small' ? '12px' : '20px')};
-    height: ${(props) => {
-      return props.size === 'small' ? '12px' : '20px'
-    }};
-    vertical-align: middle;
-    border-radius: 50%;
-  }
-`
+export default CustomBadge

@@ -574,6 +574,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={8} style={{ textAlign: 'end' }} offset={8}>
                   <CustomBadge
+                    size="default"
                     customMapping={summaryBanStaff(userInitialValues.staff)}
                   ></CustomBadge>
                 </Col>
@@ -691,6 +692,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" style={{ textAlign: 'end' }} offset={13} span={4}>
                   <CustomBadge
+                    size="default"
                     customMapping={banTextMapping(outletInitialValues.isBan)}
                   ></CustomBadge>
                 </Col>

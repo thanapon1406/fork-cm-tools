@@ -15,6 +15,25 @@ export const outletStatus: any = {
   temporarily_closed: 'Temporarily closed',
 }
 
+export const outletStatusTH: any = {
+  active: {
+    text: 'ดำเนินกิจการ',
+    status: 'success',
+  },
+  inactive: {
+    text: 'inactive',
+    status: 'error',
+  },
+  closed: {
+    text: 'ปิดกิจการ',
+    status: 'error',
+  },
+  temporarily_closed: {
+    text: 'ปิดปรับปรุง',
+    status: 'waiting',
+  },
+}
+
 export const creditPaymentChanel: any = {
   qr_payment: 'QR Code',
   bank_transfer: 'บัญชีธนาคาร',
@@ -49,6 +68,17 @@ export const deliveryInfo: any = {
 export const onlineStatus: any = {
   online: 'ร้านเปิด',
   offline: 'ร้านปิด',
+}
+
+export const onlineStatusTag: any = {
+  online: {
+    text: 'ร้านเปิด',
+    status: 'success',
+  },
+  offline: {
+    text: 'ร้านปิด',
+    status: 'error',
+  },
 }
 
 export const userServiceType: any = {

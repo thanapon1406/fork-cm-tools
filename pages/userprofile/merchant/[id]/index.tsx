@@ -4,16 +4,16 @@ import Card from '@/components/Card'
 import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
-import { StatusMapping } from '@/components/outlet/Status'
 import Tab from '@/components/Tab'
 import Table from '@/components/Table'
-import { days, userServiceType } from '@/constants/textMapping'
+import Tag from '@/components/Tag'
+import { days, onlineStatusTag, outletStatusTH, userServiceType } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { topupList, transactionList } from '@/services/credit'
 import { outletDetail, personalData, updateOutlet } from '@/services/merchant'
 import { StopOutlined } from '@ant-design/icons'
-import { Badge, Breadcrumb, Col, Divider, Modal, Row, Space, Switch, Typography } from 'antd'
+import { Badge, Breadcrumb, Col, Divider, Modal, Row, Select, Space, Typography } from 'antd'
 import { Field, FieldArray, Form, Formik } from 'formik'
 import _, { filter } from 'lodash'
 import moment from 'moment'
@@ -224,6 +224,8 @@ export default function MerchantUserView({}: Props): ReactElement {
     isBan: false,
     user_service_type: '',
     brand_name: '',
+    online_status: '',
+    default_online_status: '',
   })
 
   const mapBranchType: any = {
@@ -333,6 +335,8 @@ export default function MerchantUserView({}: Props): ReactElement {
             isBan: outletData?.is_ban,
             user_service_type: user_service_type ? userServiceType[user_service_type] : '-',
             brand_name: brand_name?.th,
+            online_status: outletData?.online_status,
+            default_online_status: outletData?.online_status,
           })
         }
       }
@@ -360,8 +364,15 @@ export default function MerchantUserView({}: Props): ReactElement {
         closed_time: outletInitialValues.closed_time,
         tel: outletInitialValues.tel,
         status: outletInitialValues.status,
+        online_status: outletInitialValues.online_status,
       },
     }
+
+    setOutletInitialValues({
+      ...outletInitialValues,
+      default_status: outletInitialValues.status,
+      default_online_status: outletInitialValues.online_status,
+    })
 
     const { result, success } = await updateOutlet(body)
     if (success) {
@@ -372,23 +383,55 @@ export default function MerchantUserView({}: Props): ReactElement {
   }
 
   const outletStatusRender = (status: string) => {
-    return StatusMapping[status]
+    const mapping = outletStatusTH[status]
+    return status ? <Tag type={mapping.status}>{mapping.text}</Tag> : ''
   }
 
-  const statusEditForm = (status: string) => {
+  const onlineStatusRender = (status: string) => {
+    const mapping = onlineStatusTag[status]
+    return status ? <Tag type={mapping?.status}>{mapping?.text}</Tag> : ''
+  }
+
+  const outletStatusEditForm = (status: string) => {
     const onChange = (event: any) => {
       setOutletInitialValues({
         ...outletInitialValues,
-        status: event ? 'active' : 'closed',
+        status: event ? event : 'closed',
       })
     }
+
     return (
-      <Switch
+      <Select
+        style={{ width: '113px' }}
+        defaultValue={outletInitialValues.status}
         onChange={onChange}
-        checkedChildren="Active"
-        unCheckedChildren="Closed"
-        defaultChecked={status === 'active'}
-      />
+        size="small"
+      >
+        <Select.Option value="active">ดำเนินกิจการ</Select.Option>
+        <Select.Option value="closed">ปิดกิจการ</Select.Option>
+        <Select.Option value="temporarily_closed">ปิดปรับปรุง</Select.Option>
+      </Select>
+    )
+  }
+
+  const onlineStatusEditForm = (status: string) => {
+    const onChange = (event: any) => {
+      setOutletInitialValues({
+        ...outletInitialValues,
+        online_status: event ? event : 'offline',
+      })
+    }
+
+    return (
+      <Select
+        style={{ width: '81px' }}
+        defaultValue={outletInitialValues.online_status}
+        onChange={onChange}
+        size="small"
+      >
+        <Select.Option value="online">ร้านเปิด</Select.Option>
+        <Select.Option value="offline">ร้านปิด</Select.Option>
+      </Select>
     )
   }
 
@@ -437,7 +480,7 @@ export default function MerchantUserView({}: Props): ReactElement {
             <Breadcrumb.Item>ข้อมูลบัญชีร้านค้า</Breadcrumb.Item>
           </Breadcrumb>
         </Col>
-        <Col span={8} offset={8} style={{ textAlign: 'end' }}>
+        <Col span={12} offset={4} style={{ textAlign: 'end' }}>
           <div>
             {isEdit ? (
               <Space size="small">
@@ -448,6 +491,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                     setOutletInitialValues({
                       ...outletInitialValues,
                       status: outletInitialValues.default_status,
+                      online_status: outletInitialValues.default_online_status,
                     })
                   }}
                 >
@@ -474,13 +518,20 @@ export default function MerchantUserView({}: Props): ReactElement {
               </Button>
             )}
           </div>
-
-          <Title style={{ textAlign: 'end', margin: '16px 0px' }} level={5}>
-            สถานะร้านค้า :{' '}
-            {isEdit
-              ? statusEditForm(outletInitialValues.status)
-              : outletStatusRender(outletInitialValues.status)}
-          </Title>
+          <Space>
+            <Title style={{ textAlign: 'end', margin: '16px 0px' }} level={5}>
+              ร้านเปิด-ปิด :{' '}
+              {isEdit
+                ? onlineStatusEditForm(outletInitialValues.status)
+                : onlineStatusRender(outletInitialValues.online_status)}
+            </Title>
+            <Title style={{ textAlign: 'end', margin: '16px 0px' }} level={5}>
+              สถานะร้านค้า :{' '}
+              {isEdit
+                ? outletStatusEditForm(outletInitialValues.status)
+                : outletStatusRender(outletInitialValues.status)}
+            </Title>
+          </Space>
         </Col>
       </Row>
 
@@ -500,7 +551,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
               </Row>
               <br />
-              <Row gutter={16}>
+              <Row gutter={[16, 24]}>
                 <Col className="gutter-row" span={4}>
                   <Title level={5}>ข้อมูลส่วนบุคคล</Title>
                 </Col>

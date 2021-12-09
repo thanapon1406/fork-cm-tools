@@ -90,14 +90,6 @@ export default function BanOutlet({}: Props): ReactElement {
       return
     }
 
-    if (values.ban_detail == '') {
-      const modal = Modal.error({
-        title: 'แจ้งเตือน',
-        content: `กรุณาใส่เหตุผลเพื่อแบนร้านค้า`,
-      })
-      return
-    }
-
     confirm({
       title: values.is_ban ? 'ยืนยันการยกเลิกแบนร้านค้า?' : 'ยืนยันการแบนร้านค้า?',
       icon: <ExclamationCircleOutlined />,

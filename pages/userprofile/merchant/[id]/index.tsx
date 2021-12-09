@@ -11,7 +11,7 @@ import { days, onlineStatusTag, outletStatusTH, userServiceType } from '@/consta
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { topupList, transactionList } from '@/services/credit'
-import { outletDetail, personalData, updateOutlet } from '@/services/merchant'
+import { outletDetail, personalData, updateOutletStatus } from '@/services/merchant'
 import { StopOutlined } from '@ant-design/icons'
 import { Badge, Breadcrumb, Col, Divider, Modal, Row, Select, Space, Typography } from 'antd'
 import { Field, FieldArray, Form, Formik } from 'formik'
@@ -357,28 +357,34 @@ export default function MerchantUserView({}: Props): ReactElement {
 
   const handleSubmit = async (values: any) => {}
   const handleSubmitStatus = async () => {
+    const staffStatus = summaryBanStaff(userInitialValues.staff)
+    if (outletInitialValues.online_status === 'online' && staffStatus.status === 'error') {
+      const modal = Modal.error({
+        title: 'แจ้งเตือน',
+        content: `ไม่สามารถเปิดร้านได้ เนื่องจากพนักงานถูกงับ`,
+      })
+      return
+    }
+
     const body = {
       data: {
         id: id,
-        opening_time: outletInitialValues.opening_time,
-        closed_time: outletInitialValues.closed_time,
-        tel: outletInitialValues.tel,
         status: outletInitialValues.status,
         online_status: outletInitialValues.online_status,
       },
     }
 
-    setOutletInitialValues({
-      ...outletInitialValues,
-      default_status: outletInitialValues.status,
-      default_online_status: outletInitialValues.online_status,
-    })
-
-    const { result, success } = await updateOutlet(body)
+    const { result, success } = await updateOutletStatus(body)
     if (success) {
+      setOutletInitialValues({
+        ...outletInitialValues,
+        default_status: outletInitialValues.status,
+        default_online_status: outletInitialValues.online_status,
+      })
       Modal.success({
         content: <Title level={4}>แก้ไขเรียบร้อยแล้ว</Title>,
       })
+      setIsEdit(false)
     }
   }
 
@@ -500,7 +506,6 @@ export default function MerchantUserView({}: Props): ReactElement {
                 <Button
                   type="primary"
                   onClick={() => {
-                    setIsEdit(false)
                     handleSubmitStatus()
                   }}
                 >
@@ -559,7 +564,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                   <Button
                     type="primary"
                     size="small"
-                    disabled={!isEdit}
+                    disabled={!isEdit || outletInitialValues.online_status == 'online'}
                     onClick={() => {
                       router.push(
                         '/userprofile/merchant/[id]/ban-user',
@@ -677,7 +682,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                   <Button
                     type="primary"
                     size="small"
-                    disabled={!isEdit}
+                    disabled={!isEdit || outletInitialValues.online_status == 'online'}
                     onClick={() => {
                       router.push(
                         '/userprofile/merchant/[id]/ban-merchant',

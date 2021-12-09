@@ -361,7 +361,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     if (outletInitialValues.online_status === 'online' && staffStatus.status === 'error') {
       const modal = Modal.error({
         title: 'แจ้งเตือน',
-        content: `ไม่สามารถเปิดร้านได้ เนื่องจากพนักงานถูกงับ`,
+        content: `ไม่สามารถเปิดร้านได้ เนื่องจากพนักงานถูกระงับการใช้งาน`,
       })
       return
     }

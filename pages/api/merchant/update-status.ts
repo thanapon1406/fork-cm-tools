@@ -5,7 +5,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body } = req
   if (method === 'POST') {
     try {
-      const url: string = `merchant-service/Outlet/update-Outlet-status`
+      const url: string = `merchant-service/Outlet/update-outlet-status`
       const { data, status } = await ServerFetch.post(url, body, headers)
       res.status(status).json(data)
     } catch (e: any) {

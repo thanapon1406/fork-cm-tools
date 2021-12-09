@@ -118,14 +118,6 @@ export default function BanUserOutlet({}: Props): ReactElement {
       return
     }
 
-    if (staff.ban_detail == '') {
-      const modal = Modal.error({
-        title: 'แจ้งเตือน',
-        content: `กรุณาใส่เหตุผลเพื่อแบนผู้ใช้งาน`,
-      })
-      return
-    }
-
     confirm({
       title: staff.is_ban ? 'ยืนยันการยกเลิกแบนผู้ใช้งาน?' : 'ยืนยันการแบนผู้ใช้งาน?',
       icon: <ExclamationCircleOutlined />,

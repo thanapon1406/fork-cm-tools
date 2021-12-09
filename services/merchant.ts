@@ -125,7 +125,7 @@ const banUser = async (body: any) => {
 
 const updateOutletStatus = async (body: any) => {
   try {
-    const result = await fetch.post(`/api/merchant/update-outlet-status`, body)
+    const result = await fetch.post(`/api/merchant/update-status`, body)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

@@ -39,17 +39,11 @@ export default function MainLayout({ children, isLoading = false }: Props) {
       <Sidebar />
       <Layout className="site-layout" style={{ marginLeft: 220 }}>
         <HeaderContent />
-
-        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
-          {isLoading ? (
-            <SkeletonLoading />
-          ) : (
-            <Spin indicator={antIcon} spinning={Loading.isShow}>
-              {children}{' '}
-            </Spin>
-          )}
-        </Content>
-
+        <Spin indicator={antIcon} spinning={Loading.isShow}>
+          <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+            {isLoading ? <SkeletonLoading /> : <>{children}</>}
+          </Content>
+        </Spin>
         {/* <Footer style={{ textAlign: 'center' }}>Footer Layout</Footer> */}
       </Layout>
     </Layout>

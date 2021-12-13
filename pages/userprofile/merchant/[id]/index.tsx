@@ -8,6 +8,7 @@ import Tab from '@/components/Tab'
 import Table from '@/components/Table'
 import Tag from '@/components/Tag'
 import { days, onlineStatusTag, outletStatusTH, userServiceType } from '@/constants/textMapping'
+import { useLoadingContext } from '@/contexts/LoadingContext'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { topupList, transactionList } from '@/services/credit'
@@ -232,11 +233,10 @@ export default function MerchantUserView({}: Props): ReactElement {
     single: 'ร้านค้าเดี่ยว',
     multiple: 'หลายสาขา',
   }
-
+  const Loading = useLoadingContext()
   useEffect(() => {
     if (id) {
       getOutlet()
-
       credit.handleFetchData({
         outlet_id: id,
         is_preload_credit: true,
@@ -357,6 +357,7 @@ export default function MerchantUserView({}: Props): ReactElement {
 
   const handleSubmit = async (values: any) => {}
   const handleSubmitStatus = async () => {
+    Loading.show()
     const staffStatus = summaryBanStaff(userInitialValues.staff)
     if (outletInitialValues.online_status === 'online' && staffStatus.status === 'error') {
       const modal = Modal.error({
@@ -388,6 +389,7 @@ export default function MerchantUserView({}: Props): ReactElement {
       })
       setIsEdit(false)
     }
+    Loading.hide()
   }
 
   const outletStatusRender = (status: string) => {

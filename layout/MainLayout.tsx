@@ -1,11 +1,14 @@
 import { isLogin } from '@/services/login'
-import { Layout } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons'
+import { Layout, Spin } from 'antd'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
+import { useLoadingContext } from '../contexts/LoadingContext'
 import HeaderContent from './HeaderContent'
 import Sidebar from './Sidebar'
 import SkeletonLoading from './SkeletonLoading'
+const antIcon = <LoadingOutlined style={{ fontSize: 60 }} spin />
 
 const { Header, Content, Footer, Sider } = Layout
 
@@ -26,6 +29,7 @@ export default function MainLayout({ children, isLoading = false }: Props) {
       }
     }
   }, [])
+  const Loading = useLoadingContext()
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -35,8 +39,15 @@ export default function MainLayout({ children, isLoading = false }: Props) {
       <Sidebar />
       <Layout className="site-layout" style={{ marginLeft: 220 }}>
         <HeaderContent />
+
         <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
-          {isLoading ? <SkeletonLoading /> : <>{children}</>}
+          {isLoading ? (
+            <SkeletonLoading />
+          ) : (
+            <Spin indicator={antIcon} spinning={Loading.isShow}>
+              {children}{' '}
+            </Spin>
+          )}
         </Content>
 
         {/* <Footer style={{ textAlign: 'center' }}>Footer Layout</Footer> */}

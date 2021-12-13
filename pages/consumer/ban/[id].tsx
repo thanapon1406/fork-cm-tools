@@ -1,22 +1,19 @@
-import CustomBadge from '@/components/Badge'
-import Card from '@/components/Card'
-import Input from '@/components/Form/Input'
-import MainLayout from '@/layout/MainLayout'
-import { consumerBan, consumerList } from '@/services/consumer'
-import { Breadcrumb, Button, Col, Modal, notification, Row, Typography } from 'antd'
-import { Field, Form, Formik } from 'formik'
-import { useRouter } from 'next/router'
-import { default as React, ReactElement, useEffect, useState } from 'react'
+import Card from '@/components/Card';
+import Input from '@/components/Form/Input';
+import MainLayout from '@/layout/MainLayout';
+import { consumerBan, consumerList } from '@/services/consumer';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, Modal, notification, Row, Typography } from 'antd';
+import { Field, Form, Formik } from 'formik';
+import { useRouter } from 'next/router';
+import { default as React, ReactElement, useEffect, useState } from 'react';
+import CustomBadge from '../../userprofile/rider/[id]/style';
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
+const { confirm } = Modal
 
-export default function BanConsumer({}: Props): ReactElement {
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [isBanConsumer, setIsBanConsumer] = useState(false)
-  const [remark, setRemark] = useState('')
-
-  const [isEdit, setIsEdit] = useState(false)
+export default function BanConsumer({ }: Props): ReactElement {
   const router = useRouter()
   const id = router.query.id as string
   let [initialValues, setInitialValues] = useState({
@@ -34,21 +31,24 @@ export default function BanConsumer({}: Props): ReactElement {
     googleId: '',
     lineId: '',
     isBan: false,
+    remark: '',
   })
 
   const showModal = (values: any, ban: boolean) => {
-    setIsModalVisible(true)
-    setIsBanConsumer(ban)
-    setRemark(values.remark)
-  }
-
-  const handleCancel = () => {
-    setIsModalVisible(false)
-  }
-
-  const handleOk = () => {
-    handleSubmit()
-    setIsModalVisible(false)
+    if (values.remark == undefined || values.remark == "" && values.isBan == false) {
+      Modal.warning({
+        content: 'กรุณาใส่เหตุผล เพื่อยืนยันการแบนผู้ใช้งาน',
+        okText: 'ตกลง',
+        okButtonProps: {
+          style: {
+            background: "#28A745",
+            borderColor: "#28A745",
+          },
+        },
+      });
+    } else {
+      openPopupBannedRider(values, ban)
+    }
   }
 
   useEffect(() => {
@@ -74,27 +74,28 @@ export default function BanConsumer({}: Props): ReactElement {
           email: data.email,
           ssoId: data.sso_id,
           tel: data.tel,
-          socialName: data.social_login_first_name + ' ' + data.social_login_last_name,
+          socialName: (data.social_login_first_name == undefined ? '' : data.social_login_first_name) + ' ' + (data.social_login_last_name == undefined ? '' : data.social_login_last_name),
           point: data.point,
           rank: data.ranking,
           confirmEKYC: data.confirm_e_kyc,
-          firstName: data.first_name,
-          lastName: data.last_name,
+          firstName: data.first_name == undefined ? '' : data.first_name,
+          lastName: data.last_name == undefined ? '' : data.last_name,
           googleId: data.google_id,
           facebookId: data.facebook_id,
           appleId: data.apple_id,
           lineId: data.line_id,
           isBan: data.is_ban,
+          remark: data.is_ban ? data.remark : "",
         })
       }
     }
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (values: any, ban: boolean) => {
     const request = {
       id: id,
-      remark: remark,
-      is_ban: isBanConsumer,
+      remark: values.remark,
+      is_ban: ban,
     }
     const update = {
       data: request,
@@ -105,25 +106,40 @@ export default function BanConsumer({}: Props): ReactElement {
         message: `ดำเนินการแบนสำเร็จ`,
         description: '',
       })
-      router.back()
+      router.reload()
     } else {
       notification.error({
         message: `ไม่สามารถทำการ แบนได้`,
         description: '',
       })
     }
-    setIsEdit(!isEdit)
+  }
+
+  const openPopupBannedRider = async (values: any, ban: boolean) => {
+    confirm({
+      title: ban ? 'ยืนยันการแบนผู้ใช้งาน?' : 'ยืนยันการยกเลิกแบนผู้ใช้งาน?',
+      icon: <ExclamationCircleOutlined />,
+      okText: "ยืนยัน",
+      cancelText: "ยกเลิก",
+      okButtonProps: { style: { background: !ban ? `#EB5757` : `#28A745`, borderColor: !ban ? `#EB5757` : `#28A745` } },
+      async onOk() {
+        handleSubmit(values, ban)
+      },
+      async onCancel() {
+        console.log('Closed!');
+      },
+    })
   }
 
   return (
     <MainLayout>
       <>
-        <Formik enableReinitialize={true} initialValues={initialValues} onSubmit={() => {}}>
+        <Formik enableReinitialize={true} initialValues={initialValues} onSubmit={() => { }}>
           {({ values }: any) => (
             <Form>
               <Row gutter={16}>
                 <Col span={20}>
-                  <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+                  <Title level={4}>อนุมัติผลการลงทะเบียนเข้าใช้ระบบ</Title>
                   <Breadcrumb style={{ margin: '16px 0' }}>
                     <Breadcrumb.Item>User Consumer</Breadcrumb.Item>
                     <Breadcrumb.Item>Consumer Profile</Breadcrumb.Item>
@@ -144,25 +160,15 @@ export default function BanConsumer({}: Props): ReactElement {
                       {initialValues.firstName +
                         ' ' +
                         initialValues.lastName +
-                        ' (Consumer ID: ' +
+                        ' (SSO ID: ' +
                         initialValues.ssoId +
                         ')'}
                     </Row>
                     <Row gutter={16}>
                       {initialValues.isBan ? (
-                        <CustomBadge
-                          customMapping={{
-                            status: 'error',
-                            text: 'ถูกแบนผู้ใช้งาน',
-                          }}
-                        ></CustomBadge>
+                        <CustomBadge status="error" text="ถูกแบนผู้ใช้งาน" />
                       ) : (
-                        <CustomBadge
-                          customMapping={{
-                            status: 'success',
-                            text: 'ปกติ',
-                          }}
-                        ></CustomBadge>
+                        <CustomBadge status="success" text="ปกติ" />
                       )}
                     </Row>
                   </Col>
@@ -216,15 +222,6 @@ export default function BanConsumer({}: Props): ReactElement {
             </Form>
           )}
         </Formik>
-        <Modal
-          okText="ยืนยัน"
-          cancelText="ยกเลิก"
-          visible={isModalVisible}
-          onOk={handleOk}
-          onCancel={handleCancel}
-        >
-          {isBanConsumer ? <p>ยืนยันการแบนผู้ใช้งาน?</p> : <p>ยืนยันการยกเลิกแบนผู้ใช้งาน?</p>}
-        </Modal>
       </>
     </MainLayout>
   )

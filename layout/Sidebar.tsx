@@ -52,9 +52,7 @@ export default function Sidebar({}: Props): ReactElement {
     Router.replace('/login')
   }
 
-  useEffect(() => {
-    findUserData()
-  }, [])
+  useEffect(() => {}, [])
 
   const findUserData = async () => {
     const { result = {}, success = false } = await findUser()

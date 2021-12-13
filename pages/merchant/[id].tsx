@@ -4,7 +4,7 @@ import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import MainLayout from '@/layout/MainLayout'
 import { approveOutlet, outletDetail, personalData } from '@/services/merchant'
-import { Breadcrumb, Col, Divider, Row, Typography } from 'antd'
+import { Breadcrumb, Col, Divider, Modal, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
@@ -27,6 +27,7 @@ export default function View({}: Props): ReactElement {
     user_phone: '',
     user_email: '',
     nation_id: '',
+    verify_email: '',
   })
 
   let [outletInitialValues, setOutletInitialValues] = useState({
@@ -39,38 +40,71 @@ export default function View({}: Props): ReactElement {
     verify_status: '',
     verify_detail: [],
   })
-  const verifyDetailList = [
+  const verifyDetailListReApprove = [
+    {
+      name: 'ชื่อ นามสกุลไม่ถูกต้อง',
+      value: '1',
+      key: 'personal',
+    },
+    {
+      name: 'เลขบัตรประชาชนไม่ถูกต้อง',
+      value: '2',
+      key: 'personal',
+    },
     {
       name: 'ชื่อร้านค้า/แบรนด์ ไม่ถูกต้อง',
-      value: '1',
+      value: '3',
+      key: 'outlet',
     },
     {
       name: 'เลขประจำตัวผู้เสียภาษี ไม่ถูกต้อง',
-      value: '2',
+      value: '4',
+      key: 'outlet',
     },
     {
       name: 'ที่อยู่ร้านค้า/แบรนด์ ไม่ถูกต้อง',
-      value: '3',
+      value: '5',
+      key: 'outlet',
     },
     {
       name: 'เบอร์โทรศัพท์ร้านค้า ไม่ถูกต้อง',
-      value: '4',
+      value: '6',
+      key: 'outlet',
     },
     {
       name: 'ชื่อสาขา ไม่ถูกต้อง',
-      value: '5',
+      value: '7',
+      key: 'outlet',
     },
     {
       name: 'เลขประจำตัวผู้เสียภาษีประจำสาขา ไม่ถูกต้อง',
-      value: '6',
+      value: '8',
+      key: 'outlet',
     },
     {
       name: 'ที่อยู่สาขา ไม่ถูกต้อง',
-      value: '7',
+      value: '9',
+      key: 'outlet',
     },
     {
       name: 'เบอร์โทรศัพท์ร้านค้า ไม่ถูกต้อง',
-      value: '8',
+      value: '10',
+      key: 'outlet',
+    },
+  ]
+
+  const verifyDetailListRejected = [
+    {
+      name: 'ตรวจสอบข้อมูลส่วนตัวมีประวัติเคยช่อโกง',
+      value: '20',
+    },
+    {
+      name: 'ตรวจสอบเลขประจำตัวผู้เสียภาษี',
+      value: '21',
+    },
+    {
+      name: 'ร้านค้าขายสินค้าผิดกฎหมาย',
+      value: '22',
     },
   ]
 
@@ -82,22 +116,47 @@ export default function View({}: Props): ReactElement {
   useEffect(() => {
     if (id) {
       getOutlet()
-      getPersonal()
     }
   }, [id])
 
-  const getPersonal = async () => {
-    const request: any = {
+  const getOutlet = async () => {
+    const request = {
+      id: id,
+    }
+    const { result, success } = await outletDetail(request)
+    let verify_email = ''
+    if (success) {
+      setIsLoading(false)
+      const { data } = result
+      let verifyDetail = []
+      if (data.verify_detail) {
+        verifyDetail = data.verify_detail.map((d: any) => d.id)
+      }
+      ;(verify_email = data?.email),
+        setOutletInitialValues({
+          ...outletInitialValues,
+          outlet_name: data?.name.th,
+          outlet_type: mapBranchType[data?.branch_type],
+          tax_id: data?.tax_id,
+          email: data?.email,
+          address: data?.address,
+          verify_status: data?.verify_status,
+          verify_detail: verifyDetail,
+          tel: data?.tel,
+        })
+    }
+
+    const userRequest: any = {
       page: 1,
       per_page: 10,
       id: id,
     }
-    const { result, success } = await personalData(request)
-    if (success) {
-      const { data = [] } = result
+    const { result: userResult, success: userSuccess } = await personalData(userRequest)
+    if (userSuccess) {
+      const { data: userData = [] } = userResult
 
-      if (data.length > 0 && data[0]) {
-        const { user = {} } = data[0]
+      if (userData.length > 0 && userData[0]) {
+        const { user = {} } = userData[0]
         const {
           email = '',
           first_name = '',
@@ -106,7 +165,6 @@ export default function View({}: Props): ReactElement {
           ssoid = '',
           nation_id = '',
         } = user
-
         if (ssoid) {
           setSsoid(ssoid)
         }
@@ -117,37 +175,11 @@ export default function View({}: Props): ReactElement {
           user_phone: tel,
           user_email: email,
           nation_id: nation_id,
+          verify_email: verify_email,
         })
       } else {
         router.replace('/merchant')
       }
-    }
-  }
-
-  const getOutlet = async () => {
-    const request = {
-      id: id,
-    }
-    const { result, success } = await outletDetail(request)
-    if (success) {
-      setIsLoading(false)
-      const { data } = result
-      let verifyDetail = []
-      if (data.verify_detail) {
-        verifyDetail = data.verify_detail.map((d: any) => d.id)
-      }
-
-      setOutletInitialValues({
-        ...outletInitialValues,
-        outlet_name: data?.name.th,
-        outlet_type: mapBranchType[data?.branch_type],
-        tax_id: data?.tax_id,
-        email: data?.email,
-        address: data?.address,
-        verify_status: data?.verify_status,
-        verify_detail: verifyDetail,
-        tel: data?.tel,
-      })
     }
   }
 
@@ -173,27 +205,33 @@ export default function View({}: Props): ReactElement {
       },
     }
 
-    if (values.verify_status === 'rejected') {
+    if (values.verify_status === 'rejected' || values.verify_status === 're-approved') {
       verify_detail = verify_detail.map((d: any) => {
+        const detailList =
+          values.verify_status === 'rejected' ? verifyDetailListRejected : verifyDetailListReApprove
+        const verifyDetail = lodash.find(detailList, { value: d })
         return {
           id: d,
-          value: lodash.find(verifyDetailList, { value: d })?.name,
+          value: lodash.get(verifyDetail, 'name'),
+          key: lodash.get(verifyDetail, 'key', undefined),
         }
       })
       verifyRequest.data.verify_detail = verify_detail
     }
-
     const { result, success } = await approveOutlet(verifyRequest)
     if (success) {
+      Modal.success({
+        content: <Title level={4}>บันทึกข้อมูลเรียบร้อยแล้ว</Title>,
+      })
       router.push('/merchant')
     }
   }
 
   return (
     <MainLayout isLoading={isLoading}>
-      <Title level={4}>อนุมัติผลการละทะเบียนเข้าใช้ระบบ</Title>
+      <Title level={4}>อนุมัติผลการลงทะเบียนเข้าใช้ระบบ</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>อนุมัติผลการละทะเบียน</Breadcrumb.Item>
+        <Breadcrumb.Item>อนุมัติผลการลงทะเบียน</Breadcrumb.Item>
         <Breadcrumb.Item>ลงทะเบียนร้านค้า</Breadcrumb.Item>
         <Breadcrumb.Item>ข้อมูลร้านค้า</Breadcrumb.Item>
       </Breadcrumb>
@@ -248,13 +286,27 @@ export default function View({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'อีเมล์' }}
+                    label={{ text: 'อีเมลที่ลงทะเบียน' }}
                     name="user_email"
                     type="text"
                     component={Input}
                     className="form-control round"
                     id="user_email"
-                    placeholder="อีเมล์"
+                    placeholder="อีเมล"
+                    disabled={true}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" offset={18} span={6}>
+                  <Field
+                    label={{ text: 'อีเมลที่ยืนยัน' }}
+                    name="verify_email"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="verify_email"
+                    placeholder="อีเมล"
                     disabled={true}
                   />
                 </Col>
@@ -269,7 +321,7 @@ export default function View({}: Props): ReactElement {
           onSubmit={handleSubmit}
           validationSchema={Schema}
         >
-          {(values) => (
+          {({ values, setFieldValue }) => (
             <Form>
               <Divider />
               <Title level={5}>ข้อมูลร้านค้า</Title>
@@ -312,13 +364,13 @@ export default function View({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'อีเมล์' }}
+                    label={{ text: 'อีเมล' }}
                     name="email"
                     type="text"
                     component={Input}
                     className="form-control round"
                     id="email"
-                    placeholder="อีเมล์"
+                    placeholder="อีเมล"
                     disabled={true}
                   />
                 </Col>
@@ -344,7 +396,7 @@ export default function View({}: Props): ReactElement {
                     component={Input}
                     className="form-control round"
                     id="tel"
-                    placeholder="อีเมล์"
+                    placeholder="อีเมล"
                     disabled={true}
                   />
                 </Col>
@@ -358,6 +410,11 @@ export default function View({}: Props): ReactElement {
                     id="verify_status"
                     placeholder="เลือกสถานะ"
                     defaultValue="approve"
+                    onChange={(event: any) => {
+                      console.log(`event`, event)
+                      setFieldValue('verify_status', event)
+                      setFieldValue('verify_detail', [])
+                    }}
                     selectOption={[
                       {
                         name: 'Approve',
@@ -382,8 +439,12 @@ export default function View({}: Props): ReactElement {
                     id="verify_detail"
                     mode="multiple"
                     placeholder="เลือกเหตุผล"
-                    selectOption={verifyDetailList}
-                    disabled={values.values.verify_status !== 'rejected'}
+                    selectOption={
+                      values.verify_status === 'rejected'
+                        ? verifyDetailListRejected
+                        : verifyDetailListReApprove
+                    }
+                    disabled={values.verify_status == 'approved'}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>

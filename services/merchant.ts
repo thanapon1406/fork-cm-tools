@@ -105,6 +105,33 @@ const updateOutlet = async (body: any) => {
   }
 }
 
+const banOutlet = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/merchant/ban-outlet`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const banUser = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/staff/ban-user`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const updateOutletStatus = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/merchant/update-status`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 export {
   outletList,
   outletDetail,
@@ -113,5 +140,8 @@ export {
   getOutletType,
   outletListById,
   updateOutlet,
-  checkOutletBySsoId
+  checkOutletBySsoId,
+  banOutlet,
+  banUser,
+  updateOutletStatus,
 }

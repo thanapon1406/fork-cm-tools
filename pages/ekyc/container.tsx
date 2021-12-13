@@ -9,9 +9,10 @@ import {
 } from '@/services/ekyc'
 import { Col, Empty, Image, message, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { isEmpty, isUndefined, omitBy } from 'lodash'
+import { isEmpty, isUndefined } from 'lodash'
 // import Image from 'next/image'
-import { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useRef, useState } from 'react'
+
 const { Title } = Typography
 
 const statusOptionCard = [
@@ -33,6 +34,7 @@ const statusVideoOption = [
 ]
 
 const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactElement => {
+  const videoRef = useRef(null)
   const [ekycDetail, setEkycDetail] = useState<EkycDetail>()
   const [isLoading, setLoading] = useState(false)
   const [isLoadingSubmit, setLoadingSubmit] = useState(false)
@@ -107,12 +109,14 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
   const onClickViewMedia = async (type: string) => {
     setIsLoadingMedia(true)
     setMediaType(type)
+
+    const ekycId = id || ekycDetail?.id
+
     const payload = {
-      id: id || '',
-      sso_id: sso_id || '',
+      id: ekycId,
       media_type: type,
     }
-    const { result, success } = await getPresignUrl(omitBy(payload, isEmpty))
+    const { result, success } = await getPresignUrl(payload)
     if (success) {
       const { url } = result
       setMediaUrl(url)
@@ -146,6 +150,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
       ) : (
         <>
           <Modal
+            destroyOnClose
             closable={false}
             onOk={() => {
               setIsShowMediaModal(false)
@@ -165,7 +170,14 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
           >
             {mediaType === 'video' ? (
               <>
-                <iframe src={mediaUrl} width="100%" height={400} title="video" />
+                <iframe
+                  ref={videoRef}
+                  id="video"
+                  src={mediaUrl}
+                  width="100%"
+                  height={400}
+                  title="video"
+                />
                 <Title style={{ textAlign: 'center', padding: '0.5rem' }} level={4}>
                   {ekycDetail.wording}
                 </Title>

@@ -6,13 +6,16 @@ import { downloadImage } from '@/services/cdn';
 import { outletListById } from '@/services/merchant';
 import { getRider, getRiderDetail, updateRider } from '@/services/rider';
 import { StopOutlined } from '@ant-design/icons';
-import { Badge, Breadcrumb, Col, Empty, Form as antForm, Modal, notification, Row, Switch, Typography } from "antd";
+import { Breadcrumb, Col, Empty, Form as antForm, Modal, notification, Row, Switch, Typography } from "antd";
 import { Field, Form, Formik } from "formik";
 import _, { isUndefined } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useState } from "react";
+import CustomBadge from './style';
 const { Title } = Typography;
+
+
 // import facebookImg from "../../../public/facebook.png";
 // import googleImg from "../../../public/google.png";
 // import lineImg from "../../../public/line.png";
@@ -213,9 +216,20 @@ export default function RiderDetail({ }: Props): ReactElement {
         }
       } else if (data[0].job_count > 0 && isActive == "inactive") {
         setActive("active")
-        notification.error({
-          message: `ไม่สามารถทำการ inactive`,
-          description: "ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ",
+        // notification.error({
+        //   message: `ไม่สามารถทำการ inactive`,
+        //   description: "ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ",
+        // });
+        Modal.warning({
+          title: 'ไม่สามารถทำการแบนไรเดอร์นี้ได้',
+          content: 'ตรวจสอบพบงานของไรเดอร์คงค้างในระบบ',
+          okText: 'ตกลง',
+          okButtonProps: {
+            style: {
+              background: "#28A745",
+              borderColor: "#28A745",
+            },
+          },
         });
       }
     }
@@ -323,8 +337,8 @@ export default function RiderDetail({ }: Props): ReactElement {
                     </Col>
                     <Col span={18} style={{ textAlign: "right" }}>
                       {(riderDetail.banned_status) ?
-                        <Badge status="error" text="ถูกแบน" /> :
-                        <Badge status="success" text="ปกติ" />
+                        <CustomBadge status="error" text="ถูกแบน" /> :
+                        <CustomBadge status="success" text="ปกติ" />
                       }
                     </Col>
                   </Row>

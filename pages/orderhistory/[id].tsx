@@ -76,7 +76,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     imagePath_2: '',
     imagePath_3: '',
     imagePath_4: '',
-    image_merchant: '',
+  })
+
+  let [merchantImagesInitialValues, setMerchantImagesInitialValues] = useState({
+    merchant_image_1: '',
+    merchant_image_2: '',
+    merchant_image_3: '',
+    merchant_image_4: '',
   })
 
   let [isCancelRider, setIsCancelRider] = useState(true)
@@ -100,7 +106,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         rider_images = '',
         rider_remark = '',
         status,
-        image_merchant,
+        merchant_images,
       } = data
 
       if (!isUndefined(data) && !isEmpty(data)) {
@@ -185,8 +191,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           let image1 = '',
             image2 = '',
             image3 = '',
-            image4 = '',
-            imageMerchant = ''
+            image4 = ''
 
           forEach(images, (item, index: number) => {
             switch (index) {
@@ -200,16 +205,39 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                 return (image4 = item.path)
             }
           })
-          if (!isUndefined(image_merchant)) {
-            imageMerchant = image_merchant
-          }
 
           setImagesInitialValues({
             imagePath_1: image1,
             imagePath_2: image2,
             imagePath_3: image3,
             imagePath_4: image4,
-            image_merchant: imageMerchant,
+          })
+        }
+
+        if (!isUndefined(merchant_images)) {
+          let image1 = '',
+            image2 = '',
+            image3 = '',
+            image4 = ''
+
+          forEach(merchant_images, (item, index: number) => {
+            switch (index) {
+              case 0:
+                return (image1 = item.path)
+              case 1:
+                return (image2 = item.path)
+              case 2:
+                return (image3 = item.path)
+              case 3:
+                return (image4 = item.path)
+            }
+          })
+
+          setMerchantImagesInitialValues({
+            merchant_image_1: image1,
+            merchant_image_2: image2,
+            merchant_image_3: image3,
+            merchant_image_4: image4,
           })
         }
 
@@ -282,6 +310,43 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           </div>
         </>
       )
+    } else if (orderStatusHistoryData.current_status_info.rider_status === Constant.ASSIGNED) {
+      let data = orderStatusHistoryData
+      if (!isUndefined(data.current_rider_info) && !isUndefined(data.previous_rider_info)) {
+        if (
+          !isEmpty(data.current_rider_info.first_name) &&
+          !isEmpty(data.previous_rider_info.first_name)
+        ) {
+          return (
+            <>
+              <div>
+                Rider 1:{' '}
+                {data.previous_rider_info.first_name + ' ' + data.previous_rider_info.last_name}
+                <div>
+                  Rider 2:{' '}
+                  {data.current_rider_info.first_name + ' ' + data.current_rider_info.last_name}
+                </div>
+                <div>
+                  {Moment(data.current_rider_info?.assigned_time).format(Constant.DATE_FORMAT)}
+                </div>
+              </div>
+            </>
+          )
+        } else {
+          return (
+            <>
+              <div>
+                <div>
+                  {data.current_rider_info.first_name + ' ' + data.current_rider_info.last_name}
+                </div>
+                <div>
+                  {Moment(data.current_rider_info?.assigned_time).format(Constant.DATE_FORMAT)}
+                </div>
+              </div>
+            </>
+          )
+        }
+      }
     } else {
       return Moment(orderStatusHistoryData.created_at).format(Constant.DATE_FORMAT)
     }
@@ -290,7 +355,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   const determineTrackingOrderStatus = (
     order_status = '',
     merchant_status = '',
-    rider_status = ''
+    rider_status = '',
+    orderHistoryData: any = {}
   ) => {
     let respObj = {
       status: 'กำลังปรุง',
@@ -311,7 +377,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       ) {
         respObj.status = 'ยกเลิกออเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
-      } else if (order_status === Constant.WAITING || rider_status === Constant.WAITING) {
+      } else if (order_status === Constant.WAITING) {
         respObj.status = 'ออเดอร์ใหม่'
         respObj.imagePath = '/asset/images/new-order.png'
       } else if (merchant_status === Constant.COOKING) {
@@ -320,11 +386,26 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       } else if (merchant_status === Constant.COOKED) {
         respObj.status = 'ปรุงสำเร็จ'
         respObj.imagePath = '/asset/images/cook.png'
+      } else if (order_status === '' && rider_status === Constant.WAITING) {
+        respObj.status = 'กำลังหาไรเดอร์ใหม่'
+        respObj.imagePath = '/asset/images/delivery.png'
       } else if (rider_status === Constant.ASSIGNING) {
         respObj.status = 'กำลังหาไรเดอร์'
         respObj.imagePath = '/asset/images/delivery.png'
       } else if (rider_status === Constant.ASSIGNED) {
         respObj.status = 'ไรเดอร์รับออเดอร์'
+
+        if (!isUndefined(orderHistoryData)) {
+          let data = orderHistoryData as OrderStatusHistoryDetail
+          if (!isUndefined(data.current_rider_info) && !isUndefined(data.previous_rider_info)) {
+            if (
+              !isEmpty(data.current_rider_info.first_name) &&
+              !isEmpty(data.previous_rider_info.first_name)
+            ) {
+              respObj.status = 'เปลี่ยนไรเดอร์'
+            }
+          }
+        }
         respObj.imagePath = '/asset/images/delivery.png'
       } else if (rider_status === Constant.GOING_MERCHANT) {
         respObj.status = 'ไรเดอร์กำลังไปที่ร้าน'
@@ -671,16 +752,16 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       />
 
                       {orderStatusHistory?.map((val: OrderStatusHistoryDetail, index: number) => {
+                        var determineTrackingResult = determineTrackingOrderStatus(
+                          val?.current_status_info?.order_status,
+                          val?.current_status_info?.merchant_status,
+                          val?.current_status_info?.rider_status,
+                          val
+                        )
                         return (
                           <Step
                             key={val.order_no}
-                            title={
-                              determineTrackingOrderStatus(
-                                val?.current_status_info?.order_status,
-                                val?.current_status_info?.merchant_status,
-                                val?.current_status_info?.rider_status
-                              ).status
-                            }
+                            title={determineTrackingResult.status}
                             description={determineDescription(val)}
                             icon={
                               <Image
@@ -688,13 +769,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 width={24}
                                 height={24}
                                 preview={false}
-                                src={
-                                  determineTrackingOrderStatus(
-                                    val?.current_status_info?.order_status,
-                                    val?.current_status_info?.merchant_status,
-                                    val?.current_status_info?.rider_status
-                                  ).imagePath
-                                }
+                                src={determineTrackingResult.imagePath}
                               />
                             }
                           />
@@ -783,9 +858,27 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
               <Row gutter={16} style={{ marginTop: '20px' }}>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
-                    <Text>สลิปการโอนเงินคืน</Text>
+                    <Text>สลิปการโอนเงินคืน 1</Text>
                   </div>
-                  <ImgButton url={imagesInitialValues.image_merchant} />
+                  <ImgButton url={merchantImagesInitialValues.merchant_image_1} />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>สลิปการโอนเงินคืน 2</Text>
+                  </div>
+                  <ImgButton url={merchantImagesInitialValues.merchant_image_2} />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>สลิปการโอนเงินคืน 3</Text>
+                  </div>
+                  <ImgButton url={merchantImagesInitialValues.merchant_image_3} />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Text>สลิปการโอนเงินคืน 4</Text>
+                  </div>
+                  <ImgButton url={merchantImagesInitialValues.merchant_image_4} />
                 </Col>
               </Row>
             </Form>

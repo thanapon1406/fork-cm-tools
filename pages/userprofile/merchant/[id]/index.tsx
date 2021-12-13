@@ -381,6 +381,8 @@ export default function MerchantUserView({}: Props): ReactElement {
         default_status: outletInitialValues.status,
         default_online_status: outletInitialValues.online_status,
       })
+      //Todo: Get After update
+      getOutlet()
       Modal.success({
         content: <Title level={4}>แก้ไขเรียบร้อยแล้ว</Title>,
       })

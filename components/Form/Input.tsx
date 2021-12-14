@@ -5,15 +5,15 @@ const { Text } = Typography
 
 interface InputProps extends FormikProps {
   id: string | undefined
-  type: string
-  className: string | undefined
-  placeholder: string | undefined
-  autoComplete: string | undefined
+  type?: string
+  className?: string | undefined
+  placeholder?: string | undefined
+  autoComplete?: string | undefined
   label: {
     text: string | undefined
     className: string
   }
-  disabled: boolean | false
+  disabled?: boolean | false
 }
 
 const CustomInput = ({ label, field, ...props }: InputProps) => {

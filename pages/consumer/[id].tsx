@@ -1,4 +1,3 @@
-import CustomBadge from '@/components/Badge'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
@@ -16,11 +15,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { default as React, ReactElement, useEffect, useState } from 'react'
 import OrderHistoryComponent from '../orderhistory/component'
+import CustomBadge from '../userprofile/rider/[id]/style'
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function View({}: Props): ReactElement {
+export default function View({ }: Props): ReactElement {
   // const [brandObject, setBrandState] = useRecoilState(brandState)
   let [_isLoading, setIsLoading] = useState(true)
   const [isEdit, setIsEdit] = useState(false)
@@ -108,12 +108,12 @@ export default function View({}: Props): ReactElement {
           email: data.email,
           ssoId: data.sso_id,
           tel: data.tel,
-          socialName: data.social_login_first_name + ' ' + data.social_login_last_name,
+          socialName: (data.social_login_first_name == undefined ? '' : data.social_login_first_name) + ' ' + (data.social_login_last_name == undefined ? '' : data.social_login_last_name),
           point: data.point,
           rank: data.ranking,
           confirmEKYC: data.confirm_e_kyc,
-          firstName: data.first_name,
-          lastName: data.last_name,
+          firstName: data.first_name == undefined ? '' : data.first_name,
+          lastName: data.last_name == undefined ? '' : data.last_name,
           googleId: data.google_id,
           facebookId: data.facebook_id,
           appleId: data.apple_id,
@@ -283,7 +283,7 @@ export default function View({}: Props): ReactElement {
     <MainLayout>
       {!_isLoading && (
         <>
-          <Formik enableReinitialize={true} initialValues={initialValues} onSubmit={() => {}}>
+          <Formik enableReinitialize={true} initialValues={initialValues} onSubmit={() => { }}>
             {({ values }: any) => (
               <Form>
                 <Row gutter={16}>
@@ -364,11 +364,12 @@ export default function View({}: Props): ReactElement {
                   </Row>
                   <Row gutter={10} style={{ marginBottom: '15px' }}>
                     <Col span={2}>ข้อมูลส่วนตัว</Col>
-                    <Col span={20}>
+                    <Col span={19}>
                       <Button
+                        disabled={(isEdit) ? false : true}
                         icon={<StopOutlined />}
                         size="small"
-                        isDanger={initialValues.isBan}
+                        isDanger={true}
                         type="primary"
                         onClick={() => {
                           router.push(`/consumer/ban/${id}`)
@@ -377,33 +378,23 @@ export default function View({}: Props): ReactElement {
                         แบนผู้ใช้งาน
                       </Button>
                     </Col>
-                    <Col span={2}>
+                    <Col span={3}>
                       {initialValues.isBan ? (
-                        <CustomBadge
-                          customMapping={{
-                            status: 'error',
-                            text: 'ถูกแบนผู้ใช้งาน',
-                          }}
-                        ></CustomBadge>
+                        <CustomBadge status="error" text="ถูกแบนผู้ใช้งาน" />
                       ) : (
-                        <CustomBadge
-                          customMapping={{
-                            status: 'success',
-                            text: 'ปกติ',
-                          }}
-                        ></CustomBadge>
+                        <CustomBadge status="success" text={`ปกติ`} />
                       )}
                     </Col>
                   </Row>
                   <Row gutter={10}>
                     <Col className="gutter-row" span={6}>
                       <Field
-                        label={{ text: 'Consumer ID' }}
+                        label={{ text: 'SSO ID' }}
                         name="ssoId"
                         type="text"
                         component={Input}
                         className="form-control round"
-                        placeholder="Consumer ID"
+                        placeholder="SSO ID"
                         isRange={true}
                         disabled={true}
                       />

@@ -1,6 +1,13 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
-import { LogoutOutlined, SolutionOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
+import {
+  FileTextOutlined,
+  LogoutOutlined,
+  SolutionOutlined,
+  TeamOutlined,
+  UserOutlined,
+  WalletOutlined,
+} from '@ant-design/icons'
 import { Layout, Menu, Typography } from 'antd'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -45,9 +52,7 @@ export default function Sidebar({}: Props): ReactElement {
     Router.replace('/login')
   }
 
-  useEffect(() => {
-    findUserData()
-  }, [])
+  useEffect(() => {}, [])
 
   const findUserData = async () => {
     const { result = {}, success = false } = await findUser()
@@ -74,108 +79,15 @@ export default function Sidebar({}: Props): ReactElement {
     </Menu>
   )
 
-  // const routingPath: Array<MenuItem> = [
-  //   {
-  //     index: 1,
-  //     title: 'Dashboard',
-  //     icon: <SolutionOutlined />,
-  //     key: 'dashboard',
-  //     link: '/',
-  //     sub: [],
-  //   },
-  //   {
-  //     index: 2,
-  //     title: 'อนุมัติผลการลงทะเบียน',
-  //     icon: <SolutionOutlined />,
-  //     key: 'register',
-  //     link: '/',
-  //     sub: [
-  //       {
-  //         title: 'ลงทะเบียนร้านค้า',
-  //         link: '/merchant',
-  //         key: '/merchant',
-  //       },
-  //       {
-  //         title: 'ลงทะเบียนคนขับ',
-  //         link: '/rider',
-  //         key: '/rider',
-  //       },
-  //       {
-  //         title: 'ลงทะเบียน E-KYC',
-  //         link: '/ekyc',
-  //         key: '/ekyc',
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     index: 3,
-  //     title: 'User Profile',
-  //     icon: <TeamOutlined />,
-  //     key: 'userProfile',
-  //     link: '/userprofile',
-  //     sub: [
-  //       {
-  //         title: 'Consumer Profile',
-  //         link: '/consumer',
-  //         key: '/consumer',
-  //       },
-  //       {
-  //         title: 'Rider Profile',
-  //         link: '/userprofile/rider',
-  //         key: '/userprofile/rider',
-  //       },
-  //       {
-  //         title: 'Merchant Profile',
-  //         link: '/userprofile/merchant',
-  //         key: '/userprofile/merchant',
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     index: 4,
-  //     title: 'การจัดการออเดอร์',
-  //     icon: <FileTextOutlined />,
-  //     key: 'order',
-  //     link: '/order',
-  //     sub: [
-  //       {
-  //         title: 'ออเดอร์ทั้งหมด',
-  //         link: '/orderhistory',
-  //         key: '/orderhistory',
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     index: 5,
-  //     title: 'การจัดการเครดิตร้านค้า',
-  //     icon: <TeamOutlined />,
-  //     key: 'credit',
-  //     link: '/credit',
-  //     sub: [
-  //       {
-  //         title: 'เครดิตร้านค้าทั้งหมด',
-  //         link: '/credit/merchant',
-  //         key: '/credit/merchant',
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     index: 6,
-  //     title: 'กระเป๋าตังค์',
-  //     icon: <WalletOutlined />,
-  //     key: 'wallet',
-  //     link: '/wallet',
-  //     sub: [
-  //       {
-  //         title: 'LALAMOVE',
-  //         link: '/wallet/lalamove',
-  //         key: '/wallet/lalamove',
-  //       },
-  //     ],
-  //   },
-  // ]
-
   const routingPath: Array<MenuItem> = [
+    {
+      index: 1,
+      title: 'Dashboard',
+      icon: <SolutionOutlined />,
+      key: 'dashboard',
+      link: '/',
+      sub: [],
+    },
     {
       index: 2,
       title: 'อนุมัติผลการลงทะเบียน',
@@ -187,6 +99,11 @@ export default function Sidebar({}: Props): ReactElement {
           title: 'ลงทะเบียนร้านค้า',
           link: '/merchant',
           key: '/merchant',
+        },
+        {
+          title: 'ลงทะเบียนคนขับ',
+          link: '/rider',
+          key: '/rider',
         },
         {
           title: 'ลงทะเบียน E-KYC',
@@ -203,9 +120,61 @@ export default function Sidebar({}: Props): ReactElement {
       link: '/userprofile',
       sub: [
         {
+          title: 'Consumer Profile',
+          link: '/consumer',
+          key: '/consumer',
+        },
+        {
+          title: 'Rider Profile',
+          link: '/userprofile/rider',
+          key: '/userprofile/rider',
+        },
+        {
           title: 'Merchant Profile',
           link: '/userprofile/merchant',
           key: '/userprofile/merchant',
+        },
+      ],
+    },
+    {
+      index: 4,
+      title: 'การจัดการออเดอร์',
+      icon: <FileTextOutlined />,
+      key: 'order',
+      link: '/order',
+      sub: [
+        {
+          title: 'ออเดอร์ทั้งหมด',
+          link: '/orderhistory',
+          key: '/orderhistory',
+        },
+      ],
+    },
+    {
+      index: 5,
+      title: 'การจัดการเครดิตร้านค้า',
+      icon: <TeamOutlined />,
+      key: 'credit',
+      link: '/credit',
+      sub: [
+        {
+          title: 'เครดิตร้านค้าทั้งหมด',
+          link: '/credit/merchant',
+          key: '/credit/merchant',
+        },
+      ],
+    },
+    {
+      index: 6,
+      title: 'กระเป๋าตังค์',
+      icon: <WalletOutlined />,
+      key: 'wallet',
+      link: '/wallet',
+      sub: [
+        {
+          title: 'LALAMOVE',
+          link: '/wallet/lalamove',
+          key: '/wallet/lalamove',
         },
       ],
     },

@@ -12,6 +12,7 @@ export const outletStatus: any = {
   active: 'Active',
   inactive: 'In-active',
   closed: 'Closed',
+  temporarily_closed: 'Temporarily closed',
 }
 
 export const creditPaymentChanel: any = {
@@ -48,4 +49,9 @@ export const deliveryInfo: any = {
 export const onlineStatus: any = {
   online: 'ร้านเปิด',
   offline: 'ร้านปิด',
+}
+
+export const userServiceType: any = {
+  pos: 'CMS',
+  delivery: 'Merchant App',
 }

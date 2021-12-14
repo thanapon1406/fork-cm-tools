@@ -11,10 +11,22 @@ export interface OrderStatusHistoryDetail {
   delivery_time: number
   current_status_info: StatusInfo
   previous_status_info: StatusInfo
+  current_rider_info: PersonalInfo
+  previous_rider_info: PersonalInfo
 }
 
 interface StatusInfo {
   merchant_status: string
   order_status: string
   rider_status: string
+}
+
+interface PersonalInfo {
+  first_name: string
+  last_name: string
+  id: string
+  line_id: string
+  phone: string
+  photo: string
+  assigned_time: Date
 }

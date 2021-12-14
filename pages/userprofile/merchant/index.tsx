@@ -5,7 +5,7 @@ import Select from '@/components/Form/Select'
 import { OnlineStatusMapping, StatusMapping } from '@/components/outlet/Status'
 import Table from '@/components/Table'
 import Tag from '@/components/Tag'
-import { deliveryInfo } from '@/constants/textMapping'
+import { deliveryInfo, userServiceType } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { getOutletType, outletList } from '@/services/merchant'
@@ -93,7 +93,15 @@ export default function MerchantProfileList({}: Props): ReactElement {
       align: 'center',
     },
     {
-      title: 'ชื่อร้านค้า',
+      title: 'ชื่อแบรนด์',
+      dataIndex: 'brand_name',
+      align: 'center',
+      render: (row: any) => {
+        return row['th']
+      },
+    },
+    {
+      title: 'ชื่อร้านค้า(สาขา)',
       dataIndex: 'name',
       align: 'center',
       render: (row: any) => {
@@ -155,6 +163,15 @@ export default function MerchantProfileList({}: Props): ReactElement {
       render: (row: any) => {
         const delivery = _.get(row, 'deliver_by', false)
         return delivery ? deliveryInfo[delivery] : '-'
+      },
+    },
+    {
+      title: 'ช่องทางลงทะเบียน',
+      dataIndex: 'user',
+      align: 'center',
+      render: (row: any) => {
+        const chanel = _.get(row, 'user_service_type', false)
+        return chanel ? userServiceType[chanel] : '-'
       },
     },
     {

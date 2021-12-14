@@ -11,7 +11,7 @@ import { getEkycList } from '@/services/ekyc'
 import { personState } from '@/store'
 import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { map } from 'lodash'
+import { get, map } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
@@ -81,7 +81,7 @@ const EkycList = (): ReactElement => {
       setEkycDataList(
         map(data, (item: EkycDetail) => ({
           ...item,
-          name: `${item.first_name} ${item.last_name}`,
+          name: `${get(item, 'first_name', ' ')} ${get(item, 'last_name', ' ')}`,
         }))
       )
     }
@@ -98,7 +98,7 @@ const EkycList = (): ReactElement => {
     console.log(values)
 
     let reqFilter: filterObject = {
-      keyword: values.keyword || '',
+      keyword: values.keyword.trim() || '',
       status: values.status || '',
       start_date: values.created_date.start || '',
       end_date: values.created_date.end || '',

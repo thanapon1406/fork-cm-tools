@@ -833,7 +833,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={imagesInitialValues.imagePath_1}
-                    privateBucket={imagesInitialValues?.imagePath_1?.includes("https") ? true : false} />
+                    privateBucket={imagesInitialValues?.imagePath_1?.includes("https") ? false : true} />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
@@ -842,7 +842,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={imagesInitialValues.imagePath_2}
-                    privateBucket={imagesInitialValues?.imagePath_2?.includes("https") ? true : false} />
+                    privateBucket={imagesInitialValues?.imagePath_2?.includes("https") ? false : true} />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
@@ -851,7 +851,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={imagesInitialValues.imagePath_3}
-                    privateBucket={imagesInitialValues?.imagePath_3?.includes("https") ? true : false} />
+                    privateBucket={imagesInitialValues?.imagePath_3?.includes("https") ? false : true} />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
@@ -860,7 +860,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={imagesInitialValues.imagePath_4}
-                    privateBucket={imagesInitialValues?.imagePath_4?.includes("https") ? true : false} />
+                    privateBucket={imagesInitialValues?.imagePath_4?.includes("https") ? false : true} />
                 </Col>
               </Row>
               <Row gutter={16} style={{ marginTop: '20px' }}>
@@ -870,7 +870,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={merchantImagesInitialValues.merchant_image_1}
-                    privateBucket={merchantImagesInitialValues?.merchant_image_1?.includes("https") ? true : false} />
+                    privateBucket={merchantImagesInitialValues?.merchant_image_1?.includes("https") ? false : true} />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
@@ -878,7 +878,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={merchantImagesInitialValues.merchant_image_2}
-                    privateBucket={merchantImagesInitialValues?.merchant_image_2?.includes("https") ? true : false} />
+                    privateBucket={merchantImagesInitialValues?.merchant_image_2?.includes("https") ? false : true} />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
@@ -886,7 +886,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={merchantImagesInitialValues.merchant_image_3}
-                    privateBucket={merchantImagesInitialValues?.merchant_image_3?.includes("https") ? true : false} />
+                    privateBucket={merchantImagesInitialValues?.merchant_image_3?.includes("https") ? false : true} />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
@@ -894,7 +894,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={merchantImagesInitialValues.merchant_image_4}
-                    privateBucket={merchantImagesInitialValues?.merchant_image_4?.includes("https") ? true : false} />
+                    privateBucket={merchantImagesInitialValues?.merchant_image_4?.includes("https") ? false : true} />
                 </Col>
               </Row>
             </Form>
@@ -1193,7 +1193,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={riderImages}
-                    privateBucket={riderImages?.includes("https") ? true : false} />
+                    privateBucket={riderImages?.includes("https") ? false : true} />
                 </Col>
               </Row>
               <Row gutter={16}>

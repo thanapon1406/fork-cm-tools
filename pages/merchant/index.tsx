@@ -5,6 +5,7 @@ import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
+import { outletType } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { outletList } from '@/services/merchant'
@@ -30,6 +31,7 @@ interface filterObject {
   approve_status?: string
   branch_type?: string
   id?: string
+  is_mass?: string
 }
 
 export default function Merchant({}: Props): ReactElement {
@@ -48,6 +50,7 @@ export default function Merchant({}: Props): ReactElement {
       start: null,
       end: null,
     },
+    is_mass: '',
   }
 
   const filterRequest: filterObject = {
@@ -61,6 +64,7 @@ export default function Merchant({}: Props): ReactElement {
     approve_status: '',
     branch_type: '',
     id: '',
+    is_mass: '',
   }
   const requestApi: Function = outletList
   const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } =
@@ -69,6 +73,7 @@ export default function Merchant({}: Props): ReactElement {
   const Schema = Yup.object().shape({})
 
   const handleSubmit = (values: any) => {
+    console.log(`values`, values)
     let reqFilter: filterObject = {
       keyword: values.keyword,
       verify_status: values.verify_status,
@@ -79,6 +84,7 @@ export default function Merchant({}: Props): ReactElement {
       end_date_create: values.date_create.end || '',
       start_date_verify: values.date_verify.start || '',
       end_date_verify: values.date_verify.end || '',
+      is_mass: values.is_mass,
     }
     handleFetchData(reqFilter)
   }
@@ -94,14 +100,11 @@ export default function Merchant({}: Props): ReactElement {
     },
     {
       title: 'ประเภทร้านค้า',
-      dataIndex: 'branch_type',
+      dataIndex: 'is_mass',
       align: 'center',
       render: (row: any) => {
-        const textMapping: any = {
-          single: 'สาขาเดี่ยว',
-          multiple: 'หลายสาขา',
-        }
-        return textMapping[row] || ''
+        const isMass = row ? 'single' : 'multiple'
+        return outletType[isMass] || ''
       },
     },
     {
@@ -206,10 +209,10 @@ export default function Merchant({}: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ประเภทร้านค้า' }}
-                    name="branch_type"
+                    name="is_mass"
                     component={Select}
-                    id="branch_type"
-                    placeholder="branch_type"
+                    id="is_mass"
+                    placeholder="ประเภทร้านค้า"
                     defaultValue={{ value: 'all' }}
                     selectOption={[
                       {
@@ -218,11 +221,11 @@ export default function Merchant({}: Props): ReactElement {
                       },
                       {
                         name: 'สาขาเดี่ยว',
-                        value: 'single',
+                        value: 'true',
                       },
                       {
                         name: 'หลายสาขา',
-                        value: 'multiple',
+                        value: 'false',
                       },
                     ]}
                   />

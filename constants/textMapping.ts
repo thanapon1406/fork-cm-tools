@@ -85,3 +85,8 @@ export const userServiceType: any = {
   pos: 'CMS',
   delivery: 'Merchant App',
 }
+
+export const outletType: any = {
+  single: 'สาขาเดี่ยว',
+  multiple: 'หลายสาขา',
+}

@@ -44,7 +44,7 @@ function Select({ label, field, selectOption, ...props }: Props): ReactElement {
         <Selects {...field} {...props} onChange={onChangeHandle()}>
           {selectOption.map((val: SelectOption, index: number) => {
             return (
-              <Option disabled={val.disabled} key={index} value={val.value}>
+              <Option disabled={val.disabled} key={`select_${index}`} value={val.value}>
                 {val.name}
               </Option>
             )

@@ -7,7 +7,13 @@ import ImgButton from '@/components/ImgButton'
 import Tab from '@/components/Tab'
 import Table from '@/components/Table'
 import Tag from '@/components/Tag'
-import { days, onlineStatusTag, outletStatusTH, userServiceType } from '@/constants/textMapping'
+import {
+  days,
+  onlineStatusTag,
+  outletStatusTH,
+  outletType,
+  userServiceType,
+} from '@/constants/textMapping'
 import { useLoadingContext } from '@/contexts/LoadingContext'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
@@ -229,10 +235,6 @@ export default function MerchantUserView({}: Props): ReactElement {
     default_online_status: '',
   })
 
-  const mapBranchType: any = {
-    single: 'ร้านค้าเดี่ยว',
-    multiple: 'หลายสาขา',
-  }
   const Loading = useLoadingContext()
   useEffect(() => {
     if (id) {
@@ -282,7 +284,7 @@ export default function MerchantUserView({}: Props): ReactElement {
         setIsLoading(false)
         const { data = [] } = userResult
         if (data[0]) {
-          const { user = {}, staff = [], brand_name = {} } = data[0]
+          const { user = {}, staff = [], brand_name = {}, is_mass = false } = data[0]
           const {
             email = '',
             first_name = '',
@@ -310,10 +312,12 @@ export default function MerchantUserView({}: Props): ReactElement {
             line_id: line_id,
           })
 
+          const type: string = is_mass ? 'single' : 'multiple'
+
           setOutletInitialValues({
             ...outletInitialValues,
             outlet_name: outletData?.name.th,
-            outlet_type: mapBranchType[outletData.branch_type],
+            outlet_type: outletType[type],
             tax_id: outletData?.tax_id,
             email: outletData?.email,
             full_address: outletData.full_address,

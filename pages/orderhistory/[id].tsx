@@ -497,7 +497,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -831,28 +831,36 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   <div style={{ marginBottom: '6px' }}>
                     <Text>สลิป 1</Text>
                   </div>
-                  <ImgButton url={imagesInitialValues.imagePath_1} />
+                  <ImgButton
+                    url={imagesInitialValues.imagePath_1}
+                    privateBucket={imagesInitialValues.imagePath_1.includes("cdn") ? true : false} />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
                     <Text>สลิป 2</Text>
                   </div>
-                  <ImgButton url={imagesInitialValues.imagePath_2} />
+                  <ImgButton
+                    url={imagesInitialValues.imagePath_2}
+                    privateBucket={imagesInitialValues.imagePath_2.includes("cdn") ? true : false} />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
                     <Text>สลิป 3</Text>
                   </div>
-                  <ImgButton url={imagesInitialValues.imagePath_3} />
+                  <ImgButton
+                    url={imagesInitialValues.imagePath_3}
+                    privateBucket={imagesInitialValues.imagePath_3.includes("cdn") ? true : false} />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
                     <Text>สลิป 4</Text>
                   </div>
-                  <ImgButton url={imagesInitialValues.imagePath_4} />
+                  <ImgButton
+                    url={imagesInitialValues.imagePath_4}
+                    privateBucket={imagesInitialValues.imagePath_4.includes("cdn") ? true : false} />
                 </Col>
               </Row>
               <Row gutter={16} style={{ marginTop: '20px' }}>
@@ -860,25 +868,33 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   <div style={{ marginBottom: '6px' }}>
                     <Text>สลิปการโอนเงินคืน 1</Text>
                   </div>
-                  <ImgButton url={merchantImagesInitialValues.merchant_image_1} />
+                  <ImgButton
+                    url={merchantImagesInitialValues.merchant_image_1}
+                    privateBucket={merchantImagesInitialValues.merchant_image_1.includes("cdn") ? true : false} />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
                     <Text>สลิปการโอนเงินคืน 2</Text>
                   </div>
-                  <ImgButton url={merchantImagesInitialValues.merchant_image_2} />
+                  <ImgButton
+                    url={merchantImagesInitialValues.merchant_image_2}
+                    privateBucket={merchantImagesInitialValues.merchant_image_2.includes("cdn") ? true : false} />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
                     <Text>สลิปการโอนเงินคืน 3</Text>
                   </div>
-                  <ImgButton url={merchantImagesInitialValues.merchant_image_3} />
+                  <ImgButton
+                    url={merchantImagesInitialValues.merchant_image_3}
+                    privateBucket={merchantImagesInitialValues.merchant_image_3.includes("cdn") ? true : false} />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
                     <Text>สลิปการโอนเงินคืน 4</Text>
                   </div>
-                  <ImgButton url={merchantImagesInitialValues.merchant_image_4} />
+                  <ImgButton
+                    url={merchantImagesInitialValues.merchant_image_4}
+                    privateBucket={merchantImagesInitialValues.merchant_image_4.includes("cdn") ? true : false} />
                 </Col>
               </Row>
             </Form>
@@ -890,7 +906,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -973,7 +989,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1110,7 +1126,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1175,7 +1191,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   <div style={{ marginBottom: '6px' }}>
                     <Text>รูปหลักฐานการส่ง</Text>
                   </div>
-                  <ImgButton url={riderImages} />
+                  <ImgButton
+                    url={riderImages}
+                    privateBucket={riderImages.includes("cdn") ? true : false} />
                 </Col>
               </Row>
               <Row gutter={16}>

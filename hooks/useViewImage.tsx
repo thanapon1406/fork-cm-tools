@@ -1,3 +1,4 @@
+import { downloadImage } from '@/services/cdn'
 import { useState } from 'react'
 
 export default function useViewImage() {
@@ -18,8 +19,22 @@ export default function useViewImage() {
     setIsShowMediaModal(true)
   }
 
+  const onClickViewMediaPrivateBucket = async (type: string, pathUrl: string) => {
+    setIsLoadingMedia(true)
+    const payload = {
+      filepath: pathUrl,
+    }
+
+    const res = await downloadImage(payload)
+    const url = URL.createObjectURL(res)
+    setMediaUrl(url)
+    setIsLoadingMedia(false)
+    setIsShowMediaModal(true)
+  }
+
   return {
     onClickViewMedia,
+    onClickViewMediaPrivateBucket,
     isShowMediaModal,
     setIsShowMediaModal,
     mediaType,

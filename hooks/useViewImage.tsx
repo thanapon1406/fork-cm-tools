@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 export default function useViewImage() {
   const [isLoadingMedia, setIsLoadingMedia] = useState(false)
-  const [mediaType, setMediaType] = useState('')
+  const [mediaType, setMediaType] = useState('image')
   const [mediaUrl, setMediaUrl] = useState('')
   const [isShowMediaModal, setIsShowMediaModal] = useState(false)
   const onClickViewMedia = async (type: string, pathUrl: string) => {
@@ -24,7 +24,7 @@ export default function useViewImage() {
     const payload = {
       filepath: pathUrl,
     }
-
+    setMediaType(type)
     const res = await downloadImage(payload)
     const url = URL.createObjectURL(res)
     setMediaUrl(url)

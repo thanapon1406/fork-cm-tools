@@ -160,9 +160,12 @@ export default function MerchantUserView({ }: Props): ReactElement {
       title: 'ยอดเครดิตที่ได้',
       dataIndex: 'credit',
       align: 'center',
-      // render: (row: number) => {
-      //   return formatter.format(row)
-      // },
+      render: (row: number) => {
+        if (row === undefined) {
+          row = 0
+        }
+        return formatter.format(row)
+      },
     },
 
     {

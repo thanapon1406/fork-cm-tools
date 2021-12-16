@@ -19,7 +19,7 @@ import * as Yup from 'yup'
 
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
 
 interface filterObject {
   id?: string
@@ -31,7 +31,7 @@ interface filterObject {
   transaction_id?: string
 }
 
-export default function MerchantCredit({}: Props): ReactElement {
+export default function MerchantCredit({ }: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     refId: '',
@@ -50,7 +50,12 @@ export default function MerchantCredit({}: Props): ReactElement {
     },
   ])
 
-  useEffect(() => {}, [])
+  var formatter = new Intl.NumberFormat('th-TH', {
+    style: 'currency',
+    currency: 'THB',
+  })
+
+  useEffect(() => { }, [])
 
   const filterRequest: filterObject = {}
   const requestApi: Function = creditTransaction
@@ -92,6 +97,28 @@ export default function MerchantCredit({}: Props): ReactElement {
       title: 'จำนวนเงิน',
       dataIndex: 'amount',
       align: 'center',
+      render: (row: number) => {
+        return formatter.format(row)
+      },
+    },
+    {
+      title: 'ภาษีที่หัก',
+      dataIndex: 'vat',
+      align: 'center',
+      render: (row: number) => {
+        return formatter.format(row)
+      },
+    },
+    {
+      title: 'ยอดเครดิตที่ได้',
+      dataIndex: 'credit',
+      align: 'center',
+      render: (row: number) => {
+        if (row === undefined) {
+          row = 0
+        }
+        return formatter.format(row)
+      },
     },
     {
       title: 'ช่องทางการเติมเงิน',

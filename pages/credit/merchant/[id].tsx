@@ -41,6 +41,8 @@ export default function MerchantCreditDetail({ }: Props): ReactElement {
     verify_user: '',
     outlet_id: 0,
     order_no: '',
+    vat: '',
+    credit: '',
   })
   const [userObject, setUserState] = useRecoilState(personState)
   const [approveStatus, setApproveStatus] = useState('default')
@@ -124,6 +126,8 @@ export default function MerchantCreditDetail({ }: Props): ReactElement {
         verify_user: get(data, 'verify_user.name', ''),
         outlet_id: get(data, 'outlet_id', ''),
         order_no: get(data, 'order_no', ''),
+        vat: get(data, 'vat', ''),
+        credit: get(data, 'credit', '')
       })
     }
   }
@@ -324,6 +328,32 @@ export default function MerchantCreditDetail({ }: Props): ReactElement {
                     className="form-control round"
                     id="created_at"
                     placeholder="เวลา"
+                    disabled={true}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'ภาษีที่หัก' }}
+                    name="vat"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="vat"
+                    placeholder="ภาษีที่หัก"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'ยอดเครดิต' }}
+                    name="credit"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="credit"
+                    placeholder="ยอดเครดิต"
                     disabled={true}
                   />
                 </Col>

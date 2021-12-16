@@ -12,7 +12,7 @@ import {
   onlineStatusTag,
   outletStatusTH,
   outletType,
-  userServiceType,
+  userServiceType
 } from '@/constants/textMapping'
 import { useLoadingContext } from '@/contexts/LoadingContext'
 import useFetchTable from '@/hooks/useFetchTable'
@@ -30,9 +30,9 @@ import * as Yup from 'yup'
 
 const { Title, Text } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function MerchantUserView({}: Props): ReactElement {
+export default function MerchantUserView({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoid, setSsoid] = useState('')
@@ -104,10 +104,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -149,6 +149,26 @@ export default function MerchantUserView({}: Props): ReactElement {
       },
     },
     {
+      title: 'ภาษีที่หัก',
+      dataIndex: 'vat',
+      align: 'center',
+      render: (row: number) => {
+        return formatter.format(row)
+      },
+    },
+    {
+      title: 'ยอดเครดิตที่ได้',
+      dataIndex: 'credit',
+      align: 'center',
+      render: (row: number) => {
+        if (row === undefined) {
+          row = 0
+        }
+        return formatter.format(row)
+      },
+    },
+
+    {
       title: 'หมายเหตุ',
       dataIndex: 'type',
       align: 'center',
@@ -182,10 +202,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -359,7 +379,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     }),
   })
 
-  const handleSubmit = async (values: any) => {}
+  const handleSubmit = async (values: any) => { }
   const handleSubmitStatus = async () => {
     Loading.show()
     const staffStatus = summaryBanStaff(userInitialValues.staff)
@@ -474,13 +494,13 @@ export default function MerchantUserView({}: Props): ReactElement {
     }
     return isBan
       ? {
-          status: 'error',
-          text: 'ถูกแบน',
-        }
+        status: 'error',
+        text: 'ถูกแบน',
+      }
       : {
-          status: 'success',
-          text: 'ปกติ',
-        }
+        status: 'success',
+        text: 'ปกติ',
+      }
   }
 
   return (
@@ -553,7 +573,7 @@ export default function MerchantUserView({}: Props): ReactElement {
         <Formik
           enableReinitialize={true}
           initialValues={userInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (

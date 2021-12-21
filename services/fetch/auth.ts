@@ -19,6 +19,7 @@ export const saveToken = (token: string, option = {}) => {
     maxAge: 86400,
     path: '/',
   }
+  destroyCookie(null, COOKIE_NAME)
   setCookie(null, COOKIE_NAME, token, option)
 }
 export const saveRefreshToken = (refresh_token: string, option = {}) => {

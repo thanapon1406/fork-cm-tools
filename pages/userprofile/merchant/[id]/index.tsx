@@ -50,7 +50,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
     {
       outlet_id: id,
       is_preload_credit: true,
-      gl_type: true,
+      gl_type: "credit",
     },
     { isAutoFetch: false }
   )
@@ -263,7 +263,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
       credit.handleFetchData({
         outlet_id: id,
         is_preload_credit: true,
-        gl_type: true,
+        gl_type: "credit",
       })
       topup.handleFetchData({
         outlet_id: id,

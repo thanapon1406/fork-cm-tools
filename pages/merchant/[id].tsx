@@ -2,9 +2,10 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
+import { useLoadingContext } from '@/contexts/LoadingContext'
 import MainLayout from '@/layout/MainLayout'
 import { approveOutlet, outletDetail, personalData } from '@/services/merchant'
-import { Breadcrumb, Col, Divider, Modal, Row, Typography } from 'antd'
+import { Breadcrumb, Col, Divider, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
@@ -21,6 +22,7 @@ export default function View({}: Props): ReactElement {
   const { id } = router.query
   const [ssoId, setSsoid] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const Loading = useLoadingContext()
   let [userInitialValues, setUserInitialValues] = useState({
     user_name: '',
     user_id: '',
@@ -204,7 +206,7 @@ export default function View({}: Props): ReactElement {
         verify_detail: [],
       },
     }
-
+    Loading.show()
     if (values.verify_status === 'rejected' || values.verify_status === 're-approved') {
       verify_detail = verify_detail.map((d: any) => {
         const detailList =
@@ -220,11 +222,13 @@ export default function View({}: Props): ReactElement {
     }
     const { result, success } = await approveOutlet(verifyRequest)
     if (success) {
-      Modal.success({
-        content: <Title level={4}>บันทึกข้อมูลเรียบร้อยแล้ว</Title>,
+      notification.success({
+        message: `บันทึกข้อมูลเรียบร้อยแล้ว`,
+        description: '',
       })
-      router.push('/merchant')
+      // router.push('/merchant')
     }
+    Loading.hide()
   }
 
   return (

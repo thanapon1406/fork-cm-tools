@@ -38,6 +38,7 @@ export const creditPaymentChanel: any = {
   qr_payment: 'QR Code',
   bank_transfer: 'บัญชีธนาคาร',
   credit_card: 'บัตรเครดิต',
+  free_credit: 'Welcome Credit'
 }
 
 export const creditStatus: any = {

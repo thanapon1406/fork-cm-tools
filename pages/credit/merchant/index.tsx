@@ -98,6 +98,9 @@ export default function MerchantCredit({ }: Props): ReactElement {
       dataIndex: 'amount',
       align: 'center',
       render: (row: number) => {
+        if (row == undefined) {
+          return ""
+        }
         return formatter.format(row)
       },
     },
@@ -106,6 +109,9 @@ export default function MerchantCredit({ }: Props): ReactElement {
       dataIndex: 'vat',
       align: 'center',
       render: (row: number) => {
+        if (row == undefined) {
+          return ""
+        }
         return formatter.format(row)
       },
     },
@@ -210,6 +216,10 @@ export default function MerchantCredit({ }: Props): ReactElement {
                       {
                         name: 'QR Code',
                         value: 'qr_payment',
+                      },
+                      {
+                        name: 'Welcome Credit',
+                        value: 'free_credit',
                       },
                     ]}
                   />

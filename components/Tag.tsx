@@ -15,6 +15,7 @@ export default function Tag({ children, icon, type = 'primary' }: Props): ReactE
     warning: 'warning',
     waiting: 'warning',
     failed: 'error',
+    disable: 'default',
   }
   const color = mapping[type] || type
   return (

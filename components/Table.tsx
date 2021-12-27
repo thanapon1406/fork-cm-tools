@@ -9,7 +9,7 @@ import {
   PageHeader,
   Row,
   Table as Tables,
-  TablePaginationConfig
+  TablePaginationConfig,
 } from 'antd'
 import lodash, { get } from 'lodash'
 import { useRouter } from 'next/router'
@@ -69,8 +69,8 @@ export default function Table({ config }: Props): ReactElement {
       }
       Router.push(`/${tableName}/${path}`)
     }
-    const Edit = () => { }
-    const Delete = () => { }
+    const Edit = () => {}
+    const Delete = () => {}
     const actionElement = (rowData: any) => (
       <Menu style={{ border: 'none' }}>
         {action.map((action) => {

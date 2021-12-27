@@ -43,6 +43,7 @@ const CustomBadge = ({
     refund: 'error',
     failed: 'error',
     error: 'error',
+    disable: 'default',
   }
   const orderStatusMapping: any = {
     waiting: 'ดำเนินการ',

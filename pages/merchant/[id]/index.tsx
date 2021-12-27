@@ -2,6 +2,7 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
+import StaffList from '@/containers/staff-list'
 import { useLoadingContext } from '@/contexts/LoadingContext'
 import MainLayout from '@/layout/MainLayout'
 import { approveOutlet, outletDetail, personalData } from '@/services/merchant'
@@ -11,8 +12,7 @@ import lodash from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
-import Ekyc from '../ekyc/component'
-
+import Ekyc from '../../ekyc/component'
 const { Title } = Typography
 
 interface Props {}
@@ -42,6 +42,7 @@ export default function View({}: Props): ReactElement {
     verify_status: '',
     verify_detail: [],
   })
+
   const verifyDetailListReApprove = [
     {
       name: 'ชื่อ นามสกุลไม่ถูกต้อง',
@@ -240,84 +241,9 @@ export default function View({}: Props): ReactElement {
         <Breadcrumb.Item>ข้อมูลร้านค้า</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
-        <br />
-        <Formik
-          enableReinitialize={true}
-          initialValues={userInitialValues}
-          onSubmit={() => {}}
-          validationSchema={Schema}
-        >
-          {(values) => (
-            <Form>
-              <Title level={5}>ข้อมูลการลงทะเบียน</Title>
-              <Title level={5}>ข้อมูลส่วนบุคคล</Title>
-              <Row gutter={16}>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'ชื่อ-นามสกุล' }}
-                    name="user_name"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="user_name"
-                    placeholder="ชื่อนามสกุล"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'เลขบัตรประชาชน' }}
-                    name="nation_id"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="nation_id"
-                    placeholder="เลขบัตรประชาชน"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'เบอร์โทรศัพท์' }}
-                    name="user_phone"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="user_phone"
-                    placeholder="เบอร์โทรศัพท์"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'อีเมลที่ลงทะเบียน' }}
-                    name="user_email"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="user_email"
-                    placeholder="อีเมล"
-                    disabled={true}
-                  />
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col className="gutter-row" offset={18} span={6}>
-                  <Field
-                    label={{ text: 'อีเมลที่ยืนยัน' }}
-                    name="verify_email"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="verify_email"
-                    placeholder="อีเมล"
-                    disabled={true}
-                  />
-                </Col>
-              </Row>
-            </Form>
-          )}
-        </Formik>
+        <Title level={4}>ข้อมูลบัญชีร้านค้า</Title>
+        {id && <StaffList outletId={id} page="merchant_approve" />}
+        <Divider />
         <div>{ssoId && <Ekyc sso_id={ssoId} />}</div>
         <Formik
           enableReinitialize={true}
@@ -415,7 +341,6 @@ export default function View({}: Props): ReactElement {
                     placeholder="เลือกสถานะ"
                     defaultValue="approve"
                     onChange={(event: any) => {
-                      console.log(`event`, event)
                       setFieldValue('verify_status', event)
                       setFieldValue('verify_detail', [])
                     }}

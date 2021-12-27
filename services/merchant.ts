@@ -132,6 +132,24 @@ const updateOutletStatus = async (body: any) => {
   }
 }
 
+const getStaffs = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/staff/find-staffs`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const getStaff = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/staff/find-staff`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 export {
   outletList,
   outletDetail,
@@ -144,4 +162,6 @@ export {
   banOutlet,
   banUser,
   updateOutletStatus,
+  getStaffs,
+  getStaff,
 }

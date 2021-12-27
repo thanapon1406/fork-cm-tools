@@ -52,6 +52,9 @@
       "@/contexts/*": [
         "contexts/*"
       ],
+      "@/containers/*": [
+        "containers/*"
+      ],
     },
     "incremental": true
   },

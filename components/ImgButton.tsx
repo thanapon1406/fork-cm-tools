@@ -6,11 +6,13 @@ import Button from './Button'
 interface Props {
   url: string | undefined
   type?: 'image' | 'video'
+  privateBucket?: true | false
 }
 
-export default function ImgButton({ url, type = 'image', ...props }: Props): ReactElement {
+export default function ImgButton({ url, type = 'image', privateBucket = false, ...props }: Props): ReactElement {
   const {
     onClickViewMedia,
+    onClickViewMediaPrivateBucket,
     isShowMediaModal,
     setIsShowMediaModal,
     mediaType,
@@ -58,7 +60,11 @@ export default function ImgButton({ url, type = 'image', ...props }: Props): Rea
         disabled={url ? false : true}
         onClick={() => {
           if (url) {
-            onClickViewMedia(type, url)
+            if (privateBucket) {
+              onClickViewMediaPrivateBucket(type, url)
+            } else {
+              onClickViewMedia(type, url)
+            }
           }
         }}
       >

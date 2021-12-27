@@ -157,6 +157,11 @@ export default function RiderDetail({ }: Props): ReactElement {
         data.car_photo = _.get(data.pdpa, 'car_info[0].photo', '')
         data.car_tax_photo = _.get(data.pdpa, 'car_info[0].tax_photo', '')
         data.disable_photo = _.get(data.pdpa, 'disable_person[0].photo', '')
+        data.main_address = _.find(data.addresses, function (o) { return o.type == "main_address"; });
+        data.main_address = _.get(data.main_address, 'address_no', '') + " " + _.get(data.main_address, 'district_name', '') + " " + _.get(data.main_address, 'subdistrict_name', '') + " " + _.get(data.main_address, 'province_name', '') + " " + _.get(data.main_address, 'zipcode', '');
+        data.contact_address = _.find(data.addresses, function (o) { return o.type == "contact_address"; });
+        data.contact_address = _.get(data.contact_address, 'address_no', '') + " " + _.get(data.contact_address, 'district_name', '') + " " + _.get(data.contact_address, 'subdistrict_name', '') + " " + _.get(data.contact_address, 'province_name', '') + " " + _.get(data.contact_address, 'zipcode', '');
+
       }
       RiderDetail = data
 
@@ -423,6 +428,34 @@ export default function RiderDetail({ }: Props): ReactElement {
                 <Card>
                   <Row gutter={16}>
                     <h3>ข้อมูล Rider</h3>
+                  </Row>
+                  <Row gutter={16}>
+                    <Col className="gutter-row" span={18} offset={4}>
+                      <Field
+                        label={{ text: "ที่อยู่ปัจจุบัน" }}
+                        name="contact_address"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="ที่อยู่"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                  </Row>
+                  <Row gutter={16}>
+                    <Col className="gutter-row" span={18} offset={4}>
+                      <Field
+                        label={{ text: "ที่อยู่ตามบัตรประชาชน" }}
+                        name="main_address"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="ที่อยู่"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
                   </Row>
                   <Row gutter={10}>
                     <Col style={{ marginTop: '31px' }} span={4}>

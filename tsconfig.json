@@ -48,7 +48,10 @@
       ],
       "@/page/*": [
         "page/*"
-      ]
+      ],
+      "@/contexts/*": [
+        "contexts/*"
+      ],
     },
     "incremental": true
   },

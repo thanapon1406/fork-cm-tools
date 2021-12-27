@@ -9,6 +9,13 @@ export const StatusMapping: any = {
   temporarily_closed: <Tag type="warning">{outletStatus['temporarily_closed']}</Tag>,
 }
 
+export const OutletStatusMapping: any = {
+  active: <Tag type="success">{outletStatus['active']}</Tag>,
+  inactive: <Tag type="error">{outletStatus['inactive']}</Tag>,
+  closed: <Tag type="error">{outletStatus['closed']}</Tag>,
+  temporarily_closed: <Tag type="warning">{outletStatus['temporarily_closed']}</Tag>,
+}
+
 export const OnlineStatusMapping: any = {
   online: <Tag type="success">{onlineStatus['online']}</Tag>,
   offline: <Tag type="error">{onlineStatus['offline']}</Tag>,

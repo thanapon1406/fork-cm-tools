@@ -1,3 +1,4 @@
+import { LoadingContextProvider } from '@/contexts/LoadingContext'
 import type { AppProps } from 'next/app'
 import Router from 'next/router'
 import nProgress from 'nprogress'
@@ -14,7 +15,9 @@ Router.events.on('routeChangeComplete', nProgress.done)
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <RecoilRoot>
-      <Component {...pageProps} />
+      <LoadingContextProvider>
+        <Component {...pageProps} />
+      </LoadingContextProvider>
     </RecoilRoot>
   )
 }

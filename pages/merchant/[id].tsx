@@ -2,9 +2,10 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
+import { useLoadingContext } from '@/contexts/LoadingContext'
 import MainLayout from '@/layout/MainLayout'
 import { approveOutlet, outletDetail, personalData } from '@/services/merchant'
-import { Breadcrumb, Col, Divider, Row, Typography } from 'antd'
+import { Breadcrumb, Col, Divider, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import lodash from 'lodash'
 import { useRouter } from 'next/router'
@@ -21,6 +22,7 @@ export default function View({}: Props): ReactElement {
   const { id } = router.query
   const [ssoId, setSsoid] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const Loading = useLoadingContext()
   let [userInitialValues, setUserInitialValues] = useState({
     user_name: '',
     user_id: '',
@@ -40,38 +42,71 @@ export default function View({}: Props): ReactElement {
     verify_status: '',
     verify_detail: [],
   })
-  const verifyDetailList = [
+  const verifyDetailListReApprove = [
+    {
+      name: 'ชื่อ นามสกุลไม่ถูกต้อง',
+      value: '1',
+      key: 'personal',
+    },
+    {
+      name: 'เลขบัตรประชาชนไม่ถูกต้อง',
+      value: '2',
+      key: 'personal',
+    },
     {
       name: 'ชื่อร้านค้า/แบรนด์ ไม่ถูกต้อง',
-      value: '1',
+      value: '3',
+      key: 'outlet',
     },
     {
       name: 'เลขประจำตัวผู้เสียภาษี ไม่ถูกต้อง',
-      value: '2',
+      value: '4',
+      key: 'outlet',
     },
     {
       name: 'ที่อยู่ร้านค้า/แบรนด์ ไม่ถูกต้อง',
-      value: '3',
+      value: '5',
+      key: 'outlet',
     },
     {
       name: 'เบอร์โทรศัพท์ร้านค้า ไม่ถูกต้อง',
-      value: '4',
+      value: '6',
+      key: 'outlet',
     },
     {
       name: 'ชื่อสาขา ไม่ถูกต้อง',
-      value: '5',
+      value: '7',
+      key: 'outlet',
     },
     {
       name: 'เลขประจำตัวผู้เสียภาษีประจำสาขา ไม่ถูกต้อง',
-      value: '6',
+      value: '8',
+      key: 'outlet',
     },
     {
       name: 'ที่อยู่สาขา ไม่ถูกต้อง',
-      value: '7',
+      value: '9',
+      key: 'outlet',
     },
     {
       name: 'เบอร์โทรศัพท์ร้านค้า ไม่ถูกต้อง',
-      value: '8',
+      value: '10',
+      key: 'outlet',
+    },
+  ]
+
+  const verifyDetailListRejected = [
+    {
+      name: 'ตรวจสอบข้อมูลส่วนตัวมีประวัติเคยช่อโกง',
+      value: '20',
+    },
+    {
+      name: 'ตรวจสอบเลขประจำตัวผู้เสียภาษี',
+      value: '21',
+    },
+    {
+      name: 'ร้านค้าขายสินค้าผิดกฎหมาย',
+      value: '22',
     },
   ]
 
@@ -171,21 +206,29 @@ export default function View({}: Props): ReactElement {
         verify_detail: [],
       },
     }
-
-    if (values.verify_status === 'rejected') {
+    Loading.show()
+    if (values.verify_status === 'rejected' || values.verify_status === 're-approved') {
       verify_detail = verify_detail.map((d: any) => {
+        const detailList =
+          values.verify_status === 'rejected' ? verifyDetailListRejected : verifyDetailListReApprove
+        const verifyDetail = lodash.find(detailList, { value: d })
         return {
           id: d,
-          value: lodash.find(verifyDetailList, { value: d })?.name,
+          value: lodash.get(verifyDetail, 'name'),
+          key: lodash.get(verifyDetail, 'key', undefined),
         }
       })
       verifyRequest.data.verify_detail = verify_detail
     }
-
     const { result, success } = await approveOutlet(verifyRequest)
     if (success) {
-      router.push('/merchant')
+      notification.success({
+        message: `บันทึกข้อมูลเรียบร้อยแล้ว`,
+        description: '',
+      })
+      // router.push('/merchant')
     }
+    Loading.hide()
   }
 
   return (
@@ -282,7 +325,7 @@ export default function View({}: Props): ReactElement {
           onSubmit={handleSubmit}
           validationSchema={Schema}
         >
-          {(values) => (
+          {({ values, setFieldValue }) => (
             <Form>
               <Divider />
               <Title level={5}>ข้อมูลร้านค้า</Title>
@@ -371,6 +414,11 @@ export default function View({}: Props): ReactElement {
                     id="verify_status"
                     placeholder="เลือกสถานะ"
                     defaultValue="approve"
+                    onChange={(event: any) => {
+                      console.log(`event`, event)
+                      setFieldValue('verify_status', event)
+                      setFieldValue('verify_detail', [])
+                    }}
                     selectOption={[
                       {
                         name: 'Approve',
@@ -395,8 +443,12 @@ export default function View({}: Props): ReactElement {
                     id="verify_detail"
                     mode="multiple"
                     placeholder="เลือกเหตุผล"
-                    selectOption={verifyDetailList}
-                    disabled={values.values.verify_status !== 'rejected'}
+                    selectOption={
+                      values.verify_status === 'rejected'
+                        ? verifyDetailListRejected
+                        : verifyDetailListReApprove
+                    }
+                    disabled={values.verify_status == 'approved'}
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>

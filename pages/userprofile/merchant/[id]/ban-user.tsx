@@ -81,7 +81,7 @@ export default function BanUserOutlet({}: Props): ReactElement {
           ban_detail,
         }
       })
-      console.log(`staffs`, staffs)
+
       setOutletInitialValues({ staff: staffs, default_value: staff })
     } else {
       router.push(`/userprofile/merchant/${id}`)
@@ -111,14 +111,6 @@ export default function BanUserOutlet({}: Props): ReactElement {
     const defaultStaff = find(outletInitialValues.default_value, { id: userId })
 
     if (staff.is_ban && staff.ban_detail == defaultStaff.ban_detail) {
-      const modal = Modal.error({
-        title: 'แจ้งเตือน',
-        content: `กรุณาใส่เหตุผลเพื่อแบนผู้ใช้งาน`,
-      })
-      return
-    }
-
-    if (staff.ban_detail == '') {
       const modal = Modal.error({
         title: 'แจ้งเตือน',
         content: `กรุณาใส่เหตุผลเพื่อแบนผู้ใช้งาน`,
@@ -223,7 +215,7 @@ export default function BanUserOutlet({}: Props): ReactElement {
                                 {`${staff?.firstname} ${staff?.lastname}`} (รหัสพนักงาน : -)
                               </Text>
                               <CustomBadge
-                                size="large"
+                                size="default"
                                 customMapping={banTextMapping(staff.is_ban)}
                               ></CustomBadge>
                             </Space>

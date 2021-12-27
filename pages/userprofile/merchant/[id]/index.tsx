@@ -4,16 +4,23 @@ import Card from '@/components/Card'
 import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
-import { StatusMapping } from '@/components/outlet/Status'
 import Tab from '@/components/Tab'
 import Table from '@/components/Table'
-import { days, userServiceType } from '@/constants/textMapping'
+import Tag from '@/components/Tag'
+import {
+  days,
+  onlineStatusTag,
+  outletStatusTH,
+  outletType,
+  userServiceType
+} from '@/constants/textMapping'
+import { useLoadingContext } from '@/contexts/LoadingContext'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { topupList, transactionList } from '@/services/credit'
-import { outletDetail, personalData, updateOutlet } from '@/services/merchant'
+import { outletDetail, personalData, updateOutletStatus } from '@/services/merchant'
 import { StopOutlined } from '@ant-design/icons'
-import { Badge, Breadcrumb, Col, Divider, Modal, Row, Space, Switch, Typography } from 'antd'
+import { Badge, Breadcrumb, Col, Divider, Modal, Row, Select, Space, Typography } from 'antd'
 import { Field, FieldArray, Form, Formik } from 'formik'
 import _, { filter } from 'lodash'
 import moment from 'moment'
@@ -23,9 +30,9 @@ import * as Yup from 'yup'
 
 const { Title, Text } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function MerchantUserView({}: Props): ReactElement {
+export default function MerchantUserView({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoid, setSsoid] = useState('')
@@ -43,6 +50,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     {
       outlet_id: id,
       is_preload_credit: true,
+      gl_type: "credit",
     },
     { isAutoFetch: false }
   )
@@ -97,10 +105,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -142,6 +150,26 @@ export default function MerchantUserView({}: Props): ReactElement {
       },
     },
     {
+      title: 'ภาษีที่หัก',
+      dataIndex: 'vat',
+      align: 'center',
+      render: (row: number) => {
+        return formatter.format(row)
+      },
+    },
+    {
+      title: 'ยอดเครดิตที่ได้',
+      dataIndex: 'credit',
+      align: 'center',
+      render: (row: number) => {
+        if (row === undefined) {
+          row = 0
+        }
+        return formatter.format(row)
+      },
+    },
+
+    {
       title: 'หมายเหตุ',
       dataIndex: 'type',
       align: 'center',
@@ -175,10 +203,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -217,26 +245,25 @@ export default function MerchantUserView({}: Props): ReactElement {
     business_times: [],
     business_extra_times: [],
     status: '',
+    default_status: '',
     opening_time: '',
     closed_time: '',
     available_credit: 0,
     isBan: false,
     user_service_type: '',
     brand_name: '',
+    online_status: '',
+    default_online_status: '',
   })
 
-  const mapBranchType: any = {
-    single: 'ร้านค้าเดี่ยว',
-    multiple: 'หลายสาขา',
-  }
-
+  const Loading = useLoadingContext()
   useEffect(() => {
     if (id) {
       getOutlet()
-
       credit.handleFetchData({
         outlet_id: id,
         is_preload_credit: true,
+        gl_type: "credit",
       })
       topup.handleFetchData({
         outlet_id: id,
@@ -279,7 +306,7 @@ export default function MerchantUserView({}: Props): ReactElement {
         setIsLoading(false)
         const { data = [] } = userResult
         if (data[0]) {
-          const { user = {}, staff = [], brand_name = {} } = data[0]
+          const { user = {}, staff = [], brand_name = {}, is_mass = false } = data[0]
           const {
             email = '',
             first_name = '',
@@ -307,10 +334,12 @@ export default function MerchantUserView({}: Props): ReactElement {
             line_id: line_id,
           })
 
+          const type: string = is_mass ? 'single' : 'multiple'
+
           setOutletInitialValues({
             ...outletInitialValues,
             outlet_name: outletData?.name.th,
-            outlet_type: mapBranchType[outletData.branch_type],
+            outlet_type: outletType[type],
             tax_id: outletData?.tax_id,
             email: outletData?.email,
             full_address: outletData.full_address,
@@ -325,12 +354,15 @@ export default function MerchantUserView({}: Props): ReactElement {
             business_times: business_times_Set,
             business_extra_times: business_extra_times_Set,
             status: outletData?.status,
+            default_status: outletData?.status,
             opening_time: outletData?.opening_time,
             closed_time: outletData?.closed_time,
             available_credit: outletData?.available_credit,
             isBan: outletData?.is_ban,
             user_service_type: user_service_type ? userServiceType[user_service_type] : '-',
             brand_name: brand_name?.th,
+            online_status: outletData?.online_status,
+            default_online_status: outletData?.online_status,
           })
         }
       }
@@ -349,44 +381,93 @@ export default function MerchantUserView({}: Props): ReactElement {
     }),
   })
 
-  const handleSubmit = async (values: any) => {}
+  const handleSubmit = async (values: any) => { }
   const handleSubmitStatus = async () => {
+    Loading.show()
+    const staffStatus = summaryBanStaff(userInitialValues.staff)
+    if (outletInitialValues.online_status === 'online' && staffStatus.status === 'error') {
+      const modal = Modal.error({
+        title: 'แจ้งเตือน',
+        content: `ไม่สามารถเปิดร้านได้ เนื่องจากพนักงานถูกระงับการใช้งาน`,
+      })
+      return
+    }
+
     const body = {
       data: {
         id: id,
-        opening_time: outletInitialValues.opening_time,
-        closed_time: outletInitialValues.closed_time,
-        tel: outletInitialValues.tel,
         status: outletInitialValues.status,
+        online_status: outletInitialValues.online_status,
       },
     }
 
-    const { result, success } = await updateOutlet(body)
+    const { result, success } = await updateOutletStatus(body)
     if (success) {
+      setOutletInitialValues({
+        ...outletInitialValues,
+        default_status: outletInitialValues.status,
+        default_online_status: outletInitialValues.online_status,
+      })
+      //Todo: Get After update
+      getOutlet()
       Modal.success({
         content: <Title level={4}>แก้ไขเรียบร้อยแล้ว</Title>,
       })
+      setIsEdit(false)
     }
+    Loading.hide()
   }
 
   const outletStatusRender = (status: string) => {
-    return StatusMapping[status]
+    const mapping = outletStatusTH[status]
+    return status ? <Tag type={mapping.status}>{mapping.text}</Tag> : ''
   }
 
-  const statusEditForm = (status: string) => {
+  const onlineStatusRender = (status: string) => {
+    const mapping = onlineStatusTag[status]
+    return status ? <Tag type={mapping?.status}>{mapping?.text}</Tag> : ''
+  }
+
+  const outletStatusEditForm = (status: string) => {
     const onChange = (event: any) => {
       setOutletInitialValues({
         ...outletInitialValues,
-        status: event ? 'active' : 'closed',
+        status: event ? event : 'closed',
       })
     }
+
     return (
-      <Switch
+      <Select
+        style={{ width: '113px' }}
+        defaultValue={outletInitialValues.status}
         onChange={onChange}
-        checkedChildren="Active"
-        unCheckedChildren="Closed"
-        defaultChecked={status === 'active'}
-      />
+        size="small"
+      >
+        <Select.Option value="active">ดำเนินกิจการ</Select.Option>
+        <Select.Option value="closed">ปิดกิจการ</Select.Option>
+        <Select.Option value="temporarily_closed">ปิดปรับปรุง</Select.Option>
+      </Select>
+    )
+  }
+
+  const onlineStatusEditForm = (status: string) => {
+    const onChange = (event: any) => {
+      setOutletInitialValues({
+        ...outletInitialValues,
+        online_status: event ? event : 'offline',
+      })
+    }
+
+    return (
+      <Select
+        style={{ width: '81px' }}
+        defaultValue={outletInitialValues.online_status}
+        onChange={onChange}
+        size="small"
+      >
+        <Select.Option value="online">ร้านเปิด</Select.Option>
+        <Select.Option value="offline">ร้านปิด</Select.Option>
+      </Select>
     )
   }
 
@@ -415,13 +496,13 @@ export default function MerchantUserView({}: Props): ReactElement {
     }
     return isBan
       ? {
-          status: 'error',
-          text: 'ถูกแบน',
-        }
+        status: 'error',
+        text: 'ถูกแบน',
+      }
       : {
-          status: 'success',
-          text: 'ปกติ',
-        }
+        status: 'success',
+        text: 'ปกติ',
+      }
   }
 
   return (
@@ -435,7 +516,7 @@ export default function MerchantUserView({}: Props): ReactElement {
             <Breadcrumb.Item>ข้อมูลบัญชีร้านค้า</Breadcrumb.Item>
           </Breadcrumb>
         </Col>
-        <Col span={8} offset={8} style={{ textAlign: 'end' }}>
+        <Col span={12} offset={4} style={{ textAlign: 'end' }}>
           <div>
             {isEdit ? (
               <Space size="small">
@@ -443,6 +524,11 @@ export default function MerchantUserView({}: Props): ReactElement {
                   type="default"
                   onClick={() => {
                     setIsEdit(false)
+                    setOutletInitialValues({
+                      ...outletInitialValues,
+                      status: outletInitialValues.default_status,
+                      online_status: outletInitialValues.default_online_status,
+                    })
                   }}
                 >
                   ยกเลิก
@@ -450,7 +536,6 @@ export default function MerchantUserView({}: Props): ReactElement {
                 <Button
                   type="primary"
                   onClick={() => {
-                    setIsEdit(false)
                     handleSubmitStatus()
                   }}
                 >
@@ -468,13 +553,20 @@ export default function MerchantUserView({}: Props): ReactElement {
               </Button>
             )}
           </div>
-
-          <Title style={{ textAlign: 'end', margin: '16px 0px' }} level={5}>
-            สถานะร้านค้า :{' '}
-            {isEdit
-              ? statusEditForm(outletInitialValues.status)
-              : outletStatusRender(outletInitialValues.status)}
-          </Title>
+          <Space>
+            <Title style={{ textAlign: 'end', margin: '16px 0px' }} level={5}>
+              ร้านเปิด-ปิด :{' '}
+              {isEdit
+                ? onlineStatusEditForm(outletInitialValues.status)
+                : onlineStatusRender(outletInitialValues.online_status)}
+            </Title>
+            <Title style={{ textAlign: 'end', margin: '16px 0px' }} level={5}>
+              สถานะร้านค้า :{' '}
+              {isEdit
+                ? outletStatusEditForm(outletInitialValues.status)
+                : outletStatusRender(outletInitialValues.status)}
+            </Title>
+          </Space>
         </Col>
       </Row>
 
@@ -483,7 +575,7 @@ export default function MerchantUserView({}: Props): ReactElement {
         <Formik
           enableReinitialize={true}
           initialValues={userInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -492,11 +584,17 @@ export default function MerchantUserView({}: Props): ReactElement {
                 <Col className="gutter-row" span={4}>
                   <Title level={5}>ข้อมูลบัญชีร้านค้า</Title>
                 </Col>
+              </Row>
+              <br />
+              <Row gutter={[16, 24]}>
+                <Col className="gutter-row" span={4}>
+                  <Title level={5}>ข้อมูลส่วนบุคคล</Title>
+                </Col>
                 <Col className="gutter-row" span={4}>
                   <Button
                     type="primary"
                     size="small"
-                    disabled={!isEdit}
+                    disabled={!isEdit || outletInitialValues.online_status == 'online'}
                     onClick={() => {
                       router.push(
                         '/userprofile/merchant/[id]/ban-user',
@@ -511,12 +609,12 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={8} style={{ textAlign: 'end' }} offset={8}>
                   <CustomBadge
+                    size="default"
                     customMapping={summaryBanStaff(userInitialValues.staff)}
                   ></CustomBadge>
                 </Col>
               </Row>
-              <br />
-              <Title level={5}>ข้อมูลส่วนบุคคล</Title>
+
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
@@ -614,7 +712,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                   <Button
                     type="primary"
                     size="small"
-                    disabled={!isEdit}
+                    disabled={!isEdit || outletInitialValues.online_status == 'online'}
                     onClick={() => {
                       router.push(
                         '/userprofile/merchant/[id]/ban-merchant',
@@ -629,6 +727,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" style={{ textAlign: 'end' }} offset={13} span={4}>
                   <CustomBadge
+                    size="default"
                     customMapping={banTextMapping(outletInitialValues.isBan)}
                   ></CustomBadge>
                 </Col>

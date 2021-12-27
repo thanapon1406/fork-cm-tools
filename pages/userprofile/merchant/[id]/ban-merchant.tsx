@@ -50,7 +50,7 @@ export default function BanOutlet({}: Props): ReactElement {
       if (isBan) {
         ban_detail = get(data, 'ban_detail')
       }
-      console.log(`ban_detail`, ban_detail)
+
       setOutletInitialValues({
         ...outletInitialValues,
         outlet_name: get(data, 'name.th'),
@@ -83,14 +83,6 @@ export default function BanOutlet({}: Props): ReactElement {
 
   const handleSubmit = async (values: typeof outletInitialValues) => {
     if (values.is_ban && values.ban_detail == outletInitialValues.default_ban_detail) {
-      const modal = Modal.error({
-        title: 'แจ้งเตือน',
-        content: `กรุณาใส่เหตุผลเพื่อแบนร้านค้า`,
-      })
-      return
-    }
-
-    if (values.ban_detail == '') {
       const modal = Modal.error({
         title: 'แจ้งเตือน',
         content: `กรุณาใส่เหตุผลเพื่อแบนร้านค้า`,
@@ -184,7 +176,7 @@ export default function BanOutlet({}: Props): ReactElement {
                       1.{values.outlet_name} (MerchantId : {values.shop_id})
                     </Text>
                     <CustomBadge
-                      size="large"
+                      size="default"
                       customMapping={banTextMapping(values.is_ban)}
                     ></CustomBadge>
                   </Space>

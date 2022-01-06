@@ -14,6 +14,7 @@ import {
   outletType,
   userServiceType,
 } from '@/constants/textMapping'
+import StaffList from '@/containers/staff-list'
 import { useLoadingContext } from '@/contexts/LoadingContext'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
@@ -383,7 +384,6 @@ export default function MerchantUserView({}: Props): ReactElement {
 
   const handleSubmit = async (values: any) => {}
   const handleSubmitStatus = async () => {
-    Loading.show()
     const staffStatus = summaryBanStaff(userInitialValues.staff)
     if (outletInitialValues.online_status === 'online' && staffStatus.status === 'error') {
       const modal = Modal.error({
@@ -392,7 +392,7 @@ export default function MerchantUserView({}: Props): ReactElement {
       })
       return
     }
-
+    Loading.show()
     const body = {
       data: {
         id: id,
@@ -572,128 +572,7 @@ export default function MerchantUserView({}: Props): ReactElement {
 
       <Card>
         <br />
-        <Formik
-          enableReinitialize={true}
-          initialValues={userInitialValues}
-          onSubmit={() => {}}
-          validationSchema={Schema}
-        >
-          {(values) => (
-            <Form>
-              <Row gutter={16}>
-                <Col className="gutter-row" span={4}>
-                  <Title level={5}>ข้อมูลบัญชีร้านค้า</Title>
-                </Col>
-              </Row>
-              <br />
-              <Row gutter={[16, 24]}>
-                <Col className="gutter-row" span={4}>
-                  <Title level={5}>ข้อมูลส่วนบุคคล</Title>
-                </Col>
-                <Col className="gutter-row" span={4}>
-                  <Button
-                    type="primary"
-                    size="small"
-                    disabled={!isEdit || outletInitialValues.online_status == 'online'}
-                    onClick={() => {
-                      router.push(
-                        '/userprofile/merchant/[id]/ban-user',
-                        `/userprofile/merchant/${id}/ban-user`
-                      )
-                    }}
-                    isDanger={true}
-                  >
-                    <StopOutlined />
-                    แบนผู้ใช้งาน
-                  </Button>
-                </Col>
-                <Col className="gutter-row" span={8} style={{ textAlign: 'end' }} offset={8}>
-                  <CustomBadge
-                    size="default"
-                    customMapping={summaryBanStaff(userInitialValues.staff)}
-                  ></CustomBadge>
-                </Col>
-              </Row>
-
-              <Row gutter={16}>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'ชื่อ-นามสกุล' }}
-                    name="user_name"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="user_name"
-                    placeholder="ชื่อนามสกุล"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'เลขบัตรประชาชน' }}
-                    name="nation_id"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="nation_id"
-                    placeholder="เลขบัตรประชาชน"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'เบอร์โทรศัพท์' }}
-                    name="user_phone"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="user_phone"
-                    placeholder="เบอร์โทรศัพท์"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'อีเมลที่ลงทะเบียน' }}
-                    name="user_email"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="user_email"
-                    placeholder="อีเมลที่ลงทะเบียน"
-                    disabled={true}
-                  />
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'LINE ID' }}
-                    name="line_id"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="line_id"
-                    placeholder="LINE ID"
-                    disabled={true}
-                  />
-                </Col>
-                <Col className="gutter-row" offset={12} span={6}>
-                  <Field
-                    label={{ text: 'อีเมลที่ยืนยัน' }}
-                    name="verify_email"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="verify_email"
-                    placeholder="อีเมลที่ยืนยัน"
-                    disabled={true}
-                  />
-                </Col>
-              </Row>
-            </Form>
-          )}
-        </Formik>
+        {id && <StaffList outletId={id} page="merchant_profile" />}
 
         <Formik
           enableReinitialize={true}

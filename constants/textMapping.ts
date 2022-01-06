@@ -95,3 +95,25 @@ export const outletType: any = {
   single: 'สาขาเดี่ยว',
   multiple: 'หลายสาขา',
 }
+
+export const isBanText: any = {
+  ban: {
+    text: 'ถูกแบน',
+    status: 'error',
+  },
+  normal: {
+    text: 'ปกติ',
+    status: 'success',
+  },
+}
+
+export const userStatus: any = {
+  active: {
+    text: 'Active',
+    status: 'success',
+  },
+  inactive: {
+    text: 'Inactive',
+    status: 'disable',
+  },
+}

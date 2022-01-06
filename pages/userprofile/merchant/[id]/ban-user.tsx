@@ -268,7 +268,8 @@ export default function BanUserOutlet({}: Props): ReactElement {
           <Col span={12} md={12} xs={24}>
             <Button
               onClick={() => {
-                router.push(`/userprofile/merchant/${id}`)
+                // router.push(`/userprofile/merchant/${id}`)
+                router.back()
               }}
               style={{ width: '120px', background: '#96989C', borderColor: '#96989C' }}
               type="primary"

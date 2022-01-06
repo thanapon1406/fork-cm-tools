@@ -73,7 +73,6 @@ export default function Merchant({}: Props): ReactElement {
   const Schema = Yup.object().shape({})
 
   const handleSubmit = (values: any) => {
-    console.log(`values`, values)
     let reqFilter: filterObject = {
       keyword: values.keyword,
       verify_status: values.verify_status,

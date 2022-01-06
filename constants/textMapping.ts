@@ -38,7 +38,7 @@ export const creditPaymentChanel: any = {
   qr_payment: 'QR Code',
   bank_transfer: 'บัญชีธนาคาร',
   credit_card: 'บัตรเครดิต',
-  free_credit: 'Welcome Credit'
+  free_credit: 'Welcome Credit',
 }
 
 export const creditStatus: any = {
@@ -53,6 +53,10 @@ export const creditStatus: any = {
   failed: {
     text: 'ไม่สำเร็จ',
     status: 'failed',
+  },
+  refund: {
+    text: 'Refund',
+    status: 'waiting',
   },
 }
 

@@ -1,6 +1,12 @@
 import { ScrollTable } from '@/interface/dataTable'
 import { uniqueId } from '@/utils/helpers'
-import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@ant-design/icons'
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  EllipsisOutlined,
+  EyeOutlined,
+} from '@ant-design/icons'
 import {
   Button,
   Col,
@@ -9,7 +15,7 @@ import {
   PageHeader,
   Row,
   Table as Tables,
-  TablePaginationConfig
+  TablePaginationConfig,
 } from 'antd'
 import lodash, { get } from 'lodash'
 import { useRouter } from 'next/router'
@@ -69,8 +75,8 @@ export default function Table({ config }: Props): ReactElement {
       }
       Router.push(`/${tableName}/${path}`)
     }
-    const Edit = () => { }
-    const Delete = () => { }
+    const Edit = () => {}
+    const Delete = () => {}
     const actionElement = (rowData: any) => (
       <Menu style={{ border: 'none' }}>
         {action.map((action) => {
@@ -160,6 +166,7 @@ export default function Table({ config }: Props): ReactElement {
               style={{ width: '120px' }}
               type="primary"
               size="middle"
+              icon={<DownloadOutlined />}
               onClick={handelDataExport}
             >
               ดาวน์โหลด

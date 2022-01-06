@@ -19,7 +19,7 @@ import * as Yup from 'yup'
 
 const { Title } = Typography
 
-interface Props { }
+interface Props {}
 
 interface filterObject {
   id?: string
@@ -31,7 +31,7 @@ interface filterObject {
   transaction_id?: string
 }
 
-export default function MerchantCredit({ }: Props): ReactElement {
+export default function MerchantCredit({}: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     refId: '',
@@ -55,7 +55,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
     currency: 'THB',
   })
 
-  useEffect(() => { }, [])
+  useEffect(() => {}, [])
 
   const filterRequest: filterObject = {}
   const requestApi: Function = creditTransaction
@@ -99,7 +99,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
       align: 'center',
       render: (row: number) => {
         if (row == undefined) {
-          return ""
+          return ''
         }
         return formatter.format(row)
       },
@@ -110,7 +110,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
       align: 'center',
       render: (row: number) => {
         if (row == undefined) {
-          return ""
+          return ''
         }
         return formatter.format(row)
       },
@@ -295,7 +295,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
           config={{
             dataTableTitle: 'บัญชีร้านค้า',
             loading: isLoading,
-            tableName: 'credit/merchant',
+            tableName: 'credit/topup',
             tableColumns: column,
             action: ['view'],
             dataSource: dataTable,

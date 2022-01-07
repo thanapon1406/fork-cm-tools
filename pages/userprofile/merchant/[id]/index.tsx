@@ -61,7 +61,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
       dataIndex: 'credit_type',
       align: 'center',
       render: (row: string) => {
-        return row == 'gross_profit' ? 'ค่าดำเนินการ' : row == 'delivery' ? 'ค่าจัดส่ง' : 'อื่นๆ'
+        return row == 'gross_profit' ? 'ค่าดำเนินการ' : row == 'delivery_fee' ? 'ค่าจัดส่ง' : 'อื่นๆ'
       },
     },
     {

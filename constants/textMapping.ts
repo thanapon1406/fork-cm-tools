@@ -117,3 +117,8 @@ export const userStatus: any = {
     status: 'disable',
   },
 }
+
+export const creditUsed: any = {
+  gross_profit: 'ค่าดำเนินการ',
+  delivery_fee: 'ค่าจัดส่ง',
+}

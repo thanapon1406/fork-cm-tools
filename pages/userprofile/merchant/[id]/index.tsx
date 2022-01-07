@@ -1,6 +1,7 @@
 import CustomBadge from '@/components/Badge'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import DownloadButton from '@/components/credit/DownloadButton'
 import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
@@ -768,8 +769,14 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   <Title level={5}>{formatter.format(outletInitialValues.available_credit)}</Title>
                 </Col>
               </Row>
+
               <Tab defaultActiveKey="1">
                 <Tab.TabPane tab="เติมเงิน" key="1">
+                  <Row style={{ marginBottom: 12 }}>
+                    <Col span={8} offset={16} style={{ textAlign: 'end' }}>
+                      <DownloadButton />
+                    </Col>
+                  </Row>
                   <Table
                     config={{
                       loading: topup.isLoading,
@@ -783,6 +790,11 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   />
                 </Tab.TabPane>
                 <Tab.TabPane tab="การใช้เครดิต" key="2">
+                  <Row style={{ marginBottom: 12 }}>
+                    <Col span={8} offset={16} style={{ textAlign: 'end' }}>
+                      <DownloadButton />
+                    </Col>
+                  </Row>
                   <Table
                     config={{
                       loading: credit.isLoading,

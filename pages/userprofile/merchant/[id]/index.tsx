@@ -12,7 +12,7 @@ import {
   onlineStatusTag,
   outletStatusTH,
   outletType,
-  userServiceType,
+  userServiceType
 } from '@/constants/textMapping'
 import StaffList from '@/containers/staff-list'
 import { useLoadingContext } from '@/contexts/LoadingContext'
@@ -31,9 +31,9 @@ import * as Yup from 'yup'
 
 const { Title, Text } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function MerchantUserView({}: Props): ReactElement {
+export default function MerchantUserView({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoid, setSsoid] = useState('')
@@ -57,11 +57,11 @@ export default function MerchantUserView({}: Props): ReactElement {
   )
   const columnCredit = [
     {
-      title: 'รายการ',
-      dataIndex: '',
+      title: 'ประเภทการใช้เครดิต',
+      dataIndex: 'credit_type',
       align: 'center',
       render: (row: string) => {
-        return row ? 'ใช้เครดิต' : 'เติมเงิน'
+        return row == 'gross_profit' ? 'ค่าดำเนินการ' : row == 'delivery' ? 'ค่าจัดส่ง' : 'อื่นๆ'
       },
     },
     {
@@ -106,10 +106,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -145,14 +145,6 @@ export default function MerchantUserView({}: Props): ReactElement {
     {
       title: 'จำนวนเงิน',
       dataIndex: 'amount',
-      align: 'center',
-      render: (row: number) => {
-        return formatter.format(row)
-      },
-    },
-    {
-      title: 'ภาษีที่หัก',
-      dataIndex: 'vat',
       align: 'center',
       render: (row: number) => {
         return formatter.format(row)
@@ -204,10 +196,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -382,7 +374,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     }),
   })
 
-  const handleSubmit = async (values: any) => {}
+  const handleSubmit = async (values: any) => { }
   const handleSubmitStatus = async () => {
     const staffStatus = summaryBanStaff(userInitialValues.staff)
     if (outletInitialValues.online_status === 'online' && staffStatus.status === 'error') {
@@ -496,13 +488,13 @@ export default function MerchantUserView({}: Props): ReactElement {
     }
     return isBan
       ? {
-          status: 'error',
-          text: 'ถูกแบน',
-        }
+        status: 'error',
+        text: 'ถูกแบน',
+      }
       : {
-          status: 'success',
-          text: 'ปกติ',
-        }
+        status: 'success',
+        text: 'ปกติ',
+      }
   }
 
   return (
@@ -790,7 +782,7 @@ export default function MerchantUserView({}: Props): ReactElement {
                     }}
                   />
                 </Tab.TabPane>
-                <Tab.TabPane tab="ถอนเงิน" key="2">
+                <Tab.TabPane tab="การใช้เครดิต" key="2">
                   <Table
                     config={{
                       loading: credit.isLoading,

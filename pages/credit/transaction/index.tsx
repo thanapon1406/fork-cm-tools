@@ -1,15 +1,15 @@
 import CustomBadge from '@/components/Badge'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import DownloadButton from '@/components/credit/DownloadButton'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
-import { creditStatus } from '@/constants/textMapping'
+import { creditStatus, creditUsed } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { transactionList } from '@/services/credit'
-import { DownloadOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
@@ -30,6 +30,8 @@ interface filterObject {
   end_date?: string
   status?: string
   transaction_id?: string
+  is_preload_credit?: boolean
+  gl_type?: string
 }
 
 export default function CreditTransaction({}: Props): ReactElement {
@@ -74,6 +76,8 @@ export default function CreditTransaction({}: Props): ReactElement {
 
   const handleSubmit = (values: typeof initialValues) => {
     let reqFilter: filterObject = {
+      is_preload_credit: true,
+      gl_type: 'credit',
       transaction_id: values.refId,
       keyword: values.outlet_name,
       type: values.type,
@@ -123,11 +127,9 @@ export default function CreditTransaction({}: Props): ReactElement {
       title: 'ประเภทการใช้เครดิต',
       dataIndex: 'credit_type',
       align: 'center',
-    },
-    {
-      title: 'หมายเหตุ',
-      dataIndex: '',
-      align: 'center',
+      render: (row: any) => {
+        return row ? creditUsed[row] : '-'
+      },
     },
     {
       title: 'เวลา',
@@ -143,7 +145,6 @@ export default function CreditTransaction({}: Props): ReactElement {
       align: 'center',
       render: (row: string) => {
         if (row) {
-          console.log(`status`, row)
           const status = creditStatus[row]
           return (
             <CustomBadge
@@ -206,12 +207,12 @@ export default function CreditTransaction({}: Props): ReactElement {
                         value: '',
                       },
                       {
-                        name: 'บัญชีธนาคาร',
-                        value: 'bank_tranfer',
+                        name: 'ค่าดำเนินการ',
+                        value: 'gross_profit',
                       },
                       {
-                        name: 'QR Code',
-                        value: 'qr_payment',
+                        name: 'ค่าจัดส่ง',
+                        value: 'delivery_fee',
                       },
                     ]}
                   />
@@ -251,7 +252,11 @@ export default function CreditTransaction({}: Props): ReactElement {
                       },
                       {
                         name: 'รอการยืนยัน',
-                        value: 'progressing',
+                        value: 'processing',
+                      },
+                      {
+                        name: 'Refund',
+                        value: 'refund',
                       },
                     ]}
                   />
@@ -293,15 +298,7 @@ export default function CreditTransaction({}: Props): ReactElement {
             <Title level={5}>ยอดรวมจำนวนเครดิตคงเหลือ: 1,323</Title>
           </Col>
           <Col className="gutter-row" span={8} style={{ textAlign: 'end' }}>
-            <Button
-              style={{ width: '120px' }}
-              type="primary"
-              size="middle"
-              icon={<DownloadOutlined />}
-              onClick={() => {}}
-            >
-              ดาวน์โหลด
-            </Button>
+            <DownloadButton />
           </Col>
         </Row>
         <br />

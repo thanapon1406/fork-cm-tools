@@ -105,17 +105,6 @@ export default function MerchantCredit({}: Props): ReactElement {
       },
     },
     {
-      title: 'ภาษีที่หัก',
-      dataIndex: 'vat',
-      align: 'center',
-      render: (row: number) => {
-        if (row == undefined) {
-          return ''
-        }
-        return formatter.format(row)
-      },
-    },
-    {
       title: 'ยอดเครดิตที่ได้',
       dataIndex: 'credit',
       align: 'center',
@@ -259,7 +248,7 @@ export default function MerchantCredit({}: Props): ReactElement {
                       },
                       {
                         name: 'รอการยืนยัน',
-                        value: 'progressing',
+                        value: 'processing',
                       },
                     ]}
                   />

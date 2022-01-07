@@ -18,9 +18,9 @@ import { useRecoilState } from 'recoil'
 import * as Yup from 'yup'
 
 const { Title, Text } = Typography
-interface Props { }
+interface Props {}
 
-export default function MerchantCreditDetail({ }: Props): ReactElement {
+export default function MerchantCreditDetail({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [isLoading, setIsLoading] = useState(true)
@@ -127,7 +127,7 @@ export default function MerchantCreditDetail({ }: Props): ReactElement {
         outlet_id: get(data, 'outlet_id', ''),
         order_no: get(data, 'order_no', ''),
         vat: get(data, 'vat', ''),
-        credit: get(data, 'credit', '')
+        credit: get(data, 'credit', ''),
       })
     }
   }
@@ -177,7 +177,7 @@ export default function MerchantCreditDetail({ }: Props): ReactElement {
 
     const { result, success } = await verifyTransaction(reqBody)
     if (success) {
-      router.push('/credit/merchant')
+      router.back()
       Modal.success({
         content: <Title level={4}>บันทึกข้อมูลเรียบร้อยแล้ว</Title>,
       })

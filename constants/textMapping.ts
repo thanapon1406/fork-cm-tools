@@ -38,7 +38,7 @@ export const creditPaymentChanel: any = {
   qr_payment: 'QR Code',
   bank_transfer: 'บัญชีธนาคาร',
   credit_card: 'บัตรเครดิต',
-  free_credit: 'Welcome Credit'
+  free_credit: 'Welcome Credit',
 }
 
 export const creditStatus: any = {
@@ -53,6 +53,10 @@ export const creditStatus: any = {
   failed: {
     text: 'ไม่สำเร็จ',
     status: 'failed',
+  },
+  refund: {
+    text: 'Refund',
+    status: 'waiting',
   },
 }
 
@@ -90,4 +94,31 @@ export const userServiceType: any = {
 export const outletType: any = {
   single: 'สาขาเดี่ยว',
   multiple: 'หลายสาขา',
+}
+
+export const isBanText: any = {
+  ban: {
+    text: 'ถูกแบน',
+    status: 'error',
+  },
+  normal: {
+    text: 'ปกติ',
+    status: 'success',
+  },
+}
+
+export const userStatus: any = {
+  active: {
+    text: 'Active',
+    status: 'success',
+  },
+  inactive: {
+    text: 'Inactive',
+    status: 'disable',
+  },
+}
+
+export const creditUsed: any = {
+  gross_profit: 'ค่าดำเนินการ',
+  delivery_fee: 'ค่าจัดส่ง',
 }

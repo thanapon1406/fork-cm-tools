@@ -158,9 +158,14 @@ export default function Sidebar({}: Props): ReactElement {
       link: '/credit',
       sub: [
         {
-          title: 'เครดิตร้านค้าทั้งหมด',
-          link: '/credit/merchant',
-          key: '/credit/merchant',
+          title: 'การเติมเครดิตร้านค้าทั้งหมด',
+          link: '/credit/topup',
+          key: '/credit/topup',
+        },
+        {
+          title: 'การใช้เครดิตร้านค้าทั้งหมด',
+          link: '/credit/transaction',
+          key: '/credit/transaction',
         },
       ],
     },

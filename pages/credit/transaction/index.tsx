@@ -1,14 +1,15 @@
 import CustomBadge from '@/components/Badge'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import DownloadButton from '@/components/credit/DownloadButton'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
-import { creditPaymentChanel, creditStatus } from '@/constants/textMapping'
+import { creditStatus, creditUsed } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { creditTransaction } from '@/services/credit'
+import { transactionList } from '@/services/credit'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
@@ -17,9 +18,9 @@ import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 
-const { Title } = Typography
+const { Text, Title } = Typography
 
-interface Props { }
+interface Props {}
 
 interface filterObject {
   id?: string
@@ -29,9 +30,11 @@ interface filterObject {
   end_date?: string
   status?: string
   transaction_id?: string
+  is_preload_credit?: boolean
+  gl_type?: string
 }
 
-export default function MerchantCredit({ }: Props): ReactElement {
+export default function CreditTransaction({}: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     refId: '',
@@ -55,17 +58,26 @@ export default function MerchantCredit({ }: Props): ReactElement {
     currency: 'THB',
   })
 
-  useEffect(() => { }, [])
-
   const filterRequest: filterObject = {}
-  const requestApi: Function = creditTransaction
+  const requestApi: Function = transactionList
   const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } =
-    useFetchTable(requestApi, filterRequest)
+    useFetchTable(requestApi, filterRequest, {
+      isAutoFetch: false,
+    })
+
+  useEffect(() => {
+    handleFetchData({
+      is_preload_credit: true,
+      gl_type: 'credit',
+    })
+  }, [])
 
   const Schema = Yup.object().shape({})
 
   const handleSubmit = (values: typeof initialValues) => {
     let reqFilter: filterObject = {
+      is_preload_credit: true,
+      gl_type: 'credit',
       transaction_id: values.refId,
       keyword: values.outlet_name,
       type: values.type,
@@ -79,11 +91,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
   const column = [
     {
       title: 'Order No.',
-      dataIndex: 'order_no',
-    },
-    {
-      title: 'Ref ID',
-      dataIndex: 'transaction_id',
+      dataIndex: 'credit_no',
     },
     {
       title: 'ชื่อร้านค้า',
@@ -94,44 +102,33 @@ export default function MerchantCredit({ }: Props): ReactElement {
       },
     },
     {
-      title: 'จำนวนเงิน',
+      title: 'หักเครดิต',
       dataIndex: 'amount',
       align: 'center',
       render: (row: number) => {
         if (row == undefined) {
-          return ""
+          return ''
         }
         return formatter.format(row)
       },
     },
     {
-      title: 'ภาษีที่หัก',
+      title: 'คงเหลือ เครดิต/เงินเติม',
       dataIndex: 'vat',
       align: 'center',
       render: (row: number) => {
         if (row == undefined) {
-          return ""
+          return ''
         }
         return formatter.format(row)
       },
     },
     {
-      title: 'ยอดเครดิตที่ได้',
-      dataIndex: 'credit',
+      title: 'ประเภทการใช้เครดิต',
+      dataIndex: 'credit_type',
       align: 'center',
-      render: (row: number) => {
-        if (row === undefined) {
-          row = 0
-        }
-        return formatter.format(row)
-      },
-    },
-    {
-      title: 'ช่องทางการเติมเงิน',
-      dataIndex: 'type',
-      align: 'center',
-      render: (row: string) => {
-        return creditPaymentChanel[row]
+      render: (row: any) => {
+        return row ? creditUsed[row] : '-'
       },
     },
     {
@@ -167,7 +164,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
       <Title level={4}>การจัดการเครดิตร้านค้า</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>การจัดการเครดิตร้านค้า</Breadcrumb.Item>
-        <Breadcrumb.Item>เครดิตร้านค้าทั้งหมด</Breadcrumb.Item>
+        <Breadcrumb.Item>การใช้เครดิตร้านค้าทั้งหมด</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
         <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
@@ -198,28 +195,24 @@ export default function MerchantCredit({ }: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'ช่องทางการเติม' }}
+                    label={{ text: 'ประเภทการใช้เครดิต' }}
                     name="type"
                     component={Select}
                     id="type"
-                    placeholder="ช่องทางการเติม"
+                    placeholder="ประเภทการใช้เครดิต"
                     defaultValue=""
                     selectOption={[
                       {
-                        name: 'ทุกช่องทาง',
+                        name: 'ทั้งหมด',
                         value: '',
                       },
                       {
-                        name: 'บัญชีธนาคาร',
-                        value: 'bank_tranfer',
+                        name: 'ค่าดำเนินการ',
+                        value: 'gross_profit',
                       },
                       {
-                        name: 'QR Code',
-                        value: 'qr_payment',
-                      },
-                      {
-                        name: 'Welcome Credit',
-                        value: 'free_credit',
+                        name: 'ค่าจัดส่ง',
+                        value: 'delivery_fee',
                       },
                     ]}
                   />
@@ -259,7 +252,11 @@ export default function MerchantCredit({ }: Props): ReactElement {
                       },
                       {
                         name: 'รอการยืนยัน',
-                        value: 'progressing',
+                        value: 'processing',
+                      },
+                      {
+                        name: 'Refund',
+                        value: 'refund',
                       },
                     ]}
                   />
@@ -291,13 +288,25 @@ export default function MerchantCredit({ }: Props): ReactElement {
         </Formik>
       </Card>
       <Card>
+        <Title level={4}>การใช้เครดิตร้านค้าทั้งหมด 1 ธันวาคม 2564 - 24 ธันวาคม 2564</Title>
+
+        <Row gutter={[8, 24]}>
+          <Col className="gutter-row" span={8}>
+            <Title level={5}>ยอดรวมจำนวนเงินใช้เครดิตทั้งหมด: 1,323 </Title>
+          </Col>
+          <Col className="gutter-row" span={8}>
+            <Title level={5}>ยอดรวมจำนวนเครดิตคงเหลือ: 1,323</Title>
+          </Col>
+          <Col className="gutter-row" span={8} style={{ textAlign: 'end' }}>
+            <DownloadButton />
+          </Col>
+        </Row>
+        <br />
         <Table
           config={{
-            dataTableTitle: 'บัญชีร้านค้า',
             loading: isLoading,
-            tableName: 'credit/merchant',
+            tableName: 'credit/transaction',
             tableColumns: column,
-            action: ['view'],
             dataSource: dataTable,
             handelDataTableLoad: handelDataTableChange,
             pagination: pagination,

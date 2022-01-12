@@ -11,6 +11,12 @@ interface queryList {
   status?: string
   outlet_id?: string
   is_preload_credit?: boolean
+  email?: string
+}
+
+interface queryExportList {
+  transaction_request?: any
+  email?: string
 }
 
 interface queryById {
@@ -67,6 +73,15 @@ const transactionList = async (body: queryList) => {
   }
 }
 
+const sendTransactionsEmail = async (body: queryExportList) => {
+  try {
+    const result = await fetch.post(`/api/credit/send-transactions-email`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 const topupList = async (body: queryList) => {
   try {
     const result = await fetch.post(`/api/credit/find-topups`, body)
@@ -75,8 +90,15 @@ const topupList = async (body: queryList) => {
     return errorHandler(error)
   }
 }
+const sendTopupsEmail = async (body: queryExportList) => {
+  try {
+    const result = await fetch.post(`/api/credit/send-topups-email`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
 
 
-
-export { creditTransaction, transactionDetail, verifyTransaction, creditList, transactionList, topupList }
+export { creditTransaction, transactionDetail, verifyTransaction, creditList, transactionList, topupList, sendTopupsEmail, sendTransactionsEmail }
 

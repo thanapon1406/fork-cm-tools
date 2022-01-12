@@ -300,11 +300,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       return (
         <>
           <div>
-            ยกเลิกโดย{' '}
-            {orderData?.cancelled_by?.app_name || determineAppId(orderData?.cancelled_by?.app_id)}
             <div>
-              - {orderData?.cancellation_reason}
+              {orderData?.cancellation_reason}
               {orderData?.cancellation_remark ? ': ' + orderData?.cancellation_remark : ''}
+            </div>
+            <div>
+              ยกเลิกโดย{' '}
+              {orderData?.cancelled_by?.app_name || determineAppId(orderData?.cancelled_by?.app_id)}
             </div>
             <div>{Moment(orderData?.cancelled_at).format(Constant.DATE_FORMAT)}</div>
           </div>
@@ -497,7 +499,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -833,7 +835,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={imagesInitialValues.imagePath_1}
-                    privateBucket={imagesInitialValues?.imagePath_1?.includes("https") ? false : true} />
+                    privateBucket={
+                      imagesInitialValues?.imagePath_1?.includes('https') ? false : true
+                    }
+                  />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
@@ -842,7 +847,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={imagesInitialValues.imagePath_2}
-                    privateBucket={imagesInitialValues?.imagePath_2?.includes("https") ? false : true} />
+                    privateBucket={
+                      imagesInitialValues?.imagePath_2?.includes('https') ? false : true
+                    }
+                  />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
@@ -851,7 +859,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={imagesInitialValues.imagePath_3}
-                    privateBucket={imagesInitialValues?.imagePath_3?.includes("https") ? false : true} />
+                    privateBucket={
+                      imagesInitialValues?.imagePath_3?.includes('https') ? false : true
+                    }
+                  />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
@@ -860,7 +871,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={imagesInitialValues.imagePath_4}
-                    privateBucket={imagesInitialValues?.imagePath_4?.includes("https") ? false : true} />
+                    privateBucket={
+                      imagesInitialValues?.imagePath_4?.includes('https') ? false : true
+                    }
+                  />
                 </Col>
               </Row>
               <Row gutter={16} style={{ marginTop: '20px' }}>
@@ -870,7 +884,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={merchantImagesInitialValues.merchant_image_1}
-                    privateBucket={merchantImagesInitialValues?.merchant_image_1?.includes("https") ? false : true} />
+                    privateBucket={
+                      merchantImagesInitialValues?.merchant_image_1?.includes('https')
+                        ? false
+                        : true
+                    }
+                  />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
@@ -878,7 +897,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={merchantImagesInitialValues.merchant_image_2}
-                    privateBucket={merchantImagesInitialValues?.merchant_image_2?.includes("https") ? false : true} />
+                    privateBucket={
+                      merchantImagesInitialValues?.merchant_image_2?.includes('https')
+                        ? false
+                        : true
+                    }
+                  />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
@@ -886,7 +910,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={merchantImagesInitialValues.merchant_image_3}
-                    privateBucket={merchantImagesInitialValues?.merchant_image_3?.includes("https") ? false : true} />
+                    privateBucket={
+                      merchantImagesInitialValues?.merchant_image_3?.includes('https')
+                        ? false
+                        : true
+                    }
+                  />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <div style={{ marginBottom: '6px' }}>
@@ -894,7 +923,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={merchantImagesInitialValues.merchant_image_4}
-                    privateBucket={merchantImagesInitialValues?.merchant_image_4?.includes("https") ? false : true} />
+                    privateBucket={
+                      merchantImagesInitialValues?.merchant_image_4?.includes('https')
+                        ? false
+                        : true
+                    }
+                  />
                 </Col>
               </Row>
             </Form>
@@ -906,7 +940,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -989,7 +1023,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1126,7 +1160,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1193,7 +1227,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   </div>
                   <ImgButton
                     url={riderImages}
-                    privateBucket={riderImages?.includes("https") ? false : true} />
+                    privateBucket={riderImages?.includes('https') ? false : true}
+                  />
                 </Col>
               </Row>
               <Row gutter={16}>

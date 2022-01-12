@@ -19,7 +19,7 @@ import StaffList from '@/containers/staff-list'
 import { useLoadingContext } from '@/contexts/LoadingContext'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { topupList, transactionList } from '@/services/credit'
+import { sendTopupsEmail, sendTransactionsEmail, topupList, transactionList } from '@/services/credit'
 import { outletDetail, personalData, updateOutletStatus } from '@/services/merchant'
 import { StopOutlined } from '@ant-design/icons'
 import { Badge, Breadcrumb, Col, Divider, Modal, Row, Select, Space, Typography } from 'antd'
@@ -45,6 +45,27 @@ export default function MerchantUserView({ }: Props): ReactElement {
     style: 'currency',
     currency: 'THB',
   })
+
+  // send transactions email
+  const transactionsEmail = (value: any) => {
+    sendTransactionsEmail({
+      email: value.email,
+      transaction_request: {
+        outlet_id: id,
+        is_preload_credit: true,
+      }
+    })
+  }
+
+  // send topups email
+  const topupsEmail = (value: any) => {
+    sendTopupsEmail({
+      email: value.email,
+      transaction_request: {
+        outlet_id: id,
+      }
+    })
+  }
   // credit list
   const requestTransactionApi: Function = transactionList
   const credit = useFetchTable(
@@ -774,7 +795,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                 <Tab.TabPane tab="เติมเงิน" key="1">
                   <Row style={{ marginBottom: 12 }}>
                     <Col span={8} offset={16} style={{ textAlign: 'end' }}>
-                      <DownloadButton />
+                      <DownloadButton handelSubmit={topupsEmail} />
                     </Col>
                   </Row>
                   <Table
@@ -792,7 +813,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                 <Tab.TabPane tab="การใช้เครดิต" key="2">
                   <Row style={{ marginBottom: 12 }}>
                     <Col span={8} offset={16} style={{ textAlign: 'end' }}>
-                      <DownloadButton />
+                      <DownloadButton handelSubmit={transactionsEmail} />
                     </Col>
                   </Row>
                   <Table

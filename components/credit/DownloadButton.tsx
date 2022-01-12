@@ -15,7 +15,6 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
   const [config, setConfig] = useState({
     visible: false,
   })
-
   const [downloadInitialValues, setDownloadInitialValues] = useState({
     email: '',
   })
@@ -39,6 +38,7 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
   const handleOk = () => { }
 
   const handleSubmitDownload = async (values: typeof downloadInitialValues) => {
+    console.log(handelSubmit)
     handelSubmit(values)
   }
 

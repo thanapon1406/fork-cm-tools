@@ -76,7 +76,31 @@ const topupList = async (body: queryList) => {
   }
 }
 
+const calculateUsedCredit = async (body: queryList) => {
+  try {
+    const result = await fetch.post(`/api/credit/calculate-used-credit`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
 
+const calculateTopup = async (body: queryList) => {
+  try {
+    const result = await fetch.post(`/api/credit/calculate-topup`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
 
-export { creditTransaction, transactionDetail, verifyTransaction, creditList, transactionList, topupList }
-
+export {
+  creditTransaction,
+  transactionDetail,
+  verifyTransaction,
+  creditList,
+  transactionList,
+  topupList,
+  calculateUsedCredit,
+  calculateTopup,
+}

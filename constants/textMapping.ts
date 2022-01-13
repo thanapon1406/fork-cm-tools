@@ -8,6 +8,21 @@ export const days: any = {
   sat: 'วันเสาร์',
 }
 
+export const monthsThName = [
+  'มกราคม',
+  'กุมภาพันธ์',
+  'มีนาคม',
+  'เมษายน',
+  'พฤษภาคม',
+  'มิถุนายน',
+  'กรกฎาคม',
+  'สิงหาคม',
+  'กันยายน',
+  'ตุลาคม',
+  'พฤศจิกายน',
+  'ธันวาคม',
+]
+
 export const outletStatus: any = {
   active: 'Active',
   inactive: 'In-active',
@@ -57,6 +72,10 @@ export const creditStatus: any = {
   refund: {
     text: 'Refund',
     status: 'waiting',
+  },
+  cancel: {
+    text: 'cancel',
+    status: 'failed',
   },
 }
 

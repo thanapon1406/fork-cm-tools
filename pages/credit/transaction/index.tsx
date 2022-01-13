@@ -9,7 +9,9 @@ import Table from '@/components/Table'
 import { creditStatus, creditUsed } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { transactionList } from '@/services/credit'
+import { calculateUsedCredit, transactionList } from '@/services/credit'
+import { CalculateOutletCredit } from '@/services/merchant'
+import { monthFormat } from '@/utils/helpers'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
@@ -25,21 +27,22 @@ interface Props {}
 interface filterObject {
   id?: string
   keyword?: string
-  type?: string
+  credit_type?: string
   start_date?: string
   end_date?: string
   status?: string
   transaction_id?: string
   is_preload_credit?: boolean
   gl_type?: string
+  credit_no?: string
 }
 
 export default function CreditTransaction({}: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
-    refId: '',
+    credit_no: '',
     outlet_name: '',
-    type: '',
+    credit_type: '',
     date: {
       start: '',
       end: '',
@@ -53,10 +56,14 @@ export default function CreditTransaction({}: Props): ReactElement {
     },
   ])
 
-  var formatter = new Intl.NumberFormat('th-TH', {
-    style: 'currency',
-    currency: 'THB',
+  const [filterDate, setFilterDate] = useState({
+    start: '',
+    end: '',
   })
+  const [usedCredit, setUsedCredit] = useState(0)
+  const [availableCredit, setAvailableCredit] = useState(0)
+
+  var formatter = new Intl.NumberFormat('th-TH')
 
   const filterRequest: filterObject = {}
   const requestApi: Function = transactionList
@@ -69,21 +76,56 @@ export default function CreditTransaction({}: Props): ReactElement {
     handleFetchData({
       is_preload_credit: true,
       gl_type: 'credit',
+      status: 'success',
     })
+    initFilterDate()
   }, [])
 
+  const initFilterDate = async (
+    start: string = moment().startOf('month').format(),
+    end: string = moment().format()
+  ) => {
+    setFilterDate({
+      start: start,
+      end: end,
+    })
+    const reqData = {
+      start_date: start,
+      end_date: end,
+    }
+
+    const { result, success } = await calculateUsedCredit(reqData)
+    if (success) {
+      const { data } = result
+      const credit = get(data, 'credit')
+      setUsedCredit(credit)
+    }
+
+    const { result: resultAvailableCredit, success: successAvailableCredit } =
+      await CalculateOutletCredit({})
+    if (successAvailableCredit) {
+      const { data } = resultAvailableCredit
+      const credit = get(data, 'available_credit')
+      setAvailableCredit(credit)
+    }
+  }
   const Schema = Yup.object().shape({})
 
   const handleSubmit = (values: typeof initialValues) => {
     let reqFilter: filterObject = {
       is_preload_credit: true,
       gl_type: 'credit',
-      transaction_id: values.refId,
+      credit_no: values.credit_no,
       keyword: values.outlet_name,
-      type: values.type,
+      credit_type: values.credit_type,
       start_date: values.date.start,
       end_date: values.date.end,
       status: values.status,
+    }
+    if (values.date.start && values.date.end) {
+      initFilterDate(values.date.start, values.date.end)
+    } else {
+      initFilterDate()
     }
     handleFetchData(reqFilter)
   }
@@ -147,12 +189,14 @@ export default function CreditTransaction({}: Props): ReactElement {
         if (row) {
           const status = creditStatus[row]
           return (
-            <CustomBadge
-              customMapping={{
-                status: status.status,
-                text: status.text,
-              }}
-            ></CustomBadge>
+            status && (
+              <CustomBadge
+                customMapping={{
+                  status: status.status,
+                  text: status.text,
+                }}
+              ></CustomBadge>
+            )
           )
         }
       },
@@ -173,13 +217,13 @@ export default function CreditTransaction({}: Props): ReactElement {
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'Ref ID' }}
-                    name="refId"
+                    label={{ text: 'Order No' }}
+                    name="credit_no"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="refId"
-                    placeholder="Ref ID"
+                    id="credit_no"
+                    placeholder="Order No"
                   />
                 </Col>
                 <Col className="gutter-row" span={6}>
@@ -196,9 +240,9 @@ export default function CreditTransaction({}: Props): ReactElement {
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ประเภทการใช้เครดิต' }}
-                    name="type"
+                    name="credit_type"
                     component={Select}
-                    id="type"
+                    id="credit_type"
                     placeholder="ประเภทการใช้เครดิต"
                     defaultValue=""
                     selectOption={[
@@ -288,14 +332,18 @@ export default function CreditTransaction({}: Props): ReactElement {
         </Formik>
       </Card>
       <Card>
-        <Title level={4}>การใช้เครดิตร้านค้าทั้งหมด 1 ธันวาคม 2564 - 24 ธันวาคม 2564</Title>
+        <Title level={4}>
+          การใช้เครดิตร้านค้าทั้งหมด {monthFormat(filterDate.start)} - {monthFormat(filterDate.end)}
+        </Title>
 
         <Row gutter={[8, 24]}>
           <Col className="gutter-row" span={8}>
-            <Title level={5}>ยอดรวมจำนวนเงินใช้เครดิตทั้งหมด: 1,323 </Title>
+            <Title level={5}>ยอดรวมจำนวนเงินใช้เครดิตทั้งหมด: {formatter.format(usedCredit)}</Title>
           </Col>
           <Col className="gutter-row" span={8}>
-            <Title level={5}>ยอดรวมจำนวนเครดิตคงเหลือ: 1,323</Title>
+            <Title level={5}>
+              ยอดรวมจำนวนเครดิตคงเหลือปัจจุบัน: {formatter.format(availableCredit)}
+            </Title>
           </Col>
           <Col className="gutter-row" span={8} style={{ textAlign: 'end' }}>
             <DownloadButton />

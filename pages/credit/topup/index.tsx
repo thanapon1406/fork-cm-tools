@@ -1,6 +1,7 @@
 import CustomBadge from '@/components/Badge'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import DownloadButton from '@/components/credit/DownloadButton'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
@@ -8,7 +9,8 @@ import Table from '@/components/Table'
 import { creditPaymentChanel, creditStatus } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { creditTransaction } from '@/services/credit'
+import { calculateTopup, creditTransaction } from '@/services/credit'
+import { monthFormat } from '@/utils/helpers'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
@@ -28,7 +30,7 @@ interface filterObject {
   start_date?: string
   end_date?: string
   status?: string
-  transaction_id?: string
+  reference_id?: string
 }
 
 export default function MerchantCredit({}: Props): ReactElement {
@@ -50,12 +52,50 @@ export default function MerchantCredit({}: Props): ReactElement {
     },
   ])
 
-  var formatter = new Intl.NumberFormat('th-TH', {
+  const [filterDate, setFilterDate] = useState({
+    start: '',
+    end: '',
+  })
+  const [summaryTopup, setSummaryTopup] = useState({
+    amount: 0,
+    credit: 0,
+  })
+
+  const formatter = new Intl.NumberFormat('th-TH', {
     style: 'currency',
     currency: 'THB',
   })
 
-  useEffect(() => {}, [])
+  const formatterNotSymbol = new Intl.NumberFormat('th-TH')
+
+  useEffect(() => {
+    initFilterDate()
+  }, [])
+
+  const initFilterDate = async (
+    start: string = moment().startOf('month').format(),
+    end: string = moment().format()
+  ) => {
+    setFilterDate({
+      start: start,
+      end: end,
+    })
+    const reqData = {
+      start_date: start,
+      end_date: end,
+    }
+
+    const { result, success } = await calculateTopup(reqData)
+    if (success) {
+      const { data } = result
+      const credit = get(data, 'credit')
+      const amount = get(data, 'amount')
+      setSummaryTopup({
+        amount: amount,
+        credit: credit,
+      })
+    }
+  }
 
   const filterRequest: filterObject = {}
   const requestApi: Function = creditTransaction
@@ -66,7 +106,7 @@ export default function MerchantCredit({}: Props): ReactElement {
 
   const handleSubmit = (values: typeof initialValues) => {
     let reqFilter: filterObject = {
-      transaction_id: values.refId,
+      reference_id: values.refId,
       keyword: values.outlet_name,
       type: values.type,
       start_date: values.date.start,
@@ -74,6 +114,11 @@ export default function MerchantCredit({}: Props): ReactElement {
       status: values.status,
     }
     handleFetchData(reqFilter)
+    if (values.date.start && values.date.end) {
+      initFilterDate(values.date.start, values.date.end)
+    } else {
+      initFilterDate()
+    }
   }
 
   const column = [
@@ -112,7 +157,7 @@ export default function MerchantCredit({}: Props): ReactElement {
         if (row === undefined) {
           row = 0
         }
-        return formatter.format(row)
+        return formatterNotSymbol.format(row)
       },
     },
     {
@@ -280,6 +325,26 @@ export default function MerchantCredit({}: Props): ReactElement {
         </Formik>
       </Card>
       <Card>
+        <Title level={4}>
+          การเติมเครดิตร้านค้าทั้งหมด {monthFormat(filterDate.start)} -{' '}
+          {monthFormat(filterDate.end)}
+        </Title>
+
+        <Row gutter={[8, 24]}>
+          <Col className="gutter-row" span={8}>
+            <Title level={5}>
+              ยอดรวมจำนวนเงินเติมเครดิตทั้งหมด: {formatterNotSymbol.format(summaryTopup.amount)}{' '}
+            </Title>
+          </Col>
+          <Col className="gutter-row" span={8}>
+            <Title level={5}>
+              ยอดรวมเติมเครดิตทั้งหมด: {formatterNotSymbol.format(summaryTopup.credit)}
+            </Title>
+          </Col>
+          <Col className="gutter-row" span={8} style={{ textAlign: 'end' }}>
+            <DownloadButton />
+          </Col>
+        </Row>
         <Table
           config={{
             dataTableTitle: 'บัญชีร้านค้า',

@@ -23,7 +23,6 @@ export default function MainLayout({ children, isLoading = false }: Props) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       authToken = isLogin()
-      console.log(`authToken`, authToken)
       if (!authToken) {
         router.replace('/login')
       }

@@ -150,6 +150,15 @@ const getStaff = async (body: any) => {
   }
 }
 
+const CalculateOutletCredit = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/merchant/calculate-outlet-credit`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 export {
   outletList,
   outletDetail,
@@ -164,4 +173,5 @@ export {
   updateOutletStatus,
   getStaffs,
   getStaff,
+  CalculateOutletCredit,
 }

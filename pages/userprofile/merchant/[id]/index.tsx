@@ -1,6 +1,7 @@
 import CustomBadge from '@/components/Badge'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import DownloadButton from '@/components/credit/DownloadButton'
 import CheckBox from '@/components/Form/CheckBox'
 import Input from '@/components/Form/Input'
 import ImgButton from '@/components/ImgButton'
@@ -12,13 +13,13 @@ import {
   onlineStatusTag,
   outletStatusTH,
   outletType,
-  userServiceType,
+  userServiceType
 } from '@/constants/textMapping'
 import StaffList from '@/containers/staff-list'
 import { useLoadingContext } from '@/contexts/LoadingContext'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { topupList, transactionList } from '@/services/credit'
+import { sendTopupsEmail, sendTransactionsEmail, topupList, transactionList } from '@/services/credit'
 import { outletDetail, personalData, updateOutletStatus } from '@/services/merchant'
 import { StopOutlined } from '@ant-design/icons'
 import { Badge, Breadcrumb, Col, Divider, Modal, Row, Select, Space, Typography } from 'antd'
@@ -31,9 +32,9 @@ import * as Yup from 'yup'
 
 const { Title, Text } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function MerchantUserView({}: Props): ReactElement {
+export default function MerchantUserView({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoid, setSsoid] = useState('')
@@ -44,6 +45,27 @@ export default function MerchantUserView({}: Props): ReactElement {
     style: 'currency',
     currency: 'THB',
   })
+
+  // send transactions email
+  const transactionsEmail = (value: any) => {
+    sendTransactionsEmail({
+      email: value.email,
+      transaction_request: {
+        outlet_id: id,
+        is_preload_credit: true,
+      }
+    })
+  }
+
+  // send topups email
+  const topupsEmail = (value: any) => {
+    sendTopupsEmail({
+      email: value.email,
+      transaction_request: {
+        outlet_id: id,
+      }
+    })
+  }
   // credit list
   const requestTransactionApi: Function = transactionList
   const credit = useFetchTable(
@@ -57,11 +79,11 @@ export default function MerchantUserView({}: Props): ReactElement {
   )
   const columnCredit = [
     {
-      title: 'รายการ',
-      dataIndex: '',
+      title: 'ประเภทการใช้เครดิต',
+      dataIndex: 'credit_type',
       align: 'center',
       render: (row: string) => {
-        return row ? 'ใช้เครดิต' : 'เติมเงิน'
+        return row == 'gross_profit' ? 'ค่าดำเนินการ' : row == 'delivery_fee' ? 'ค่าจัดส่ง' : 'อื่นๆ'
       },
     },
     {
@@ -106,10 +128,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -145,14 +167,6 @@ export default function MerchantUserView({}: Props): ReactElement {
     {
       title: 'จำนวนเงิน',
       dataIndex: 'amount',
-      align: 'center',
-      render: (row: number) => {
-        return formatter.format(row)
-      },
-    },
-    {
-      title: 'ภาษีที่หัก',
-      dataIndex: 'vat',
       align: 'center',
       render: (row: number) => {
         return formatter.format(row)
@@ -204,10 +218,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -382,7 +396,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     }),
   })
 
-  const handleSubmit = async (values: any) => {}
+  const handleSubmit = async (values: any) => { }
   const handleSubmitStatus = async () => {
     const staffStatus = summaryBanStaff(userInitialValues.staff)
     if (outletInitialValues.online_status === 'online' && staffStatus.status === 'error') {
@@ -496,13 +510,13 @@ export default function MerchantUserView({}: Props): ReactElement {
     }
     return isBan
       ? {
-          status: 'error',
-          text: 'ถูกแบน',
-        }
+        status: 'error',
+        text: 'ถูกแบน',
+      }
       : {
-          status: 'success',
-          text: 'ปกติ',
-        }
+        status: 'success',
+        text: 'ปกติ',
+      }
   }
 
   return (
@@ -776,8 +790,14 @@ export default function MerchantUserView({}: Props): ReactElement {
                   <Title level={5}>{formatter.format(outletInitialValues.available_credit)}</Title>
                 </Col>
               </Row>
+
               <Tab defaultActiveKey="1">
                 <Tab.TabPane tab="เติมเงิน" key="1">
+                  <Row style={{ marginBottom: 12 }}>
+                    <Col span={8} offset={16} style={{ textAlign: 'end' }}>
+                      <DownloadButton handelSubmit={topupsEmail} />
+                    </Col>
+                  </Row>
                   <Table
                     config={{
                       loading: topup.isLoading,
@@ -790,7 +810,12 @@ export default function MerchantUserView({}: Props): ReactElement {
                     }}
                   />
                 </Tab.TabPane>
-                <Tab.TabPane tab="ถอนเงิน" key="2">
+                <Tab.TabPane tab="การใช้เครดิต" key="2">
+                  <Row style={{ marginBottom: 12 }}>
+                    <Col span={8} offset={16} style={{ textAlign: 'end' }}>
+                      <DownloadButton handelSubmit={transactionsEmail} />
+                    </Col>
+                  </Row>
                   <Table
                     config={{
                       loading: credit.isLoading,

@@ -117,6 +117,24 @@ const calculateTopup = async (body: queryList) => {
   }
 }
 
+const ExportCreditTopup = async (body: queryList) => {
+  try {
+    const result = await fetch.post(`/api/credit/export-credit-topup`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const ExportCreditTransaction = async (body: queryList) => {
+  try {
+    const result = await fetch.post(`/api/credit/export-credit-transaction`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 export {
   creditTransaction,
   transactionDetail,
@@ -128,4 +146,6 @@ export {
   calculateTopup,
   sendTopupsEmail,
   sendTransactionsEmail,
+  ExportCreditTopup,
+  ExportCreditTransaction,
 }

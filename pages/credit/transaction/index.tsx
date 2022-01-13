@@ -9,10 +9,10 @@ import Table from '@/components/Table'
 import { creditStatus, creditUsed } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { calculateUsedCredit, transactionList } from '@/services/credit'
+import { calculateUsedCredit, ExportCreditTransaction, transactionList } from '@/services/credit'
 import { CalculateOutletCredit } from '@/services/merchant'
 import { monthFormat } from '@/utils/helpers'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
 import moment from 'moment'
@@ -49,12 +49,6 @@ export default function CreditTransaction({}: Props): ReactElement {
     },
     status: '',
   }
-  let [outletType, setOutletType] = useState<Array<any>>([
-    {
-      name: 'ทุกประเภท',
-      value: '',
-    },
-  ])
 
   const [filterDate, setFilterDate] = useState({
     start: '',
@@ -62,6 +56,16 @@ export default function CreditTransaction({}: Props): ReactElement {
   })
   const [usedCredit, setUsedCredit] = useState(0)
   const [availableCredit, setAvailableCredit] = useState(0)
+  const [filterSearch, setFilterSearch] = useState<filterObject>({
+    is_preload_credit: true,
+    gl_type: 'credit',
+    credit_no: '',
+    keyword: '',
+    credit_type: '',
+    start_date: '',
+    end_date: '',
+    status: '',
+  })
 
   var formatter = new Intl.NumberFormat('th-TH')
 
@@ -122,6 +126,7 @@ export default function CreditTransaction({}: Props): ReactElement {
       end_date: values.date.end,
       status: values.status,
     }
+    setFilterSearch(reqFilter)
     if (values.date.start && values.date.end) {
       initFilterDate(values.date.start, values.date.end)
     } else {
@@ -202,6 +207,28 @@ export default function CreditTransaction({}: Props): ReactElement {
       },
     },
   ]
+
+  const handleDownloadClick = async (values: any) => {
+    const request = {
+      email: get(values, 'email'),
+      is_preload_credit: true,
+      gl_type: 'credit',
+      credit_no: filterSearch.credit_no,
+      keyword: filterSearch.keyword,
+      credit_type: filterSearch.credit_type,
+      start_date: filterSearch.start_date,
+      end_date: filterSearch.end_date,
+      status: filterSearch.status,
+    }
+    console.log(`request`, request)
+    const { result, success } = await ExportCreditTransaction(request)
+    if (success) {
+      notification.success({
+        message: `ส่งรายงานไปยังอีเมลที่ระบุใว้เรียบร้อยแล้ว`,
+        description: '',
+      })
+    }
+  }
 
   return (
     <MainLayout>
@@ -346,7 +373,7 @@ export default function CreditTransaction({}: Props): ReactElement {
             </Title>
           </Col>
           <Col className="gutter-row" span={8} style={{ textAlign: 'end' }}>
-            <DownloadButton />
+            <DownloadButton handelSubmit={handleDownloadClick} />
           </Col>
         </Row>
         <br />

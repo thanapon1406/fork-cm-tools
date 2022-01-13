@@ -9,9 +9,9 @@ import Table from '@/components/Table'
 import { creditPaymentChanel, creditStatus } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { calculateTopup, creditTransaction } from '@/services/credit'
+import { calculateTopup, creditTransaction, ExportCreditTopup } from '@/services/credit'
 import { monthFormat } from '@/utils/helpers'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
 import moment from 'moment'
@@ -45,12 +45,15 @@ export default function MerchantCredit({}: Props): ReactElement {
     },
     status: '',
   }
-  let [outletType, setOutletType] = useState<Array<any>>([
-    {
-      name: 'ทุกประเภท',
-      value: '',
-    },
-  ])
+
+  const [filterSearch, setFilterSearch] = useState<filterObject>({
+    reference_id: '',
+    keyword: '',
+    type: '',
+    start_date: '',
+    end_date: '',
+    status: '',
+  })
 
   const [filterDate, setFilterDate] = useState({
     start: '',
@@ -113,6 +116,7 @@ export default function MerchantCredit({}: Props): ReactElement {
       end_date: values.date.end,
       status: values.status,
     }
+    setFilterSearch(reqFilter)
     handleFetchData(reqFilter)
     if (values.date.start && values.date.end) {
       initFilterDate(values.date.start, values.date.end)
@@ -195,6 +199,21 @@ export default function MerchantCredit({}: Props): ReactElement {
       },
     },
   ]
+
+  const handleDownloadClick = async (values: any) => {
+    const request = {
+      email: get(values, 'email'),
+      ...filterSearch,
+    }
+    console.log(`request`, request)
+    const { result, success } = await ExportCreditTopup(request)
+    if (success) {
+      notification.success({
+        message: `ส่งรายงานไปยังอีเมลที่ระบุใว้เรียบร้อยแล้ว`,
+        description: '',
+      })
+    }
+  }
 
   return (
     <MainLayout>
@@ -342,7 +361,7 @@ export default function MerchantCredit({}: Props): ReactElement {
             </Title>
           </Col>
           <Col className="gutter-row" span={8} style={{ textAlign: 'end' }}>
-            <DownloadButton />
+            <DownloadButton handelSubmit={handleDownloadClick} />
           </Col>
         </Row>
         <Table

@@ -53,6 +53,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
       transaction_request: {
         outlet_id: id,
         is_preload_credit: true,
+        all: true,
+        gl_type: 'credit',
       }
     })
   }
@@ -63,6 +65,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
       email: value.email,
       transaction_request: {
         outlet_id: id,
+        all: true,
       }
     })
   }

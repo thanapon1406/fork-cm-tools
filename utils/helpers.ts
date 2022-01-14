@@ -1,4 +1,5 @@
 import * as Constant from '@/constants/common'
+import { monthsThName } from '@/constants/textMapping'
 import { isEmpty, join, map } from 'lodash'
 import moment from 'moment'
 
@@ -62,6 +63,17 @@ const determineAppId = (appId: string = '') => {
   }
 }
 
+const monthFormat = (date: string) => {
+  if (date) {
+    const dateFormat = moment(date)
+    const day = dateFormat.date()
+    const month = dateFormat.month()
+    const year = dateFormat.year() + 543
+    return `${day} ${monthsThName[month]} ${year}`
+  }
+  return ''
+}
+
 export {
   numberFormat,
   uniqueId,
@@ -70,4 +82,5 @@ export {
   convertDateToString,
   currencyFormat,
   determineAppId,
+  monthFormat,
 }

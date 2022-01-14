@@ -15,7 +15,6 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
   const [config, setConfig] = useState({
     visible: false,
   })
-
   const [downloadInitialValues, setDownloadInitialValues] = useState({
     email: '',
   })
@@ -36,7 +35,7 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
     })
   }
 
-  const handleOk = () => { }
+  const handleOk = () => {}
 
   const handleSubmitDownload = async (values: typeof downloadInitialValues) => {
     handelSubmit(values)
@@ -55,7 +54,9 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
       </Button>
       <Modal visible={config.visible} centered title={null} footer={null} onCancel={hideModal}>
         <Title level={3}>ต้องการดาวน์โหลดรายงานใช่หรือไม่</Title>
-        <Title style={{ color: '#d9d9d9', margin: 0 }} level={5} >กรุณากรอกอีเมลที่ต้องการรับรายงาน</Title>
+        <Title style={{ color: '#d9d9d9', margin: 0 }} level={5}>
+          กรุณากรอกอีเมลที่ต้องการรับรายงาน
+        </Title>
         <br />
         <Formik
           initialValues={downloadInitialValues}

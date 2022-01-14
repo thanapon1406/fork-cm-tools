@@ -18,6 +18,7 @@ import {
   TablePaginationConfig,
 } from 'antd'
 import lodash, { get } from 'lodash'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { ReactElement } from 'react'
 interface Props {
@@ -73,7 +74,8 @@ export default function Table({ config }: Props): ReactElement {
       if (mappingPath) {
         path = mappingPath(rowData)
       }
-      Router.push(`/${tableName}/${path}`)
+      // Router.push()
+      return `/${tableName}/${path}`
     }
     const Edit = () => {}
     const Delete = () => {}
@@ -107,6 +109,24 @@ export default function Table({ config }: Props): ReactElement {
         })}
       </Menu>
     )
+
+    const singleRender = (rowData: any) => {
+      if (action[0] === 'view') {
+        const viewUrl = View(rowData)
+        return (
+          <>
+            <Link href={viewUrl}>
+              <a>
+                <Menu style={{ border: 'none' }}>
+                  <Menu.Item icon={<EyeOutlined />}>View</Menu.Item>
+                </Menu>
+              </a>
+            </Link>
+          </>
+        )
+      }
+    }
+
     const isCustomAction = lodash.find(tableColumns, { dataIndex: 'action' })
     if (!isCustomAction) {
       tableColumns = [
@@ -117,7 +137,7 @@ export default function Table({ config }: Props): ReactElement {
           render: (rows: any, rowData: any) => {
             const { id } = rowData
             if (action.length === 1) {
-              return actionElement(rowData)
+              return singleRender(rowData)
             } else {
               return (
                 <Dropdown overlay={actionElement(id)} trigger={['click']}>

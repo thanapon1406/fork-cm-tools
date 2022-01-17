@@ -5,12 +5,18 @@ import Input from '@/components/Form/Input'
 import { userStatus } from '@/constants/textMapping'
 import MainLayout from '@/layout/MainLayout'
 import { getStaff, outletDetail } from '@/services/merchant'
+import { GetSocialLinkProvider } from '@/services/sso'
 import { StopOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import { map } from 'lodash'
 import moment from 'moment'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
+import facebookLogo from '../../../public/asset/icon/facebook.png'
+import googleLogo from '../../../public/asset/icon/google.png'
+import lineLogo from '../../../public/asset/icon/line.png'
 const { Title, Text } = Typography
 interface Props {}
 
@@ -36,6 +42,7 @@ export default function StaffMerchant({}: Props): ReactElement {
     register_date: '',
     created_at: '',
     status: '',
+    social: [],
   })
 
   useEffect(() => {
@@ -68,13 +75,28 @@ export default function StaffMerchant({}: Props): ReactElement {
           firstname = '',
           lastname = '',
           tel = '',
-          ssoid = '',
+          sso_id = '',
           nation_id = '',
           is_ban = false,
           line_id = '',
           user_status = '',
           created_at = '',
         } = data
+
+        let social: any = []
+        if (sso_id) {
+          const socialReq = {
+            uid: sso_id,
+            project_id: '1',
+          }
+          const { result: ssoResult, success: ssoSuccess } = await GetSocialLinkProvider(socialReq)
+          if (ssoSuccess) {
+            const { data } = ssoResult
+            social = map(data, (val) => {
+              return val['provider'] || '-'
+            })
+          }
+        }
 
         setUserInitialValues({
           ...userInitialValues,
@@ -89,6 +111,7 @@ export default function StaffMerchant({}: Props): ReactElement {
           line_id: line_id,
           register_date: created_at ? moment(created_at).format('YYYY-MM-DD HH:mm') : '',
           created_at: created_at ? moment(created_at).format('YYYY-MM-DD HH:mm') : '',
+          social: social,
         })
       }
     }
@@ -109,6 +132,28 @@ export default function StaffMerchant({}: Props): ReactElement {
   }
 
   const handleSubmit = (values: Personal) => {}
+
+  const renderSocialLink = (socialList: any) => {
+    return socialList.map((val: string) => {
+      let logImg = googleLogo
+      switch (val) {
+        case 'google':
+          logImg = googleLogo
+          break
+        case 'facebook':
+          logImg = facebookLogo
+          break
+        case 'line':
+          logImg = lineLogo
+          break
+      }
+      return (
+        <span id={val} style={{ marginRight: '10px' }}>
+          <Image src={logImg} width={30} height={30} />
+        </span>
+      )
+    })
+  }
 
   return (
     <MainLayout isLoading={isLoadingPage}>
@@ -273,6 +318,11 @@ export default function StaffMerchant({}: Props): ReactElement {
             </Form>
           )}
         </Formik>
+        <div>
+          <Text strong>Social Login</Text>
+        </div>
+        <br />
+        {renderSocialLink(userInitialValues.social)}
         <br />
         <br />
         <br />

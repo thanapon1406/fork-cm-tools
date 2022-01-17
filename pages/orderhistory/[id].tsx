@@ -462,6 +462,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         const { result, success } = await cancelOrder(body)
         if (success) {
           setIsOrderStatus(true)
+          setIsCancelRider(true)
+          router.reload()
         }
       },
     })

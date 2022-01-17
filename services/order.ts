@@ -10,6 +10,12 @@ export interface orderStatusInterface {
   order_no?: string
 }
 
+export interface cancelOrderInterface {
+  order_no?: string
+  cancellation_id?: string
+  cancellation_reason?: string
+}
+
 const findOrdersStatusHistory = async (params: orderStatusInterface) => {
   try {
     const result = await fetch.get(`/api/order/find-orders-status-history`, { params: params })
@@ -19,4 +25,14 @@ const findOrdersStatusHistory = async (params: orderStatusInterface) => {
   }
 }
 
-export { findOrdersStatusHistory }
+const cancelOrder = async (body: cancelOrderInterface) => {
+  try {
+    const result = await fetch.post(`/api/order/cancel-order`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export { findOrdersStatusHistory, cancelOrder }
+

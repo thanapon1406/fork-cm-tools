@@ -311,7 +311,7 @@ export default function StaffMerchantProfile({}: Props): ReactElement {
           break
       }
       return (
-        <span id={val} style={{ marginRight: '10px' }}>
+        <span key={val} style={{ marginRight: '10px' }}>
           <Image src={logImg} width={30} height={30} />
         </span>
       )

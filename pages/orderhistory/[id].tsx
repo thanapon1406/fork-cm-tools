@@ -463,6 +463,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         if (success) {
           setIsOrderStatus(true)
           setIsCancelRider(true)
+          router.reload()
         }
       },
     })

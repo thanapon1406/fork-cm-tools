@@ -7,7 +7,7 @@ import { OrderDetail } from '@/interface/order'
 import { OrderStatusHistoryDetail } from '@/interface/orderStatusHistory'
 import MainLayout from '@/layout/MainLayout'
 import { consumerList, queryList } from '@/services/consumer'
-import { findOrdersStatusHistory, orderStatusInterface } from '@/services/order'
+import { cancelOrder, cancelOrderInterface, findOrdersStatusHistory, orderStatusInterface } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
 import { cancelRider, getRiderDetail } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
@@ -447,6 +447,26 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     })
   }
 
+  const fetchCancelOrder = async (order_no: any) => {
+    confirm({
+      title: 'ยืนยันการยกเลิกออเดอร์ ?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'ยืนยันการยกเลิกออเดอร์',
+      async onOk() {
+        const body: cancelOrderInterface = {
+          order_no: String(order_no),
+          cancellation_id: String(0),
+          cancellation_reason: "ยกเลิกโดยผู้ดูเเลระบบ"
+
+        }
+        const { result, success } = await cancelOrder(body)
+        if (success) {
+          setIsOrderStatus(true)
+        }
+      },
+    })
+  }
+
   useEffect(() => {
     if (id) {
       const request: requestReportInterface = {
@@ -458,7 +478,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       fetchOrderTransaction(request)
       fetchOrdersStatusHistory(request)
     }
-  }, [id])
+  }, [id, isOrderStatus])
 
   return (
     <MainLayout isLoading={isLoading}>
@@ -489,6 +509,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             isDanger={true}
             size="middle"
             disabled={isOrderStatus}
+            onClick={() => fetchCancelOrder(id)}
           >
             ยกเลิก
           </Button>
@@ -499,7 +520,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -940,7 +961,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1023,7 +1044,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1160,7 +1181,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (

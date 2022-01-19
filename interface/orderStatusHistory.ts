@@ -13,6 +13,12 @@ export interface OrderStatusHistoryDetail {
   previous_status_info: StatusInfo
   current_rider_info: PersonalInfo
   previous_rider_info: PersonalInfo
+  type: string
+  images: [
+    {
+      path: string
+    }
+  ]
 }
 
 interface StatusInfo {

@@ -7,13 +7,18 @@ import { OrderDetail } from '@/interface/order'
 import { OrderStatusHistoryDetail } from '@/interface/orderStatusHistory'
 import MainLayout from '@/layout/MainLayout'
 import { consumerList, queryList } from '@/services/consumer'
-import { cancelOrder, cancelOrderInterface, findOrdersStatusHistory, orderStatusInterface } from '@/services/order'
+import {
+  cancelOrder,
+  cancelOrderInterface,
+  findOrdersStatusHistory,
+  orderStatusInterface,
+} from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
 import { cancelRider, getRiderDetail } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { forEach, isEmpty, isUndefined } from 'lodash'
+import { forEach, isEmpty, isUndefined, size } from 'lodash'
 import Moment from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
@@ -168,15 +173,26 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         if (!isUndefined(buyer_info)) {
           let consumerData = await getConsumerList(data.sso_id)
           let socialName = '-'
+          let consumerFullName = '-'
           if (!isUndefined(consumerData) && !isEmpty(consumerData)) {
             if (!isUndefined(consumerData.social_login_first_name)) {
-              socialName =
-                consumerData.social_login_first_name + ' ' + consumerData.social_login_last_name
+              socialName = consumerData.social_login_first_name
+            }
+
+            if (!isUndefined(consumerData.social_login_last_name)) {
+              socialName += ' ' + consumerData.social_login_last_name
             }
           }
 
+          if (!isUndefined(buyer_info.first_name)) {
+            consumerFullName = buyer_info.first_name
+          }
+          if (!isUndefined(buyer_info.last_name)) {
+            consumerFullName += ' ' + buyer_info.last_name
+          }
+
           setCustomerInitialValues({
-            consumer_full_name: buyer_info.first_name + buyer_info.last_name || '-',
+            consumer_full_name: consumerFullName,
             consumer_id: data.sso_id || '',
             consumer_social_name: socialName,
             consumer_full_address: buyer_info.address || '-',
@@ -296,7 +312,21 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   }
 
   const determineDescription = (orderStatusHistoryData: OrderStatusHistoryDetail) => {
-    if (orderStatusHistoryData.current_status_info.order_status === Constant.CANCEL) {
+    if (size(orderStatusHistoryData.current_status_info) === 0) {
+      if (
+        orderStatusHistoryData.type.toLowerCase() === Constant.MERCHANT.toLowerCase() &&
+        size(orderStatusHistoryData.images) > 0
+      ) {
+        return (
+          <>
+            <div>
+              ร้านค้า upload slip คืนเงิน
+              <div>{Moment(orderStatusHistoryData?.created_at).format(Constant.DATE_FORMAT)}</div>
+            </div>
+          </>
+        )
+      }
+    } else if (orderStatusHistoryData.current_status_info.order_status === Constant.CANCEL) {
       return (
         <>
           <div>
@@ -361,9 +391,21 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     orderHistoryData: any = {}
   ) => {
     let respObj = {
+      statusEnum: '',
       status: 'กำลังปรุง',
       imagePath: '/asset/images/cook.png',
     }
+
+    if (order_status === '' && merchant_status === '' && rider_status === '') {
+      if (orderData?.status === Constant.CANCEL) {
+        respObj.statusEnum = Constant.CANCEL
+        respObj.status = 'ยกเลิกออเดอร์'
+        respObj.imagePath = '/asset/images/cancel.png'
+
+        return respObj
+      }
+    }
+
     if (!isUndefined(orderData)) {
       if (
         order_status === Constant.SUCCESS ||
@@ -377,6 +419,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         merchant_status === Constant.CANCEL ||
         rider_status === Constant.CANCEL
       ) {
+        respObj.statusEnum = Constant.CANCEL
         respObj.status = 'ยกเลิกออเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
       } else if (order_status === Constant.WAITING) {
@@ -456,8 +499,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         const body: cancelOrderInterface = {
           order_no: String(order_no),
           cancellation_id: String(0),
-          cancellation_reason: "ยกเลิกโดยผู้ดูเเลระบบ"
-
+          cancellation_reason: 'ยกเลิกโดยผู้ดูเเลระบบ',
         }
         const { result, success } = await cancelOrder(body)
         if (success) {
@@ -522,7 +564,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -785,6 +827,11 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         )
                         return (
                           <Step
+                            status={
+                              determineTrackingResult?.statusEnum === Constant.CANCEL
+                                ? 'error'
+                                : 'process'
+                            }
                             key={val.order_no}
                             title={determineTrackingResult.status}
                             description={determineDescription(val)}
@@ -963,7 +1010,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1046,7 +1093,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1183,7 +1230,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (

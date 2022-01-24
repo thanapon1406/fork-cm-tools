@@ -74,6 +74,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   let [orderInitialValues, setOrderInitialValues] = useState({
     order_no: '',
     payment_channel: '',
+    device: '',
+    app_client: '',
   })
 
   let [imagesInitialValues, setImagesInitialValues] = useState({
@@ -118,6 +120,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         setOrderInitialValues({
           order_no: data.order_no,
           payment_channel: data.payment_channel_detail?.name || '-',
+          device: data.device,
+          app_client: data.app_client,
         })
 
         if (!isUndefined(outlet_info)) {
@@ -571,7 +575,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             <Form>
               <Title level={5}>ข้อมูลรายการออเดอร์</Title>
               <Row gutter={16}>
-                <Col className="gutter-row" span={12}>
+                <Col className="gutter-row" span={8}>
                   <Field
                     label={{ text: 'เลขออเดอร์' }}
                     name="order_no"
@@ -580,6 +584,28 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     className="form-control round"
                     id="order_no"
                     placeholder="เลขออเดอร์"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'Device' }}
+                    name="device"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="device"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={10}>
+                  <Field
+                    label={{ text: 'App Client' }}
+                    name="app_client"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="app_client"
                     disabled={true}
                   />
                 </Col>
@@ -596,16 +622,16 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       <Col className="gutter-row" span={8}>
                         ชื่อเมนู
                       </Col>
-                      <Col className="gutter-row" span={3}>
+                      <Col className="gutter-row center" span={2}>
                         จำนวน
                       </Col>
-                      <Col className="gutter-row" span={3}>
+                      <Col className="gutter-row center" span={3}>
                         ราคาต่อหน่วย
                       </Col>
-                      <Col className="gutter-row" span={3}>
+                      <Col className="gutter-row center" span={2}>
                         ราคารวม
                       </Col>
-                      <Col className="gutter-row" span={5}>
+                      <Col className="gutter-row" span={8}>
                         หมายเหตุ
                       </Col>
                       <Divider />
@@ -621,16 +647,16 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             <Col className="gutter-row" span={8}>
                               {val.name.th}
                             </Col>
-                            <Col className="gutter-row" span={3}>
+                            <Col className="gutter-row center" span={2}>
                               {val.quantity}
                             </Col>
-                            <Col className="gutter-row" span={3}>
+                            <Col className="gutter-row pull-right" span={3}>
                               {numberFormat(val.price)}
                             </Col>
-                            <Col className="gutter-row" span={3}>
+                            <Col className="gutter-row pull-right" span={2}>
                               {numberFormat(val.price * val.quantity)}
                             </Col>
-                            <Col className="gutter-row" span={5}>
+                            <Col className="gutter-row" span={8}>
                               {val.remark || '-'}
                             </Col>
                           </Row>
@@ -641,18 +667,19 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 <Row gutter={16}>
                                   <Col className="gutter-row" span={1}></Col>
                                   <Col className="gutter-row" span={8}>
+                                    {' - '}
                                     {choice.name.th}
                                   </Col>
-                                  <Col className="gutter-row" span={3}>
+                                  <Col className="gutter-row center" span={2}>
                                     {val.quantity}
                                   </Col>
-                                  <Col className="gutter-row" span={3}>
+                                  <Col className="gutter-row pull-right" span={3}>
                                     {numberFormat(choice.price)}
                                   </Col>
-                                  <Col className="gutter-row" span={3}>
+                                  <Col className="gutter-row pull-right" span={2}>
                                     {numberFormat(choice.price * val.quantity)}
                                   </Col>
-                                  <Col className="gutter-row" span={5}></Col>
+                                  <Col className="gutter-row" span={8}></Col>
                                 </Row>
                               </>
                             )
@@ -666,12 +693,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 <Col className="gutter-row" span={8}>
                                   <Text strong>รวม</Text>
                                 </Col>
-                                <Col className="gutter-row" span={3}></Col>
-                                <Col className="gutter-row" span={3}></Col>
-                                <Col className="gutter-row" span={3}>
-                                  {numberFormat(val.total)}
+                                <Col className="gutter-row" span={2}></Col>
+                                <Col className="gutter-row" span={2}></Col>
+                                <Col className="gutter-row pull-right" span={3}>
+                                  <Text strong>{numberFormat(val.total)}</Text>
                                 </Col>
-                                <Col className="gutter-row" span={5}></Col>
+                                <Col className="gutter-row" span={8}></Col>
                               </Row>
                               <Divider />
                             </>
@@ -703,10 +730,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         <Row gutter={16} className="mb-6">
                           <Col span={1}></Col>
                           <Col span={11} className="pull-left">
-                            <Text>ส่วนลดยำ</Text>
+                            <Text>{orderData?.promotion_name || '-'}</Text>
                           </Col>
                           <Col span={12} className="pull-right">
-                            <Text>0.00</Text>
+                            <Text>{numberFormat(orderData?.product_discount || 0)}</Text>
                           </Col>
                         </Row>
 
@@ -719,10 +746,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         <Row gutter={16} className="mt-16">
                           <Col span={1}></Col>
                           <Col span={11} className="pull-left">
-                            <Text>welcomekh100</Text>
+                            <Text>{orderData?.coupon_code || '-'}</Text>
                           </Col>
                           <Col span={12} className="pull-right">
-                            <Text>{numberFormat(orderData?.total_discount || 0)}</Text>
+                            <Text>{numberFormat(orderData?.discount_amount || 0)}</Text>
                           </Col>
                         </Row>
                       </Col>
@@ -763,7 +790,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             <Title level={5}>รวมมูลค่าสินค้า</Title>
                           </Col>
                           <Col span={12} className="pull-right">
-                            <Text>{numberFormat(orderData?.total || 0)}</Text>
+                            <Title level={5}>{numberFormat(orderData?.total || 0)}</Title>
                           </Col>
                         </Row>
                       </Col>

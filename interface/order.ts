@@ -70,6 +70,9 @@ export interface OrderDetail {
   delivery_fee: number
   distance: number
   discount_amount: number
+  coupon_code: string
+  product_discount: number
+  promotion_name: string
 
   total: number
   total_amount: number

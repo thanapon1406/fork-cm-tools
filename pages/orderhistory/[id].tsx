@@ -7,13 +7,18 @@ import { OrderDetail } from '@/interface/order'
 import { OrderStatusHistoryDetail } from '@/interface/orderStatusHistory'
 import MainLayout from '@/layout/MainLayout'
 import { consumerList, queryList } from '@/services/consumer'
-import { cancelOrder, cancelOrderInterface, findOrdersStatusHistory, orderStatusInterface } from '@/services/order'
+import {
+  cancelOrder,
+  cancelOrderInterface,
+  findOrdersStatusHistory,
+  orderStatusInterface,
+} from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
 import { cancelRider, getRiderDetail } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { forEach, isEmpty, isUndefined } from 'lodash'
+import { forEach, isEmpty, isUndefined, size } from 'lodash'
 import Moment from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
@@ -69,6 +74,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   let [orderInitialValues, setOrderInitialValues] = useState({
     order_no: '',
     payment_channel: '',
+    device: '',
+    app_client: '',
   })
 
   let [imagesInitialValues, setImagesInitialValues] = useState({
@@ -113,6 +120,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         setOrderInitialValues({
           order_no: data.order_no,
           payment_channel: data.payment_channel_detail?.name || '-',
+          device: data.device,
+          app_client: data.app_client,
         })
 
         if (!isUndefined(outlet_info)) {
@@ -168,15 +177,26 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         if (!isUndefined(buyer_info)) {
           let consumerData = await getConsumerList(data.sso_id)
           let socialName = '-'
+          let consumerFullName = '-'
           if (!isUndefined(consumerData) && !isEmpty(consumerData)) {
             if (!isUndefined(consumerData.social_login_first_name)) {
-              socialName =
-                consumerData.social_login_first_name + ' ' + consumerData.social_login_last_name
+              socialName = consumerData.social_login_first_name
+            }
+
+            if (!isUndefined(consumerData.social_login_last_name)) {
+              socialName += ' ' + consumerData.social_login_last_name
             }
           }
 
+          if (!isUndefined(buyer_info.first_name)) {
+            consumerFullName = buyer_info.first_name
+          }
+          if (!isUndefined(buyer_info.last_name)) {
+            consumerFullName += ' ' + buyer_info.last_name
+          }
+
           setCustomerInitialValues({
-            consumer_full_name: buyer_info.first_name + buyer_info.last_name || '-',
+            consumer_full_name: consumerFullName,
             consumer_id: data.sso_id || '',
             consumer_social_name: socialName,
             consumer_full_address: buyer_info.address || '-',
@@ -296,7 +316,21 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   }
 
   const determineDescription = (orderStatusHistoryData: OrderStatusHistoryDetail) => {
-    if (orderStatusHistoryData.current_status_info.order_status === Constant.CANCEL) {
+    if (size(orderStatusHistoryData.current_status_info) === 0) {
+      if (
+        orderStatusHistoryData.type.toLowerCase() === Constant.MERCHANT.toLowerCase() &&
+        size(orderStatusHistoryData.images) > 0
+      ) {
+        return (
+          <>
+            <div>
+              ร้านค้า upload slip คืนเงิน
+              <div>{Moment(orderStatusHistoryData?.created_at).format(Constant.DATE_FORMAT)}</div>
+            </div>
+          </>
+        )
+      }
+    } else if (orderStatusHistoryData.current_status_info.order_status === Constant.CANCEL) {
       return (
         <>
           <div>
@@ -361,9 +395,21 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     orderHistoryData: any = {}
   ) => {
     let respObj = {
+      statusEnum: '',
       status: 'กำลังปรุง',
       imagePath: '/asset/images/cook.png',
     }
+
+    if (order_status === '' && merchant_status === '' && rider_status === '') {
+      if (orderData?.status === Constant.CANCEL) {
+        respObj.statusEnum = Constant.CANCEL
+        respObj.status = 'ยกเลิกออเดอร์'
+        respObj.imagePath = '/asset/images/cancel.png'
+
+        return respObj
+      }
+    }
+
     if (!isUndefined(orderData)) {
       if (
         order_status === Constant.SUCCESS ||
@@ -377,6 +423,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         merchant_status === Constant.CANCEL ||
         rider_status === Constant.CANCEL
       ) {
+        respObj.statusEnum = Constant.CANCEL
         respObj.status = 'ยกเลิกออเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
       } else if (order_status === Constant.WAITING) {
@@ -456,8 +503,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         const body: cancelOrderInterface = {
           order_no: String(order_no),
           cancellation_id: String(0),
-          cancellation_reason: "ยกเลิกโดยผู้ดูเเลระบบ"
-
+          cancellation_reason: 'ยกเลิกโดยผู้ดูเเลระบบ',
         }
         const { result, success } = await cancelOrder(body)
         if (success) {
@@ -522,14 +568,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
             <Form>
               <Title level={5}>ข้อมูลรายการออเดอร์</Title>
               <Row gutter={16}>
-                <Col className="gutter-row" span={12}>
+                <Col className="gutter-row" span={8}>
                   <Field
                     label={{ text: 'เลขออเดอร์' }}
                     name="order_no"
@@ -538,6 +584,28 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     className="form-control round"
                     id="order_no"
                     placeholder="เลขออเดอร์"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'Device' }}
+                    name="device"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="device"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={10}>
+                  <Field
+                    label={{ text: 'App Client' }}
+                    name="app_client"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="app_client"
                     disabled={true}
                   />
                 </Col>
@@ -554,16 +622,16 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       <Col className="gutter-row" span={8}>
                         ชื่อเมนู
                       </Col>
-                      <Col className="gutter-row" span={3}>
+                      <Col className="gutter-row center" span={2}>
                         จำนวน
                       </Col>
-                      <Col className="gutter-row" span={3}>
+                      <Col className="gutter-row center" span={3}>
                         ราคาต่อหน่วย
                       </Col>
-                      <Col className="gutter-row" span={3}>
+                      <Col className="gutter-row center" span={2}>
                         ราคารวม
                       </Col>
-                      <Col className="gutter-row" span={5}>
+                      <Col className="gutter-row" span={8}>
                         หมายเหตุ
                       </Col>
                       <Divider />
@@ -579,16 +647,16 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             <Col className="gutter-row" span={8}>
                               {val.name.th}
                             </Col>
-                            <Col className="gutter-row" span={3}>
+                            <Col className="gutter-row center" span={2}>
                               {val.quantity}
                             </Col>
-                            <Col className="gutter-row" span={3}>
+                            <Col className="gutter-row pull-right" span={3}>
                               {numberFormat(val.price)}
                             </Col>
-                            <Col className="gutter-row" span={3}>
+                            <Col className="gutter-row pull-right" span={2}>
                               {numberFormat(val.price * val.quantity)}
                             </Col>
-                            <Col className="gutter-row" span={5}>
+                            <Col className="gutter-row" span={8}>
                               {val.remark || '-'}
                             </Col>
                           </Row>
@@ -599,18 +667,19 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 <Row gutter={16}>
                                   <Col className="gutter-row" span={1}></Col>
                                   <Col className="gutter-row" span={8}>
+                                    {' - '}
                                     {choice.name.th}
                                   </Col>
-                                  <Col className="gutter-row" span={3}>
+                                  <Col className="gutter-row center" span={2}>
                                     {val.quantity}
                                   </Col>
-                                  <Col className="gutter-row" span={3}>
+                                  <Col className="gutter-row pull-right" span={3}>
                                     {numberFormat(choice.price)}
                                   </Col>
-                                  <Col className="gutter-row" span={3}>
+                                  <Col className="gutter-row pull-right" span={2}>
                                     {numberFormat(choice.price * val.quantity)}
                                   </Col>
-                                  <Col className="gutter-row" span={5}></Col>
+                                  <Col className="gutter-row" span={8}></Col>
                                 </Row>
                               </>
                             )
@@ -624,12 +693,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 <Col className="gutter-row" span={8}>
                                   <Text strong>รวม</Text>
                                 </Col>
-                                <Col className="gutter-row" span={3}></Col>
-                                <Col className="gutter-row" span={3}></Col>
-                                <Col className="gutter-row" span={3}>
-                                  {numberFormat(val.total)}
+                                <Col className="gutter-row" span={2}></Col>
+                                <Col className="gutter-row" span={2}></Col>
+                                <Col className="gutter-row pull-right" span={3}>
+                                  <Text strong>{numberFormat(val.total)}</Text>
                                 </Col>
-                                <Col className="gutter-row" span={5}></Col>
+                                <Col className="gutter-row" span={8}></Col>
                               </Row>
                               <Divider />
                             </>
@@ -661,10 +730,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         <Row gutter={16} className="mb-6">
                           <Col span={1}></Col>
                           <Col span={11} className="pull-left">
-                            <Text>ส่วนลดยำ</Text>
+                            <Text>{orderData?.promotion_name || '-'}</Text>
                           </Col>
                           <Col span={12} className="pull-right">
-                            <Text>0.00</Text>
+                            <Text>{numberFormat(orderData?.product_discount || 0)}</Text>
                           </Col>
                         </Row>
 
@@ -677,10 +746,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         <Row gutter={16} className="mt-16">
                           <Col span={1}></Col>
                           <Col span={11} className="pull-left">
-                            <Text>welcomekh100</Text>
+                            <Text>{orderData?.coupon_code || '-'}</Text>
                           </Col>
                           <Col span={12} className="pull-right">
-                            <Text>{numberFormat(orderData?.total_discount || 0)}</Text>
+                            <Text>{numberFormat(orderData?.discount_amount || 0)}</Text>
                           </Col>
                         </Row>
                       </Col>
@@ -721,7 +790,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             <Title level={5}>รวมมูลค่าสินค้า</Title>
                           </Col>
                           <Col span={12} className="pull-right">
-                            <Text>{numberFormat(orderData?.total || 0)}</Text>
+                            <Title level={5}>{numberFormat(orderData?.total || 0)}</Title>
                           </Col>
                         </Row>
                       </Col>
@@ -785,6 +854,11 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         )
                         return (
                           <Step
+                            status={
+                              determineTrackingResult?.statusEnum === Constant.CANCEL
+                                ? 'error'
+                                : 'process'
+                            }
                             key={val.order_no}
                             title={determineTrackingResult.status}
                             description={determineDescription(val)}
@@ -963,7 +1037,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1046,7 +1120,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1183,7 +1257,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (

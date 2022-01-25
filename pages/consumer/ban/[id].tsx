@@ -2,6 +2,7 @@ import Card from '@/components/Card';
 import Input from '@/components/Form/Input';
 import MainLayout from '@/layout/MainLayout';
 import { consumerBan, consumerList } from '@/services/consumer';
+import { getOrderTransaction } from '@/services/report';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Col, Modal, notification, Row, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
@@ -16,6 +17,7 @@ const { confirm } = Modal
 export default function BanConsumer({ }: Props): ReactElement {
   const router = useRouter()
   const id = router.query.id as string
+  const [totalOrder, setTotalOrder] = useState(0)
   let [initialValues, setInitialValues] = useState({
     email: '',
     ssoId: '',
@@ -35,9 +37,22 @@ export default function BanConsumer({ }: Props): ReactElement {
   })
 
   const showModal = (values: any, ban: boolean) => {
+    console.log(totalOrder)
     if (values.remark == undefined || values.remark == "" && values.isBan == false) {
       Modal.warning({
         content: 'กรุณาใส่เหตุผล เพื่อยืนยันการแบนผู้ใช้งาน',
+        okText: 'ตกลง',
+        okButtonProps: {
+          style: {
+            background: "#28A745",
+            borderColor: "#28A745",
+          },
+        },
+      });
+    } else if (totalOrder > 0) {
+      Modal.warning({
+        title: 'ไม่สามารถทำการแบนผู้ใช้งานได้',
+        content: 'ตรวจสอบพบ order ของผู้ใช้งานคงค้างในระบบ',
         okText: 'ตกลง',
         okButtonProps: {
           style: {
@@ -55,8 +70,21 @@ export default function BanConsumer({ }: Props): ReactElement {
     console.log(`useEffect`, id)
     if (id) {
       getConsumerList()
+      getOrders()
     }
-  }, [id])
+  }, [id, initialValues.ssoId])
+
+  const getOrders = async () => {
+
+    const request = {
+      sso_id: initialValues.ssoId,
+      order_overall_status: "waiting"
+    }
+    const { result, success } = await getOrderTransaction(request)
+    if (success) {
+      setTotalOrder(result.meta.total)
+    }
+  }
 
   const getConsumerList = async () => {
     const request = {

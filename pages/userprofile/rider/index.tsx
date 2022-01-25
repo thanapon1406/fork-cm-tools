@@ -130,7 +130,11 @@ export default function Rider({ }: Props): ReactElement {
       dataIndex: 'rating',
       align: 'center',
       render: (row: any) => {
-        return row
+        let rating = 0
+        if (row) {
+          rating = row
+        }
+        return Number(rating).toFixed(2)
       },
     },
 

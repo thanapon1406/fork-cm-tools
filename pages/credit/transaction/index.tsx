@@ -161,7 +161,7 @@ export default function CreditTransaction({}: Props): ReactElement {
     },
     {
       title: 'คงเหลือ เครดิต/เงินเติม',
-      dataIndex: 'vat',
+      dataIndex: 'available_credit',
       align: 'center',
       render: (row: number) => {
         if (row == undefined) {

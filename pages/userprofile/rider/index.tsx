@@ -134,7 +134,8 @@ export default function Rider({ }: Props): ReactElement {
         if (row) {
           rating = row
         }
-        return Number(rating).toFixed(2)
+        let num = Number(rating)
+        return (Math.round(num * 100) / 100).toFixed(2)
       },
     },
 

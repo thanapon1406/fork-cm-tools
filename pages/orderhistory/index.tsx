@@ -14,7 +14,7 @@ import { requestReportInterface } from '@/services/report'
 import { getRider } from '@/services/rider'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { debounce, isEqual, map, uniqWith } from 'lodash'
+import { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
 import React, { ReactElement, useState } from 'react'
 import * as Yup from 'yup'
@@ -98,61 +98,73 @@ const OrderHistory = (): ReactElement => {
   const onSearchRiderDebounce = debounce(async (message) => await fetchRider(message), 800)
 
   const fetchCustomer = async (message: any) => {
-    const request = {
-      keyword: message,
-    }
+    if (!isEmpty(message)) {
+      const request = {
+        keyword: message,
+      }
 
-    const { result, success } = await consumerList(request)
-    if (success) {
-      const { meta, data } = result
+      const { result, success } = await consumerList(request)
+      if (success) {
+        const { meta, data } = result
 
-      let customerData = map<CustomerDetail, SelectOption>(data, function (item: CustomerDetail) {
-        return { name: item.first_name + ' ' + item.last_name, value: item.sso_id }
-      })
+        let customerData = map<CustomerDetail, SelectOption>(data, function (item: CustomerDetail) {
+          return { name: item.first_name + ' ' + item.last_name, value: item.sso_id }
+        })
 
-      setCustomerDropDown(customerData)
+        setCustomerDropDown(customerData)
+      }
+    } else {
+      setCustomerDropDown([])
     }
   }
 
   const fetchRider = async (message: any) => {
-    const request = {
-      keyword: message,
-      page: 1,
-      per_page: 100,
-    }
+    if (!isEmpty(message)) {
+      const request = {
+        keyword: message,
+        page: 1,
+        per_page: 100,
+      }
 
-    const { result, success } = await getRider(request)
-    if (success) {
-      const { meta, data } = result
+      const { result, success } = await getRider(request)
+      if (success) {
+        const { meta, data } = result
 
-      let uniqData = uniqWith(data, isEqual)
+        let uniqData = uniqWith(data, isEqual)
 
-      let riderData = map<RiderDetail, SelectOption>(uniqData, function (item: RiderDetail) {
-        return { name: item.first_name + ' ' + item.last_name, value: String(item.id) }
-      })
+        let riderData = map<RiderDetail, SelectOption>(uniqData, function (item: RiderDetail) {
+          return { name: item.first_name + ' ' + item.last_name, value: String(item.id) }
+        })
 
-      setRiderDropDown(riderData)
+        setRiderDropDown(riderData)
+      }
+    } else {
+      setRiderDropDown([])
     }
   }
 
   const fetchMerchant = async (message: string) => {
-    const request = {
-      keyword: message,
-      page: 1,
-      per_page: 100,
-    }
+    if (!isEmpty(message)) {
+      const request = {
+        keyword: message,
+        page: 1,
+        per_page: 100,
+      }
 
-    const { result, success } = await outletListById(request)
-    if (success) {
-      const { meta, data } = result
+      const { result, success } = await outletListById(request)
+      if (success) {
+        const { meta, data } = result
 
-      let uniqData = uniqWith(data, isEqual)
+        let uniqData = uniqWith(data, isEqual)
 
-      let outletData = map<OutletDetail, SelectOption>(uniqData, function (item: OutletDetail) {
-        return { name: item.name.en, value: String(item.id) }
-      })
+        let outletData = map<OutletDetail, SelectOption>(uniqData, function (item: OutletDetail) {
+          return { name: item.name.en, value: String(item.id) }
+        })
 
-      setMerchantDropDown(outletData)
+        setMerchantDropDown(outletData)
+      }
+    } else {
+      setMerchantDropDown([])
     }
   }
 

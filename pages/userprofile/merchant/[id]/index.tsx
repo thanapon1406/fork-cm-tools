@@ -9,17 +9,23 @@ import Tab from '@/components/Tab'
 import Table from '@/components/Table'
 import Tag from '@/components/Tag'
 import {
+  creditPaymentChanel,
   days,
   onlineStatusTag,
   outletStatusTH,
   outletType,
-  userServiceType
+  userServiceType,
 } from '@/constants/textMapping'
 import StaffList from '@/containers/staff-list'
 import { useLoadingContext } from '@/contexts/LoadingContext'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { sendTopupsEmail, sendTransactionsEmail, topupList, transactionList } from '@/services/credit'
+import {
+  sendTopupsEmail,
+  sendTransactionsEmail,
+  topupList,
+  transactionList,
+} from '@/services/credit'
 import { outletDetail, personalData, updateOutletStatus } from '@/services/merchant'
 import { StopOutlined } from '@ant-design/icons'
 import { Badge, Breadcrumb, Col, Divider, Modal, Row, Select, Space, Typography } from 'antd'
@@ -32,9 +38,9 @@ import * as Yup from 'yup'
 
 const { Title, Text } = Typography
 
-interface Props { }
+interface Props {}
 
-export default function MerchantUserView({ }: Props): ReactElement {
+export default function MerchantUserView({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoid, setSsoid] = useState('')
@@ -55,7 +61,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
         is_preload_credit: true,
         all: true,
         gl_type: 'credit',
-      }
+      },
     })
   }
 
@@ -66,7 +72,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
       transaction_request: {
         outlet_id: id,
         all: true,
-      }
+      },
     })
   }
   // credit list
@@ -86,7 +92,11 @@ export default function MerchantUserView({ }: Props): ReactElement {
       dataIndex: 'credit_type',
       align: 'center',
       render: (row: string) => {
-        return row == 'gross_profit' ? 'ค่าดำเนินการ' : row == 'delivery_fee' ? 'ค่าจัดส่ง' : 'อื่นๆ'
+        return row == 'gross_profit'
+          ? 'ค่าดำเนินการ'
+          : row == 'delivery_fee'
+          ? 'ค่าจัดส่ง'
+          : 'อื่นๆ'
       },
     },
     {
@@ -131,10 +141,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                    ? 'สำเร็จ'
-                    : row == 'refund'
-                      ? 'คืนเงิน'
-                      : 'ยกเลิก'
+                  ? 'สำเร็จ'
+                  : row == 'refund'
+                  ? 'คืนเงิน'
+                  : 'ยกเลิก'
               }
             />
           </>
@@ -192,7 +202,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
       dataIndex: 'type',
       align: 'center',
       render: (row: string) => {
-        return row == 'bank_transfer' ? 'เติมเงินผ่านธนาคาร' : 'เติมเงินผ่านบาร์โค้ด'
+        return creditPaymentChanel[row]
       },
     },
     {
@@ -221,10 +231,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                    ? 'สำเร็จ'
-                    : row == 'refund'
-                      ? 'คืนเงิน'
-                      : 'ยกเลิก'
+                  ? 'สำเร็จ'
+                  : row == 'refund'
+                  ? 'คืนเงิน'
+                  : 'ยกเลิก'
               }
             />
           </>
@@ -399,7 +409,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
     }),
   })
 
-  const handleSubmit = async (values: any) => { }
+  const handleSubmit = async (values: any) => {}
   const handleSubmitStatus = async () => {
     const staffStatus = summaryBanStaff(userInitialValues.staff)
     if (outletInitialValues.online_status === 'online' && staffStatus.status === 'error') {
@@ -513,13 +523,13 @@ export default function MerchantUserView({ }: Props): ReactElement {
     }
     return isBan
       ? {
-        status: 'error',
-        text: 'ถูกแบน',
-      }
+          status: 'error',
+          text: 'ถูกแบน',
+        }
       : {
-        status: 'success',
-        text: 'ปกติ',
-      }
+          status: 'success',
+          text: 'ปกติ',
+        }
   }
 
   return (

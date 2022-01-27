@@ -264,7 +264,7 @@ export default function MerchantCredit({}: Props): ReactElement {
                       },
                       {
                         name: 'บัญชีธนาคาร',
-                        value: 'bank_tranfer',
+                        value: 'bank_transfer',
                       },
                       {
                         name: 'QR Code',

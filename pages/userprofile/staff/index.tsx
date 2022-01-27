@@ -89,22 +89,22 @@ export default function StaffProfileList({ }: Props): ReactElement {
         return chanel ? userServiceType[chanel] : '-'
       },
     },
-    {
-      title: 'จำนวนแบรนด์',
-      dataIndex: 'permissions_brand',
-      align: 'center',
-      render: (row: any) => {
-        return row ? row : 0
-      },
-    },
-    {
-      title: 'จำนวนสาขา',
-      dataIndex: 'permissions_outlet',
-      align: 'center',
-      render: (row: any) => {
-        return row ? row : 0
-      },
-    },
+    // {
+    //   title: 'จำนวนแบรนด์',
+    //   dataIndex: 'permissions_brand',
+    //   align: 'center',
+    //   render: (row: any) => {
+    //     return row ? row : 0
+    //   },
+    // },
+    // {
+    //   title: 'จำนวนสาขา',
+    //   dataIndex: 'permissions_outlet',
+    //   align: 'center',
+    //   render: (row: any) => {
+    //     return row ? row : 0
+    //   },
+    // },
     {
       title: 'สถานะพนักงาน',
       dataIndex: 'is_ban',
@@ -122,32 +122,13 @@ export default function StaffProfileList({ }: Props): ReactElement {
       },
     },
     {
-      title: 'วันที่สร้างพนักงาน CMS',
+      title: 'วันที่สร้างพนักงาน',
       dataIndex: 'created_at',
       align: 'center',
       render: (row: any) => {
         return row ? moment(row).format('YYYY-MM-DD HH:mm') : '-'
       },
     },
-    // {
-    //   title: 'Delivery Info',
-    //   dataIndex: 'delivery_setting',
-    //   align: 'center',
-    //   render: (row: any) => {
-    //     const delivery = _.get(row, 'deliver_by', false)
-    //     return delivery ? deliveryInfo[delivery] : '-'
-    //   },
-    // },
-    // {
-    //   title: 'ช่องทางลงทะเบียน',
-    //   dataIndex: 'user',
-    //   align: 'center',
-    //   render: (row: any) => {
-    //     const chanel = _.get(row, 'user_service_type', false)
-    //     return chanel ? userServiceType[chanel] : '-'
-    //   },
-    // },
-
   ]
 
   return (

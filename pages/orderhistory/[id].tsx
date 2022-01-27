@@ -575,7 +575,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             <Form>
               <Title level={5}>ข้อมูลรายการออเดอร์</Title>
               <Row gutter={16}>
-                <Col className="gutter-row" span={8}>
+                <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'เลขออเดอร์' }}
                     name="order_no"
@@ -587,7 +587,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     disabled={true}
                   />
                 </Col>
-                <Col className="gutter-row" span={6}>
+                <Col className="gutter-row" span={3}>
                   <Field
                     label={{ text: 'Device' }}
                     name="device"
@@ -598,7 +598,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     disabled={true}
                   />
                 </Col>
-                <Col className="gutter-row" span={10}>
+              </Row>
+
+              <Row gutter={16}>
+                <Col className="gutter-row" span={18}>
                   <Field
                     label={{ text: 'App Client' }}
                     name="app_client"

@@ -73,11 +73,11 @@ export default function StaffDetail({ }: Props): ReactElement {
     },
 
   }, {
-    title: 'วันที่ลงทะเบียน merchant App',
-    dataIndex: '',
+    title: 'วันที่ลงทะเบียน Merchant App',
+    dataIndex: 'mapping_sso_at',
     align: 'center',
     render: (row: any) => {
-      return "-"
+      return row ? moment(row).format('YYYY-MM-DD HH:mm') : '-'
     },
   }]
   let [userInitialValues, setUserInitialValues] = useState({

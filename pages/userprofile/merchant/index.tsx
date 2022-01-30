@@ -252,7 +252,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
                         value: '',
                       },
                       {
-                        name: 'Active',
+                        name: 'ดำเนินกิจการ',
                         value: 'active',
                       },
                       {

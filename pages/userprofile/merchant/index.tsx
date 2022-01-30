@@ -256,8 +256,12 @@ export default function MerchantProfileList({}: Props): ReactElement {
                         value: 'active',
                       },
                       {
-                        name: 'In-Active',
-                        value: 'inactive',
+                        name: 'ปิดกิจการ',
+                        value: 'closed',
+                      },
+                      {
+                        name: 'ปิดปรับปรุง',
+                        value: 'temporarily_closed',
                       },
                     ]}
                   />

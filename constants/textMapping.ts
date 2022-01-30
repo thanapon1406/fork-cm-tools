@@ -24,10 +24,10 @@ export const monthsThName = [
 ]
 
 export const outletStatus: any = {
-  active: 'Active',
+  active: 'ดำเนินกิจการ',
   inactive: 'In-active',
-  closed: 'Closed',
-  temporarily_closed: 'Temporarily closed',
+  closed: 'ปิดกิจการ',
+  temporarily_closed: 'ปิดปรับปรุง',
 }
 
 export const outletStatusTH: any = {

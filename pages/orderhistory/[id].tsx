@@ -357,10 +357,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             <>
               <div>
                 Rider 1:{' '}
-                {data.previous_rider_info.first_name + ' ' + data.previous_rider_info.last_name}
+                {data.previous_rider_info.first_name + ' ' + data?.previous_rider_info?.last_name ||
+                  ''}
                 <div>
                   Rider 2:{' '}
-                  {data.current_rider_info.first_name + ' ' + data.current_rider_info.last_name}
+                  {data.current_rider_info.first_name + ' ' + data?.current_rider_info?.last_name ||
+                    ''}
                 </div>
                 <div>
                   {Moment(data.current_rider_info?.assigned_time).format(Constant.DATE_FORMAT)}
@@ -373,7 +375,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             <>
               <div>
                 <div>
-                  {data.current_rider_info.first_name + ' ' + data.current_rider_info.last_name}
+                  {data.current_rider_info.first_name + ' '}
+                  {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
                 </div>
                 <div>
                   {Moment(data.current_rider_info?.assigned_time).format(Constant.DATE_FORMAT)}

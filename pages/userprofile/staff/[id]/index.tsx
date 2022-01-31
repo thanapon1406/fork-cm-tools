@@ -56,11 +56,17 @@ export default function StaffDetail({ }: Props): ReactElement {
   const [isBan, setIsBan] = useState(false)
   const [isLoadingMedia, setIsLoadingMedia] = useState(false)
   const [imgUrl, setImgUrl] = useState('')
+  const [bands, setBands] = useState([]);
+
   const column = [{
     title: 'แบรนด์',
     dataIndex: 'brand_name',
     align: 'center',
-    render: (row: any) => {
+    width: '30%',
+    render: (row: never) => {
+      if (!(bands.includes(row['th']))) {
+        setBands([...bands, row['th']])
+      }
       return row['th']
     },
   },
@@ -68,6 +74,7 @@ export default function StaffDetail({ }: Props): ReactElement {
     title: 'สาขา',
     dataIndex: 'name',
     align: 'center',
+    width: '30%',
     render: (row: any) => {
       return row['th']
     },
@@ -76,6 +83,7 @@ export default function StaffDetail({ }: Props): ReactElement {
     title: 'วันที่ลงทะเบียน Merchant App',
     dataIndex: 'mapping_sso_at',
     align: 'center',
+    width: '40%',
     render: (row: any) => {
       return row ? moment(row).format('YYYY-MM-DD HH:mm') : '-'
     },
@@ -131,7 +139,6 @@ export default function StaffDetail({ }: Props): ReactElement {
       if (data.user_status === 'active') {
         status = true
       }
-      console.log('sso: ', data.sso_id)
       let social: any = []
       if (data.sso_id) {
         const socialReq = {
@@ -148,6 +155,7 @@ export default function StaffDetail({ }: Props): ReactElement {
       }
       let permissionsOutlets = _.get(data, 'permissions_outlet', [])
       if (permissionsOutlets.length > 0) {
+        data.cout_outlets = permissionsOutlets.length
         let reqFilter: filterObject = {
           ids: permissionsOutlets
         }
@@ -211,7 +219,7 @@ export default function StaffDetail({ }: Props): ReactElement {
           </Modal>
           <Formik
             enableReinitialize={true}
-            initialValues={staffDetail}
+            initialValues={{ "staff_detail": staffDetail, "count_bands": bands.length }}
             onSubmit={() => { }}
           >
 
@@ -235,12 +243,12 @@ export default function StaffDetail({ }: Props): ReactElement {
                   <Row gutter={10} >
                     <Col className="gutter-row" span={6}>
                       <Field
-                        label={{ text: "รหัสพนักงาน" }}
-                        name="id"
+                        label={{ text: "ลำดับ" }}
+                        name="staff_detail.id"
                         type="text"
                         component={Input}
                         className="form-control round"
-                        placeholder="รหัสพนักงาน"
+                        placeholder="ลำดับ"
                         isRange={true}
                         disabled={true}
                       />
@@ -248,7 +256,7 @@ export default function StaffDetail({ }: Props): ReactElement {
                     <Col className="gutter-row" span={6}>
                       <Field
                         label={{ text: "ชื่อ - สกุล" }}
-                        name="name"
+                        name="staff_detail.name"
                         type="text"
                         component={Input}
                         className="form-control round"
@@ -260,7 +268,7 @@ export default function StaffDetail({ }: Props): ReactElement {
                     <Col className="gutter-row" span={6}>
                       <Field
                         label={{ text: "เบอร์โทรศัพท์" }}
-                        name="tel"
+                        name="staff_detail.tel"
                         type="text"
                         component={Input}
                         className="form-control round"
@@ -272,7 +280,7 @@ export default function StaffDetail({ }: Props): ReactElement {
                     <Col className="gutter-row" span={6}>
                       <Field
                         label={{ text: "อีเมล" }}
-                        name="email"
+                        name="staff_detail.email"
                         type="text"
                         component={Input}
                         className="form-control round"
@@ -284,7 +292,7 @@ export default function StaffDetail({ }: Props): ReactElement {
                     <Col className="gutter-row" span={6}>
                       <Field
                         label={{ text: "สิทธิ์การใช้งาน" }}
-                        name="user_type"
+                        name="staff_detail.user_type"
                         type="text"
                         component={Input}
                         className="form-control round"
@@ -296,11 +304,35 @@ export default function StaffDetail({ }: Props): ReactElement {
                     <Col className="gutter-row" span={6}>
                       <Field
                         label={{ text: "วันที่สร้างพนักงาน" }}
-                        name="created_at_format"
+                        name="staff_detail.created_at_format"
                         type="text"
                         component={Input}
                         className="form-control round"
                         placeholder="วันที่สร้างพนักงาน"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: "จำนวนแบรนด์" }}
+                        name="count_bands"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="จำนวนแบรนด์"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: "จำนวนสาขา" }}
+                        name="staff_detail.cout_outlets"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="จำนวนสาขา"
                         isRange={true}
                         disabled={true}
                       />

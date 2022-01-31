@@ -53,7 +53,7 @@ export default function StaffProfileList({ }: Props): ReactElement {
 
   const column = [
     {
-      title: 'รหัสพนักงาน',
+      title: 'ลำดับ',
       dataIndex: 'id',
       align: 'center',
     },

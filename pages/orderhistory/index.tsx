@@ -10,11 +10,17 @@ import { OutletDetail } from '@/interface/outlet'
 import { RiderDetail } from '@/interface/rider'
 import MainLayout from '@/layout/MainLayout'
 import { outletListById } from '@/services/merchant'
-import { requestReportInterface } from '@/services/report'
+import {
+  exportOrderTransaction,
+  exportOrderTransactionExcel,
+  requestReportInterface,
+} from '@/services/report'
 import { getRider } from '@/services/rider'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { DownloadOutlined } from '@ant-design/icons'
+import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
+import FileSaver from 'file-saver'
 import { Field, Form, Formik } from 'formik'
-import { debounce, isEqual, map, uniqWith } from 'lodash'
+import lodash, { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
 import React, { ReactElement, useState } from 'react'
 import * as Yup from 'yup'
@@ -39,6 +45,17 @@ const OrderHistory = (): ReactElement => {
     starttime: '',
     endtime: '',
     order_number: '',
+    client_time: {
+      start: '',
+      end: '',
+    },
+    sso_id: null,
+    order_overall_status: null,
+    rider_id: null,
+    rider_status: null,
+    rider_overall_status: null,
+    branch_id: null,
+    merchant_overall_status: null,
   }
 
   let [pagination, setPagination] = useState<Pagination>({
@@ -53,26 +70,7 @@ const OrderHistory = (): ReactElement => {
   })
 
   const handleSubmit = (values: any) => {
-    var startDate = values.client_time ? values.client_time.start : ''
-    var endDate = values.client_time ? values.client_time.end : ''
-
-    setParams({
-      ...params,
-      brand_id: 'all',
-      sso_id: values.sso_id || '',
-      status: values.status || '',
-      order_overall_status: values.order_overall_status || '',
-      rider_id: values.rider_id || '',
-      branch_id: values.branch_id || '',
-      merchant_overall_status: values.merchant_overall_status || '',
-      rider_status: values.rider_status || '',
-      rider_overall_status: values.rider_overall_status || '',
-      order_number: values.order_number || '',
-      startdate: startDate ? moment(startDate).format('YYYY-MM-DD') : '',
-      enddate: endDate ? moment(endDate).format('YYYY-MM-DD') : '',
-      starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
-      endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
-    })
+    manageParam(values)
   }
 
   const overAllOption = [
@@ -98,61 +96,73 @@ const OrderHistory = (): ReactElement => {
   const onSearchRiderDebounce = debounce(async (message) => await fetchRider(message), 800)
 
   const fetchCustomer = async (message: any) => {
-    const request = {
-      keyword: message,
-    }
+    if (!isEmpty(message)) {
+      const request = {
+        keyword: message,
+      }
 
-    const { result, success } = await consumerList(request)
-    if (success) {
-      const { meta, data } = result
+      const { result, success } = await consumerList(request)
+      if (success) {
+        const { meta, data } = result
 
-      let customerData = map<CustomerDetail, SelectOption>(data, function (item: CustomerDetail) {
-        return { name: item.first_name + ' ' + item.last_name, value: item.sso_id }
-      })
+        let customerData = map<CustomerDetail, SelectOption>(data, function (item: CustomerDetail) {
+          return { name: item.first_name + ' ' + item.last_name, value: item.sso_id }
+        })
 
-      setCustomerDropDown(customerData)
+        setCustomerDropDown(customerData)
+      }
+    } else {
+      setCustomerDropDown([])
     }
   }
 
   const fetchRider = async (message: any) => {
-    const request = {
-      keyword: message,
-      page: 1,
-      per_page: 100,
-    }
+    if (!isEmpty(message)) {
+      const request = {
+        keyword: message,
+        page: 1,
+        per_page: 100,
+      }
 
-    const { result, success } = await getRider(request)
-    if (success) {
-      const { meta, data } = result
+      const { result, success } = await getRider(request)
+      if (success) {
+        const { meta, data } = result
 
-      let uniqData = uniqWith(data, isEqual)
+        let uniqData = uniqWith(data, isEqual)
 
-      let riderData = map<RiderDetail, SelectOption>(uniqData, function (item: RiderDetail) {
-        return { name: item.first_name + ' ' + item.last_name, value: String(item.id) }
-      })
+        let riderData = map<RiderDetail, SelectOption>(uniqData, function (item: RiderDetail) {
+          return { name: item.first_name + ' ' + item.last_name, value: String(item.id) }
+        })
 
-      setRiderDropDown(riderData)
+        setRiderDropDown(riderData)
+      }
+    } else {
+      setRiderDropDown([])
     }
   }
 
   const fetchMerchant = async (message: string) => {
-    const request = {
-      keyword: message,
-      page: 1,
-      per_page: 100,
-    }
+    if (!isEmpty(message)) {
+      const request = {
+        keyword: message,
+        page: 1,
+        per_page: 100,
+      }
 
-    const { result, success } = await outletListById(request)
-    if (success) {
-      const { meta, data } = result
+      const { result, success } = await outletListById(request)
+      if (success) {
+        const { meta, data } = result
 
-      let uniqData = uniqWith(data, isEqual)
+        let uniqData = uniqWith(data, isEqual)
 
-      let outletData = map<OutletDetail, SelectOption>(uniqData, function (item: OutletDetail) {
-        return { name: item.name.en, value: String(item.id) }
-      })
+        let outletData = map<OutletDetail, SelectOption>(uniqData, function (item: OutletDetail) {
+          return { name: item.name.en, value: String(item.id) }
+        })
 
-      setMerchantDropDown(outletData)
+        setMerchantDropDown(outletData)
+      }
+    } else {
+      setMerchantDropDown([])
     }
   }
 
@@ -166,6 +176,71 @@ const OrderHistory = (): ReactElement => {
 
   const onClearRider = () => {
     setMerchantDropDown([])
+  }
+
+  const manageParam = (values: any) => {
+    var startDate = values.client_time ? values.client_time.start : ''
+    var endDate = values.client_time ? values.client_time.end : ''
+
+    setParams({
+      ...params,
+      brand_id: 'all',
+      sso_id: values.sso_id || '',
+      status: values.status || '',
+      order_overall_status: values.order_overall_status || '',
+      rider_id: values.rider_id || '',
+      branch_id: values.branch_id || '',
+      merchant_overall_status: values.merchant_overall_status || '',
+      rider_status: values.rider_status || '',
+      rider_overall_status: values.rider_overall_status || '',
+      order_number: values.order_number || '',
+      startdate: startDate ? moment(startDate).format('YYYY-MM-DD') : '',
+      enddate: endDate ? moment(endDate).format('YYYY-MM-DD') : '',
+      starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
+      endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
+    })
+  }
+
+  const exportOrderData = async (values: any) => {
+    var startDate = values.client_time ? values.client_time.start : ''
+    var endDate = values.client_time ? values.client_time.end : ''
+
+    const req: object = {
+      sort_by: 'ClientTime',
+      sort_type: 'asc',
+      brand_id: 'all',
+      sso_id: values.sso_id || '',
+      status: values.status || '',
+      order_overall_status: values.order_overall_status || '',
+      rider_id: values.rider_id || '',
+      branch_id: values.branch_id || '',
+      merchant_overall_status: values.merchant_overall_status || '',
+      rider_status: values.rider_status || '',
+      rider_overall_status: values.rider_overall_status || '',
+      order_number: values.order_number || '',
+      startdate: startDate ? moment(startDate).format('YYYY-MM-DD') : '',
+      enddate: endDate ? moment(endDate).format('YYYY-MM-DD') : '',
+      starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
+      endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
+    }
+
+    const { result, success } = await exportOrderTransaction(req)
+
+    if (lodash.get(result, 'download_key')) {
+      const request: object = {
+        key: result.download_key,
+      }
+      const res = await exportOrderTransactionExcel(request)
+      const filename = `ประวัติการขาย_${moment(startDate).format('YYYY-MM-DD')}_${moment(
+        endDate
+      ).format('YYYY-MM-DD')}.xlsx`
+      FileSaver.saveAs(res, decodeURIComponent(filename))
+    } else {
+      notification.success({
+        message: `ส่งรายงานไปยังอีเมลเรียบร้อยแล้ว`,
+        description: '',
+      })
+    }
   }
 
   return (
@@ -294,6 +369,24 @@ const OrderHistory = (): ReactElement => {
                       htmlType="submit"
                     >
                       ค้นหา
+                    </Button>
+                  </div>
+                </Col>
+
+                <Col className="gutter-row" span={18} style={{ textAlign: 'end' }}>
+                  <div className="ant-form ant-form-vertical">
+                    <Button
+                      icon={<DownloadOutlined />}
+                      style={{ width: '120px', marginTop: '27px', marginLeft: '10px' }}
+                      type="primary"
+                      size="middle"
+                      htmlType="button"
+                      onClick={async () => {
+                        await exportOrderData(values)
+                      }}
+                      disabled={values.client_time.start == '' && values.client_time.end == ''}
+                    >
+                      ดาวน์โหลด
                     </Button>
                   </div>
                 </Col>

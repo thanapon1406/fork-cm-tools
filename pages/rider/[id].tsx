@@ -66,6 +66,7 @@ interface riderDetail {
   car_tax_photo?: string
   disable_photo?: string
   register_email?: string
+  pdpa?: any
 }
 
 export default function RiderDetail({ }: Props): ReactElement {
@@ -107,7 +108,7 @@ export default function RiderDetail({ }: Props): ReactElement {
       data.phone = data.country_code + data.phone
       data.reason = []
 
-      if (isUndefined(data.pdpa)) {
+      if (!isUndefined(data.pdpa)) {
         data.contact_emergency = ''
         data.contact_emergency_address = ''
         data.contact_refer = ''
@@ -121,6 +122,10 @@ export default function RiderDetail({ }: Props): ReactElement {
         data.contact_emergency = _.find(data.contacts, function (o) {
           return o.type == 'emergency'
         })
+
+        console.log(data.contact_emergency);
+
+        data.contact_emergency.relationship = (_.get(data.contact_emergency, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_emergency, 'relationship', '')}(${_.get(data.contact_emergency, 'relationship_other', '')})` : _.get(data.contact_emergency, 'relationship', ''))
         data.contact_emergency_phone =
           _.get(data.contact_emergency, 'country_code', '') +
           _.get(data.contact_emergency, 'phone', '')
@@ -137,6 +142,7 @@ export default function RiderDetail({ }: Props): ReactElement {
         data.contact_refer = _.find(data.contacts, function (o) {
           return o.type == 'refer'
         })
+        data.contact_refer.relationship = (_.get(data.contact_refer, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_refer, 'relationship', '')}(${_.get(data.contact_refer, 'relationship_other', '')})` : _.get(data.contact_refer, 'relationship', ''))
         data.contact_refer_phone =
           _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '')
         data.contact_refer_address =
@@ -163,8 +169,11 @@ export default function RiderDetail({ }: Props): ReactElement {
         data.contact_address = _.get(data.contact_address, 'address_no', '') + " " + _.get(data.contact_address, 'district_name', '') + " " + _.get(data.contact_address, 'subdistrict_name', '') + " " + _.get(data.contact_address, 'province_name', '') + " " + _.get(data.contact_address, 'zipcode', '');
 
       }
+
+
       RiderDetail = data
 
+      console.log(RiderDetail);
       if (data.status == 'waiting' || data.status == 'uploaded' || data.status == 'approved') {
         setDisableRejectReason(true)
       } else {
@@ -675,18 +684,36 @@ export default function RiderDetail({ }: Props): ReactElement {
                     <Col style={{ marginTop: '31px' }} span={4}>
                       ความบกพร่องทางร่างกาย
                     </Col>
+
                     <Col className="gutter-row" span={6}>
-                      <Field
-                        label={{ text: 'ความบกพร่องทางร่างกาย' }}
-                        name="pdpa.disable_person[0].disable"
-                        type="text"
-                        component={Input}
-                        className="form-control round"
-                        placeholder="ความบกพร่องทางร่างกาย"
-                        isRange={true}
-                        disabled={true}
-                      />
+                      <div className="ant-form ant-form-vertical">
+                        <Field
+                          label={{ text: 'ความบกพร่องทางร่างกาย' }}
+                          name="pdpa.disable_person[0].disable"
+                          type="text"
+                          component={Input}
+                          className="form-control round"
+                          placeholder="ความบกพร่องทางร่างกาย"
+                          isRange={true}
+                          disabled={true}
+                        />
+                        {_.get(riderDetail, 'pdpa.disable_person[0].disable', '') == 'ข้าพเจ้ามีความบกพร่องทางกายภาพอื่น ๆ' && (
+                          <>
+                            <Field
+                              name="pdpa.disable_person[0].remark"
+                              type="text"
+                              component={Input}
+                              className="form-control round"
+                              placeholder="ความบกพร่องทางร่างกาย"
+                              isRange={true}
+                              disabled={true}
+                            />
+
+                          </>
+                        )}
+                      </div>
                     </Col>
+
                     <Col className="gutter-row" span={6}>
                       <div className="ant-form ant-form-vertical">
                         <antForm.Item label="รูปความบกพร่องทางร่างกาย">

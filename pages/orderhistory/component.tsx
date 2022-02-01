@@ -75,7 +75,11 @@ const columns = [
         !isNull(record.rider_info?.first_name) &&
         !isEmpty(record.rider_info?.first_name)
       ) {
-        return record.rider_info?.first_name + ' ' + record.rider_info?.last_name
+        let fullName = record.rider_info?.first_name + ' '
+        if (record?.rider_info?.last_name) {
+          fullName += record?.rider_info?.last_name
+        }
+        return fullName
       } else {
         return '-'
       }

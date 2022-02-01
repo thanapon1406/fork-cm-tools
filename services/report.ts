@@ -1,5 +1,7 @@
 import { PREFIX_REPORT } from '@/constants/api'
+import axios from 'axios'
 import fetch from './fetch'
+import { retrieveToken } from './fetch/auth'
 import errorHandler from './handler/errorHandler'
 import successHandler from './handler/successHandler'
 
@@ -44,6 +46,42 @@ export const getOrderTransaction = async (params: requestReportInterface) => {
 export const findOrder = async (params: requestReportInterface) => {
   try {
     const result = await fetch.get(`/api/report/find-order`, { params: params })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export const exportOrderTransaction = async (req: any) => {
+  try {
+    const result = await fetch.get(`/api/report/export-order-transaction/`, { params: req })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export const exportOrderTransactionExcel = async (req: any) => {
+  try {
+    const token = retrieveToken()
+    const { result } = await getEnv()
+    const res = await axios({
+      url: result.data + '/report-service/download-report/' + req.key,
+      method: 'GET',
+      responseType: 'blob',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    return res.data
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const getEnv = async () => {
+  try {
+    const result = await fetch.get(`/api/env/get-env-rest`)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

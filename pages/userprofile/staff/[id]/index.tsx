@@ -56,7 +56,7 @@ export default function StaffDetail({ }: Props): ReactElement {
   const [isBan, setIsBan] = useState(false)
   const [isLoadingMedia, setIsLoadingMedia] = useState(false)
   const [imgUrl, setImgUrl] = useState('')
-  const [bands, setBands] = useState([]);
+  const [brands, setBrands] = useState([]);
 
   const column = [{
     title: 'แบรนด์',
@@ -64,8 +64,8 @@ export default function StaffDetail({ }: Props): ReactElement {
     align: 'center',
     width: '30%',
     render: (row: never) => {
-      if (!(bands.includes(row['th']))) {
-        setBands([...bands, row['th']])
+      if (!(brands.includes(row['th']))) {
+        setBrands([...brands, row['th']])
       }
       return row['th']
     },
@@ -219,7 +219,7 @@ export default function StaffDetail({ }: Props): ReactElement {
           </Modal>
           <Formik
             enableReinitialize={true}
-            initialValues={{ "staff_detail": staffDetail, "count_bands": bands.length }}
+            initialValues={{ "staff_detail": staffDetail, "count_brands": brands.length }}
             onSubmit={() => { }}
           >
 
@@ -316,7 +316,7 @@ export default function StaffDetail({ }: Props): ReactElement {
                     <Col className="gutter-row" span={6}>
                       <Field
                         label={{ text: "จำนวนแบรนด์" }}
-                        name="count_bands"
+                        name="count_brands"
                         type="text"
                         component={Input}
                         className="form-control round"

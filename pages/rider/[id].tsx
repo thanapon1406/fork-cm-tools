@@ -108,7 +108,7 @@ export default function RiderDetail({ }: Props): ReactElement {
       data.phone = data.country_code + data.phone
       data.reason = []
 
-      if (!isUndefined(data.pdpa)) {
+      if (isUndefined(data.pdpa)) {
         data.contact_emergency = ''
         data.contact_emergency_address = ''
         data.contact_refer = ''
@@ -123,9 +123,9 @@ export default function RiderDetail({ }: Props): ReactElement {
           return o.type == 'emergency'
         })
 
-        console.log(data.contact_emergency);
-
-        data.contact_emergency.relationship = (_.get(data.contact_emergency, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_emergency, 'relationship', '')}(${_.get(data.contact_emergency, 'relationship_other', '')})` : _.get(data.contact_emergency, 'relationship', ''))
+        if (_.get(data.contact_emergency, 'relationship', '')) {
+          data.contact_emergency.relationship = (_.get(data.contact_emergency, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_emergency, 'relationship', '')}(${_.get(data.contact_emergency, 'relationship_other', '')})` : _.get(data.contact_emergency, 'relationship', ''))
+        }
         data.contact_emergency_phone =
           _.get(data.contact_emergency, 'country_code', '') +
           _.get(data.contact_emergency, 'phone', '')
@@ -142,7 +142,11 @@ export default function RiderDetail({ }: Props): ReactElement {
         data.contact_refer = _.find(data.contacts, function (o) {
           return o.type == 'refer'
         })
-        data.contact_refer.relationship = (_.get(data.contact_refer, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_refer, 'relationship', '')}(${_.get(data.contact_refer, 'relationship_other', '')})` : _.get(data.contact_refer, 'relationship', ''))
+
+        if (_.get(data.contact_refer, 'relationship', '')) {
+          data.contact_refer.relationship = (_.get(data.contact_refer, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_refer, 'relationship', '')}(${_.get(data.contact_refer, 'relationship_other', '')})` : _.get(data.contact_refer, 'relationship', ''))
+        }
+
         data.contact_refer_phone =
           _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '')
         data.contact_refer_address =

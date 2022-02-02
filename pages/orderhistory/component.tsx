@@ -1,6 +1,5 @@
 import CustomBadge from '@/components/Badge'
 import Table from '@/components/Table'
-import * as Constant from '@/constants/common'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
 import { metaReportPagination } from '@/interface/pagination'
@@ -81,7 +80,7 @@ const columns = [
           fullName += record?.rider_info?.last_name
         }
         if (record?.rider_info?.partner_name) {
-          fullName += '(' + Constant.LALAMOVE + ')'
+          fullName += '(' + record?.rider_info?.partner_name + ')'
         }
 
         return fullName

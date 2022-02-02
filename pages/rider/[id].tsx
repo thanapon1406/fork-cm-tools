@@ -124,7 +124,7 @@ export default function RiderDetail({ }: Props): ReactElement {
         })
 
         if (_.get(data.contact_emergency, 'relationship', '')) {
-          data.contact_emergency.relationship = (_.get(data.contact_emergency, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_emergency, 'relationship', '')}(${_.get(data.contact_emergency, 'relationship_other', '')})` : _.get(data.contact_emergency, 'relationship', ''))
+          data.contact_emergency.relationship = (_.get(data.contact_emergency, 'relationship', '') == "อื่น ๆ" ? `${_.get(data.contact_emergency, 'relationship', '')}(${_.get(data.contact_emergency, 'relationship_other', '')})` : _.get(data.contact_emergency, 'relationship', ''))
         }
         data.contact_emergency_phone =
           _.get(data.contact_emergency, 'country_code', '') +
@@ -144,7 +144,7 @@ export default function RiderDetail({ }: Props): ReactElement {
         })
 
         if (_.get(data.contact_refer, 'relationship', '')) {
-          data.contact_refer.relationship = (_.get(data.contact_refer, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_refer, 'relationship', '')}(${_.get(data.contact_refer, 'relationship_other', '')})` : _.get(data.contact_refer, 'relationship', ''))
+          data.contact_refer.relationship = (_.get(data.contact_refer, 'relationship', '') == "อื่น ๆ" ? `${_.get(data.contact_refer, 'relationship', '')}(${_.get(data.contact_refer, 'relationship_other', '')})` : _.get(data.contact_refer, 'relationship', ''))
         }
 
         data.contact_refer_phone =

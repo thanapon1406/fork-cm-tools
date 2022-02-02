@@ -174,10 +174,8 @@ export default function RiderDetail({ }: Props): ReactElement {
 
       }
 
-
       RiderDetail = data
 
-      console.log(RiderDetail);
       if (data.status == 'waiting' || data.status == 'uploaded' || data.status == 'approved') {
         setDisableRejectReason(true)
       } else {

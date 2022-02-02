@@ -445,7 +445,19 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         respObj.status = 'กำลังหาไรเดอร์'
         respObj.imagePath = '/asset/images/delivery.png'
       } else if (rider_status === Constant.ASSIGNED) {
-        respObj.status = 'ไรเดอร์รับออเดอร์'
+        let partnerName = ''
+
+        if (!isUndefined(orderHistoryData?.current_rider_info)) {
+          if (
+            orderHistoryData?.current_rider_info?.partner_name &&
+            orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
+              Constant.LALAMOVE.toLowerCase()
+          ) {
+            partnerName = ' (LLM)'
+          }
+        }
+
+        respObj.status = 'ไรเดอร์รับออเดอร์' + partnerName
 
         if (!isUndefined(orderHistoryData)) {
           let data = orderHistoryData as OrderStatusHistoryDetail

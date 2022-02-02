@@ -1,5 +1,6 @@
 import CustomBadge from '@/components/Badge'
 import Table from '@/components/Table'
+import * as Constant from '@/constants/common'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
 import { metaReportPagination } from '@/interface/pagination'
@@ -69,7 +70,7 @@ const columns = [
     width: '200px',
     wrap: true,
     center: true,
-    render: (text: any, record: any) => {
+    render: (text: any, record: OrderDetail) => {
       if (
         !isUndefined(record.rider_info) &&
         !isNull(record.rider_info?.first_name) &&
@@ -79,6 +80,10 @@ const columns = [
         if (record?.rider_info?.last_name) {
           fullName += record?.rider_info?.last_name
         }
+        if (record?.rider_info?.partner_name) {
+          fullName += '(' + Constant.LALAMOVE + ')'
+        }
+
         return fullName
       } else {
         return '-'

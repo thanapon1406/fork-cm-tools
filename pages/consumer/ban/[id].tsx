@@ -200,7 +200,7 @@ export default function BanConsumer({ }: Props): ReactElement {
                       )}
                     </Row>
                   </Col>
-                  <Col span={14}>
+                  <Col span={10}>
                     <Field
                       label={{ text: 'เหตุผล' }}
                       name="remark"
@@ -221,7 +221,7 @@ export default function BanConsumer({ }: Props): ReactElement {
                           showModal(values, false)
                         }}
                       >
-                        ยกเลิกการแบน
+                        ยกเลิกแบนผู้ใช้งาน
                       </Button>
                     ) : (
                       <Button
@@ -232,7 +232,7 @@ export default function BanConsumer({ }: Props): ReactElement {
                           showModal(values, true)
                         }}
                       >
-                        แบน
+                        แบนผู้ใช้งาน
                       </Button>
                     )}
                   </Col>

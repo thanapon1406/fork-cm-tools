@@ -15,9 +15,9 @@ const { confirm } = Modal
 
 const { Title, Text } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function BanOutlet({}: Props): ReactElement {
+export default function BanOutlet({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [isLoadingPage, setIsLoading] = useState(true)
@@ -70,13 +70,13 @@ export default function BanOutlet({}: Props): ReactElement {
   ): { status: 'processing' | 'success' | 'error' | 'waiting'; text: string } => {
     return isBan
       ? {
-          status: 'error',
-          text: 'ถูกแบน',
-        }
+        status: 'error',
+        text: 'ถูกแบน',
+      }
       : {
-          status: 'success',
-          text: 'ปกติ',
-        }
+        status: 'success',
+        text: 'ปกติ',
+      }
   }
 
   const Schema = Yup.object().shape({})
@@ -195,11 +195,11 @@ export default function BanOutlet({}: Props): ReactElement {
                 <Col span={4} md={4} xs={24} style={{ padding: '0 19px' }}>
                   {values.is_ban ? (
                     <Button type="primary" block htmlType="submit">
-                      ยกเลิก
+                      ยกเลิกแบนผู้ใช้งาน
                     </Button>
                   ) : (
                     <Button type="primary" block htmlType="submit" isDanger={true}>
-                      แบน
+                      แบนผู้ใช้งาน
                     </Button>
                   )}
                 </Col>

@@ -18,9 +18,9 @@ import { useRecoilState } from 'recoil'
 import * as Yup from 'yup'
 
 const { Title, Text } = Typography
-interface Props {}
+interface Props { }
 
-export default function MerchantCreditDetail({}: Props): ReactElement {
+export default function MerchantCreditDetail({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [isLoading, setIsLoading] = useState(true)

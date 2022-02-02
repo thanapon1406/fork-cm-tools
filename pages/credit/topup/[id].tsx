@@ -100,7 +100,7 @@ export default function MerchantCreditDetail({ }: Props): ReactElement {
       }
       if (verify_status === 'approved' || verify_status === 'rejected') {
         setApproveStatus(verify_status)
-      } else if (status === 'success') {
+      } else if (status === 'success' || status === 'cancel') {
         setApproveStatus('success')
       } else if (status === 'failed') {
         setApproveStatus('failed')

@@ -251,7 +251,7 @@ export default function RiderBan({ }: Props): ReactElement {
                     <Col span={6}>
                       <Button
                         style={{
-                          width: '120px',
+                          width: '140px',
                           background: !riderDetail.banned_status ? `#EB5757` : `#17C2D7`,
                           borderColor: !riderDetail.banned_status ? `#EB5757` : `#17C2D7`,
                         }}
@@ -259,7 +259,7 @@ export default function RiderBan({ }: Props): ReactElement {
                         size="middle"
                         htmlType="submit"
                       >
-                        {!riderDetail.banned_status ? `แบน` : `ยกเลิก`}
+                        {!riderDetail.banned_status ? `แบนผู้ใช้งาน` : `ยกเลิกแบนผู้ใช้งาน`}
                       </Button>
                     </Col>
                   </Row>

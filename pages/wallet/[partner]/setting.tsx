@@ -61,8 +61,8 @@ export default function WalletSetting({ }: Props): ReactElement {
       const { data } = result;
       WalletSettingDetail = {
         ...data,
-        min_alert_email: _.split(data.min_alert_email, ','),
-        top_up_alert_email: _.split(data.top_up_alert_email, ','),
+        min_alert_email: (_.get(data, 'min_alert_email', false) ? _.split(data.min_alert_email, ',') : []),
+        top_up_alert_email: (_.get(data, 'top_up_alert_email', false) ? _.split(data.top_up_alert_email, ',') : []),
       }
       setWalletSettingDetail(WalletSettingDetail)
       setIsLoading(false);

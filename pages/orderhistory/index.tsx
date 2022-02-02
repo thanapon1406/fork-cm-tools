@@ -106,7 +106,11 @@ const OrderHistory = (): ReactElement => {
         const { meta, data } = result
 
         let customerData = map<CustomerDetail, SelectOption>(data, function (item: CustomerDetail) {
-          return { name: item.first_name + ' ' + item.last_name, value: item.sso_id }
+          let lastName = ''
+          if (item?.last_name) {
+            lastName = item?.last_name
+          }
+          return { name: item.first_name + ' ' + lastName, value: item.sso_id }
         })
 
         setCustomerDropDown(customerData)
@@ -131,7 +135,11 @@ const OrderHistory = (): ReactElement => {
         let uniqData = uniqWith(data, isEqual)
 
         let riderData = map<RiderDetail, SelectOption>(uniqData, function (item: RiderDetail) {
-          return { name: item.first_name + ' ' + item.last_name, value: String(item.id) }
+          let lastName = ''
+          if (item?.last_name) {
+            lastName = item?.last_name
+          }
+          return { name: item.first_name + ' ' + lastName, value: String(item.id) }
         })
 
         setRiderDropDown(riderData)
@@ -156,7 +164,7 @@ const OrderHistory = (): ReactElement => {
         let uniqData = uniqWith(data, isEqual)
 
         let outletData = map<OutletDetail, SelectOption>(uniqData, function (item: OutletDetail) {
-          return { name: item.name.en, value: String(item.id) }
+          return { name: item.name.th, value: String(item.id) }
         })
 
         setMerchantDropDown(outletData)

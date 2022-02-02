@@ -123,13 +123,13 @@ export default function RiderDetail({ }: Props): ReactElement {
       } else {
         data.contact_emergency = _.find(data.contacts, function (o) { return o.type == "emergency"; });
         if (_.get(data.contact_emergency, 'relationship', '')) {
-          data.contact_emergency.relationship = (_.get(data.contact_emergency, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_emergency, 'relationship', '')}(${_.get(data.contact_emergency, 'relationship_other', '')})` : _.get(data.contact_emergency, 'relationship', ''))
+          data.contact_emergency.relationship = (_.get(data.contact_emergency, 'relationship', '') == " ๆ" ? `${_.get(data.contact_emergency, 'relationship', '')}(${_.get(data.contact_emergency, 'relationship_other', '')})` : _.get(data.contact_emergency, 'relationship', ''))
         }
         data.contact_emergency_phone = _.get(data.contact_emergency, 'country_code', '') + _.get(data.contact_emergency, 'phone', '');
         data.contact_emergency_address = _.get(data.contact_emergency, 'address_no', '') + " " + _.get(data.contact_emergency, 'district_name', '') + " " + _.get(data.contact_emergency, 'subdistrict_name', '') + " " + _.get(data.contact_emergency, 'province_name', '') + " " + _.get(data.contact_emergency, 'zipcode', '');
         data.contact_refer = _.find(data.contacts, function (o) { return o.type == "refer"; });
         if (_.get(data.contact_refer, 'relationship', '')) {
-          data.contact_refer.relationship = (_.get(data.contact_refer, 'relationship', '') == "อื่นๆ" ? `${_.get(data.contact_refer, 'relationship', '')}(${_.get(data.contact_refer, 'relationship_other', '')})` : _.get(data.contact_refer, 'relationship', ''))
+          data.contact_refer.relationship = (_.get(data.contact_refer, 'relationship', '') == "อื่น ๆ" ? `${_.get(data.contact_refer, 'relationship', '')}(${_.get(data.contact_refer, 'relationship_other', '')})` : _.get(data.contact_refer, 'relationship', ''))
         }
         data.contact_refer_phone = _.get(data.contact_refer, 'country_code', '') + _.get(data.contact_refer, 'phone', '');
         data.contact_refer_address = _.get(data.contact_refer, 'address_no', '') + " " + _.get(data.contact_refer, 'district_name', '') + " " + _.get(data.contact_refer, 'subdistrict_name', '') + " " + _.get(data.contact_refer, 'province_name', '') + " " + _.get(data.contact_refer, 'zipcode', '');

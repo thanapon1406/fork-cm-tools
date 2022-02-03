@@ -21,7 +21,7 @@ import * as Yup from 'yup'
 
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
 
 interface filterObject {
   id?: string
@@ -33,7 +33,7 @@ interface filterObject {
   reference_id?: string
 }
 
-export default function MerchantCredit({}: Props): ReactElement {
+export default function MerchantCredit({ }: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     refId: '',
@@ -313,6 +313,10 @@ export default function MerchantCredit({}: Props): ReactElement {
                       {
                         name: 'รอการยืนยัน',
                         value: 'processing',
+                      },
+                      {
+                        name: 'ยกเลิก',
+                        value: 'cancel',
                       },
                     ]}
                   />

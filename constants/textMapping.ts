@@ -74,7 +74,7 @@ export const creditStatus: any = {
     status: 'waiting',
   },
   cancel: {
-    text: 'cancel',
+    text: 'ยกเลิก',
     status: 'failed',
   },
 }

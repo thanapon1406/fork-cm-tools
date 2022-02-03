@@ -439,7 +439,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         respObj.status = 'ปรุงสำเร็จ'
         respObj.imagePath = '/asset/images/cook.png'
       } else if (order_status === '' && rider_status === Constant.WAITING) {
-        respObj.status = 'กำลังหาไรเดอร์ใหม่'
+        respObj.status = 'รอร้านค้าเรียกไรเดอร์ใหม่'
         respObj.imagePath = '/asset/images/delivery.png'
       } else if (rider_status === Constant.ASSIGNING) {
         respObj.status = 'กำลังหาไรเดอร์'

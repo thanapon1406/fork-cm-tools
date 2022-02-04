@@ -9,6 +9,8 @@ const { Title } = Typography
 
 const EkycList = (): ReactElement => {
   const [status, setEkycStatus] = useState('')
+  const [name, setName] = useState('')
+  const [citizneId, setCitizneId] = useState('')
   const router = useRouter()
   const { query } = router
 
@@ -24,6 +26,12 @@ const EkycList = (): ReactElement => {
       <Card>
         <Row style={{ padding: '16px' }} justify="end">
           <Col offset={2} span={6}>
+            ชื่อ นามสกุล : {name}
+          </Col>
+          <Col offset={2} span={6}>
+            เลขบัตรประชาชน : {citizneId}
+          </Col>
+          <Col offset={2} span={6}>
             สถานะ {statusMapping[status]}
           </Col>
         </Row>
@@ -36,7 +44,12 @@ const EkycList = (): ReactElement => {
             สถานะการยืนยัน
           </Col>
         </Row>
-        <EkycContainer id={id as string} setEkycStatus={setEkycStatus} />
+        <EkycContainer
+          id={id as string}
+          setName={setName}
+          setCitizneId={setCitizneId}
+          setEkycStatus={setEkycStatus}
+        />
       </Card>
     </MainLayout>
   )

@@ -22,6 +22,8 @@ export interface EkycDetailProps {
   id?: string
   sso_id?: string
   setEkycStatus?: React.Dispatch<React.SetStateAction<string>>
+  setName?: React.Dispatch<React.SetStateAction<string>>
+  setCitizneId?: React.Dispatch<React.SetStateAction<string>>
 }
 
 export interface EkycApproveStatusInterface {

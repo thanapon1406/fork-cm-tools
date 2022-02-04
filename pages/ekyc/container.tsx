@@ -9,7 +9,7 @@ import {
 } from '@/services/ekyc'
 import { Col, Empty, Image, message, Modal, Row, Skeleton, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { isEmpty, isUndefined } from 'lodash'
+import { get, isEmpty, isUndefined } from 'lodash'
 // import Image from 'next/image'
 import { ReactElement, useEffect, useRef, useState } from 'react'
 
@@ -33,7 +33,13 @@ const statusVideoOption = [
   { name: 'ใบหน้าไม่ชัดเจน', value: 3, disabled: false },
 ]
 
-const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactElement => {
+const EkycContainer = ({
+  sso_id,
+  id,
+  setEkycStatus,
+  setCitizneId,
+  setName,
+}: EkycDetailProps): ReactElement => {
   const videoRef = useRef(null)
   const [ekycDetail, setEkycDetail] = useState<EkycDetail>()
   const [isLoading, setLoading] = useState(false)
@@ -54,6 +60,12 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
     if (success) {
       const { data } = result
       setEkycDetail(data)
+      if (setCitizneId) {
+        setCitizneId(data.citizen_id)
+      }
+      if (setName) {
+        setName(`${get(ekycDetail, 'first_name', '-')} ${get(ekycDetail, 'last_name', '')}`)
+      }
       if (setEkycStatus) {
         setEkycStatus(data.status)
       }
@@ -188,7 +200,6 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
               </div>
             )}
           </Modal>
-
           <Formik initialValues={ekycDetail} enableReinitialize onSubmit={() => {}}>
             {({ values }) => (
               <Form name="ekyc" style={{ justifyContent: 'center' }}>
@@ -264,6 +275,7 @@ const EkycContainer = ({ sso_id, id, setEkycStatus }: EkycDetailProps): ReactEle
                     />
                   </Col>
                 </Row>
+
                 <Row style={{ padding: '16px' }} justify="space-between">
                   <Col offset={2} span={4} />
                   <Col offset={2} span={6}>

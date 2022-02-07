@@ -64,7 +64,7 @@ const EkycContainer = ({
         setCitizneId(data.citizen_id)
       }
       if (setName) {
-        setName(`${get(ekycDetail, 'first_name', '-')} ${get(ekycDetail, 'last_name', '')}`)
+        setName(`${get(data, 'first_name', '-')} ${get(data, 'last_name', '')}`)
       }
       if (setEkycStatus) {
         setEkycStatus(data.status)

@@ -31,6 +31,7 @@ interface filterObject {
   end_date?: string
   status?: string
   reference_id?: string
+  is_all_status?: boolean
 }
 
 export default function MerchantCredit({ }: Props): ReactElement {
@@ -53,6 +54,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
     start_date: '',
     end_date: '',
     status: '',
+    is_all_status: true
   })
 
   const [filterDate, setFilterDate] = useState({
@@ -108,6 +110,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
   const Schema = Yup.object().shape({})
 
   const handleSubmit = (values: typeof initialValues) => {
+    let is_all_status = !values.status
     let reqFilter: filterObject = {
       reference_id: values.refId,
       keyword: values.outlet_name,
@@ -115,6 +118,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
       start_date: values.date.start,
       end_date: values.date.end,
       status: values.status,
+      is_all_status: is_all_status,
     }
     setFilterSearch(reqFilter)
     handleFetchData(reqFilter)

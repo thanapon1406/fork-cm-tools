@@ -699,7 +699,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                           isRange={true}
                           disabled={true}
                         />
-                        {_.get(riderDetail, 'pdpa.disable_person[0].disable', '') == 'ข้าพเจ้ามีความบกพร่องทางกายภาพอื่น ๆ' && (
+                        {(_.get(riderDetail, 'pdpa.disable_person[0].disable', '') == 'ข้าพเจ้ามีความบกพร่องทางกายภาพอื่น ๆ' || _.get(riderDetail, 'pdpa.disable_person[0].disable', '') == 'ข้าพเจ้ามีความบกพร่องทางการได้ยินและทางกายภาพอื่น ๆ') && (
                           <>
                             <Field
                               name="pdpa.disable_person[0].remark"

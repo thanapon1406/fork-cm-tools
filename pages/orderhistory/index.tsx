@@ -13,7 +13,7 @@ import { outletListById } from '@/services/merchant'
 import {
   exportOrderTransaction,
   exportOrderTransactionExcel,
-  requestReportInterface
+  requestReportInterface,
 } from '@/services/report'
 import { getRider } from '@/services/rider'
 import { DownloadOutlined } from '@ant-design/icons'
@@ -36,6 +36,7 @@ const OrderHistory = (): ReactElement => {
   const [riderDropDown, setRiderDropDown] = useState<Array<SelectOption>>([])
 
   const initialValues = {
+    delivery_type: 'delivery',
     brand_id: 'all',
     page: 1,
     per_page: 10,
@@ -65,6 +66,7 @@ const OrderHistory = (): ReactElement => {
   })
   let [params, setParams] = useState<requestReportInterface>({
     brand_id: 'all',
+    delivery_type: 'delivery',
     page: pagination.current,
     per_page: pagination.pageSize,
   })
@@ -193,6 +195,7 @@ const OrderHistory = (): ReactElement => {
     setParams({
       ...params,
       brand_id: 'all',
+      delivery_type: 'delivery',
       sso_id: values.sso_id || '',
       status: values.status || '',
       order_overall_status: values.order_overall_status || '',

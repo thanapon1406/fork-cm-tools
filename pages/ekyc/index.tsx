@@ -119,7 +119,7 @@ const EkycList = (): ReactElement => {
       align: 'center',
     },
     {
-      title: 'Chanel',
+      title: 'แอปพลิเคชัน',
       dataIndex: 'app_id',
       align: 'center',
       render: (data: any) => {
@@ -132,7 +132,7 @@ const EkycList = (): ReactElement => {
       align: 'center',
     },
     {
-      title: 'Social login',
+      title: 'ชื่อและนามสกุล',
       dataIndex: 'name',
       align: 'center',
     },

@@ -233,6 +233,7 @@ const OrderHistory = (): ReactElement => {
       enddate: endDate ? moment(endDate).format('YYYY-MM-DD') : '',
       starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
+      delivery_type: 'delivery',
     }
 
     const { result, success } = await exportOrderTransaction(req)

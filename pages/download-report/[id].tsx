@@ -2,7 +2,7 @@ import { exportOrderTransactionExcel, getFileDetail } from '@/services/report'
 import { humanFileSize } from '@/utils/helpers'
 import { CloudDownloadOutlined, FrownOutlined } from '@ant-design/icons'
 import { Col, Row } from 'antd'
-import lodash from 'lodash'
+import lodash, { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 const Download = () => {
@@ -53,7 +53,9 @@ const Download = () => {
   }
 
   useEffect(() => {
-    GetFileDetail()
+    if (!isUndefined(filekey)) {
+      GetFileDetail()
+    }
   }, [filekey])
 
   return (

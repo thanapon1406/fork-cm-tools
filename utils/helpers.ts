@@ -74,6 +74,13 @@ const monthFormat = (date: string) => {
   return ''
 }
 
+const humanFileSize = (size: number | any | bigint) => {
+  var i = Math.floor(Math.log(size) / Math.log(1024))
+  var fileSize = size / Math.pow(1024, i)
+  var fileType = (fileSize * 1).toFixed(2) + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
+  return fileType
+}
+
 export {
   numberFormat,
   uniqueId,
@@ -83,4 +90,5 @@ export {
   currencyFormat,
   determineAppId,
   monthFormat,
+  humanFileSize,
 }

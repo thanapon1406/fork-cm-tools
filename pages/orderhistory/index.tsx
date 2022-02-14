@@ -18,7 +18,6 @@ import {
 import { getRider } from '@/services/rider'
 import { DownloadOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
-import FileSaver from 'file-saver'
 import { Field, Form, Formik } from 'formik'
 import lodash, { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
@@ -241,11 +240,7 @@ const OrderHistory = (): ReactElement => {
       const request: object = {
         key: result.download_key,
       }
-      const res = await exportOrderTransactionExcel(request)
-      const filename = `ประวัติการขาย_${moment(startDate).format('YYYY-MM-DD')}_${moment(
-        endDate
-      ).format('YYYY-MM-DD')}.xlsx`
-      FileSaver.saveAs(res, decodeURIComponent(filename))
+      await exportOrderTransactionExcel(request)
     } else {
       notification.success({
         message: `ส่งรายงานไปยังอีเมลเรียบร้อยแล้ว`,

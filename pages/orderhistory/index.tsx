@@ -256,7 +256,7 @@ const OrderHistory = (): ReactElement => {
 
   return (
     <MainLayout>
-      <Title level={4}>บัญชีผู้ใช้งาน</Title>
+      <Title level={4}>การจัดการออเดอร์</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>การจัดการออเดอร์</Breadcrumb.Item>
         <Breadcrumb.Item>ออเดอร์ทั้งหมด</Breadcrumb.Item>

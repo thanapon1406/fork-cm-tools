@@ -9,14 +9,16 @@ import MainLayout from '@/layout/MainLayout'
 import { outletListById } from '@/services/merchant'
 import { getBrandList } from '@/services/pos-profile'
 import { promotionTrackingQueryList } from '@/services/promotion'
+import { downloadFile, exportPromotionTracking } from '@/services/report'
 import { DownloadOutlined } from '@ant-design/icons'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
+import lodash, { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
 import React, { ReactElement, useState } from 'react'
 import * as Yup from 'yup'
 import PromotionTrackingComponent from './component'
+
 const { Title } = Typography
 
 const PromotionReport = (): ReactElement => {
@@ -90,7 +92,41 @@ const PromotionReport = (): ReactElement => {
     })
   }
 
-  const exportData = async (values: any) => {}
+  const exportData = async (values: any) => {
+    var startDate = values.client_time ? values.client_time.start : ''
+    var endDate = values.client_time ? values.client_time.end : ''
+
+    let reqStartDate = ''
+    let reqEndDate = ''
+
+    if (!isEmpty(startDate) && !isEmpty(endDate)) {
+      reqStartDate =
+        moment(startDate).format('YYYY-MM-DD') + ' ' + moment(startDate).format('HH:mm:ss')
+      reqEndDate = moment(endDate).format('YYYY-MM-DD') + ' ' + moment(endDate).format('HH:mm:ss')
+    }
+
+    const req: object = {
+      status: values.status || '',
+      outlet_id: values.outlet_id || '',
+      brand_id: values.brand_id || '',
+      start_date: startDate ? reqStartDate : '',
+      end_date: endDate ? reqEndDate : '',
+    }
+
+    const { result, success } = await exportPromotionTracking(req)
+
+    if (lodash.get(result, 'download_key')) {
+      const request: object = {
+        key: result.download_key,
+      }
+      await downloadFile(request)
+    } else {
+      notification.success({
+        message: `ส่งรายงานไปยังอีเมลเรียบร้อยแล้ว`,
+        description: '',
+      })
+    }
+  }
 
   const onSearchBrandDebounce = debounce(async (message) => await fetchBrand(message), 800)
   const onSearchOutletDebounce = debounce(async (message, brand_id) => {

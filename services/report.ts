@@ -63,9 +63,10 @@ export const exportOrderTransaction = async (req: any) => {
 
 export const exportOrderTransactionExcel = async (req: any) => {
   try {
+    let filename = ''
     const token = retrieveToken()
     const { result } = await getEnv()
-    const res = await axios({
+    await axios({
       url: result.data + '/report-service/download-report/' + req.key,
       method: 'GET',
       responseType: 'blob',
@@ -73,7 +74,29 @@ export const exportOrderTransactionExcel = async (req: any) => {
         Authorization: `Bearer ${token}`,
       },
     })
-    return res.data
+      .then((resp) => {
+        if (resp.status === 200) {
+          const header = resp.headers['content-disposition']
+          const parts = header?.split(';')
+          filename = parts[1].split('=')[1]
+          FileSaver.saveAs(resp.data, decodeURIComponent(filename))
+          return resp
+        } else {
+          return false
+        }
+      })
+      .catch((err) => {
+        return errorHandler(err)
+      })
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export const getFileDetail = async (req: any) => {
+  try {
+    const result = await fetch.get(`/api/report/get-file-detail/`, { params: req })
+    return successHandler(result)
   } catch (error) {
     return errorHandler(error)
   }

@@ -13,10 +13,12 @@ import { Field, FieldArray, Form, Formik } from 'formik'
 import { isEmpty, map } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import EkycComponent from 'pages/ekyc/component'
 import { default as React, ReactElement, useEffect, useState } from 'react'
 import OrderHistoryComponent from '../orderhistory/component'
 import CustomBadge from '../userprofile/rider/[id]/style'
 const { Title } = Typography
+
 
 interface Props { }
 
@@ -565,13 +567,15 @@ export default function View({ }: Props): ReactElement {
               </div>
             }
           />
-          {/* <Card>
-                <div>
-                    <Ekyc sso_id={ssoId} />
-                </div>
-            </Card> */}
+          <div style={{ marginTop: "2rem" }}>
+            <Card >
+              <EkycComponent sso_id={initialValues.ssoId} />
+            </Card>
+          </div>
         </>
-      )}
-    </MainLayout>
+      )
+      }
+
+    </MainLayout >
   )
 }

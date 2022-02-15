@@ -26,7 +26,7 @@ const EkycList = (): ReactElement => {
       <Card>
         <Row style={{ padding: '16px' }} justify="end">
           <Col offset={2} span={6}>
-            ชื่อ นามสกุล : {name}
+            ชื่อและนามสกุล : {name}
           </Col>
           <Col offset={2} span={6}>
             เลขบัตรประชาชน : {citizneId}

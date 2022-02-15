@@ -1,4 +1,4 @@
-import { exportOrderTransactionExcel, getFileDetail } from '@/services/report'
+import { downloadFile, getFileDetail } from '@/services/report'
 import { humanFileSize } from '@/utils/helpers'
 import { CloudDownloadOutlined, FrownOutlined } from '@ant-design/icons'
 import { Col, Row } from 'antd'
@@ -20,7 +20,7 @@ const Download = () => {
       link.click()
       document.body.removeChild(link)
     } else {
-      await exportOrderTransactionExcel({ key: filekey })
+      await downloadFile({ key: filekey })
     }
   }
 
@@ -43,7 +43,7 @@ const Download = () => {
             link.click()
             document.body.removeChild(link)
           } else {
-            await exportOrderTransactionExcel({ key: filekey })
+            await downloadFile({ key: filekey })
           }
         }
       })

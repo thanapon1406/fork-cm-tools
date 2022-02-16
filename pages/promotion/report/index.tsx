@@ -82,29 +82,6 @@ const PromotionReport = (): ReactElement => {
       reqEndDate = moment(endDate).format('YYYY-MM-DD') + ' ' + moment(endDate).format('HH:mm:ss')
     }
 
-    setParams({
-      ...params,
-      status: values.status || '',
-      outlet_id: values.outlet_id || '',
-      brand_id: values.brand_id || '',
-      start_date: startDate ? reqStartDate : '',
-      end_date: endDate ? reqEndDate : '',
-    })
-  }
-
-  const exportData = async (values: any) => {
-    var startDate = values.client_time ? values.client_time.start : ''
-    var endDate = values.client_time ? values.client_time.end : ''
-
-    let reqStartDate = ''
-    let reqEndDate = ''
-
-    if (!isEmpty(startDate) && !isEmpty(endDate)) {
-      reqStartDate =
-        moment(startDate).format('YYYY-MM-DD') + ' ' + moment(startDate).format('HH:mm:ss')
-      reqEndDate = moment(endDate).format('YYYY-MM-DD') + ' ' + moment(endDate).format('HH:mm:ss')
-    }
-
     const req: object = {
       status: values.status || '',
       outlet_id: values.outlet_id || '',
@@ -113,6 +90,20 @@ const PromotionReport = (): ReactElement => {
       end_date: endDate ? reqEndDate : '',
     }
 
+    setParams({
+      ...params,
+      status: values.status || '',
+      outlet_id: values.outlet_id || '',
+      brand_id: values.brand_id || '',
+      start_date: startDate ? reqStartDate : '',
+      end_date: endDate ? reqEndDate : '',
+    })
+
+    return req
+  }
+
+  const exportData = async (values: any) => {
+    let req = manageParam(values)
     const { result, success } = await exportPromotionTracking(req)
 
     if (lodash.get(result, 'download_key')) {

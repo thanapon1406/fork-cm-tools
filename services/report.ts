@@ -61,7 +61,16 @@ export const exportOrderTransaction = async (req: any) => {
   }
 }
 
-export const exportOrderTransactionExcel = async (req: any) => {
+export const getFileDetail = async (req: any) => {
+  try {
+    const result = await fetch.get(`/api/report/get-file-detail/`, { params: req })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export const downloadFile = async (req: any) => {
   try {
     let filename = ''
     const token = retrieveToken()
@@ -93,9 +102,9 @@ export const exportOrderTransactionExcel = async (req: any) => {
   }
 }
 
-export const getFileDetail = async (req: any) => {
+export const exportPromotionTracking = async (req: any) => {
   try {
-    const result = await fetch.get(`/api/report/get-file-detail/`, { params: req })
+    const result = await fetch.get(`/api/report/export-promotion-tracking/`, { params: req })
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

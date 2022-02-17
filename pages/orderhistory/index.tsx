@@ -10,15 +10,10 @@ import { OutletDetail } from '@/interface/outlet'
 import { RiderDetail } from '@/interface/rider'
 import MainLayout from '@/layout/MainLayout'
 import { outletListById } from '@/services/merchant'
-import {
-  exportOrderTransaction,
-  exportOrderTransactionExcel,
-  requestReportInterface,
-} from '@/services/report'
+import { downloadFile, exportOrderTransaction, requestReportInterface } from '@/services/report'
 import { getRider } from '@/services/rider'
 import { DownloadOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
-import FileSaver from 'file-saver'
 import { Field, Form, Formik } from 'formik'
 import lodash, { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
@@ -30,7 +25,6 @@ const { Title } = Typography
 
 const OrderHistory = (): ReactElement => {
   const Schema = Yup.object().shape({})
-  // const [brandObject, setBrandState] = useRecoilState(brandState)
   const [customerDropDown, setCustomerDropDown] = useState<Array<SelectOption>>([])
   const [merchantDropDown, setMerchantDropDown] = useState<Array<SelectOption>>([])
   const [riderDropDown, setRiderDropDown] = useState<Array<SelectOption>>([])
@@ -242,11 +236,7 @@ const OrderHistory = (): ReactElement => {
       const request: object = {
         key: result.download_key,
       }
-      const res = await exportOrderTransactionExcel(request)
-      const filename = `ประวัติการขาย_${moment(startDate).format('YYYY-MM-DD')}_${moment(
-        endDate
-      ).format('YYYY-MM-DD')}.xlsx`
-      FileSaver.saveAs(res, decodeURIComponent(filename))
+      await downloadFile(request)
     } else {
       notification.success({
         message: `ส่งรายงานไปยังอีเมลเรียบร้อยแล้ว`,
@@ -257,7 +247,7 @@ const OrderHistory = (): ReactElement => {
 
   return (
     <MainLayout>
-      <Title level={4}>บัญชีผู้ใช้งาน</Title>
+      <Title level={4}>การจัดการออเดอร์</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>การจัดการออเดอร์</Breadcrumb.Item>
         <Breadcrumb.Item>ออเดอร์ทั้งหมด</Breadcrumb.Item>

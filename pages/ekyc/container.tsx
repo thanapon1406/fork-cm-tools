@@ -105,6 +105,9 @@ const EkycContainer = ({
       const { data } = result
       Modal.success({
         content: <Title level={4}>บันทึกสำเร็จ</Title>,
+        onOk: () => {
+          window.location.reload()
+        },
       })
       setEkycDetail(data)
       if (setEkycStatus) {
@@ -113,6 +116,9 @@ const EkycContainer = ({
     } else {
       Modal.error({
         content: <Title level={4}>{message}</Title>,
+        onOk: () => {
+          window.location.reload()
+        },
       })
     }
     setLoadingSubmit(false)

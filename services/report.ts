@@ -1,10 +1,10 @@
 import { PREFIX_REPORT } from '@/constants/api'
 import axios from 'axios'
+import FileSaver from 'file-saver'
 import fetch from './fetch'
 import { retrieveToken } from './fetch/auth'
 import errorHandler from './handler/errorHandler'
 import successHandler from './handler/successHandler'
-
 const POS_WAPI = process.env.NEXT_PUBLIC_POS_WAPI
 const HOST = POS_WAPI + PREFIX_REPORT
 
@@ -61,11 +61,21 @@ export const exportOrderTransaction = async (req: any) => {
   }
 }
 
-export const exportOrderTransactionExcel = async (req: any) => {
+export const getFileDetail = async (req: any) => {
   try {
+    const result = await fetch.get(`/api/report/get-file-detail/`, { params: req })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export const downloadFile = async (req: any) => {
+  try {
+    let filename = ''
     const token = retrieveToken()
     const { result } = await getEnv()
-    const res = await axios({
+    await axios({
       url: result.data + '/report-service/download-report/' + req.key,
       method: 'GET',
       responseType: 'blob',
@@ -73,7 +83,29 @@ export const exportOrderTransactionExcel = async (req: any) => {
         Authorization: `Bearer ${token}`,
       },
     })
-    return res.data
+      .then((resp) => {
+        if (resp.status === 200) {
+          const header = resp.headers['content-disposition']
+          const parts = header?.split(';')
+          filename = parts[1].split('=')[1]
+          FileSaver.saveAs(resp.data, decodeURIComponent(filename))
+          return resp
+        } else {
+          return false
+        }
+      })
+      .catch((err) => {
+        return errorHandler(err)
+      })
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export const exportPromotionTracking = async (req: any) => {
+  try {
+    const result = await fetch.get(`/api/report/export-promotion-tracking/`, { params: req })
+    return successHandler(result)
   } catch (error) {
     return errorHandler(error)
   }

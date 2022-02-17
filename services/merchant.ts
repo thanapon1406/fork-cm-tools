@@ -18,6 +18,7 @@ interface queryList {
   approve_status?: string
   id?: string | number
   ids?: number[]
+  brand_id?: number
 }
 
 interface querySsoId {

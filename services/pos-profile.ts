@@ -12,6 +12,7 @@ export interface requestBrandInterface {
   brand_id?: number
   sort_by?: string
   sort_type?: string
+  keyword?: string
 }
 
 export const getBrandList = async (params: requestBrandInterface) => {

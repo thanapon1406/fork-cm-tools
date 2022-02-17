@@ -115,6 +115,11 @@ export const outletType: any = {
   multiple: 'หลายสาขา',
 }
 
+export const riderType: any = {
+  outlet: 'จัดส่งโดยร้านค้า',
+  partner: 'จัดส่งโดยพาร์ทเนอร์'
+}
+
 export const isBanText: any = {
   ban: {
     text: 'ถูกแบน',

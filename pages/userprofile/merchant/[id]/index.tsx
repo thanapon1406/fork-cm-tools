@@ -14,7 +14,8 @@ import {
   onlineStatusTag,
   outletStatusTH,
   outletType,
-  userServiceType,
+  riderType,
+  userServiceType
 } from '@/constants/textMapping'
 import StaffList from '@/containers/staff-list'
 import { useLoadingContext } from '@/contexts/LoadingContext'
@@ -24,9 +25,10 @@ import {
   sendTopupsEmail,
   sendTransactionsEmail,
   topupList,
-  transactionList,
+  transactionList
 } from '@/services/credit'
 import { outletDetail, personalData, updateOutletStatus } from '@/services/merchant'
+import { getRiderOutletDetail } from '@/services/rider'
 import { StopOutlined } from '@ant-design/icons'
 import { Badge, Breadcrumb, Col, Divider, Modal, Row, Select, Space, Typography } from 'antd'
 import { Field, FieldArray, Form, Formik } from 'formik'
@@ -38,9 +40,9 @@ import * as Yup from 'yup'
 
 const { Title, Text } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function MerchantUserView({}: Props): ReactElement {
+export default function MerchantUserView({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoid, setSsoid] = useState('')
@@ -95,8 +97,8 @@ export default function MerchantUserView({}: Props): ReactElement {
         return row == 'gross_profit'
           ? 'ค่าดำเนินการ'
           : row == 'delivery_fee'
-          ? 'ค่าจัดส่ง'
-          : 'อื่นๆ'
+            ? 'ค่าจัดส่ง'
+            : 'อื่นๆ'
       },
     },
     {
@@ -141,10 +143,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -231,10 +233,10 @@ export default function MerchantUserView({}: Props): ReactElement {
                 row == 'processing'
                   ? 'ดำเนินการ'
                   : row == 'success'
-                  ? 'สำเร็จ'
-                  : row == 'refund'
-                  ? 'คืนเงิน'
-                  : 'ยกเลิก'
+                    ? 'สำเร็จ'
+                    : row == 'refund'
+                      ? 'คืนเงิน'
+                      : 'ยกเลิก'
               }
             />
           </>
@@ -282,6 +284,9 @@ export default function MerchantUserView({}: Props): ReactElement {
     brand_name: '',
     online_status: '',
     default_online_status: '',
+    rider_type: '',
+    rider_condition: [],
+    outlet_rider: [],
   })
 
   const Loading = useLoadingContext()
@@ -329,12 +334,17 @@ export default function MerchantUserView({}: Props): ReactElement {
         id: id,
         include_staff: true,
       }
+      const { result: riderResult, success: riderSuccess } = await getRiderOutletDetail({ outlet_id: id })
+      const { data: riderData } = riderResult
+      riderData?.map((value: any, key: number) => {
+        value.fullname = value.first_name + " " + value.last_name
+      })
       const { result: userResult, success: userSuccess } = await personalData(userRequest)
       if (userSuccess) {
         setIsLoading(false)
         const { data = [] } = userResult
         if (data[0]) {
-          const { user = {}, staff = [], brand_name = {}, is_mass = false } = data[0]
+          const { user = {}, staff = [], brand_name = {}, is_mass = false, delivery_setting = {} } = data[0]
           const {
             email = '',
             first_name = '',
@@ -363,7 +373,6 @@ export default function MerchantUserView({}: Props): ReactElement {
           })
 
           const type: string = is_mass ? 'single' : 'multiple'
-
           setOutletInitialValues({
             ...outletInitialValues,
             outlet_name: outletData?.name.th,
@@ -391,6 +400,9 @@ export default function MerchantUserView({}: Props): ReactElement {
             brand_name: brand_name?.th,
             online_status: outletData?.online_status,
             default_online_status: outletData?.online_status,
+            rider_type: delivery_setting?.deliver_by ? riderType[delivery_setting?.deliver_by] : '-',
+            rider_condition: outletData?.delivery_condition,
+            outlet_rider: riderData
           })
         }
       }
@@ -409,7 +421,7 @@ export default function MerchantUserView({}: Props): ReactElement {
     }),
   })
 
-  const handleSubmit = async (values: any) => {}
+  const handleSubmit = async (values: any) => { }
   const handleSubmitStatus = async () => {
     const staffStatus = summaryBanStaff(userInitialValues.staff)
     if (outletInitialValues.online_status === 'online' && staffStatus.status === 'error') {
@@ -523,13 +535,13 @@ export default function MerchantUserView({}: Props): ReactElement {
     }
     return isBan
       ? {
-          status: 'error',
-          text: 'ถูกแบน',
-        }
+        status: 'error',
+        text: 'ถูกแบน',
+      }
       : {
-          status: 'success',
-          text: 'ปกติ',
-        }
+        status: 'success',
+        text: 'ปกติ',
+      }
   }
 
   return (
@@ -795,6 +807,112 @@ export default function MerchantUserView({}: Props): ReactElement {
                   />
                 </Col>
               </Row>
+              {outletInitialValues.rider_condition?.length > 0 &&
+                <>
+                  <Row>
+                    <Col span={12}>
+                      <Title level={5}>การจัดส่ง</Title>
+                    </Col>
+                  </Row>
+                  <Row gutter={16}>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'วิธีการจัดส่ง' }}
+                        name="rider_type"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        id="rider_type"
+                        placeholder="วิธีการจัดส่ง"
+                        disabled={true}
+                      />
+                    </Col>
+                  </Row></>}
+              {outletInitialValues.rider_condition?.map((value: any, key: number) => {
+                return <>
+                  <Row gutter={16}>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'ระยะทางเริ่มต้น' }}
+                        name={`rider_condition.${key}.min`}
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="ระยะทางเริ่มต้น"
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'ระยะทางสิ้นสุด' }}
+                        name={`rider_condition.${key}.max`}
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="ระยะทางสิ้นสุด"
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'ค่าจัดส่ง' }}
+                        name={`rider_condition.${key}.price`}
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        id="price"
+                        placeholder="ค่าจัดส่ง"
+                        disabled={true}
+                      />
+                    </Col>
+                  </Row></>
+              })}
+
+              {outletInitialValues.outlet_rider?.length > 0 && <Row>
+                <Col span={12}>
+                  <Title level={5}>รายชื่อไรเดอร์ที่ผูกกับร้านค้า</Title>
+                </Col>
+              </Row>}
+
+              {outletInitialValues.outlet_rider?.map((value: any, key: number) => {
+                return <>
+                  <Row gutter={16}>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'Rider ID' }}
+                        name={`outlet_rider.${key}.rider_id`}
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="Rider ID"
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'ชื่อไรเดอร์' }}
+                        name={`outlet_rider.${key}.fullname`}
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="ชื่อไรเดอร์"
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'เบอร์โทรศัพท์' }}
+                        name={`outlet_rider.${key}.phone`}
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        id="price"
+                        placeholder="เบอร์โทรศัพท์"
+                        disabled={true}
+                      />
+                    </Col>
+                  </Row></>
+              })}
               <Row>
                 <Col span={8}>
                   <Title level={5}>เครดิตร้านค้า</Title>

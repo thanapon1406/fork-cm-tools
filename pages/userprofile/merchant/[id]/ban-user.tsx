@@ -10,11 +10,12 @@ import { Field, FieldArray, Form, Formik } from 'formik'
 import { find, get, map } from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
+
 const { confirm, useModal } = Modal
 
 const { Title, Text } = Typography
 
-interface Props {}
+interface Props { }
 
 interface StaffModel {
   brand_list: string[]
@@ -40,7 +41,7 @@ interface Personal {
   default_value: Array<any>
 }
 
-export default function BanUserOutlet({}: Props): ReactElement {
+export default function BanUserOutlet({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [isLoadingPage, setIsLoading] = useState(true)
@@ -93,13 +94,13 @@ export default function BanUserOutlet({}: Props): ReactElement {
   ): { status: 'processing' | 'success' | 'error' | 'waiting'; text: string } => {
     return isBan
       ? {
-          status: 'error',
-          text: 'ถูกแบน',
-        }
+        status: 'error',
+        text: 'ถูกแบน',
+      }
       : {
-          status: 'success',
-          text: 'ปกติ',
-        }
+        status: 'success',
+        text: 'ปกติ',
+      }
   }
 
   const handleSubmit = (saving: boolean) => async (values: Personal, userId: any) => {

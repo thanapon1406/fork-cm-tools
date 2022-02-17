@@ -15,9 +15,9 @@ import * as Yup from 'yup'
 import Ekyc from '../../ekyc/component'
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
 
-export default function View({}: Props): ReactElement {
+export default function View({ }: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [ssoId, setSsoid] = useState('')
@@ -126,6 +126,7 @@ export default function View({}: Props): ReactElement {
     const request = {
       id: id,
     }
+
     const { result, success } = await outletDetail(request)
     let verify_email = ''
     if (success) {
@@ -135,7 +136,7 @@ export default function View({}: Props): ReactElement {
       if (data.verify_detail) {
         verifyDetail = data.verify_detail.map((d: any) => d.id)
       }
-      ;(verify_email = data?.email),
+      ; (verify_email = data?.email),
         setOutletInitialValues({
           ...outletInitialValues,
           outlet_name: data?.name.th,

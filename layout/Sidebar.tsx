@@ -188,20 +188,20 @@ export default function Sidebar({}: Props): ReactElement {
         },
       ],
     },
-    // {
-    //   index: 7,
-    //   title: 'โปรโมชั่น',
-    //   icon: <FileTextOutlined />,
-    //   key: 'promotion',
-    //   link: '/promotion',
-    //   sub: [
-    //     {
-    //       title: 'รายงานโปรโมชั่น',
-    //       link: '/promotion/report',
-    //       key: '/promotion/report',
-    //     },
-    //   ],
-    // },
+    {
+      index: 7,
+      title: 'โปรโมชั่น',
+      icon: <FileTextOutlined />,
+      key: 'promotion',
+      link: '/promotion',
+      sub: [
+        {
+          title: 'รายงานโปรโมชั่น',
+          link: '/promotion/report',
+          key: '/promotion/report',
+        },
+      ],
+    },
   ]
 
   return (

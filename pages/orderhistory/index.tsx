@@ -349,8 +349,6 @@ const OrderHistory = (): ReactElement => {
                     component={DateTimeRangePicker}
                     id="client_time"
                     placeholder="วันเวลาที่ทำรายการ"
-                    minDate={moment(values.client_time.end).subtract(3, 'month')}
-                    maxDate={moment(values.client_time.start).add(3, 'month')}
                   />
                 </Col>
 

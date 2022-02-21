@@ -220,7 +220,7 @@ const PromotionTrackingComponent = ({
       validatePagination({
         per_page: parseInt(meta.per_page),
         page: parseInt(meta.page),
-        total: parseInt(meta.total),
+        total: meta.total_count,
       })
     }
   }

@@ -338,6 +338,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
       const { data: riderData } = riderResult
       riderData?.map((value: any, key: number) => {
         value.fullname = value.first_name + " " + value.last_name
+        console.log(value)
+        value.phone = (value.country_code === '66' ? '0' : value.country_code) + value.phone
       })
       const { result: userResult, success: userSuccess } = await personalData(userRequest)
       if (userSuccess) {
@@ -370,6 +372,13 @@ export default function MerchantUserView({ }: Props): ReactElement {
             is_ban: is_ban,
             staff: staff,
             line_id: line_id,
+          })
+
+          outletData?.delivery_condition?.map((value: any, key: number) => {
+            if (key > 0) {
+              value.min = ">" + " " + value.min
+            }
+            value.price = value.price + " " + "บาท"
           })
 
           const type: string = is_mass ? 'single' : 'multiple'
@@ -828,7 +837,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       />
                     </Col>
                   </Row></>}
-              {outletInitialValues.rider_condition?.map((value: any, key: number) => {
+              {outletInitialValues?.rider_type == "จัดส่งโดยร้านค้า" && outletInitialValues.rider_condition?.map((value: any, key: number) => {
                 return <>
                   <Row gutter={16}>
                     <Col className="gutter-row" span={6}>
@@ -868,13 +877,13 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   </Row></>
               })}
 
-              {outletInitialValues.outlet_rider?.length > 0 && <Row>
+              {outletInitialValues?.rider_type == "จัดส่งโดยร้านค้า" && outletInitialValues.outlet_rider?.length > 0 && <Row>
                 <Col span={12}>
                   <Title level={5}>รายชื่อไรเดอร์ที่ผูกกับร้านค้า</Title>
                 </Col>
               </Row>}
 
-              {outletInitialValues.outlet_rider?.map((value: any, key: number) => {
+              {outletInitialValues?.rider_type == "จัดส่งโดยร้านค้า" && outletInitialValues.outlet_rider?.map((value: any, key: number) => {
                 return <>
                   <Row gutter={16}>
                     <Col className="gutter-row" span={6}>

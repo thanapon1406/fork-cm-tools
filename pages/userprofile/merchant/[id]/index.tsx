@@ -807,7 +807,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   />
                 </Col>
               </Row>
-              {outletInitialValues.rider_condition?.length > 0 &&
+              {outletInitialValues?.rider_type != "" &&
                 <>
                   <Row>
                     <Col span={12}>

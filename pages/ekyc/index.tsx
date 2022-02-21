@@ -32,12 +32,14 @@ interface filterObject {
   update_start_date?: string
   update_end_date?: string
   keyword?: string
+  app_id?: string
 }
 
 const initialValues = {
   keyword: '',
   sso_id: '',
   status: '',
+  app_id: '',
   created_date: { start: null, end: null },
   updated_date: { start: null, end: null },
 }
@@ -95,8 +97,6 @@ const EkycList = (): ReactElement => {
   }, [])
 
   const handleSubmit = (values: any) => {
-    console.log(values)
-
     let reqFilter: filterObject = {
       keyword: values.keyword.trim() || '',
       status: values.status || '',
@@ -104,6 +104,7 @@ const EkycList = (): ReactElement => {
       end_date: values.created_date.end || '',
       update_start_date: values.updated_date.start || '',
       update_end_date: values.updated_date.end || '',
+      app_id: values.app_id || '',
     }
     getEkyc(reqFilter, { current: 1, total: 0, pageSize: 10 })
   }
@@ -209,7 +210,7 @@ const EkycList = (): ReactElement => {
                     </Space>
                   </div>
                 </Col>
-                <Col className="gutter-row" span={6}>
+                <Col className="gutter-row" span={4}>
                   <Field
                     label={{ text: 'สถานะการตรวจสอบ' }}
                     name="status"
@@ -240,7 +241,34 @@ const EkycList = (): ReactElement => {
                     ]}
                   />
                 </Col>
-                <Col className="gutter-row" span={6}>
+                <Col className="gutter-row" span={4}>
+                  <Field
+                    label={{ text: 'แอปพลิเคชัน' }}
+                    name="app_id"
+                    component={Select}
+                    id="app_id"
+                    placeholder="แอปพลิเคชัน"
+                    selectOption={[
+                      {
+                        name: 'ทุกแอปพลิเคชัน',
+                        value: '',
+                      },
+                      {
+                        name: 'Consumer',
+                        value: '1',
+                      },
+                      {
+                        name: 'Merchant',
+                        value: '2',
+                      },
+                      {
+                        name: 'Rider',
+                        value: '3',
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col className="gutter-row" span={4}>
                   <Field
                     label={{ text: 'วันเวลาที่ทำ E-KYC' }}
                     name="created_date"
@@ -249,7 +277,7 @@ const EkycList = (): ReactElement => {
                     placeholder="date_create"
                   />
                 </Col>
-                <Col className="gutter-row" span={6}>
+                <Col className="gutter-row" span={4}>
                   <Field
                     label={{ text: 'วันเวลาที่อัพเดท' }}
                     name="updated_date"

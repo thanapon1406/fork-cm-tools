@@ -12,6 +12,7 @@ export interface promotionTrackingQueryList {
   status?: string
   brand_id?: number
   outlet_id?: number
+  keyword?: string
 }
 
 export interface promotionTrackingInterface {

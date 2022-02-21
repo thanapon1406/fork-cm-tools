@@ -152,22 +152,37 @@ export default function CreditTransaction({}: Props): ReactElement {
       title: 'หักเครดิต',
       dataIndex: 'amount',
       align: 'center',
-      render: (row: number) => {
+      render: (row: number, col: any) => {
         if (row == undefined) {
           return ''
         }
-        return formatter.format(row)
+        let credit
+        if (row) {
+          if (['success', 'processing'].includes(col.status) && col.gl_type == 'credit') {
+            credit = <Text type="danger">{formatter.format(row)}</Text>
+          } else {
+            credit = formatter.format(row)
+          }
+        }
+        return credit
       },
     },
     {
       title: 'คงเหลือ เครดิต/เงินเติม',
-      dataIndex: 'available_credit',
+      dataIndex: 'balance',
       align: 'center',
-      render: (row: number) => {
-        if (row == undefined) {
-          return ''
+      render: (row: number, col: any) => {
+        let credit = '-'
+        if (row) {
+          if (col.status == 'refund') {
+            credit = formatter.format(col.balance)
+          } else {
+            console.log(`this.2`)
+
+            credit = formatter.format(col.balance - col.credit)
+          }
         }
-        return formatter.format(row)
+        return credit
       },
     },
     {

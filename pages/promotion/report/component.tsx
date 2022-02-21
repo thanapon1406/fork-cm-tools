@@ -46,7 +46,7 @@ const columns = [
   },
 
   {
-    title: 'เวลา',
+    title: 'วันที่/เวลา',
     dataIndex: 'created_at',
     align: 'center',
     key: 'created_at',
@@ -166,7 +166,7 @@ const columns = [
     },
   },
   {
-    title: 'สถานะ',
+    title: 'สถานะคูปอง',
     dataIndex: 'status',
     align: 'center',
     key: 'status',

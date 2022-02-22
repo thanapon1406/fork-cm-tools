@@ -378,7 +378,6 @@ export default function MerchantUserView({ }: Props): ReactElement {
             if (key > 0) {
               value.min = ">" + " " + value.min
             }
-            value.price = value.price + " " + "บาท"
           })
 
           const type: string = is_mass ? 'single' : 'multiple'
@@ -818,6 +817,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
               </Row>
               {outletInitialValues?.rider_type != "" &&
                 <>
+                  <Divider />
+
                   <Row>
                     <Col span={12}>
                       <Title level={5}>การจัดส่ง</Title>
@@ -840,7 +841,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
               {outletInitialValues?.rider_type == "จัดส่งโดยร้านค้า" && outletInitialValues.rider_condition?.map((value: any, key: number) => {
                 return <>
                   <Row gutter={16}>
-                    <Col className="gutter-row" span={6}>
+                    <Col className="gutter-row" span={2}>
                       <Field
                         label={{ text: 'ระยะทางเริ่มต้น' }}
                         name={`rider_condition.${key}.min`}
@@ -851,7 +852,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={6}>
+                    <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>กม.</Col>
+                    <Col className="gutter-row" span={2}>
                       <Field
                         label={{ text: 'ระยะทางสิ้นสุด' }}
                         name={`rider_condition.${key}.max`}
@@ -862,7 +864,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={6}>
+                    <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>กม.</Col>
+                    <Col className="gutter-row" span={2}>
                       <Field
                         label={{ text: 'ค่าจัดส่ง' }}
                         name={`rider_condition.${key}.price`}
@@ -874,6 +877,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
+                    <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>บาท</Col>
+
                   </Row></>
               })}
 
@@ -922,6 +927,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
                     </Col>
                   </Row></>
               })}
+              <Divider />
+
               <Row>
                 <Col span={8}>
                   <Title level={5}>เครดิตร้านค้า</Title>

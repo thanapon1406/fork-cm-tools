@@ -4,42 +4,31 @@ import Input from '@/components/Form/Input';
 import Select from '@/components/Form/Select';
 import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
-import { createBroadcastNew } from '@/services/broadcastNews';
+import { getBroadcastNew, requestBroadcastNewInterface, updateBroadcastNew } from '@/services/broadcastNews';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Col, Modal, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import moment, { Moment } from "moment";
 import { useRouter } from 'next/router';
-import { ReactElement, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import * as Yup from 'yup';
-
 const { Title } = Typography
 const { confirm } = Modal
 
-const NotificationsBroadcastNews = (): ReactElement => {
-  const router = useRouter()
 
+const EditBroadcastNew = (): ReactElement => {
+  const router = useRouter()
+  const { id } = router.query
   const [isActive, setActive] = useState('active')
   const [isShedule, setSchedule] = useState(true)
-
-  const initialValues = {
+  let [initialValues, setInitialValues] = useState({
     app_type: '',
     title: '',
     body: '',
     schedule_at: '',
-
-  }
-
-  const Schema = Yup.object().shape({
-    app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
-    title: Yup.string().trim().required('กรุณากรอกชื่อแคมเปญ'),
-    body: Yup.string().trim().required('กรุณากรอกรายละเอียด'),
-    schedule_at: Yup.mixed().test('is-42', 'กรุณาเลือกเหตุผล', (value: string, form: any) => {
-      if (!isShedule && value === undefined || value === "") {
-        return false
-      }
-      return true
-    }),
+    active_status: '',
+    send_now: false,
+    status: '',
   })
 
   const handleSubmit = (values: typeof initialValues) => {
@@ -54,22 +43,36 @@ const NotificationsBroadcastNews = (): ReactElement => {
       icon: <ExclamationCircleOutlined />,
       async onOk() {
         const data = {
+          id: id,
           app_type: String(values.app_type),
           title: String(values.title),
           body: String(values.body),
           schedule_at: scheduleAt,
-          status: String("submit"),
+          // status: String("submit"),
           active_status: isActive,
           send_now: isShedule
         }
 
-        const { result, success } = await createBroadcastNew(data)
+        const { result, success } = await updateBroadcastNew(data)
         if (success) {
           router.push('/notifications/broadcast_news');
         }
       },
     })
+
   }
+
+  const Schema = Yup.object().shape({
+    app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
+    title: Yup.string().trim().required('กรุณากรอกชื่อแคมเปญ'),
+    body: Yup.string().trim().required('กรุณากรอกรายละเอียด'),
+    schedule_at: Yup.mixed().test('is-42', 'กรุณาเลือกเหตุผล', (value: string, form: any) => {
+      if (!isShedule && value === undefined || value === "") {
+        return false
+      }
+      return true
+    }),
+  })
 
   const disabledDate = (d: Moment) => {
     if (!d) {
@@ -88,6 +91,30 @@ const NotificationsBroadcastNews = (): ReactElement => {
     setSchedule(checkStatus)
   }
 
+  const fetchBroadCastNew = async (id: any) => {
+    const request: requestBroadcastNewInterface = {
+      id: String(id)
+    }
+    const { result, success } = await getBroadcastNew(request)
+    if (success) {
+      const { meta, data } = result
+      console.log("-----------------data-----------------")
+      console.log(data)
+      console.log(data.active_status)
+      setInitialValues(data)
+      setSchedule(data.send_now)
+      setActive(data.active_status)
+    }
+  }
+
+  useEffect(() => {
+
+    if (id) {
+      fetchBroadCastNew(id)
+    }
+
+
+  }, [id])
   return (
     <MainLayout>
       <Row justify="space-around" align="middle">
@@ -95,14 +122,19 @@ const NotificationsBroadcastNews = (): ReactElement => {
           <Title level={4}>Broadcast News</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>Notifications</Breadcrumb.Item>
-            <Breadcrumb.Item>Create Broadcast News </Breadcrumb.Item>
+            <Breadcrumb.Item>Edit Broadcast News </Breadcrumb.Item>
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}></Col>
       </Row>
       <Card>
         {/* <Title level={5}>Create Broadcast News</Title> */}
-        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
+        <Formik
+          enableReinitialize={true}
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          validationSchema={Schema}
+        >
           {({ values, resetForm, setFieldValue }) => (
             <Form>
               <Row gutter={16}>
@@ -174,7 +206,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       onClick={handleSheduleStatus}
                       checkedChildren="ส่งทันที"
                       unCheckedChildren="ตั้งเวลา"
-                      defaultChecked={isShedule == true ? true : false}
+                      checked={isShedule == true ? true : false}
                     />
                   </div>
                   <Field
@@ -198,8 +230,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                           onClick={handleStatus}
                           checkedChildren="active"
                           unCheckedChildren="inactive"
-                          defaultChecked={isActive == 'active' ? true : false}
-                        />
+                          checked={isActive == "active" ? true : false} />
                       </span>
                     </Col>
                   </Row>
@@ -213,7 +244,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                     size="middle"
                     htmlType="submit"
                   >
-                    บันทึก
+                    แก้ไข
                   </Button>
                 </Col>
               </Row>
@@ -227,4 +258,4 @@ const NotificationsBroadcastNews = (): ReactElement => {
 }
 
 
-export default NotificationsBroadcastNews
+export default EditBroadcastNew

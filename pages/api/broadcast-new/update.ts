@@ -6,7 +6,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body } = req
   if (method === 'POST') {
     try {
-      const url: string = `${API_PATH_CONTENT_SERVICE}${PREFIX_BROADCAST_NEWS}/create`
+      const url: string = `${API_PATH_CONTENT_SERVICE}${PREFIX_BROADCAST_NEWS}/update`
       const { data, status } = await ServerFetch.post(url, body, headers)
       res.status(status).json(data)
     } catch (e: any) {

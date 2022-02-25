@@ -193,14 +193,14 @@ const NotificationsBroadcastNews = (): ReactElement => {
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}>
           <Button
-            style={{ width: '120px' }}
+            style={{ width: '150px' }}
             type="primary"
             size="middle"
             onClick={() => {
               Router.push('/notifications/broadcast_news/create', `/notifications/broadcast_news/create`);
             }}
           >
-            ตั้งค่า
+            สร้าง Notifications
           </Button>
         </Col>
       </Row>
@@ -339,7 +339,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
       <Card>
         <Table
           config={{
-            dataTableTitle: 'รายการแคมเปญ',
+            dataTableTitle: 'รายการ Notifications',
             loading: isLoading,
             tableName: 'notifications/broadcast_news',
             tableColumns: column,

@@ -3,11 +3,20 @@ import errorHandler from './handler/errorHandler';
 import successHandler from './handler/successHandler';
 
 export {
-  createBroadcastNew, getBroadcastNew, updateBroadcastNew
+  createBroadcastNew, getBroadcastNew, updateBroadcastNew, getBroadcastNewList
 };
 
 export interface requestBroadcastNewInterface {
   id?: string
+  page: number;
+  per_page: number;
+  sort_by?: string;
+  sort_type?: string;
+  title?: string;
+  active_status?: string;
+  status?: string;
+  schedule_start_date?: string;
+  schedule_end_date?: string;
 }
 
 const createBroadcastNew = async (req: any) => {
@@ -37,6 +46,15 @@ const updateBroadcastNew = async (req: any) => {
 const getBroadcastNew = async (req: requestBroadcastNewInterface) => {
   try {
     const result = await fetch.get(`/api/broadcast-new/find/`, { params: req })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const getBroadcastNewList = async (req: requestBroadcastNewInterface) => {
+  try {
+    const result = await fetch.post(`/api/broadcast-new/finds`, req)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

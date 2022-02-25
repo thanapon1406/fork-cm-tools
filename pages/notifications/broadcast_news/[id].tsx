@@ -140,7 +140,7 @@ const EditBroadcastNew = (): ReactElement => {
               </Button>
             </>
             :
-            <Button style={{ float: 'right', backGroundColor: 'forestgreen !important' }}
+            <Button style={{ float: 'right' }}
               type="primary"
               size="middle"
               htmlType="button"

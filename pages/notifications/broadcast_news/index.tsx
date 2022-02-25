@@ -151,11 +151,11 @@ const NotificationsBroadcastNews = (): ReactElement => {
     },
     {
       title: 'สถานะการส่ง',
-      dataIndex: 'active_status',
+      dataIndex: 'status',
       className: 'column-typverifye',
       align: 'center',
       render: (row: any, record: any) => {
-        if (record.active_status == "active") {
+        if (record.status == "active") {
           return "Active"
         } else
           return "Inactive"
@@ -163,12 +163,12 @@ const NotificationsBroadcastNews = (): ReactElement => {
     },
     {
       title: 'สถานะแคมเปญ',
-      dataIndex: 'status',
+      dataIndex: 'active_status',
       align: 'center',
       render: (row: any, record: any) => {
-        if (record.status == "submit") {
+        if (record.active_status == "submit") {
           return "Submit"
-        } else if (record.status == "in_progress") {
+        } else if (record.active_status == "in_progress") {
           return "In-Process"
         } else
           return "Done"

@@ -21,6 +21,8 @@ const EditBroadcastNew = (): ReactElement => {
   const { id } = router.query
   const [isActive, setActive] = useState('active')
   const [isEdit, setIsEdit] = useState(false)
+  const [isdone, setIsdone] = useState(false)
+  const [isSendnow, setIsSendnow] = useState(false)
   const [isShedule, setSchedule] = useState(true)
   let [initialValues, setInitialValues] = useState({
     app_type: '',
@@ -95,12 +97,20 @@ const EditBroadcastNew = (): ReactElement => {
     const request: requestBroadcastNewInterface = {
       id: String(id)
     }
+
     const { result, success } = await getBroadcastNew(request)
     if (success) {
       const { meta, data } = result
+      console.log(" data : ", data)
       setInitialValues(data)
       setSchedule(data.send_now)
       setActive(data.active_status)
+      if (data.status !== "submit") {
+        setIsdone(true)
+      }
+      if (data.send_now === false) {
+        setIsSendnow(true)
+      }
     }
   }
 
@@ -128,7 +138,8 @@ const EditBroadcastNew = (): ReactElement => {
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}>
-          {(isEdit) ?
+
+          {(isdone) ? <></> : (isEdit) ?
             <>
 
               <Button style={{ float: 'right', marginRight: "10px" }}
@@ -236,7 +247,7 @@ const EditBroadcastNew = (): ReactElement => {
                       checkedChildren="ส่งทันที"
                       unCheckedChildren="ตั้งเวลา"
                       checked={isShedule == true ? true : false}
-                      disabled={!isEdit}
+                      disabled={!isEdit || isSendnow}
                     />
                   </div>
                   <Field
@@ -246,7 +257,7 @@ const EditBroadcastNew = (): ReactElement => {
                     disabledDate={disabledDate}
                     id="schedule_at"
                     placeholder="ตั้งเวลาส่ง"
-                    disabled={isShedule || !isEdit}
+                    disabled={isShedule || !isEdit || isSendnow}
                   // disabled={!isEdit}
                   />
                 </Col>
@@ -270,27 +281,30 @@ const EditBroadcastNew = (): ReactElement => {
               </Row>
               <Row>
                 <Col className="gutter-row" span={8}>
-                  <>
-                    <Button
-                      style={{ width: '120px', marginTop: '31px' }}
-                      type="primary"
-                      size="middle"
-                      htmlType="submit"
-                    >
-                      แก้ไข
-                    </Button>
-                    <Button
-                      style={{ width: '120px', marginTop: '31px' }}
-                      type="default"
-                      size="middle"
-                      htmlType="button"
-                      onClick={handleEdit}
-                      disabled={!isEdit}
-                    >
-                      ยกเลิก
-                    </Button>
+                  {(isdone) ? <></>
+                    :
+                    <>
+                      <Button
+                        style={{ width: '120px', marginTop: '31px' }}
+                        type="primary"
+                        size="middle"
+                        htmlType="submit"
+                      >
+                        แก้ไข
+                      </Button>
+                      <Button
+                        style={{ width: '120px', marginTop: '31px' }}
+                        type="default"
+                        size="middle"
+                        htmlType="button"
+                        onClick={handleEdit}
+                        disabled={!isEdit}
+                      >
+                        ยกเลิก
+                      </Button>
 
-                  </>
+                    </>
+                  }
                 </Col>
               </Row>
             </Form>

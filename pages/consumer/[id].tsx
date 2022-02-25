@@ -178,7 +178,7 @@ export default function View({ }: Props): ReactElement {
   const showDefaultAddress = (isDisable: boolean, index: number) => {
     if (isDisable == true) {
       return (
-        <Row gutter={10}>
+        <Row key={index} gutter={10}>
           <Col className="gutter-row" span={2}>
             ที่อยู่ {index + 1}
           </Col>

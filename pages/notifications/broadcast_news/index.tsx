@@ -10,6 +10,7 @@ import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _ from 'lodash'
 import Moment from 'moment'
+import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 const { Title } = Typography
@@ -36,6 +37,7 @@ interface SearchValue {
 }
 
 const NotificationsBroadcastNews = (): ReactElement => {
+  const Router = useRouter()
   const initialValues = {
     title: '',
     active_status: 'all',

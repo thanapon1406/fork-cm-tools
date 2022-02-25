@@ -20,6 +20,7 @@ const EditBroadcastNew = (): ReactElement => {
   const router = useRouter()
   const { id } = router.query
   const [isActive, setActive] = useState('active')
+  const [isEdit, setIsEdit] = useState(false)
   const [isShedule, setSchedule] = useState(true)
   let [initialValues, setInitialValues] = useState({
     app_type: '',
@@ -31,8 +32,7 @@ const EditBroadcastNew = (): ReactElement => {
     status: '',
   })
 
-  const handleSubmit = (values: typeof initialValues) => {
-
+  const handleSubmit = (values: typeof initialValues, e: Event) => {
     let scheduleAt = values.schedule_at
     if (scheduleAt == "") {
       scheduleAt = String(moment().format());
@@ -98,13 +98,14 @@ const EditBroadcastNew = (): ReactElement => {
     const { result, success } = await getBroadcastNew(request)
     if (success) {
       const { meta, data } = result
-      console.log("-----------------data-----------------")
-      console.log(data)
-      console.log(data.active_status)
       setInitialValues(data)
       setSchedule(data.send_now)
       setActive(data.active_status)
     }
+  }
+
+  const handleEdit = async (values: any) => {
+    setIsEdit(!isEdit)
   }
 
   useEffect(() => {
@@ -119,13 +120,38 @@ const EditBroadcastNew = (): ReactElement => {
     <MainLayout>
       <Row justify="space-around" align="middle">
         <Col span={8}>
+
           <Title level={4}>Broadcast News</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>Notifications</Breadcrumb.Item>
             <Breadcrumb.Item>Edit Broadcast News </Breadcrumb.Item>
           </Breadcrumb>
         </Col>
-        <Col span={8} offset={8} style={{ textAlign: 'end' }}></Col>
+        <Col span={8} offset={8} style={{ textAlign: 'end' }}>
+          {(isEdit) ?
+            <>
+
+              <Button style={{ float: 'right', marginRight: "10px" }}
+                type="default"
+                size="middle"
+                htmlType="button"
+                onClick={handleEdit}
+              // onClick={handleCancelEdit}
+              >
+                ยกเลิก
+              </Button>
+            </>
+            :
+            <Button style={{ float: 'right', backGroundColor: 'forestgreen !important' }}
+              type="primary"
+              size="middle"
+              htmlType="button"
+              onClick={handleEdit}
+            >
+              แก้ไข
+            </Button>
+          }
+        </Col>
       </Row>
       <Card>
         {/* <Title level={5}>Create Broadcast News</Title> */}
@@ -136,7 +162,7 @@ const EditBroadcastNew = (): ReactElement => {
           validationSchema={Schema}
         >
           {({ values, resetForm, setFieldValue }) => (
-            <Form>
+            <Form id="form1">
               <Row gutter={16}>
                 <Col className="gutter-row" span={8} >
                   <Field
@@ -146,6 +172,7 @@ const EditBroadcastNew = (): ReactElement => {
                     id="app_type"
                     placeholder="แอพที่ต้องการส่ง"
                     defaultValue=""
+                    disabled={!isEdit}
                     selectOption={[
                       {
                         name: 'กรุณาเลือก',
@@ -181,6 +208,7 @@ const EditBroadcastNew = (): ReactElement => {
                     className="form-control round"
                     id="title"
                     placeholder="ชื่อแคมเปญ"
+                    disabled={!isEdit}
                   />
                 </Col>
                 <Col className="gutter-row" span={8}></Col>
@@ -195,6 +223,7 @@ const EditBroadcastNew = (): ReactElement => {
                     className="form-control round"
                     id="body"
                     placeholder="รายละเอียด"
+                    disabled={!isEdit}
                   />
                 </Col>
               </Row>
@@ -207,6 +236,7 @@ const EditBroadcastNew = (): ReactElement => {
                       checkedChildren="ส่งทันที"
                       unCheckedChildren="ตั้งเวลา"
                       checked={isShedule == true ? true : false}
+                      disabled={!isEdit}
                     />
                   </div>
                   <Field
@@ -216,7 +246,8 @@ const EditBroadcastNew = (): ReactElement => {
                     disabledDate={disabledDate}
                     id="schedule_at"
                     placeholder="ตั้งเวลาส่ง"
-                    disabled={isShedule}
+                    disabled={isShedule || !isEdit}
+                  // disabled={!isEdit}
                   />
                 </Col>
               </Row>
@@ -230,7 +261,8 @@ const EditBroadcastNew = (): ReactElement => {
                           onClick={handleStatus}
                           checkedChildren="active"
                           unCheckedChildren="inactive"
-                          checked={isActive == "active" ? true : false} />
+                          checked={isActive == "active" ? true : false}
+                          disabled={!isEdit} />
                       </span>
                     </Col>
                   </Row>
@@ -238,14 +270,27 @@ const EditBroadcastNew = (): ReactElement => {
               </Row>
               <Row>
                 <Col className="gutter-row" span={8}>
-                  <Button
-                    style={{ width: '120px', marginTop: '31px' }}
-                    type="primary"
-                    size="middle"
-                    htmlType="submit"
-                  >
-                    แก้ไข
-                  </Button>
+                  <>
+                    <Button
+                      style={{ width: '120px', marginTop: '31px' }}
+                      type="primary"
+                      size="middle"
+                      htmlType="submit"
+                    >
+                      แก้ไข
+                    </Button>
+                    <Button
+                      style={{ width: '120px', marginTop: '31px' }}
+                      type="default"
+                      size="middle"
+                      htmlType="button"
+                      onClick={handleEdit}
+                      disabled={!isEdit}
+                    >
+                      ยกเลิก
+                    </Button>
+
+                  </>
                 </Col>
               </Row>
             </Form>

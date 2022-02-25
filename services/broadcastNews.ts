@@ -8,8 +8,8 @@ export {
 
 export interface requestBroadcastNewInterface {
   id?: string
-  page: number;
-  per_page: number;
+  page?: number;
+  per_page?: number;
   sort_by?: string;
   sort_type?: string;
   title?: string;

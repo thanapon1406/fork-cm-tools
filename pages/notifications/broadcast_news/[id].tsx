@@ -97,7 +97,7 @@ const EditBroadcastNew = (): ReactElement => {
 
   const fetchBroadCastNew = async (id: any) => {
     const request: requestBroadcastNewInterface = {
-      id: String(id)
+      id: id
     }
 
     const { result, success } = await getBroadcastNew(id)

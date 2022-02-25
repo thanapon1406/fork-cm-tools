@@ -150,7 +150,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
       },
     },
     {
-      title: 'สถานะการส่ง',
+      title: 'สถานะแคมเปญ',
       dataIndex: 'active_status',
       className: 'column-typverifye',
       align: 'center',
@@ -162,7 +162,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
       },
     },
     {
-      title: 'สถานะแคมเปญ',
+      title: 'สถานะการส่ง',
       dataIndex: 'status',
       align: 'center',
       render: (row: any, record: any) => {

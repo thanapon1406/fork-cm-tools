@@ -4,7 +4,7 @@ import Input from '@/components/Form/Input';
 import Select from '@/components/Form/Select';
 import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
-import { getBroadcastNew, requestBroadcastNewInterface, updateBroadcastNew } from '@/services/broadcastNews';
+import { getBroadcastNew, updateBroadcastNew } from '@/services/broadcastNews';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Col, Modal, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
@@ -92,10 +92,8 @@ const EditBroadcastNew = (): ReactElement => {
   }
 
   const fetchBroadCastNew = async (id: any) => {
-    const request: requestBroadcastNewInterface = {
-      id: String(id)
-    }
-    const { result, success } = await getBroadcastNew(request)
+
+    const { result, success } = await getBroadcastNew(id)
     if (success) {
       const { meta, data } = result
       setInitialValues(data)

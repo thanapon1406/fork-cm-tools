@@ -43,9 +43,9 @@ const updateBroadcastNew = async (req: any) => {
   }
 }
 
-const getBroadcastNew = async (req: requestBroadcastNewInterface) => {
+const getBroadcastNew = async (id: number) => {
   try {
-    const result = await fetch.get(`/api/broadcast-new/find/`, { params: req })
+    const result = await fetch.get(`/api/broadcast-new/find?id=${id}`)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

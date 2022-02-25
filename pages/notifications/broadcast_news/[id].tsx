@@ -32,7 +32,9 @@ const EditBroadcastNew = (): ReactElement => {
     status: '',
   })
 
-  const handleSubmit = (values: typeof initialValues, e: Event) => {
+
+
+  const handleSubmit = (values: typeof initialValues) => {
     let scheduleAt = values.schedule_at
     if (scheduleAt == "") {
       scheduleAt = String(moment().format());
@@ -153,8 +155,7 @@ const EditBroadcastNew = (): ReactElement => {
       </Row>
       <Card>
         {/* <Title level={5}>Create Broadcast News</Title> */}
-        <Formik
-          enableReinitialize={true}
+        <Formik enableReinitialize={true}
           initialValues={initialValues}
           onSubmit={handleSubmit}
           validationSchema={Schema}

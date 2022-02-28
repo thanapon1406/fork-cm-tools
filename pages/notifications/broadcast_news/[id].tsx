@@ -8,7 +8,9 @@ import { getBroadcastNew, requestBroadcastNewInterface, updateBroadcastNew } fro
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Col, Modal, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
+import { range } from 'lodash';
 import moment, { Moment } from "moment";
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useState } from 'react';
 import * as Yup from 'yup';
@@ -22,7 +24,7 @@ const EditBroadcastNew = (): ReactElement => {
   const [isActive, setActive] = useState('active')
   const [isEdit, setIsEdit] = useState(false)
   const [isdone, setIsdone] = useState(false)
-  const [isSendnow, setIsSendnow] = useState(false)
+  const [isSendnow, setIsSendnow] = useState(true)
   const [isShedule, setSchedule] = useState(true)
   let [initialValues, setInitialValues] = useState({
     app_type: '',
@@ -68,7 +70,7 @@ const EditBroadcastNew = (): ReactElement => {
 
   const Schema = Yup.object().shape({
     app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
-    title: Yup.string().trim().required('กรุณากรอกชื่อแคมเปญ'),
+    title: Yup.string().trim().required('กรุณากรอกชื่อเรื่อง'),
     body: Yup.string().trim().required('กรุณากรอกรายละเอียด'),
     schedule_at: Yup.mixed().test('is-42', 'กรุณาเลือกเหตุผล', (value: string, form: any) => {
       if (!isShedule && value === undefined || value === "") {
@@ -82,8 +84,30 @@ const EditBroadcastNew = (): ReactElement => {
     if (!d) {
       return false;
     }
+    let customDate = moment().format("YYYY-MM-DD");
+    return d && d < moment(customDate, "YYYY-MM-DD");
+  }
 
-    return d && d < moment().endOf('day');
+  const disabledDateTime = (current: Moment) => {
+    const isToday = moment(current).isSame(new Date(), "day");
+    let hour = moment(new Date()).hour();
+    let minute = moment(new Date()).minute();
+    if (isToday) {
+      minute += 5;
+      if (minute >= 60) {
+        minute = minute - 60;
+        hour += 1;
+        if (hour >= 24) {
+          hour = hour - 24;
+        }
+      }
+      return {
+        disabledHours: () => range(0, hour),
+        disabledMinutes: () => range(0, minute)
+      };
+    } else {
+      return {};
+    }
   }
 
   const handleStatus = (event: any) => {
@@ -135,7 +159,11 @@ const EditBroadcastNew = (): ReactElement => {
 
           <Title level={4}>Broadcast News</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>Notifications</Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <Link href="/notifications/broadcast_news">
+                Notifications
+              </Link>
+            </Breadcrumb.Item>
             <Breadcrumb.Item>Edit Broadcast News </Breadcrumb.Item>
           </Breadcrumb>
         </Col>
@@ -213,13 +241,13 @@ const EditBroadcastNew = (): ReactElement => {
               <Row gutter={16}>
                 <Col className="gutter-row" span={8}>
                   <Field
-                    label={{ text: 'ชื่อแคมเปญ' }}
+                    label={{ text: 'ชื่อเรื่อง' }}
                     name="title"
                     type="text"
                     component={Input}
                     className="form-control round"
                     id="title"
-                    placeholder="ชื่อแคมเปญ"
+                    placeholder="ชื่อเรื่อง"
                     disabled={!isEdit}
                   />
                 </Col>
@@ -254,18 +282,34 @@ const EditBroadcastNew = (): ReactElement => {
                   <Field
                     name="schedule_at"
                     component={DatePicker}
+                    showTime={{
+                      hideDisabledOptions: true,
+                      defaultValue: moment(
+                        moment(moment().toDate(), "HH:mm").add(5, "minute"),
+                        "HH:mm"
+                      )
+                    }}
+                    disabledDate={disabledDate}
+                    disabledTime={disabledDateTime}
+                    id="schedule_at"
+                    placeholder="ตั้งเวลาส่ง"
+                    disabled={isShedule || !isEdit || isSendnow}
+                  />
+                  {/* <Field
+                    name="schedule_at"
+                    component={DatePicker}
                     showTime={{ format: 'HH:mm' }}
                     disabledDate={disabledDate}
                     id="schedule_at"
                     placeholder="ตั้งเวลาส่ง"
                     disabled={isShedule || !isEdit || isSendnow}
                   // disabled={!isEdit}
-                  />
+                  /> */}
                 </Col>
               </Row>
               <Row gutter={16}>
                 <Col className="gutter-row" span={16}>
-                  สถานะแคมเปญ
+                  สถานะ
                   <Row gutter={16}>
                     <Col className="gutter-row" span={16} style={{ marginTop: "10px" }}>
                       <span >

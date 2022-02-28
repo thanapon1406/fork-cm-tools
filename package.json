@@ -43,8 +43,8 @@
     "@types/nprogress": "0.2.0",
     "@types/qs": "6.9.7",
     "@types/react": "17.0.24",
-    "eslint": "7.28.0",
-    "eslint-config-next": "11.1.2",
+    "eslint": "8.5.0",
+    "eslint-config-next": "12.0.7",
     "typescript": "4.4.3"
   }
 }

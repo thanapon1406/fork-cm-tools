@@ -4,6 +4,7 @@ import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
+import Tag from '@/components/Tag'
 import MainLayout from '@/layout/MainLayout'
 import { getBroadcastNewList } from '@/services/broadcastNews'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
@@ -42,7 +43,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
     title: '',
     active_status: 'all',
     status: 'all',
-    app_type: 'all',
+    app_type: '',
     schedule_start_date: '',
     schedule_end_date: '',
     created_start_date: '',
@@ -64,7 +65,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
       per_page: paging.pageSize,
       ...filterObj,
     }
-    if (reqBody.app_type == "all") {
+    if (reqBody.app_type == "") {
       delete (reqBody.app_type)
     }
     if (reqBody.active_status == "all") {
@@ -119,6 +120,21 @@ const NotificationsBroadcastNews = (): ReactElement => {
   }, [])
 
   let seq = (pagination.current - 1) * pagination.pageSize
+  const activeStatusMessage: any = {
+    active: 'Active',
+    inactive: 'Inactive',
+    submit: 'Submit',
+    in_progress: 'In-Process',
+    done: 'Done',
+  }
+  const ActiveStatusMapping: any = {
+    // active_status
+    active: <Tag type="success">{activeStatusMessage['active']}</Tag>,
+    inactive: <Tag type="error">{activeStatusMessage['inactive']}</Tag>,
+    done: <Tag type="success">{activeStatusMessage['done']}</Tag>,
+    in_progress: <Tag type="orange">{activeStatusMessage['in_progress']}</Tag>,
+    submit: <Tag type="blue">{activeStatusMessage['submit']}</Tag>,
+  }
 
   const column = [
     {
@@ -129,7 +145,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
       },
     },
     {
-      title: 'ชื่อแคมเปญ',
+      title: 'ชื่อเรื่อง',
       dataIndex: 'title',
       align: 'center',
     },
@@ -150,15 +166,17 @@ const NotificationsBroadcastNews = (): ReactElement => {
       },
     },
     {
-      title: 'สถานะแคมเปญ',
+      title: 'สถานะ',
       dataIndex: 'active_status',
       className: 'column-typverifye',
       align: 'center',
       render: (row: any, record: any) => {
-        if (record.active_status == "active") {
-          return "Active"
-        } else
-          return "Inactive"
+        return record ? ActiveStatusMapping[record.active_status] : "-"
+        // if (record.active_status == "active") {
+        //   return ActiveStatusMapping[record.active_status]
+        // } else
+        // return ActiveStatusMapping[record.active_status]
+        //   return "Inactive"
       },
     },
     {
@@ -166,12 +184,13 @@ const NotificationsBroadcastNews = (): ReactElement => {
       dataIndex: 'status',
       align: 'center',
       render: (row: any, record: any) => {
-        if (record.status == "submit") {
-          return "Submit"
-        } else if (record.status == "in_progress") {
-          return "In-Process"
-        } else
-          return "Done"
+        return record ? ActiveStatusMapping[record.status] : "-"
+        // if (record.status == "submit") {
+        //   return "Submit"
+        // } else if (record.status == "in_progress") {
+        //   return "In-Process"
+        // } else
+        //   return "Done"
       },
     },
     {
@@ -217,7 +236,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                     component={Input}
                     className="form-control round"
                     id="title"
-                    placeholder="ชื่อแคมเปญ"
+                    placeholder="ชื่อเรื่อง"
                     isRange={true}
                   />
                   <div className="ant-form ant-form-vertical">
@@ -304,7 +323,11 @@ const NotificationsBroadcastNews = (): ReactElement => {
                     placeholder="แอปพลิเคชันที่ทำการส่ง"
                     selectOption={[
                       {
-                        name: 'ทุกสถานะ',
+                        name: 'ทั้งหมด',
+                        value: '',
+                      },
+                      {
+                        name: 'all',
                         value: 'all',
                       },
                       {

@@ -174,12 +174,13 @@ export default function Wallet({ }: Props): ReactElement {
     FileSaver.saveAs(res, decodeURIComponent(filename))
   }
 
+  let seq = (pagination.current - 1) * pagination.pageSize
+
   const column = [
     {
       title: '#',
-      dataIndex: 'id',
-      render: (row: string, record: number, index: number) => {
-        return index + 1
+      render: () => {
+        return seq = seq + 1
       },
     },
     {

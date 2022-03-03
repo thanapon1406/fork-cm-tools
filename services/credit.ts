@@ -12,6 +12,7 @@ interface queryList {
   outlet_id?: string
   is_preload_credit?: boolean
   email?: string
+  order_no?: string
 }
 
 interface queryExportList {
@@ -58,6 +59,15 @@ const verifyTransaction = async (body: any) => {
 const creditList = async (body: queryList) => {
   try {
     const result = await fetch.post(`/api/credit/find-credits`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const credit = async (body: queryList) => {
+  try {
+    const result = await fetch.post(`/api/credit/find-credit`, body)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)
@@ -140,6 +150,7 @@ export {
   transactionDetail,
   verifyTransaction,
   creditList,
+  credit,
   transactionList,
   topupList,
   calculateUsedCredit,

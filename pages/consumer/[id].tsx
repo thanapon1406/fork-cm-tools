@@ -224,7 +224,7 @@ export default function View({ }: Props): ReactElement {
                         <Col className="gutter-row" span={8}>
                           <Field
                             label={{ text: 'ชื่อที่อยุ่' }}
-                            name={`address.${index}.address_name`}
+                            name={`address.${index}.title_location`}
                             type="text"
                             component={Input}
                             className="form-control round"

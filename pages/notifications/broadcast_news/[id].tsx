@@ -70,8 +70,8 @@ const EditBroadcastNew = (): ReactElement => {
 
   const Schema = Yup.object().shape({
     app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
-    title: Yup.string().trim().required('กรุณากรอกชื่อเรื่อง'),
-    body: Yup.string().trim().required('กรุณากรอกรายละเอียด'),
+    title: Yup.string().trim().max(100).required('กรุณากรอกชื่อเรื่อง'),
+    body: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียด'),
     schedule_at: Yup.mixed().test('is-42', 'กรุณาเลือกเหตุผล', (value: string, form: any) => {
       if (!isShedule && value === undefined || value === "") {
         return false
@@ -334,6 +334,7 @@ const EditBroadcastNew = (): ReactElement => {
                         type="primary"
                         size="middle"
                         htmlType="submit"
+                        disabled={!isEdit}
                       >
                         แก้ไข
                       </Button>

@@ -34,15 +34,17 @@ const NotificationsBroadcastNews = (): ReactElement => {
 
   const Schema = Yup.object().shape({
     app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
-    title: Yup.string().trim().required('กรุณากรอกชื่อเรื่อง'),
-    body: Yup.string().trim().required('กรุณากรอกรายละเอียด'),
+    title: Yup.string().trim().max(100).required('กรุณากรอกชื่อเรื่อง'),
+    body: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียด'),
     schedule_at: Yup.mixed().test('is-42', 'กรุณาตั้งเวลาส่ง', (value: string, form: any) => {
-      if (!isShedule && value === undefined || value === "") {
-        return false
-      }
       let customDate = moment().format("YYYY-MM-DD HH:mm");
       let newValue = moment(value).add(-4, "minute").format("YYYY-MM-DD HH:mm")
-      if (newValue < customDate) {
+      if (!isShedule && value === undefined || value === "") {
+        console.log("if one")
+        if (newValue < customDate) {
+          console.log("if if if")
+          return false
+        }
         return false
       }
       return true
@@ -51,7 +53,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
   })
 
   const handleSubmit = (values: typeof initialValues) => {
-
+    console.log("isShedule : ", isShedule)
     let scheduleAt = values.schedule_at
     if (scheduleAt == "") {
       scheduleAt = String(moment().format());

@@ -265,6 +265,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
     email: '',
     full_address: '',
     address: '',
+    province_name: '',
+    district_name: '',
+    sub_district_name: '',
+    zipcode: '',
     verify_status: '',
     photo: '',
     banner_photo: '',
@@ -389,6 +393,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
             email: outletData?.email,
             full_address: outletData.full_address,
             address: outletData.address,
+            province_name: outletData?.province_name,
+            district_name: outletData?.district_name,
+            sub_district_name: outletData?.sub_district_name,
+            zipcode: outletData?.zipcode,
             verify_status: outletData.verify_status,
             photo: outletData?.photo,
             banner_photo: outletData?.banner_photo,
@@ -736,15 +744,63 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   />
                 </Col>
 
-                <Col className="gutter-row" span={18}>
+                <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ที่อยู่' }}
-                    name="full_address"
+                    name="address"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="full_address"
+                    id="address"
                     placeholder="ที่อยู่"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'เขต/อำเภอ' }}
+                    name="district_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="district_name"
+                    placeholder="เขต/อำเภอ"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'แขวง/ตำบล' }}
+                    name="sub_district_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="sub_district_name"
+                    placeholder="แขวง/ตำบล"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'จังหวัด' }}
+                    name="province_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="province_name"
+                    placeholder="จังหวัด"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'รหัสไปรษณีย์' }}
+                    name="zipcode"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="zipcode"
+                    placeholder="รหัสไปรษณีย์"
                     disabled={true}
                   />
                 </Col>

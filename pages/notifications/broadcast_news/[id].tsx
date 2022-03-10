@@ -22,6 +22,7 @@ const EditBroadcastNew = (): ReactElement => {
   const router = useRouter()
   const { id } = router.query
   const [isActive, setActive] = useState('active')
+  const [isActiveStatus, setIsActiveStatus] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [isdone, setIsdone] = useState(false)
   const [isSendnow, setIsSendnow] = useState(true)
@@ -127,9 +128,10 @@ const EditBroadcastNew = (): ReactElement => {
     const { result, success } = await getBroadcastNew(id)
     if (success) {
       const { meta, data } = result
-      console.log(" data : ", data)
+      let customDate = moment().format("YYYY-MM-DD HH:mm");
       setInitialValues(data)
       setSchedule(data.send_now)
+
       setActive(data.active_status)
       if (data.status !== "submit") {
         setIsdone(true)
@@ -137,11 +139,21 @@ const EditBroadcastNew = (): ReactElement => {
       if (data.send_now === false) {
         setIsSendnow(true)
       }
+      if (moment(data.schedule_at).format("YYYY-MM-DD HH:mm") <= moment(customDate).format("YYYY-MM-DD HH:mm")) {
+        setIsdone(true)
+      }
+
     }
   }
 
   const handleEdit = async (values: any) => {
+    let customDate = moment().format("YYYY-MM-DD HH:mm");
+    if (moment(initialValues.schedule_at).format("YYYY-MM-DD HH:mm") <= moment(customDate).format("YYYY-MM-DD HH:mm")) {
+      setIsActiveStatus(true)
+    }
     setIsEdit(!isEdit)
+
+
   }
 
   useEffect(() => {
@@ -318,7 +330,8 @@ const EditBroadcastNew = (): ReactElement => {
                           checkedChildren="active"
                           unCheckedChildren="inactive"
                           checked={isActive == "active" ? true : false}
-                          disabled={!isEdit} />
+                          disabled={!isEdit || isActiveStatus}
+                        />
                       </span>
                     </Col>
                   </Row>

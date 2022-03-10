@@ -40,9 +40,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
       let customDate = moment().format("YYYY-MM-DD HH:mm");
       let newValue = moment(value).add(-4, "minute").format("YYYY-MM-DD HH:mm")
       if (!isShedule && value === undefined || value === "") {
-        console.log("if one")
         if (newValue < customDate) {
-          console.log("if if if")
           return false
         }
         return false
@@ -53,7 +51,6 @@ const NotificationsBroadcastNews = (): ReactElement => {
   })
 
   const handleSubmit = (values: typeof initialValues) => {
-    console.log("isShedule : ", isShedule)
     let scheduleAt = values.schedule_at
     if (scheduleAt == "") {
       scheduleAt = String(moment().format());

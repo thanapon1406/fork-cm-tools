@@ -239,48 +239,6 @@ const NotificationsBroadcastNews = (): ReactElement => {
                     placeholder="ชื่อเรื่อง"
                     isRange={true}
                   />
-                  <div className="ant-form ant-form-vertical">
-                    <Button
-                      style={{ width: '120px', marginTop: '31px' }}
-                      type="primary"
-                      size="middle"
-                      htmlType="submit"
-                    >
-                      ค้นหา
-                    </Button>
-                    <Button
-                      style={{ width: '120px', marginTop: '31px', marginLeft: '10px' }}
-                      type="default"
-                      size="middle"
-                      htmlType="reset"
-                      onClick={() => resetForm()}
-                    >
-                      เคลียร์
-                    </Button>
-                  </div>
-                </Col>
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'สถานะแคมเปญ' }}
-                    name="active_status"
-                    component={Select}
-                    id="active_status"
-                    placeholder="สถานะการตรวจสอบ"
-                    selectOption={[
-                      {
-                        name: 'ทุกสถานะ',
-                        value: 'all',
-                      },
-                      {
-                        name: 'Active',
-                        value: 'active',
-                      },
-                      {
-                        name: 'Inactive',
-                        value: 'inactive',
-                      }
-                    ]}
-                  />
                   <Field
                     label={{ text: 'สถานะการส่ง' }}
                     name="status"
@@ -306,14 +264,29 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       }
                     ]}
                   />
+
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'วันเวลาที่ทำการสร้าง' }}
-                    name="created_at"
-                    component={DateTimeRangePicker}
-                    id="created_at"
-                    placeholder="scheduleAt"
+                    label={{ text: 'สถานะแคมเปญ' }}
+                    name="active_status"
+                    component={Select}
+                    id="active_status"
+                    placeholder="สถานะการตรวจสอบ"
+                    selectOption={[
+                      {
+                        name: 'ทุกสถานะ',
+                        value: 'all',
+                      },
+                      {
+                        name: 'Active',
+                        value: 'active',
+                      },
+                      {
+                        name: 'Inactive',
+                        value: 'inactive',
+                      }
+                    ]}
                   />
                   <Field
                     label={{ text: 'แอปพลิเคชันที่ทำการส่ง' }}
@@ -347,12 +320,43 @@ const NotificationsBroadcastNews = (): ReactElement => {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
+                    label={{ text: 'วันเวลาที่ทำการสร้าง' }}
+                    name="created_at"
+                    component={DateTimeRangePicker}
+                    id="created_at"
+                    placeholder="scheduleAt"
+                  />
+
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
                     label={{ text: 'วันเวลาที่ทำการส่ง' }}
                     name="schedule_at"
                     component={DateTimeRangePicker}
                     id="schedule_at"
                     placeholder="scheduleAt"
                   />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <div className="ant-form ant-form-vertical">
+                    <Button
+                      style={{ width: '120px', marginTop: '31px' }}
+                      type="primary"
+                      size="middle"
+                      htmlType="submit"
+                    >
+                      ค้นหา
+                    </Button>
+                    <Button
+                      style={{ width: '120px', marginTop: '31px', marginLeft: '10px' }}
+                      type="default"
+                      size="middle"
+                      htmlType="reset"
+                      onClick={() => resetForm()}
+                    >
+                      เคลียร์
+                    </Button>
+                  </div>
                 </Col>
               </Row>
             </Form>

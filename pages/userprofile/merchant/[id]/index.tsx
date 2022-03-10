@@ -897,7 +897,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
               {outletInitialValues?.rider_type == "จัดส่งโดยร้านค้า" && outletInitialValues.rider_condition?.map((value: any, key: number) => {
                 return <>
                   <Row gutter={16}>
-                    <Col className="gutter-row" span={2}>
+                    <Col className="gutter-row" span={3}>
                       <Field
                         label={{ text: 'ระยะทางเริ่มต้น' }}
                         name={`rider_condition.${key}.min`}
@@ -909,7 +909,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       />
                     </Col>
                     <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>กม.</Col>
-                    <Col className="gutter-row" span={2}>
+                    <Col className="gutter-row" span={3}>
                       <Field
                         label={{ text: 'ระยะทางสิ้นสุด' }}
                         name={`rider_condition.${key}.max`}
@@ -921,7 +921,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       />
                     </Col>
                     <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>กม.</Col>
-                    <Col className="gutter-row" span={2}>
+                    <Col className="gutter-row" span={3}>
                       <Field
                         label={{ text: 'ค่าจัดส่ง' }}
                         name={`rider_condition.${key}.price`}
@@ -1048,7 +1048,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                           {values.business_times.map((day, index) => {
                             return (
                               <Row gutter={16} justify="space-around" align="middle" key={index}>
-                                <Col className="gutter-row" span={8}>
+                                <Col className="gutter-row" span={4}>
                                   <Field
                                     label={{ text: days[day['day']] }}
                                     name={`business_times.${index}.status`}
@@ -1057,6 +1057,15 @@ export default function MerchantUserView({ }: Props): ReactElement {
                                     id="day"
                                     disabled={true}
                                   />
+                                </Col>
+                                <Col className="gutter-row" span={3} >
+                                  <Button
+                                    style={{ background: outletInitialValues?.business_times[index]["is_open_24hr"] ? "#28a745" : "", borderColor: "white" }}
+                                    disabled={!outletInitialValues?.business_times[index]["is_open_24hr"]}
+                                    shape="round"
+                                  >
+                                    24 ชั่วโมง
+                                  </Button>
                                 </Col>
                                 <Col className="gutter-row" span={8}>
                                   <Field

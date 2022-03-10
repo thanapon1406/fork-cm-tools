@@ -13,7 +13,7 @@ import {
   cancelOrder,
   cancelOrderInterface,
   findOrdersStatusHistory,
-  orderStatusInterface,
+  orderStatusInterface
 } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
 import { cancelRider, getRiderDetail } from '@/services/rider'
@@ -455,7 +455,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-              Constant.LALAMOVE.toLowerCase()
+            Constant.LALAMOVE.toLowerCase()
           ) {
             partnerName = ' (LLM)'
           }
@@ -487,6 +487,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       } else if (rider_status === Constant.ARRIVED) {
         respObj.status = 'ไรเดอร์ถึงจุดหมาย'
         respObj.imagePath = '/asset/images/placeholder.png'
+      } else if (merchant_status === Constant.ACCEPT_ORDER && order_status === Constant.WAITING_PAYMENT) {
+        respObj.status = 'ร้านรับออเดอร์'
+        respObj.imagePath = '/asset/images/receive-order-icon.png'
+      } else if (merchant_status === Constant.ACCEPT_ORDER && order_status === Constant.CONFIRM_PAYMENT) {
+        respObj.status = 'ลูกค้าแจ้งชำระเงิน'
+        respObj.imagePath = '/asset/images/cash.png'
       }
     }
 
@@ -597,7 +603,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1058,7 +1064,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1141,7 +1147,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1278,7 +1284,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (

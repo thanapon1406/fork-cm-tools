@@ -265,6 +265,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
     email: '',
     full_address: '',
     address: '',
+    province_name: '',
+    district_name: '',
+    sub_district_name: '',
+    zipcode: '',
     verify_status: '',
     photo: '',
     banner_photo: '',
@@ -338,6 +342,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
       const { data: riderData } = riderResult
       riderData?.map((value: any, key: number) => {
         value.fullname = value.first_name + " " + value.last_name
+        console.log(value)
+        value.phone = (value.country_code === '66' ? '0' : value.country_code) + value.phone
       })
       const { result: userResult, success: userSuccess } = await personalData(userRequest)
       if (userSuccess) {
@@ -372,6 +378,12 @@ export default function MerchantUserView({ }: Props): ReactElement {
             line_id: line_id,
           })
 
+          outletData?.delivery_condition?.map((value: any, key: number) => {
+            if (key > 0) {
+              value.min = ">" + " " + value.min
+            }
+          })
+
           const type: string = is_mass ? 'single' : 'multiple'
           setOutletInitialValues({
             ...outletInitialValues,
@@ -381,6 +393,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
             email: outletData?.email,
             full_address: outletData.full_address,
             address: outletData.address,
+            province_name: outletData?.province_name,
+            district_name: outletData?.district_name,
+            sub_district_name: outletData?.sub_district_name,
+            zipcode: outletData?.zipcode,
             verify_status: outletData.verify_status,
             photo: outletData?.photo,
             banner_photo: outletData?.banner_photo,
@@ -728,15 +744,63 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   />
                 </Col>
 
-                <Col className="gutter-row" span={18}>
+                <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ที่อยู่' }}
-                    name="full_address"
+                    name="address"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="full_address"
+                    id="address"
                     placeholder="ที่อยู่"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'เขต/อำเภอ' }}
+                    name="district_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="district_name"
+                    placeholder="เขต/อำเภอ"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'แขวง/ตำบล' }}
+                    name="sub_district_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="sub_district_name"
+                    placeholder="แขวง/ตำบล"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'จังหวัด' }}
+                    name="province_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="province_name"
+                    placeholder="จังหวัด"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'รหัสไปรษณีย์' }}
+                    name="zipcode"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="zipcode"
+                    placeholder="รหัสไปรษณีย์"
                     disabled={true}
                   />
                 </Col>
@@ -809,6 +873,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
               </Row>
               {outletInitialValues?.rider_type != "" &&
                 <>
+                  <Divider />
+
                   <Row>
                     <Col span={12}>
                       <Title level={5}>การจัดส่ง</Title>
@@ -828,10 +894,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       />
                     </Col>
                   </Row></>}
-              {outletInitialValues.rider_condition?.map((value: any, key: number) => {
+              {outletInitialValues?.rider_type == "จัดส่งโดยร้านค้า" && outletInitialValues.rider_condition?.map((value: any, key: number) => {
                 return <>
                   <Row gutter={16}>
-                    <Col className="gutter-row" span={6}>
+                    <Col className="gutter-row" span={3}>
                       <Field
                         label={{ text: 'ระยะทางเริ่มต้น' }}
                         name={`rider_condition.${key}.min`}
@@ -842,7 +908,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={6}>
+                    <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>กม.</Col>
+                    <Col className="gutter-row" span={3}>
                       <Field
                         label={{ text: 'ระยะทางสิ้นสุด' }}
                         name={`rider_condition.${key}.max`}
@@ -853,7 +920,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={6}>
+                    <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>กม.</Col>
+                    <Col className="gutter-row" span={3}>
                       <Field
                         label={{ text: 'ค่าจัดส่ง' }}
                         name={`rider_condition.${key}.price`}
@@ -865,16 +933,18 @@ export default function MerchantUserView({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
+                    <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>บาท</Col>
+
                   </Row></>
               })}
 
-              {outletInitialValues.outlet_rider?.length > 0 && <Row>
+              {outletInitialValues?.rider_type == "จัดส่งโดยร้านค้า" && outletInitialValues.outlet_rider?.length > 0 && <Row>
                 <Col span={12}>
                   <Title level={5}>รายชื่อไรเดอร์ที่ผูกกับร้านค้า</Title>
                 </Col>
               </Row>}
 
-              {outletInitialValues.outlet_rider?.map((value: any, key: number) => {
+              {outletInitialValues?.rider_type == "จัดส่งโดยร้านค้า" && outletInitialValues.outlet_rider?.map((value: any, key: number) => {
                 return <>
                   <Row gutter={16}>
                     <Col className="gutter-row" span={6}>
@@ -913,6 +983,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
                     </Col>
                   </Row></>
               })}
+              <Divider />
+
               <Row>
                 <Col span={8}>
                   <Title level={5}>เครดิตร้านค้า</Title>
@@ -976,7 +1048,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                           {values.business_times.map((day, index) => {
                             return (
                               <Row gutter={16} justify="space-around" align="middle" key={index}>
-                                <Col className="gutter-row" span={8}>
+                                <Col className="gutter-row" span={4}>
                                   <Field
                                     label={{ text: days[day['day']] }}
                                     name={`business_times.${index}.status`}
@@ -985,6 +1057,15 @@ export default function MerchantUserView({ }: Props): ReactElement {
                                     id="day"
                                     disabled={true}
                                   />
+                                </Col>
+                                <Col className="gutter-row" span={3} >
+                                  <Button
+                                    style={{ background: outletInitialValues?.business_times[index]["is_open_24hr"] ? "#28a745" : "", borderColor: "white" }}
+                                    disabled={!outletInitialValues?.business_times[index]["is_open_24hr"]}
+                                    shape="round"
+                                  >
+                                    24 ชั่วโมง
+                                  </Button>
                                 </Col>
                                 <Col className="gutter-row" span={8}>
                                   <Field

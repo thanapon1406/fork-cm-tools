@@ -16,6 +16,7 @@ interface Props {
   disabled?: boolean
   className?: string
   isDanger?: boolean
+  shape?: any
 }
 
 function Button({
@@ -28,6 +29,7 @@ function Button({
   disabled,
   className,
   isDanger = false,
+  shape,
   ...Props
 }: Props): ReactElement {
   return (
@@ -41,6 +43,7 @@ function Button({
       size={size}
       className={className}
       danger={isDanger}
+      shape={shape}
     >
       {children}
     </Buttons>

@@ -178,7 +178,7 @@ export default function View({ }: Props): ReactElement {
   const showDefaultAddress = (isDisable: boolean, index: number) => {
     if (isDisable == true) {
       return (
-        <Row gutter={10}>
+        <Row key={index} gutter={10}>
           <Col className="gutter-row" span={2}>
             ที่อยู่ {index + 1}
           </Col>
@@ -224,7 +224,7 @@ export default function View({ }: Props): ReactElement {
                         <Col className="gutter-row" span={8}>
                           <Field
                             label={{ text: 'ชื่อที่อยุ่' }}
-                            name={`address.${index}.address_name`}
+                            name={`address.${index}.title_location`}
                             type="text"
                             component={Input}
                             className="form-control round"

@@ -227,6 +227,7 @@ const OrderHistory = (): ReactElement => {
       enddate: endDate ? moment(endDate).format('YYYY-MM-DD') : '',
       starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
+      delivery_type: 'delivery',
     }
 
     const { result, success } = await exportOrderTransaction(req)
@@ -349,8 +350,6 @@ const OrderHistory = (): ReactElement => {
                     component={DateTimeRangePicker}
                     id="client_time"
                     placeholder="วันเวลาที่ทำรายการ"
-                    minDate={moment(values.client_time.end).subtract(3, 'month')}
-                    maxDate={moment(values.client_time.start).add(3, 'month')}
                   />
                 </Col>
 

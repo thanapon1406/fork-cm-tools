@@ -1,10 +1,10 @@
-import React, { ReactElement } from "react";
-import { DatePicker as DatePickers, Typography, Form } from "antd";
-const { RangePicker } = DatePickers;
-import { FormikProps } from "./props";
-import moment from "moment";
-const { Text } = Typography;
+import { DatePicker as DatePickers, Form, Typography } from "antd";
 import { ErrorMessage } from "formik";
+import moment from "moment";
+import React, { ReactElement } from "react";
+import { FormikProps } from "./props";
+const { RangePicker } = DatePickers;
+const { Text } = Typography;
 
 interface Props extends FormikProps {
   id: string | undefined;
@@ -50,7 +50,7 @@ export default function DatePicker({
         />
 
         <Text type="danger">
-          <div style={{ minHeight: "25px" }}>
+          <div >
             <ErrorMessage
               name={field.name}
               component="div"

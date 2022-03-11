@@ -1,6 +1,7 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
+import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import { BrandDetail } from '@/interface/brand'
 import { SelectOption } from '@/interface/common'
@@ -53,6 +54,7 @@ const PromotionReport = (): ReactElement => {
       end: '',
     },
     brand_id: null,
+    keyword: '',
   }
 
   let [pagination, setPagination] = useState<Pagination>({
@@ -88,6 +90,7 @@ const PromotionReport = (): ReactElement => {
       brand_id: values.brand_id || '',
       start_date: startDate ? reqStartDate : '',
       end_date: endDate ? reqEndDate : '',
+      keyword: values.keyword || '',
     }
 
     setParams({
@@ -97,6 +100,7 @@ const PromotionReport = (): ReactElement => {
       brand_id: values.brand_id || '',
       start_date: startDate ? reqStartDate : '',
       end_date: endDate ? reqEndDate : '',
+      keyword: values.keyword || '',
     })
 
     return req
@@ -211,6 +215,16 @@ const PromotionReport = (): ReactElement => {
                     allowClear={true}
                     onClear={onClearBrand}
                   />
+
+                  <Field
+                    label={{ text: 'ค้นหา (เลขออเดอร์, ชื่อแคมเปญ, โปรโมโค้ด)' }}
+                    name="keyword"
+                    type="text"
+                    component={Input}
+                    autoComplete="off"
+                    id="keyword"
+                    placeholder="ค้นหา"
+                  />
                 </Col>
 
                 <Col className="gutter-row" span={6}>
@@ -249,8 +263,6 @@ const PromotionReport = (): ReactElement => {
                     component={DateTimeRangePicker}
                     id="client_time"
                     placeholder="วันเวลาที่ทำรายการ"
-                    minDate={moment(values.client_time.end).subtract(3, 'month')}
-                    maxDate={moment(values.client_time.start).add(3, 'month')}
                   />
                 </Col>
 

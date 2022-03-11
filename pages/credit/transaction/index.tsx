@@ -137,7 +137,7 @@ export default function CreditTransaction({}: Props): ReactElement {
 
   const column = [
     {
-      title: 'Order No.',
+      title: 'Credit No.',
       dataIndex: 'credit_no',
     },
     {

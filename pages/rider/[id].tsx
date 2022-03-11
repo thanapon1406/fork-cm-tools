@@ -168,11 +168,13 @@ export default function RiderDetail({ }: Props): ReactElement {
         data.car_tax_photo = _.get(data.pdpa, 'car_info[0].tax_photo', '')
         data.disable_photo = _.get(data.pdpa, 'disable_person[0].photo', '')
         data.main_address = _.find(data.addresses, function (o) { return o.type == "main_address"; });
-        data.main_address = _.get(data.main_address, 'address_no', '') + " " + _.get(data.main_address, 'district_name', '') + " " + _.get(data.main_address, 'subdistrict_name', '') + " " + _.get(data.main_address, 'province_name', '') + " " + _.get(data.main_address, 'zipcode', '');
+        // data.main_address = _.get(data.main_address, 'address_no', '') + " " + _.get(data.main_address, 'district_name', '') + " " + _.get(data.main_address, 'subdistrict_name', '') + " " + _.get(data.main_address, 'province_name', '') + " " + _.get(data.main_address, 'zipcode', '');
         data.contact_address = _.find(data.addresses, function (o) { return o.type == "contact_address"; });
-        data.contact_address = _.get(data.contact_address, 'address_no', '') + " " + _.get(data.contact_address, 'district_name', '') + " " + _.get(data.contact_address, 'subdistrict_name', '') + " " + _.get(data.contact_address, 'province_name', '') + " " + _.get(data.contact_address, 'zipcode', '');
+        //data.contact_address = _.get(data.contact_address, 'address_no', '') + " " + _.get(data.contact_address, 'district_name', '') + " " + _.get(data.contact_address, 'subdistrict_name', '') + " " + _.get(data.contact_address, 'province_name', '') + " " + _.get(data.contact_address, 'zipcode', '');
 
       }
+
+      console.log(data);
 
       RiderDetail = data
 
@@ -441,10 +443,13 @@ export default function RiderDetail({ }: Props): ReactElement {
                     <h3>ข้อมูล Rider</h3>
                   </Row>
                   <Row gutter={16}>
-                    <Col className="gutter-row" span={18} offset={4}>
+                    <Col style={{ marginTop: '31px' }} span={4}>
+                      ที่อยู่ปัจจุบัน
+                    </Col>
+                    <Col className="gutter-row" span={4}>
                       <Field
-                        label={{ text: "ที่อยู่ปัจจุบัน" }}
-                        name="contact_address"
+                        label={{ text: "ที่อยู่" }}
+                        name="contact_address.address_no"
                         type="text"
                         component={Input}
                         className="form-control round"
@@ -453,16 +458,115 @@ export default function RiderDetail({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
+                    <Col className="gutter-row" span={4} >
+                      <Field
+                        label={{ text: "เขต/อำเภอ" }}
+                        name="contact_address.district_name"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="เขต/อำเภอ"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={4} >
+                      <Field
+                        label={{ text: "แขวง/ตำบล" }}
+                        name="contact_address.subdistrict_name"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="แขวง/ตำบล"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={4}>
+                      <Field
+                        label={{ text: "จังหวัด" }}
+                        name="contact_address.province_name"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="จังหวัด"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={2}>
+                      <Field
+                        label={{ text: "รหัสไปรษณีย์" }}
+                        name="contact_address.zipcode"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="รหัสไปรษณีย์"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
                   </Row>
                   <Row gutter={16}>
-                    <Col className="gutter-row" span={18} offset={4}>
+                    <Col style={{ marginTop: '31px' }} span={4}>
+                      ที่อยู่ตามบัตรประชาชน
+                    </Col>
+                    <Col className="gutter-row" span={4}>
                       <Field
-                        label={{ text: "ที่อยู่ตามบัตรประชาชน" }}
-                        name="main_address"
+                        label={{ text: "ที่อยู่" }}
+                        name="main_address.address_no"
                         type="text"
                         component={Input}
                         className="form-control round"
                         placeholder="ที่อยู่"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={4} >
+                      <Field
+                        label={{ text: "เขต/อำเภอ" }}
+                        name="main_address.district_name"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="เขต/อำเภอ"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={4} >
+                      <Field
+                        label={{ text: "แขวง/ตำบล" }}
+                        name="main_address.subdistrict_name"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="แขวง/ตำบล"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={4}>
+                      <Field
+                        label={{ text: "จังหวัด" }}
+                        name="main_address.province_name"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="จังหวัด"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={2}>
+                      <Field
+                        label={{ text: "รหัสไปรษณีย์" }}
+                        name="main_address.zipcode"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="รหัสไปรษณีย์"
                         isRange={true}
                         disabled={true}
                       />

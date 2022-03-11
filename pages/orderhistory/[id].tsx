@@ -494,6 +494,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         respObj.status = 'ลูกค้าแจ้งชำระเงิน'
         respObj.imagePath = '/asset/images/cash.png'
       }
+      else if (merchant_status === Constant.ACCEPT_ORDER) {
+        respObj.status = 'ร้านรับออเดอร์'
+        respObj.imagePath = '/asset/images/receive-order-icon.png'
+      }
     }
 
     return respObj

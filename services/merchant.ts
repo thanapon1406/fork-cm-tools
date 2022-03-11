@@ -142,6 +142,15 @@ const getStaffs = async (body: any) => {
   }
 }
 
+const getAccounts = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/merchant/account-list`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 const getStaff = async (body: any) => {
   try {
     const result = await fetch.post(`/api/staff/find-staff`, body)
@@ -173,6 +182,7 @@ export {
   banUser,
   updateOutletStatus,
   getStaffs,
+  getAccounts,
   getStaff,
   CalculateOutletCredit,
 }

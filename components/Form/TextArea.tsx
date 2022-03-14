@@ -15,6 +15,7 @@ interface InputProps extends FormikProps {
     className: string
   }
   disabled?: boolean | false
+  rows?: number | 4
 }
 
 const CustomInput = ({ label, field, ...props }: InputProps) => {
@@ -29,7 +30,7 @@ const CustomInput = ({ label, field, ...props }: InputProps) => {
         <TextArea
           id={props.id}
           // type={props.type}
-          rows={4}
+          rows={props.rows || 4}
           name={field.name}
           className={props.className}
           value={field.value}

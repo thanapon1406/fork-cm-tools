@@ -71,7 +71,7 @@ const EditBroadcastNew = (): ReactElement => {
 
   const Schema = Yup.object().shape({
     app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
-    title: Yup.string().trim().max(100).required('กรุณากรอกชื่อเรื่อง'),
+    title: Yup.string().trim().max(50).required('กรุณากรอกชื่อเรื่อง'),
     body: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียด'),
     schedule_at: Yup.mixed().test('is-42', 'กรุณาเลือกเหตุผล', (value: string, form: any) => {
       if (!isShedule && value === undefined || value === "") {
@@ -259,7 +259,7 @@ const EditBroadcastNew = (): ReactElement => {
                     component={Input}
                     className="form-control round"
                     id="title"
-                    placeholder="ชื่อเรื่อง"
+                    placeholder="ชื่อเรื่องรองรับไม่เกิน 50 ตัวอักษร"
                     disabled={!isEdit}
                   />
                 </Col>
@@ -274,7 +274,7 @@ const EditBroadcastNew = (): ReactElement => {
                     component={TextArea}
                     className="form-control round"
                     id="body"
-                    placeholder="รายละเอียด"
+                    placeholder="รายละเอียดรองรับไม่เกิน 255 ตัวอักษร"
                     disabled={!isEdit}
                   />
                 </Col>

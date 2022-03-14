@@ -34,7 +34,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
 
   const Schema = Yup.object().shape({
     app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
-    title: Yup.string().trim().max(100).required('กรุณากรอกชื่อเรื่อง'),
+    title: Yup.string().trim().max(50).required('กรุณากรอกชื่อเรื่อง'),
     body: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียด'),
     schedule_at: Yup.mixed().test('is-42', 'กรุณาตั้งเวลาส่ง', (value: string, form: any) => {
       let customDate = moment().format("YYYY-MM-DD HH:mm");
@@ -175,13 +175,15 @@ const NotificationsBroadcastNews = (): ReactElement => {
               <Row gutter={16}>
                 <Col className="gutter-row" span={8}>
                   <Field
-                    label={{ text: 'ชื่อเรื่อง' }}
+                    label={{ text: "ชื่อเรื่อง" }}
+                    style={{ color: "red" }}
                     name="title"
                     type="text"
                     component={Input}
+                    rows={2}
                     className="form-control round"
                     id="title"
-                    placeholder="ชื่อเรื่อง"
+                    placeholder="ชื่อเรื่องรองรับไม่เกิน 50 ตัวอักษร"
                   />
                 </Col>
                 <Col className="gutter-row" span={8}></Col>
@@ -189,13 +191,13 @@ const NotificationsBroadcastNews = (): ReactElement => {
               <Row gutter={16}>
                 <Col className="gutter-row" span={8} >
                   <Field
-                    label={{ text: 'รายละเอียด' }}
+                    label={{ text: "รายละเอียด" }}
                     name="body"
                     type="text"
                     component={TextArea}
                     className="form-control round"
                     id="body"
-                    placeholder="รายละเอียด"
+                    placeholder="รายละเอียดรองรับไม่เกิน 255 ตัวอักษร"
                   />
                 </Col>
               </Row>

@@ -1055,7 +1055,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   />
                 </Tab.TabPane>
               </Tab>
-              <Divider />
+              {/* <Divider />
               {values.banks.length > 0 || values.promptpays.length > 0 ?
                 <>
                   <Title level={5}>การรับชำระเงิน</Title>
@@ -1176,7 +1176,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   </>
                 )
               })}
-              <Divider />
+              <Divider /> */}
 
               <Title level={5}>ข้อมูลการเปิด-ปิดร้าน</Title>
               <br />
@@ -1203,7 +1203,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                                     disabled={true}
                                   />
                                 </Col>
-                                <Col className="gutter-row" span={3} >
+                                {/* <Col className="gutter-row" span={3} >
                                   <Button
                                     style={{ background: outletInitialValues?.business_times[index]["is_open_24hr"] ? "#28a745" : "", borderColor: "white" }}
                                     disabled={!outletInitialValues?.business_times[index]["is_open_24hr"]}
@@ -1211,7 +1211,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                                   >
                                     24 ชั่วโมง
                                   </Button>
-                                </Col>
+                                </Col> */}
                                 <Col className="gutter-row" span={8}>
                                   <Field
                                     label={{ text: 'เวลา' }}

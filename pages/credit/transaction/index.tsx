@@ -22,7 +22,7 @@ import * as Yup from 'yup'
 
 const { Text, Title } = Typography
 
-interface Props {}
+interface Props { }
 
 interface filterObject {
   id?: string
@@ -37,7 +37,7 @@ interface filterObject {
   credit_no?: string
 }
 
-export default function CreditTransaction({}: Props): ReactElement {
+export default function CreditTransaction({ }: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     credit_no: '',
@@ -137,7 +137,7 @@ export default function CreditTransaction({}: Props): ReactElement {
 
   const column = [
     {
-      title: 'Order No.',
+      title: 'Credit No.',
       dataIndex: 'credit_no',
     },
     {
@@ -325,7 +325,7 @@ export default function CreditTransaction({}: Props): ReactElement {
                     defaultValue=""
                     selectOption={[
                       {
-                        name: 'N/A',
+                        name: 'ทั้งหมด',
                         value: '',
                       },
                       {

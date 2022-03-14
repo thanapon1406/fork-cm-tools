@@ -27,7 +27,7 @@ import {
   topupList,
   transactionList
 } from '@/services/credit'
-import { outletDetail, personalData, updateOutletStatus } from '@/services/merchant'
+import { getAccounts, outletDetail, personalData, updateOutletStatus } from '@/services/merchant'
 import { getRiderOutletDetail } from '@/services/rider'
 import { StopOutlined } from '@ant-design/icons'
 import { Badge, Breadcrumb, Col, Divider, Modal, Row, Select, Space, Typography } from 'antd'
@@ -265,6 +265,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
     email: '',
     full_address: '',
     address: '',
+    province_name: '',
+    district_name: '',
+    sub_district_name: '',
+    zipcode: '',
     verify_status: '',
     photo: '',
     banner_photo: '',
@@ -287,6 +291,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
     rider_type: '',
     rider_condition: [],
     outlet_rider: [],
+    banks: [],
+    promptpays: [],
   })
 
   const Loading = useLoadingContext()
@@ -380,6 +386,25 @@ export default function MerchantUserView({ }: Props): ReactElement {
             }
           })
 
+          let banks: any = []
+          let promptpay: any = []
+          const { result: accountResult, success: accountSuccess } = await getAccounts({
+            merchant_id: id,
+          })
+          accountResult?.account_list?.map((value: any, key: number) => {
+            console.log(value)
+            if (value.status == "active") {
+              if (value.payment_channel_id == 1) {
+                banks.push(value)
+              } else if (value.payment_channel_id == 2) {
+                promptpay.push(value)
+              }
+            }
+          })
+
+          console.log("banks", banks)
+          console.log("promptpay", promptpay)
+
           const type: string = is_mass ? 'single' : 'multiple'
           setOutletInitialValues({
             ...outletInitialValues,
@@ -389,6 +414,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
             email: outletData?.email,
             full_address: outletData.full_address,
             address: outletData.address,
+            province_name: outletData?.province_name,
+            district_name: outletData?.district_name,
+            sub_district_name: outletData?.sub_district_name,
+            zipcode: outletData?.zipcode,
             verify_status: outletData.verify_status,
             photo: outletData?.photo,
             banner_photo: outletData?.banner_photo,
@@ -410,7 +439,9 @@ export default function MerchantUserView({ }: Props): ReactElement {
             default_online_status: outletData?.online_status,
             rider_type: delivery_setting?.deliver_by ? riderType[delivery_setting?.deliver_by] : '-',
             rider_condition: outletData?.delivery_condition,
-            outlet_rider: riderData
+            outlet_rider: riderData,
+            banks: banks,
+            promptpays: promptpay,
           })
         }
       }
@@ -736,15 +767,63 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   />
                 </Col>
 
-                <Col className="gutter-row" span={18}>
+                <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ที่อยู่' }}
-                    name="full_address"
+                    name="address"
                     type="text"
                     component={Input}
                     className="form-control round"
-                    id="full_address"
+                    id="address"
                     placeholder="ที่อยู่"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'เขต/อำเภอ' }}
+                    name="district_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="district_name"
+                    placeholder="เขต/อำเภอ"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'แขวง/ตำบล' }}
+                    name="sub_district_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="sub_district_name"
+                    placeholder="แขวง/ตำบล"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'จังหวัด' }}
+                    name="province_name"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="province_name"
+                    placeholder="จังหวัด"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={3}>
+                  <Field
+                    label={{ text: 'รหัสไปรษณีย์' }}
+                    name="zipcode"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="zipcode"
+                    placeholder="รหัสไปรษณีย์"
                     disabled={true}
                   />
                 </Col>
@@ -841,7 +920,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
               {outletInitialValues?.rider_type == "จัดส่งโดยร้านค้า" && outletInitialValues.rider_condition?.map((value: any, key: number) => {
                 return <>
                   <Row gutter={16}>
-                    <Col className="gutter-row" span={2}>
+                    <Col className="gutter-row" span={3}>
                       <Field
                         label={{ text: 'ระยะทางเริ่มต้น' }}
                         name={`rider_condition.${key}.min`}
@@ -853,7 +932,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       />
                     </Col>
                     <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>กม.</Col>
-                    <Col className="gutter-row" span={2}>
+                    <Col className="gutter-row" span={3}>
                       <Field
                         label={{ text: 'ระยะทางสิ้นสุด' }}
                         name={`rider_condition.${key}.max`}
@@ -865,7 +944,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       />
                     </Col>
                     <Col className="gutter-row" style={{ display: "flex", alignItems: 'center' }} span={1}>กม.</Col>
-                    <Col className="gutter-row" span={2}>
+                    <Col className="gutter-row" span={3}>
                       <Field
                         label={{ text: 'ค่าจัดส่ง' }}
                         name={`rider_condition.${key}.price`}
@@ -976,6 +1055,128 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   />
                 </Tab.TabPane>
               </Tab>
+              {/* <Divider />
+              {values.banks.length > 0 || values.promptpays.length > 0 ?
+                <>
+                  <Title level={5}>การรับชำระเงิน</Title>
+                  <Row gutter={16}>
+                    <Col className="gutter-row" span={6}>
+                      <Text >ช่องทางการรับชำระเงิน</Text>
+                    </Col>
+                  </Row>
+                </> : ''
+              }
+              {values.banks.length > 0 &&
+                <Row gutter={16}>
+                  <Col className="gutter-row" span={4}>
+                    <Field
+                      label={{ text: "บัญชีธนาคาร" }}
+                      name={`outlet_name`}
+                      component={CheckBox}
+                      className="form-control round"
+                      id="bank_account"
+                      disabled={true}
+                    />
+                  </Col>
+                </Row>}
+              {values.banks.map((value, index) => {
+                console.log("value: ", value)
+                return (
+                  <>
+                    <Row gutter={16}>
+                      <Col className="gutter-row" span={6}>
+                        <Text >บัญชีที่ {index + 1}</Text>
+                      </Col>
+                      <Col className="gutter-row" span={6}>
+                        <Field
+                          label={{ text: 'ธนาคาร' }}
+                          name={`banks.${index}.bank.bank_name`}
+                          type="text"
+                          component={Input}
+                          className="form-control round"
+                          id="rating"
+                          placeholder="ธนาคาร"
+                          disabled={true}
+                        />
+                      </Col>
+                      <Col className="gutter-row" span={6}>
+                        <Field
+                          label={{ text: 'ชื่อบัญชี' }}
+                          name={`banks.${index}.account_name`}
+                          type="text"
+                          component={Input}
+                          className="form-control round"
+                          id="rating"
+                          placeholder="ชื่อบัญชี"
+                          disabled={true}
+                        />
+                      </Col>
+                      <Col className="gutter-row" span={6}>
+                        <Field
+                          label={{ text: 'เลขบัญชี' }}
+                          name={`banks.${index}.account_number`}
+                          type="text"
+                          component={Input}
+                          className="form-control round"
+                          id="rating"
+                          placeholder="เลขบัญชี"
+                          disabled={true}
+                        />
+                      </Col>
+                    </Row>
+                  </>
+                )
+              })}
+              {values.promptpays.length > 0 &&
+                <Row gutter={16}>
+                  <Col className="gutter-row" span={4}>
+                    <Field
+                      label={{ text: "พร้อมเพย์" }}
+                      name={`outlet_name`}
+                      component={CheckBox}
+                      className="form-control round"
+                      id="promptpay_account"
+                      disabled={true}
+                    />
+                  </Col>
+                </Row>}
+              {values.promptpays.map((value, index) => {
+                console.log("value: ", value)
+                return (
+                  <>
+                    <Row gutter={16}>
+                      <Col className="gutter-row" span={6}>
+                        <Text >บัญชีที่ {index + 1}</Text>
+                      </Col>
+                      <Col className="gutter-row" span={6}>
+                        <Field
+                          label={{ text: 'ชื่อพร้อมเพย์' }}
+                          name={`promptpays.${index}.account_name`}
+                          type="text"
+                          component={Input}
+                          className="form-control round"
+                          id="rating"
+                          placeholder="ชื่อพร้อมเพย์"
+                          disabled={true}
+                        />
+                      </Col>
+                      <Col className="gutter-row" span={6}>
+                        <Field
+                          label={{ text: 'หมายเลขพร้อมเพย์' }}
+                          name={`promptpays.${index}.account_number`}
+                          type="text"
+                          component={Input}
+                          className="form-control round"
+                          id="rating"
+                          placeholder="หมายเลขพร้อมเพย์"
+                          disabled={true}
+                        />
+                      </Col>
+                    </Row>
+                  </>
+                )
+              })}
+              <Divider /> */}
 
               <Title level={5}>ข้อมูลการเปิด-ปิดร้าน</Title>
               <br />
@@ -992,7 +1193,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                           {values.business_times.map((day, index) => {
                             return (
                               <Row gutter={16} justify="space-around" align="middle" key={index}>
-                                <Col className="gutter-row" span={8}>
+                                <Col className="gutter-row" span={4}>
                                   <Field
                                     label={{ text: days[day['day']] }}
                                     name={`business_times.${index}.status`}
@@ -1002,6 +1203,15 @@ export default function MerchantUserView({ }: Props): ReactElement {
                                     disabled={true}
                                   />
                                 </Col>
+                                {/* <Col className="gutter-row" span={3} >
+                                  <Button
+                                    style={{ background: outletInitialValues?.business_times[index]["is_open_24hr"] ? "#28a745" : "", borderColor: "white" }}
+                                    disabled={!outletInitialValues?.business_times[index]["is_open_24hr"]}
+                                    shape="round"
+                                  >
+                                    24 ชั่วโมง
+                                  </Button>
+                                </Col> */}
                                 <Col className="gutter-row" span={8}>
                                   <Field
                                     label={{ text: 'เวลา' }}

@@ -303,7 +303,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
                     defaultValue=""
                     selectOption={[
                       {
-                        name: 'N/A',
+                        name: 'ทั้งหมด',
                         value: '',
                       },
                       {

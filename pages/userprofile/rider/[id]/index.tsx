@@ -626,7 +626,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                     </Col>
                   </Row>
                   <Row>
-                    <Col className="gutter-row" span={18}>
+                    <Col className="gutter-row" span={18} offset={4}>
                       <Field
                         label={{ text: "ที่อยู่" }}
                         name="contact_emergency_address"

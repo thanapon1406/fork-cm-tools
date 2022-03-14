@@ -446,7 +446,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                     <Col style={{ marginTop: '31px' }} span={4}>
                       ที่อยู่ปัจจุบัน
                     </Col>
-                    <Col className="gutter-row" span={4}>
+                    <Col className="gutter-row" span={20}>
                       <Field
                         label={{ text: "ที่อยู่" }}
                         name="contact_address.address_no"
@@ -458,7 +458,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={4} >
+                    <Col className="gutter-row" span={5} offset={4} >
                       <Field
                         label={{ text: "เขต/อำเภอ" }}
                         name="contact_address.district_name"
@@ -470,7 +470,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={4} >
+                    <Col className="gutter-row" span={5} >
                       <Field
                         label={{ text: "แขวง/ตำบล" }}
                         name="contact_address.subdistrict_name"
@@ -482,7 +482,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={4}>
+                    <Col className="gutter-row" span={5}>
                       <Field
                         label={{ text: "จังหวัด" }}
                         name="contact_address.province_name"
@@ -494,7 +494,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={2}>
+                    <Col className="gutter-row" span={5}>
                       <Field
                         label={{ text: "รหัสไปรษณีย์" }}
                         name="contact_address.zipcode"
@@ -511,7 +511,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                     <Col style={{ marginTop: '31px' }} span={4}>
                       ที่อยู่ตามบัตรประชาชน
                     </Col>
-                    <Col className="gutter-row" span={4}>
+                    <Col className="gutter-row" span={20} >
                       <Field
                         label={{ text: "ที่อยู่" }}
                         name="main_address.address_no"
@@ -523,7 +523,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={4} >
+                    <Col className="gutter-row" span={5} offset={4}>
                       <Field
                         label={{ text: "เขต/อำเภอ" }}
                         name="main_address.district_name"
@@ -535,7 +535,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={4} >
+                    <Col className="gutter-row" span={5} >
                       <Field
                         label={{ text: "แขวง/ตำบล" }}
                         name="main_address.subdistrict_name"
@@ -547,7 +547,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={4}>
+                    <Col className="gutter-row" span={5}>
                       <Field
                         label={{ text: "จังหวัด" }}
                         name="main_address.province_name"
@@ -559,7 +559,7 @@ export default function RiderDetail({ }: Props): ReactElement {
                         disabled={true}
                       />
                     </Col>
-                    <Col className="gutter-row" span={2}>
+                    <Col className="gutter-row" span={5}>
                       <Field
                         label={{ text: "รหัสไปรษณีย์" }}
                         name="main_address.zipcode"

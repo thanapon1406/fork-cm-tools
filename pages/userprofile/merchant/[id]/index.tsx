@@ -345,7 +345,6 @@ export default function MerchantUserView({ }: Props): ReactElement {
       const { data: riderData } = riderResult
       riderData?.map((value: any, key: number) => {
         value.fullname = value.first_name + " " + value.last_name
-        console.log(value)
         value.phone = (value.country_code === '66' ? '0' : value.country_code) + value.phone
       })
       const { result: userResult, success: userSuccess } = await personalData(userRequest)
@@ -394,20 +393,17 @@ export default function MerchantUserView({ }: Props): ReactElement {
             merchant_id: id,
           })
           accountResult?.account_list?.map((value: any, key: number) => {
-            console.log(value)
             if (value.account_name != "" && value.account_number != "") {
               if (value.payment_channel_id == 1) {
                 banks.push(value)
               } else if (value.payment_channel_id == 2) {
                 promptpay.push(value)
-              } else {
-                is_cash = true
               }
             }
+            if (value.payment_channel_id == 3) {
+              is_cash = true
+            }
           })
-
-          console.log("banks", banks)
-          console.log("promptpay", promptpay)
 
           const type: string = is_mass ? 'single' : 'multiple'
           setOutletInitialValues({
@@ -1098,7 +1094,6 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   </Col>
                 </Row>}
               {values.banks.map((value: any, index) => {
-                console.log("value: ", value)
                 return (
                   <>
                     <Row gutter={16}>

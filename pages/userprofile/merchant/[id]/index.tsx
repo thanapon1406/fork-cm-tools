@@ -293,6 +293,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
     outlet_rider: [],
     banks: [],
     promptpays: [],
+    is_cash: false
   })
 
   const Loading = useLoadingContext()
@@ -344,7 +345,6 @@ export default function MerchantUserView({ }: Props): ReactElement {
       const { data: riderData } = riderResult
       riderData?.map((value: any, key: number) => {
         value.fullname = value.first_name + " " + value.last_name
-        console.log(value)
         value.phone = (value.country_code === '66' ? '0' : value.country_code) + value.phone
       })
       const { result: userResult, success: userSuccess } = await personalData(userRequest)
@@ -388,22 +388,22 @@ export default function MerchantUserView({ }: Props): ReactElement {
 
           let banks: any = []
           let promptpay: any = []
+          let is_cash = false
           const { result: accountResult, success: accountSuccess } = await getAccounts({
             merchant_id: id,
           })
           accountResult?.account_list?.map((value: any, key: number) => {
-            console.log(value)
-            if (value.status == "active") {
+            if (value.account_name != "" && value.account_number != "") {
               if (value.payment_channel_id == 1) {
                 banks.push(value)
               } else if (value.payment_channel_id == 2) {
                 promptpay.push(value)
               }
             }
+            if (value.payment_channel_id == 3) {
+              is_cash = true
+            }
           })
-
-          console.log("banks", banks)
-          console.log("promptpay", promptpay)
 
           const type: string = is_mass ? 'single' : 'multiple'
           setOutletInitialValues({
@@ -442,6 +442,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
             outlet_rider: riderData,
             banks: banks,
             promptpays: promptpay,
+            is_cash: is_cash
           })
         }
       }
@@ -1066,12 +1067,25 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   </Row>
                 </> : ''
               }
+              {values.is_cash &&
+                <Row gutter={16}>
+                  <Col className="gutter-row" span={4}>
+                    <Field
+                      label={{ text: "เงินสด" }}
+                      name={`is_cash`}
+                      component={CheckBox}
+                      className="form-control round"
+                      id="is_cash"
+                      disabled={true}
+                    />
+                  </Col>
+                </Row>}
               {values.banks.length > 0 &&
                 <Row gutter={16}>
                   <Col className="gutter-row" span={4}>
                     <Field
                       label={{ text: "บัญชีธนาคาร" }}
-                      name={`outlet_name`}
+                      name={`banks.0.account_name`}
                       component={CheckBox}
                       className="form-control round"
                       id="bank_account"
@@ -1079,13 +1093,14 @@ export default function MerchantUserView({ }: Props): ReactElement {
                     />
                   </Col>
                 </Row>}
-              {values.banks.map((value, index) => {
-                console.log("value: ", value)
+              {values.banks.map((value: any, index) => {
                 return (
                   <>
                     <Row gutter={16}>
-                      <Col className="gutter-row" span={6}>
-                        <Text >บัญชีที่ {index + 1}</Text>
+                      <Col style={{ display: 'flex', alignItems: 'center' }} className="gutter-row" span={6}>
+                        <Text style={{ marginRight: "4%" }}>บัญชีที่ {index + 1}</Text>
+                        {value?.is_main_account == "yes" &&
+                          <Button type="primary" shape="round" >บัญชีหลัก</Button>}
                       </Col>
                       <Col className="gutter-row" span={6}>
                         <Field
@@ -1132,7 +1147,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   <Col className="gutter-row" span={4}>
                     <Field
                       label={{ text: "พร้อมเพย์" }}
-                      name={`outlet_name`}
+                      name={`promptpays.0.account_name`}
                       component={CheckBox}
                       className="form-control round"
                       id="promptpay_account"
@@ -1140,13 +1155,14 @@ export default function MerchantUserView({ }: Props): ReactElement {
                     />
                   </Col>
                 </Row>}
-              {values.promptpays.map((value, index) => {
-                console.log("value: ", value)
+              {values.promptpays.map((value: any, index) => {
                 return (
                   <>
-                    <Row gutter={16}>
-                      <Col className="gutter-row" span={6}>
-                        <Text >บัญชีที่ {index + 1}</Text>
+                    <Row gutter={16} >
+                      <Col style={{ display: 'flex', alignItems: 'center' }} className="gutter-row" span={6}>
+                        <Text style={{ marginRight: "4%" }}>บัญชีที่ {index + 1}</Text>
+                        {value?.is_main_account == "yes" &&
+                          <Button type="primary" shape="round" style={{ cursor: 'auto' }} >บัญชีหลัก</Button>}
                       </Col>
                       <Col className="gutter-row" span={6}>
                         <Field
@@ -1205,7 +1221,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                                 </Col>
                                 <Col className="gutter-row" span={3} >
                                   <Button
-                                    style={{ background: outletInitialValues?.business_times[index]["is_open_24hr"] ? "#28a745" : "", borderColor: "white" }}
+                                    style={{ background: outletInitialValues?.business_times[index]["is_open_24hr"] ? "#28a745" : "", borderColor: "white", cursor: 'auto' }}
                                     disabled={!outletInitialValues?.business_times[index]["is_open_24hr"]}
                                     shape="round"
                                   >
@@ -1214,6 +1230,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                                 </Col>
                                 <Col className="gutter-row" span={8}>
                                   <Field
+                                    style={{}}
                                     label={{ text: 'เวลา' }}
                                     name={`business_times.${index}.opening_time`}
                                     type="text"

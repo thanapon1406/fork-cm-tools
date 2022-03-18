@@ -1103,7 +1103,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   <>
                     <Row gutter={16}>
                       <Col style={{ display: 'flex', alignItems: 'center' }} className="gutter-row" span={6}>
-                        <Text >บัญชีที่ {index + 1}</Text>
+                        <Text style={{ marginRight: "4%" }}>บัญชีที่ {index + 1}</Text>
                         {value?.is_main_account == "yes" &&
                           <Button type="primary" shape="round" >บัญชีหลัก</Button>}
                       </Col>

@@ -1069,7 +1069,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
               }
               {values.is_cash &&
                 <Row gutter={16}>
-                  <Col className="gutter-row" span={4}>
+                  <Col className="gutter-row" style={{ marginTop: '24px' }} span={4}>
                     <Field
                       label={{ text: "เงินสด" }}
                       name={`is_cash`}

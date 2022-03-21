@@ -78,8 +78,8 @@ export const creditStatus: any = {
     status: 'failed',
   },
   uploaded_slip: {
-    name: 'อัพโหลดสลิป',
-    value: 'uploaded_slip',
+    text: 'อัพโหลดสลิป',
+    status: 'uploaded_slip',
   },
 }
 

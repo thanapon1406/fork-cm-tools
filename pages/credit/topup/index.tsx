@@ -191,7 +191,7 @@ export default function MerchantCredit({ }: Props): ReactElement {
       render: (row: string, record: any) => {
         if (row) {
           let raw_status = row
-          if (row == "" && record.is_upload_slip) {
+          if (row == "processing" && record.is_upload_slip) {
             raw_status = "uploaded_slip"
           }
           const status = creditStatus[raw_status]

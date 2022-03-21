@@ -77,6 +77,10 @@ export const creditStatus: any = {
     text: 'ยกเลิก',
     status: 'failed',
   },
+  uploaded_slip: {
+    name: 'อัพโหลดสลิป',
+    value: 'uploaded_slip',
+  },
 }
 
 export const verifyStatusMapping: any = {

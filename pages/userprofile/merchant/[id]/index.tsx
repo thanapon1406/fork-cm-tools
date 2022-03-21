@@ -1228,9 +1228,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
                                     24 ชั่วโมง
                                   </Button>
                                 </Col>
-                                <Col className="gutter-row" span={8}>
+                                <Col className={`gutter-row ${outletInitialValues?.business_times[index]["is_open_24hr"] && 'is_24hr'}`} span={8}>
                                   <Field
-                                    style={{}}
                                     label={{ text: 'เวลา' }}
                                     name={`business_times.${index}.opening_time`}
                                     type="text"
@@ -1241,7 +1240,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                                     disabled={true}
                                   />
                                 </Col>
-                                <Col className="gutter-row" span={8}>
+                                <Col className={`gutter-row ${outletInitialValues?.business_times[index]["is_open_24hr"] && 'is_24hr'}`} span={8}>
                                   <Field
                                     label={{ text: 'เวลา' }}
                                     name={`business_times.${index}.closed_time`}

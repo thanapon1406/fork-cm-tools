@@ -79,7 +79,7 @@ export const creditStatus: any = {
   },
   uploaded_slip: {
     text: 'อัพโหลดสลิป',
-    status: 'uploaded_slip',
+    status: 'waiting',
   },
 }
 

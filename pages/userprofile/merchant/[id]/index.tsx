@@ -292,7 +292,9 @@ export default function MerchantUserView({ }: Props): ReactElement {
     rider_condition: [],
     outlet_rider: [],
     banks: [],
+    is_banks: false,
     promptpays: [],
+    is_promptpays: false,
     is_cash: false
   })
 
@@ -386,9 +388,11 @@ export default function MerchantUserView({ }: Props): ReactElement {
             }
           })
 
-          let banks: any = []
-          let promptpay: any = []
+          let banks: any, promptpay: any = []
+          // let promptpay: any = []
           let is_cash = false
+          let is_banks = false
+          let is_promptpays = false
           const { result: accountResult, success: accountSuccess } = await getAccounts({
             merchant_id: id,
           })
@@ -396,8 +400,14 @@ export default function MerchantUserView({ }: Props): ReactElement {
             if (value.account_name != "" && value.account_number != "") {
               if (value.payment_channel_id == 1) {
                 banks.push(value)
+                if (value.status == "active") {
+                  is_banks = true
+                }
               } else if (value.payment_channel_id == 2) {
                 promptpay.push(value)
+                if (value.status == "active") {
+                  is_promptpays = true
+                }
               }
             }
             if (value.payment_channel_id == 3) {
@@ -442,7 +452,9 @@ export default function MerchantUserView({ }: Props): ReactElement {
             outlet_rider: riderData,
             banks: banks,
             promptpays: promptpay,
-            is_cash: is_cash
+            is_cash: is_cash,
+            is_banks: is_banks,
+            is_promptpays: is_promptpays,
           })
         }
       }
@@ -1057,7 +1069,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                 </Tab.TabPane>
               </Tab>
               <Divider />
-              {values.banks.length > 0 || values.promptpays.length > 0 ?
+              {(values.banks.length > 0 || values.promptpays.length > 0 || values.is_cash) &&
                 <>
                   <Title level={5}>การรับชำระเงิน</Title>
                   <Row gutter={16}>
@@ -1065,7 +1077,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       <Text >ช่องทางการรับชำระเงิน</Text>
                     </Col>
                   </Row>
-                </> : ''
+                </>
               }
               {values.is_cash &&
                 <Row gutter={16}>
@@ -1085,7 +1097,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   <Col className="gutter-row" span={4}>
                     <Field
                       label={{ text: "บัญชีธนาคาร" }}
-                      name={`banks.0.account_name`}
+                      name={`is_banks`}
                       component={CheckBox}
                       className="form-control round"
                       id="bank_account"
@@ -1147,7 +1159,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   <Col className="gutter-row" span={4}>
                     <Field
                       label={{ text: "พร้อมเพย์" }}
-                      name={`promptpays.0.account_name`}
+                      name={`is_promptpays`}
                       component={CheckBox}
                       className="form-control round"
                       id="promptpay_account"

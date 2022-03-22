@@ -295,7 +295,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
     is_banks: false,
     promptpays: [],
     is_promptpays: false,
-    is_cash: false
+    is_cash: false,
+    is_cash_active: false,
   })
 
   const Loading = useLoadingContext()
@@ -388,9 +389,10 @@ export default function MerchantUserView({ }: Props): ReactElement {
             }
           })
 
-          let banks: any, promptpay: any = []
-          // let promptpay: any = []
+          let banks: any = []
+          let promptpay: any = []
           let is_cash = false
+          let is_cash_active = false
           let is_banks = false
           let is_promptpays = false
           const { result: accountResult, success: accountSuccess } = await getAccounts({
@@ -412,6 +414,9 @@ export default function MerchantUserView({ }: Props): ReactElement {
             }
             if (value.payment_channel_id == 3) {
               is_cash = true
+              if (value.status == "active") {
+                is_cash_active = true
+              }
             }
           })
 
@@ -455,6 +460,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
             is_cash: is_cash,
             is_banks: is_banks,
             is_promptpays: is_promptpays,
+            is_cash_active: is_cash_active,
           })
         }
       }
@@ -1069,7 +1075,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                 </Tab.TabPane>
               </Tab>
               <Divider />
-              {(values.banks.length > 0 || values.promptpays.length > 0 || values.is_cash) &&
+              {(values.banks?.length > 0 || values.promptpays?.length > 0 || values.is_cash) &&
                 <>
                   <Title level={5}>การรับชำระเงิน</Title>
                   <Row gutter={16}>
@@ -1084,15 +1090,15 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   <Col className="gutter-row" style={{ marginTop: '24px' }} span={4}>
                     <Field
                       label={{ text: "เงินสด" }}
-                      name={`is_cash`}
+                      name={`is_cash_active`}
                       component={CheckBox}
                       className="form-control round"
-                      id="is_cash"
+                      id="is_cash_active"
                       disabled={true}
                     />
                   </Col>
                 </Row>}
-              {values.banks.length > 0 &&
+              {values.banks?.length > 0 &&
                 <Row gutter={16}>
                   <Col className="gutter-row" span={4}>
                     <Field
@@ -1105,7 +1111,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                     />
                   </Col>
                 </Row>}
-              {values.banks.map((value: any, index) => {
+              {values.banks?.map((value: any, index) => {
                 return (
                   <>
                     <Row gutter={16}>
@@ -1154,7 +1160,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   </>
                 )
               })}
-              {values.promptpays.length > 0 &&
+              {values.promptpays?.length > 0 &&
                 <Row gutter={16}>
                   <Col className="gutter-row" span={4}>
                     <Field
@@ -1167,7 +1173,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                     />
                   </Col>
                 </Row>}
-              {values.promptpays.map((value: any, index) => {
+              {values.promptpays?.map((value: any, index) => {
                 return (
                   <>
                     <Row gutter={16} >
@@ -1218,7 +1224,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       name="business_times"
                       render={(arrayHelpers) => (
                         <div>
-                          {values.business_times.map((day, index) => {
+                          {values.business_times?.map((day, index) => {
                             return (
                               <Row gutter={16} justify="space-around" align="middle" key={index}>
                                 <Col className="gutter-row" span={4}>
@@ -1284,7 +1290,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       name="business_extra_times"
                       render={(arrayHelpers) => (
                         <div>
-                          {values.business_extra_times.map((day, index) => {
+                          {values.business_extra_times?.map((day, index) => {
                             return (
                               <Row gutter={16} justify="space-around" align="middle" key={index}>
                                 <Col className="gutter-row" span={8}>

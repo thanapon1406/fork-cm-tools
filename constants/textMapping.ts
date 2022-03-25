@@ -78,8 +78,8 @@ export const creditStatus: any = {
     status: 'failed',
   },
   uploaded_slip: {
-    text: 'อัพโหลดสลิป',
-    status: 'waiting',
+    name: 'อัพโหลดสลิป',
+    value: 'uploading',
   },
 }
 
@@ -121,7 +121,7 @@ export const outletType: any = {
 
 export const riderType: any = {
   outlet: 'จัดส่งโดยร้านค้า',
-  partner: 'จัดส่งโดยพาร์ทเนอร์'
+  partner: 'จัดส่งโดยพาร์ทเนอร์',
 }
 
 export const isBanText: any = {

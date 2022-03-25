@@ -14,11 +14,11 @@ const Badges = styled(Badge)`
     top: -1px;
     display: inline-block;
     width: ${(props) => {
-    return props.size === 'small' ? '6px' : '12px !important'
-  }};
+      return props.size === 'small' ? '9px' : '12px !important'
+    }};
     height: ${(props) => {
-    return props.size === 'small' ? '6px' : '12px !important'
-  }};
+      return props.size === 'small' ? '9px' : '12px !important'
+    }};
     vertical-align: middle;
     border-radius: 50%;
   }
@@ -45,6 +45,7 @@ const CustomBadge = ({
     failed: 'error',
     error: 'error',
     disable: 'default',
+    uploading: 'cyan',
   }
   const orderStatusMapping: any = {
     waiting: 'ดำเนินการ',

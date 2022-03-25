@@ -79,7 +79,7 @@ export const creditStatus: any = {
   },
   uploaded_slip: {
     name: 'อัพโหลดสลิป',
-    value: 'uploaded_slip',
+    value: 'uploading',
   },
 }
 
@@ -121,7 +121,7 @@ export const outletType: any = {
 
 export const riderType: any = {
   outlet: 'จัดส่งโดยร้านค้า',
-  partner: 'จัดส่งโดยพาร์ทเนอร์'
+  partner: 'จัดส่งโดยพาร์ทเนอร์',
 }
 
 export const isBanText: any = {

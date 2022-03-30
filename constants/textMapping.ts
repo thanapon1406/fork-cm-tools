@@ -70,7 +70,7 @@ export const creditStatus: any = {
     status: 'failed',
   },
   refund: {
-    text: 'Refund',
+    text: 'คืนเงิน',
     status: 'waiting',
   },
   cancel: {

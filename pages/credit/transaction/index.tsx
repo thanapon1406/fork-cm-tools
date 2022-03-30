@@ -341,7 +341,7 @@ export default function CreditTransaction({ }: Props): ReactElement {
                         value: 'processing',
                       },
                       {
-                        name: 'Refund',
+                        name: 'คืนเงิน',
                         value: 'refund',
                       },
                     ]}

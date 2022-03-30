@@ -122,7 +122,11 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return numberFormat(text)
+      if (record.delivery_raw_fee != 0) {
+        return numberFormat(text)
+      } else {
+        return numberFormat(record.delivery_fee)
+      }
     },
   },
   {

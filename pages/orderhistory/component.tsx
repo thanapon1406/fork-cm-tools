@@ -102,6 +102,51 @@ const columns = [
     },
   },
   {
+    title: 'ค่าจัดส่ง',
+    dataIndex: 'delivery_fee',
+    align: 'center',
+    key: 'delivery_fee',
+    width: '100px',
+    wrap: true,
+    center: true,
+    render: (text: any, record: any) => {
+      return numberFormat(text)
+    },
+  },
+  {
+    title: 'ค่าจัดส่งจริง',
+    dataIndex: 'delivery_raw_fee',
+    align: 'center',
+    key: 'delivery_raw_fee',
+    width: '100px',
+    wrap: true,
+    center: true,
+    render: (text: any, record: any) => {
+      if (record.delivery_raw_fee != 0) {
+        return numberFormat(text)
+      } else {
+        return numberFormat(record.delivery_fee)
+      }
+    },
+  },
+  {
+    title: 'ค่าจัดส่งส่วนเกิน',
+    dataIndex: 'difference_delivery_fee',
+    align: 'center',
+    key: 'difference_delivery_fee',
+    width: '100px',
+    wrap: true,
+    center: true,
+    render: (text: any, record: any) => {
+      if (record.delivery_raw_fee != 0) {
+        return numberFormat(record.delivery_raw_fee - record.delivery_fee)
+      } else {
+        return numberFormat(0)
+      }
+
+    },
+  },
+  {
     title: 'เวลา',
     dataIndex: 'client_time',
     align: 'center',

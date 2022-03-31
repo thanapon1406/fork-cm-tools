@@ -14,6 +14,7 @@ interface InputProps extends FormikProps {
     className: string
   }
   disabled?: boolean | false
+  style?: any | undefined
 }
 
 const CustomInput = ({ label, field, ...props }: InputProps) => {
@@ -35,6 +36,7 @@ const CustomInput = ({ label, field, ...props }: InputProps) => {
           onChange={handleChange}
           autoComplete={props.autoComplete}
           disabled={props.disabled}
+          style={props.style}
         />
         <Text type="danger">
           <div>

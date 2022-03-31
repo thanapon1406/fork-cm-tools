@@ -188,9 +188,13 @@ export default function MerchantCredit({ }: Props): ReactElement {
       title: 'สถานะ',
       dataIndex: 'status',
       align: 'center',
-      render: (row: string) => {
+      render: (row: string, record: any) => {
         if (row) {
-          const status = creditStatus[row]
+          let raw_status = row
+          if (row == "processing" && record.is_upload_slip) {
+            raw_status = "uploaded_slip"
+          }
+          const status = creditStatus[raw_status]
           return (
             <CustomBadge
               customMapping={{
@@ -317,6 +321,10 @@ export default function MerchantCredit({ }: Props): ReactElement {
                       {
                         name: 'รอการยืนยัน',
                         value: 'processing',
+                      },
+                      {
+                        name: 'อัพโหลดสลิป',
+                        value: 'uploaded_slip',
                       },
                       {
                         name: 'ยกเลิก',

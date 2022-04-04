@@ -151,6 +151,15 @@ const getAccounts = async (body: any) => {
   }
 }
 
+const exportPaymentAccount = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/merchant/export-payment-account`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 const getStaff = async (body: any) => {
   try {
     const result = await fetch.post(`/api/staff/find-staff`, body)
@@ -185,4 +194,5 @@ export {
   getAccounts,
   getStaff,
   CalculateOutletCredit,
+  exportPaymentAccount,
 }

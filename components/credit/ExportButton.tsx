@@ -1,8 +1,8 @@
 import Button from '@/components/Button'
 import Input from '@/components/Form/Input'
-import { PlusOutlined } from "@ant-design/icons"
-import { Modal, Space, Typography } from 'antd'
-import { Field, Form, Formik } from 'formik'
+import { CloseOutlined, PlusOutlined } from "@ant-design/icons"
+import { Col, Modal, Row, Space, Typography } from 'antd'
+import { Field, FieldArray, Form, Formik } from 'formik'
 import moment from 'moment'
 import React, { ReactElement, useState } from 'react'
 import * as Yup from 'yup'
@@ -37,26 +37,6 @@ export default function ExportButton({ propsSubmit }: Props): ReactElement {
     })
   }
 
-  const generateUI = (items: any[]) => {
-    console.log(items)
-    return items?.map((val: any, index: number) => {
-      <>
-        {console.log(index)}
-        <Field
-          label={{ text: 'อีเมล' }}
-          name={`emails[${index}]`}
-          type="text"
-          component={Input}
-          className="form-control round"
-          id={`emails[${index}]`}
-          placeholder="Please enter email"
-        />
-      </>
-    })
-  }
-
-
-
   const submit = async (values: typeof initialValues) => {
     propsSubmit(values)
   }
@@ -88,57 +68,79 @@ export default function ExportButton({ propsSubmit }: Props): ReactElement {
         >
           {({ values, resetForm }) => (
             <Form>
-              {/* <Field
-                label={{ text: 'อีเมล' }}
+              <FieldArray
                 name="emails"
-                type="text"
-                component={Input}
-                className="form-control round"
-                id="emails"
-                placeholder="Please enter email"
-              /> */}
-              {generateUI(initialValues.emails)}
-              <div style={{ marginBottom: 10 }}>
-                <Button
-                  type="dashed"
-                  onClick={() => {
-                    setInitialValues({
-                      emails: [...initialValues.emails, ""],
-                    })
-                  }}
-                  block
-                  icon={<PlusOutlined />}
-                >
-                  เพิ่มอีเมล
-                </Button>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <Space>
-                  <Button
-                    style={{ width: '120px' }}
-                    type="default"
-                    size="middle"
-                    onClick={hideModal}
-                  >
-                    ยกเลิก
-                  </Button>
-                  <Button
-                    style={{ width: '120px' }}
-                    type="primary"
-                    onClick={() => {
-                      if (values.emails) {
-                        submit(values)
-                        hideModal()
-                        resetForm()
-                      }
-                    }}
-                    size="middle"
-                    htmlType="submit"
-                  >
-                    ส่งข้อมูล
-                  </Button>
-                </Space>
-              </div>
+                render={arrayHelpers => (
+                  <div>
+                    {values.emails && values.emails.length > 0 && (
+                      values.emails.map((email, index) => (
+                        <div key={index}>
+                          <Row gutter={10} >
+                            <Col className="gutter-row" span={values.emails.length !== 1 ? 23 : 24}>
+                              <Field
+                                label={{ text: 'อีเมล' }}
+                                name={`emails.${index}`}
+                                type="text"
+                                component={Input}
+                                className="form-control round"
+                                id={`emails.${index}`}
+                                placeholder="Please enter email"
+                              />
+                            </Col>
+                            {values.emails.length !== 1 &&
+                              <Col className="gutter-row" span={1}>
+                                <CloseOutlined style={{ marginTop: "36px" }} onClick={() => arrayHelpers.remove(index)} />
+                              </Col>
+                            }
+                          </Row>
+                        </div>
+                      ))
+                    )}
+                    <div style={{ marginBottom: "24px" }}>
+                      <Button
+                        type="dashed"
+                        onClick={() => arrayHelpers.push('')}
+                        block
+                        icon={<PlusOutlined />}
+                      >
+                        เพิ่มอีเมล
+                      </Button>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <Space>
+                        <Button
+                          style={{ width: '120px' }}
+                          type="default"
+                          size="middle"
+                          onClick={hideModal}
+                        >
+                          ยกเลิก
+                        </Button>
+                        <Button
+                          style={{ width: '120px' }}
+                          type="primary"
+                          onClick={() => {
+                            if (values.emails) {
+                              submit(values)
+                              hideModal()
+                              resetForm()
+                              setInitialValues({
+                                emails: [""],
+                              })
+                            }
+                          }}
+                          size="middle"
+                          htmlType="submit"
+                        >
+                          ส่งข้อมูล
+                        </Button>
+                      </Space>
+                    </div>
+                  </div>
+                )}
+              />
+
+
             </Form>
           )}
         </Formik>

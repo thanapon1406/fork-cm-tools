@@ -171,6 +171,11 @@ export default function Sidebar({ }: Props): ReactElement {
           link: '/credit/transaction',
           key: '/credit/transaction',
         },
+        {
+          title: 'ข้อมูลบัญชีร้านค้า',
+          link: '/credit/merchant-account',
+          key: '/credit/merchant-account',
+        },
       ],
     },
     {

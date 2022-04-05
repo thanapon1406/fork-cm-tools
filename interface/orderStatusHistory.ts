@@ -35,4 +35,5 @@ interface PersonalInfo {
   phone: string
   photo: string
   assigned_time: Date
+  tracking_link: string
 }

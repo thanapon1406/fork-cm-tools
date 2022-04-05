@@ -91,8 +91,12 @@ export default function MerchantCreditDetail({ }: Props): ReactElement {
     if (success) {
       setIsLoading(false)
       const { data } = result
-      const status = get(data, 'status', '')
+      let status = get(data, 'status', '')
       const verify_status = get(data, 'verify_status', '')
+
+      if (status == "processing" && get(data, 'is_upload_slip')) {
+        status = "uploaded_slip"
+      }
 
       let verifyDetail = []
       if (data.verify_detail) {

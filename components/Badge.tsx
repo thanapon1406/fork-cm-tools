@@ -37,6 +37,7 @@ const CustomBadge = ({
 }: Props): any => {
   const badgeStatusMapping: any = {
     waiting: 'warning',
+    uploaded_slip: 'warning',
     success: 'success',
     cancel: 'error',
     void: 'error',

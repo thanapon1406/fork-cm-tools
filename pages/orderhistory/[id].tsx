@@ -22,10 +22,13 @@ import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from '
 import { Field, Form, Formik } from 'formik'
 import { forEach, get, isEmpty, isUndefined, map, size } from 'lodash'
 import Moment from 'moment'
+import ImageNext from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { determineAppId, numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
+import mapIcon from '../../public/maplocation.png'
 
 const { confirm } = Modal
 const { Title, Text } = Typography
@@ -375,13 +378,25 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             </>
           )
         } else {
+          let dataMap = <div>
+            {data.current_rider_info.first_name + ' '}
+            {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
+          </div>
+          if (data.current_rider_info?.tracking_link != '') {
+            dataMap = <div>
+              <Link href={data.current_rider_info?.tracking_link}>
+                <a target="_blank" style={{ color: "#000000", textDecoration: "underline" }}>
+                  {data.current_rider_info.first_name + ' '}
+                  {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
+                  <ImageNext src={mapIcon} alt="" width={15} height={15} />
+                </a>
+              </Link>
+            </div>
+          }
           return (
             <>
               <div>
-                <div>
-                  {data.current_rider_info.first_name + ' '}
-                  {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
-                </div>
+                {dataMap}
                 <div>
                   {Moment(data.current_rider_info?.assigned_time).format(Constant.DATE_FORMAT)}
                 </div>
@@ -458,6 +473,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             Constant.LALAMOVE.toLowerCase()
           ) {
             partnerName = ' (LLM)'
+          } else if (
+            orderHistoryData?.current_rider_info?.partner_name &&
+            orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
+            Constant.PANDAGO.toLowerCase()
+          ) {
+            partnerName = ' (PANDAGO)'
           }
         }
 

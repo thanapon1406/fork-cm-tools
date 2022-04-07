@@ -382,9 +382,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             {data.current_rider_info.first_name + ' '}
             {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
           </div>
-          if (data.current_rider_info?.tracking_link != '') {
+
+          if (data.current_rider_info && (data.current_rider_info.tracking_link != '' && data.current_rider_info.tracking_link != undefined)) {
             dataMap = <div>
-              <Link href={data.current_rider_info?.tracking_link}>
+              <Link href={data.current_rider_info?.tracking_link ? data.current_rider_info?.tracking_link : ''}>
                 <a target="_blank" style={{ color: "#000000", textDecoration: "underline" }}>
                   {data.current_rider_info.first_name + ' '}
                   {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}

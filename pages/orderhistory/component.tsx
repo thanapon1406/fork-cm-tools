@@ -1,5 +1,6 @@
 import CustomBadge from '@/components/Badge'
 import Table from '@/components/Table'
+import { paymentChannel } from '@/constants/textMapping'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
 import { metaReportPagination } from '@/interface/pagination'
@@ -112,6 +113,18 @@ const columns = [
     center: true,
     render: (text: any, record: any) => {
       return numberFormat(text)
+    },
+  },
+  {
+    title: 'ช่องทางชำระเงิน',
+    dataIndex: 'payment_channel',
+    align: 'center',
+    key: 'payment_channel',
+    width: '100px',
+    wrap: true,
+    center: true,
+    render: (text: string) => {
+      return paymentChannel[text]
     },
   },
   {

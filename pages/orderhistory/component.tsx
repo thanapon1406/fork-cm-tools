@@ -90,6 +90,19 @@ const columns = [
     },
   },
   {
+    title: 'ประเภทไรเดอร์',
+    dataIndex: 'rider_type',
+    align: 'center',
+    key: 'rider_type',
+    width: '150px',
+    render: (data: string) => {
+      if (data === 'outlet') {
+        return 'Default Rider'
+      }
+      return 'Lalamove'
+    },
+  },
+  {
     title: 'ราคา',
     dataIndex: 'total',
     align: 'center',
@@ -143,7 +156,6 @@ const columns = [
       } else {
         return numberFormat(0)
       }
-
     },
   },
   {

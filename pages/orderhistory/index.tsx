@@ -87,6 +87,21 @@ const OrderHistory = (): ReactElement => {
       value: 'cancel',
     },
   ]
+
+  const riderTypeOption = [
+    {
+      name: 'ทุกประเภท',
+      value: '',
+    },
+    {
+      name: 'Default Rider',
+      value: 'outlet',
+    },
+    {
+      name: 'Lalamove',
+      value: 'partner',
+    },
+  ]
   const onSearchCustomerDebounce = debounce(async (message) => await fetchCustomer(message), 800)
   const onSearchMerchantDebounce = debounce(async (message) => await fetchMerchant(message), 800)
   const onSearchRiderDebounce = debounce(async (message) => await fetchRider(message), 800)
@@ -194,6 +209,7 @@ const OrderHistory = (): ReactElement => {
       status: values.status || '',
       order_overall_status: values.order_overall_status || '',
       rider_id: values.rider_id || '',
+      rider_type: values.rider_type || '',
       branch_id: values.branch_id || '',
       merchant_overall_status: values.merchant_overall_status || '',
       rider_status: values.rider_status || '',
@@ -317,7 +333,6 @@ const OrderHistory = (): ReactElement => {
                     allowClear={true}
                     onClear={onClearRider}
                   />
-
                   <Field
                     label={{ text: 'สถานะไรเดอร์' }}
                     name="rider_overall_status"
@@ -352,25 +367,37 @@ const OrderHistory = (): ReactElement => {
                     placeholder="วันเวลาที่ทำรายการ"
                   />
                 </Col>
-
+                <Col span={6}>
+                  <Field
+                    label={{ text: 'ประเภทไรเดอร์' }}
+                    name="rider_type"
+                    component={Select}
+                    id="rider_type"
+                    placeholder="ประเภทไรเดอร์"
+                    selectOption={riderTypeOption}
+                  />
+                </Col>
+              </Row>
+              <Row>
                 <Col className="gutter-row" span={6}>
                   <div className="ant-form ant-form-vertical">
                     <Button
                       style={{ width: '120px', marginTop: '27px' }}
+                      type="primary"
+                      size="middle"
+                      htmlType="submit"
+                    >
+                      ค้นหา
+                    </Button>
+
+                    <Button
+                      style={{ width: '120px', marginTop: '27px', marginLeft: '10px' }}
                       type="default"
                       size="middle"
                       htmlType="reset"
                       onClick={() => resetForm()}
                     >
                       เคลียร์
-                    </Button>
-                    <Button
-                      style={{ width: '120px', marginTop: '27px', marginLeft: '10px' }}
-                      type="primary"
-                      size="middle"
-                      htmlType="submit"
-                    >
-                      ค้นหา
                     </Button>
                   </div>
                 </Col>

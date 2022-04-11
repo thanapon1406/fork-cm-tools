@@ -102,6 +102,26 @@ const OrderHistory = (): ReactElement => {
       value: 'partner',
     },
   ]
+
+  const paymentChannelOption = [
+    {
+      name: 'เงินสด',
+      value: 'PAYMENT_CASH',
+    },
+    {
+      name: 'พร้อมเพย์',
+      value: 'PAYMENT_PROMTPAY',
+    },
+    {
+      name: 'บัตรเครดิต',
+      value: 'PAYMENT_CREDIT',
+    },
+    {
+      name: 'ชำระผ่านบัญชีธนาคาร',
+      value: 'PAYMENT_BANK_TRANSFER',
+    },
+  ]
+
   const onSearchCustomerDebounce = debounce(async (message) => await fetchCustomer(message), 800)
   const onSearchMerchantDebounce = debounce(async (message) => await fetchMerchant(message), 800)
   const onSearchRiderDebounce = debounce(async (message) => await fetchRider(message), 800)
@@ -209,6 +229,7 @@ const OrderHistory = (): ReactElement => {
       status: values.status || '',
       order_overall_status: values.order_overall_status || '',
       rider_id: values.rider_id || '',
+      payment_channel: values.payment_channel || '',
       rider_type: values.rider_type || '',
       branch_id: values.branch_id || '',
       merchant_overall_status: values.merchant_overall_status || '',
@@ -235,6 +256,8 @@ const OrderHistory = (): ReactElement => {
       order_overall_status: values.order_overall_status || '',
       rider_id: values.rider_id || '',
       branch_id: values.branch_id || '',
+      payment_channel: values.payment_channel || '',
+      rider_type: values.rider_type || '',
       merchant_overall_status: values.merchant_overall_status || '',
       rider_status: values.rider_status || '',
       rider_overall_status: values.rider_overall_status || '',
@@ -375,6 +398,16 @@ const OrderHistory = (): ReactElement => {
                     id="rider_type"
                     placeholder="ประเภทไรเดอร์"
                     selectOption={riderTypeOption}
+                  />
+                </Col>
+                <Col span={6}>
+                  <Field
+                    label={{ text: 'ช่องทางชำระเงิน' }}
+                    name="payment_channel"
+                    component={Select}
+                    id="payment_channel"
+                    placeholder="ช่องทางชำระเงิน"
+                    selectOption={paymentChannelOption}
                   />
                 </Col>
               </Row>

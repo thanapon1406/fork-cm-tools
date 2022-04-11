@@ -71,6 +71,15 @@ export const getFileDetail = async (req: any) => {
   }
 }
 
+export const exportOrderByEmail = async (req: any) => {
+  try {
+    const result = await fetch.post(`/api/report/export-order-by-email/`, req)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 export const downloadFile = async (req: any) => {
   try {
     let filename = ''

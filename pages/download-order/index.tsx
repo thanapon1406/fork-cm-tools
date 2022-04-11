@@ -9,11 +9,11 @@ import { OutletDetail } from '@/interface/outlet'
 import { RiderDetail } from '@/interface/rider'
 import MainLayout from '@/layout/MainLayout'
 import { outletListById } from '@/services/merchant'
-import { requestReportInterface } from '@/services/report'
+import { exportOrderByEmail, requestReportInterface } from '@/services/report'
 import { getRider } from '@/services/rider'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
+import _, { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
 import React, { ReactElement, useState } from 'react'
 import * as Yup from 'yup'
@@ -278,27 +278,24 @@ export default function MerchantAccount({ }: Props): ReactElement {
                 <Col className="gutter-row" span={4} >
                   <div className="ant-form ant-form-vertical" style={{ display: "flex", justifyContent: "start" }}>
                     <ExportButton title='ส่งข้อมูลรายการออเดอร์ไปยังอีเมล' subtitle={`ข้อมูลออเดอร์วันที่ ` + moment().format("YYYY-MM-DD")} propsSubmit={async (value: any) => {
-                      // console.log(value.emails)
-                      // _.pull(value.emails, "")
-                      // const { result, success } = await exportPaymentAccount({ email: value.emails })
-                      // if (success) {
-                      //   notification.success({
-                      //     message: `ดาวน์โหลดไฟล์รายละเอียดช่องทางการชำระเงินของร้านค้าเรียบร้อยแล้ว`,
-                      //     description: '',
-                      //   })
-                      // }
+                      _.pull(value.emails, "")
+                      console.log("params.branch_id: ", params.branch_id)
 
-                      var test = {
+                      const { result, success } = await exportOrderByEmail({
                         email: value.emails,
-                        outlet_id: params.branch_id,
-                        rider_id: params.rider_id,
+                        outlet_id: (params.branch_id !== undefined) && +params.branch_id,
+                        rider_id: (params.rider_id !== undefined) && +params.rider_id,
                         start_date: params.startdate,
                         end_date: params.enddate,
-                        sso_id: params.sso_id
+                        consumer_id: params.sso_id
                       }
-
-                      console.log("emails: ", value.emails)
-                      console.log("params: ", params)
+                      )
+                      if (success) {
+                        notification.success({
+                          message: `ดาวน์โหลดไฟล์รายการออเดอร์ เรียบร้อยแล้ว`,
+                          description: '',
+                        })
+                      }
                     }} />
                   </div>
                 </Col>

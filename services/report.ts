@@ -32,6 +32,7 @@ export interface requestReportInterface {
   rider_overall_status?: string
   merchant_overall_status?: string
   branch_id?: number
+  payment_channel?: string
 }
 
 export const getOrderTransaction = async (params: requestReportInterface) => {

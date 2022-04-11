@@ -13,12 +13,12 @@ import {
   cancelOrder,
   cancelOrderInterface,
   findOrdersStatusHistory,
-  orderStatusInterface
+  orderStatusInterface,
 } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
 import { cancelRider, getRiderDetail } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
-import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
+import { Breadcrumb, Col, Divider, Image, message, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { forEach, get, isEmpty, isUndefined, map, size } from 'lodash'
 import Moment from 'moment'
@@ -378,21 +378,35 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             </>
           )
         } else {
-          let dataMap = <div>
-            {data.current_rider_info.first_name + ' '}
-            {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
-          </div>
-
-          if (data.current_rider_info && (data.current_rider_info.tracking_link != '' && data.current_rider_info.tracking_link != undefined)) {
-            dataMap = <div>
-              <Link href={data.current_rider_info?.tracking_link ? data.current_rider_info?.tracking_link : ''}>
-                <a target="_blank" style={{ color: "#000000", textDecoration: "underline" }}>
-                  {data.current_rider_info.first_name + ' '}
-                  {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
-                  <ImageNext src={mapIcon} alt="" width={15} height={15} />
-                </a>
-              </Link>
+          let dataMap = (
+            <div>
+              {data.current_rider_info.first_name + ' '}
+              {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
             </div>
+          )
+
+          if (
+            data.current_rider_info &&
+            data.current_rider_info.tracking_link != '' &&
+            data.current_rider_info.tracking_link != undefined
+          ) {
+            dataMap = (
+              <div>
+                <Link
+                  href={
+                    data.current_rider_info?.tracking_link
+                      ? data.current_rider_info?.tracking_link
+                      : ''
+                  }
+                >
+                  <a target="_blank" style={{ color: '#000000', textDecoration: 'underline' }}>
+                    {data.current_rider_info.first_name + ' '}
+                    {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
+                    <ImageNext src={mapIcon} alt="" width={15} height={15} />
+                  </a>
+                </Link>
+              </div>
+            )
           }
           return (
             <>
@@ -471,13 +485,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-            Constant.LALAMOVE.toLowerCase()
+              Constant.LALAMOVE.toLowerCase()
           ) {
             partnerName = ' (LLM)'
           } else if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-            Constant.PANDAGO.toLowerCase()
+              Constant.PANDAGO.toLowerCase()
           ) {
             partnerName = ' (PANDAGO)'
           }
@@ -509,14 +523,19 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       } else if (rider_status === Constant.ARRIVED) {
         respObj.status = 'ไรเดอร์ถึงจุดหมาย'
         respObj.imagePath = '/asset/images/placeholder.png'
-      } else if (merchant_status === Constant.ACCEPT_ORDER && order_status === Constant.WAITING_PAYMENT) {
+      } else if (
+        merchant_status === Constant.ACCEPT_ORDER &&
+        order_status === Constant.WAITING_PAYMENT
+      ) {
         respObj.status = 'ร้านรับออเดอร์'
         respObj.imagePath = '/asset/images/receive-order-icon.png'
-      } else if (merchant_status === Constant.ACCEPT_ORDER && order_status === Constant.CONFIRM_PAYMENT) {
+      } else if (
+        merchant_status === Constant.ACCEPT_ORDER &&
+        order_status === Constant.CONFIRM_PAYMENT
+      ) {
         respObj.status = 'ลูกค้าแจ้งชำระเงิน'
         respObj.imagePath = '/asset/images/cash.png'
-      }
-      else if (merchant_status === Constant.ACCEPT_ORDER) {
+      } else if (merchant_status === Constant.ACCEPT_ORDER) {
         respObj.status = 'ร้านรับออเดอร์'
         respObj.imagePath = '/asset/images/receive-order-icon.png'
       }
@@ -556,6 +575,24 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           cancellation_id: String(0),
           cancellation_reason: 'ยกเลิกโดยผู้ดูเเลระบบ',
         }
+        const request: requestReportInterface = {
+          order_number: String(id),
+          brand_id: String(brand_id),
+          branch_id: Number(outlet_id),
+        }
+
+        const { result: orderDetail } = await findOrder(request)
+        console.log(orderDetail)
+        const { data } = orderDetail
+        const { status } = data
+        console.log(status)
+        if (status === 'success') {
+          message.error({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์สำเร็จแล้ว',
+          })
+          return
+        }
+
         const { result, success } = await cancelOrder(body)
         if (success) {
           setIsOrderStatus(true)
@@ -629,7 +666,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -917,6 +954,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             description={determineDescription(val)}
                             icon={
                               <Image
+                                alt="order-tracking-icon"
                                 className="order-tracking-icon"
                                 width={24}
                                 height={24}
@@ -942,6 +980,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
                         icon={
                           <Image
+                            alt="order-tracking-icon"
                             className="order-tracking-icon"
                             width={24}
                             height={24}
@@ -1090,7 +1129,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1173,7 +1212,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1310,7 +1349,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (

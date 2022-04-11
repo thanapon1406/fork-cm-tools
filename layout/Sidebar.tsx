@@ -152,6 +152,11 @@ export default function Sidebar({ }: Props): ReactElement {
           link: '/orderhistory',
           key: '/orderhistory',
         },
+        {
+          title: 'ดาวน์โหลดไฟล์รายการออเดอร์',
+          link: '/download-order',
+          key: '/download-order',
+        },
       ],
     },
     {

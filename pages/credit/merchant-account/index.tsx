@@ -5,7 +5,7 @@ import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { calculateTopup, creditTransaction } from '@/services/credit'
 import { exportPaymentAccount } from '@/services/merchant'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _, { get } from 'lodash'
 import moment from 'moment'
@@ -128,10 +128,16 @@ export default function MerchantAccount({ }: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={4} offset={14}>
                   <div className="ant-form ant-form-vertical" style={{ display: "flex", justifyContent: "end" }}>
-                    <ExportButton propsSubmit={(value: any) => {
+                    <ExportButton title='ส่งข้อมูลบัญชีร้านค้าไปยังอีเมล' subtitle={`ข้อมูลบัญชีร้านค้าวันที่ ` + moment().format("YYYY-MM-DD")} propsSubmit={async (value: any) => {
                       console.log(value.emails)
                       _.pull(value.emails, "")
-                      exportPaymentAccount({ email: value.emails })
+                      const { result, success } = await exportPaymentAccount({ email: value.emails })
+                      if (success) {
+                        notification.success({
+                          message: `ดาวน์โหลดไฟล์รายละเอียดช่องทางการชำระเงินของร้านค้าเรียบร้อยแล้ว`,
+                          description: '',
+                        })
+                      }
                     }} />
                   </div>
                 </Col>

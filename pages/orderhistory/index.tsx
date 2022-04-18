@@ -34,7 +34,7 @@ const OrderHistory = (): ReactElement => {
     brand_id: 'all',
     page: 1,
     per_page: 10,
-    status: '',
+    status: null,
     startdate: '',
     enddate: '',
     starttime: '',
@@ -51,6 +51,7 @@ const OrderHistory = (): ReactElement => {
     rider_overall_status: null,
     branch_id: null,
     merchant_overall_status: null,
+    merchant_status: null,
   }
 
   let [pagination, setPagination] = useState<Pagination>({
@@ -77,6 +78,90 @@ const OrderHistory = (): ReactElement => {
     {
       name: 'ดำเนินการ',
       value: 'waiting',
+    },
+    {
+      name: 'สำเร็จ',
+      value: 'success',
+    },
+    {
+      name: 'ยกเลิก',
+      value: 'cancel',
+    },
+  ]
+  const orderStatus = [
+    {
+      name: 'ทุกสถานะ',
+      value: '',
+    },
+    {
+      name: 'รอรับออเดอร์',
+      value: 'waiting',
+    },
+    {
+      name: 'รอการจ่ายเงิน',
+      value: 'waiting_payment',
+    },
+    {
+      name: 'ยืนยันการจ่ายเงิน',
+      value: 'confirm_payment',
+    },
+    {
+      name: 'สำเร็จ',
+      value: 'success',
+    },
+    {
+      name: 'ยกเลิก',
+      value: 'cancel',
+    },
+  ]
+
+  const merchantStatus = [
+    {
+      name: 'ทุกสถานะ',
+      value: '',
+    },
+    {
+      name: 'รอรับออเดอร์',
+      value: 'waiting',
+    },
+    {
+      name: 'รับออเดอร์',
+      value: 'accept_order',
+    },
+    {
+      name: 'กำลังปรุง',
+      value: 'cooking',
+    },
+    {
+      name: 'สำเร็จ',
+      value: 'success',
+    },
+    {
+      name: 'ยกเลิก',
+      value: 'cancel',
+    },
+  ]
+
+  const riderStatus = [
+    {
+      name: 'ทุกสถานะ',
+      value: '',
+    },
+    {
+      name: 'รอเรียกไรเดอร์',
+      value: 'waiting',
+    },
+    {
+      name: 'กำลังเรียกไรเดอร์',
+      value: 'assigning',
+    },
+    {
+      name: 'ไรเดอร์รับงาน',
+      value: 'assigned',
+    },
+    {
+      name: 'กำลังจัดส่ง',
+      value: 'picking_up',
     },
     {
       name: 'สำเร็จ',
@@ -233,6 +318,7 @@ const OrderHistory = (): ReactElement => {
       rider_type: values.rider_type || '',
       branch_id: values.branch_id || '',
       merchant_overall_status: values.merchant_overall_status || '',
+      merchant_status: values.merchant_status || '',
       rider_status: values.rider_status || '',
       rider_overall_status: values.rider_overall_status || '',
       order_number: values.order_number || '',
@@ -259,6 +345,7 @@ const OrderHistory = (): ReactElement => {
       payment_channel: values.payment_channel || '',
       rider_type: values.rider_type || '',
       merchant_overall_status: values.merchant_overall_status || '',
+      merchant_status: values.merchant_status || '',
       rider_status: values.rider_status || '',
       rider_overall_status: values.rider_overall_status || '',
       order_number: values.order_number || '',
@@ -307,11 +394,11 @@ const OrderHistory = (): ReactElement => {
 
                   <Field
                     label={{ text: 'สถานะออเดอร์' }}
-                    name="order_overall_status"
+                    name="status"
                     component={Select}
-                    id="order_overall_status"
+                    id="status"
                     placeholder="สถานะออเดอร์"
-                    selectOption={overAllOption}
+                    selectOption={orderStatus}
                   />
                 </Col>
 
@@ -333,11 +420,11 @@ const OrderHistory = (): ReactElement => {
 
                   <Field
                     label={{ text: 'สถานะร้านค้า' }}
-                    name="merchant_overall_status"
+                    name="merchant_status"
                     component={Select}
-                    id="merchant_overall_status"
+                    id="merchant_status"
                     placeholder="สถานะร้านค้า"
-                    selectOption={overAllOption}
+                    selectOption={merchantStatus}
                   />
                 </Col>
 
@@ -358,11 +445,11 @@ const OrderHistory = (): ReactElement => {
                   />
                   <Field
                     label={{ text: 'สถานะไรเดอร์' }}
-                    name="rider_overall_status"
+                    name="rider_status"
                     component={Select}
-                    id="rider_overall_status"
+                    id="rider_status"
                     placeholder="สถานะไรเดอร์"
-                    selectOption={overAllOption}
+                    selectOption={riderStatus}
                   />
                 </Col>
 

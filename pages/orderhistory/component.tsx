@@ -100,8 +100,15 @@ const columns = [
       if (data === 'outlet') {
         return 'Default Rider'
       }
-      return 'Lalamove'
+      return 'Partner'
     },
+  },
+  {
+    title: 'ประเภทพาทเนอร์',
+    dataIndex: ['rider_info', 'partner_name'],
+    align: 'center',
+    key: 'partner_name',
+    width: '150px',
   },
   {
     title: 'ราคา',

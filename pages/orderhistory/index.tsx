@@ -47,6 +47,7 @@ const OrderHistory = (): ReactElement => {
     sso_id: null,
     order_overall_status: null,
     rider_id: null,
+    rider_partner_type: null,
     rider_status: null,
     rider_overall_status: null,
     branch_id: null,
@@ -173,6 +174,21 @@ const OrderHistory = (): ReactElement => {
     },
   ]
 
+  const riderPartnerTypeOption = [
+    {
+      name: 'ทุกประเภท',
+      value: '',
+    },
+    {
+      name: 'Lalamove',
+      value: 'LALAMOVE',
+    },
+    {
+      name: 'PandaGo',
+      value: 'PANDAGO',
+    },
+  ]
+
   const riderTypeOption = [
     {
       name: 'ทุกประเภท',
@@ -183,7 +199,7 @@ const OrderHistory = (): ReactElement => {
       value: 'outlet',
     },
     {
-      name: 'Lalamove',
+      name: 'Partner',
       value: 'partner',
     },
   ]
@@ -315,6 +331,7 @@ const OrderHistory = (): ReactElement => {
       order_overall_status: values.order_overall_status || '',
       rider_id: values.rider_id || '',
       payment_channel: values.payment_channel || '',
+      rider_partner_type: values.rider_partner_type || '',
       rider_type: values.rider_type || '',
       branch_id: values.branch_id || '',
       merchant_overall_status: values.merchant_overall_status || '',
@@ -343,6 +360,7 @@ const OrderHistory = (): ReactElement => {
       rider_id: values.rider_id || '',
       branch_id: values.branch_id || '',
       payment_channel: values.payment_channel || '',
+      rider_partner_type: values.rider_partner_type || '',
       rider_type: values.rider_type || '',
       merchant_overall_status: values.merchant_overall_status || '',
       merchant_status: values.merchant_status || '',
@@ -485,6 +503,16 @@ const OrderHistory = (): ReactElement => {
                     id="rider_type"
                     placeholder="ประเภทไรเดอร์"
                     selectOption={riderTypeOption}
+                  />
+                </Col>
+                <Col span={6}>
+                  <Field
+                    label={{ text: 'ประเภทไรเดอร์พาทเนอร์' }}
+                    name="rider_partner_type"
+                    component={Select}
+                    id="rider_partner_type"
+                    placeholder="ประเภทไรเดอร์พาทเนอร์"
+                    selectOption={riderPartnerTypeOption}
                   />
                 </Col>
                 <Col span={6}>

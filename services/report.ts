@@ -25,6 +25,7 @@ export interface requestReportInterface {
   sort_type?: string
   rider_id?: string
   rider_type?: string
+  rider_partner_type?: string
   rider_status?: string
   delivery_type?: string
   merchant_status?: string

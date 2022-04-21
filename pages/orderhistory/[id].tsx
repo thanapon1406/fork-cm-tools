@@ -573,8 +573,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             content: 'ไม่สามารถยกเลิกได้เนื่องจากไรเดอร์ถูกยกเลิกไปแล้ว',
             okText: 'ตกลง',
             cancelText: 'ปิด',
+            onOk: () => {
+              router.reload()
+            },
+            onCancel: () => {
+              router.reload()
+            },
           })
-          router.reload()
+
           return
         }
 
@@ -583,8 +589,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์สำเร็จแล้ว',
             okText: 'ตกลง',
             cancelText: 'ปิด',
+            onOk: () => {
+              router.reload()
+            },
+            onCancel: () => {
+              router.reload()
+            },
           })
-          router.reload()
           return
         }
 
@@ -624,6 +635,28 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์สำเร็จแล้ว',
             okText: 'ตกลง',
             cancelText: 'ปิด',
+            onOk: () => {
+              router.reload()
+            },
+            onCancel: () => {
+              router.reload()
+            },
+          })
+
+          return
+        }
+
+        if (status === 'cancel') {
+          Modal.confirm({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์ถูกยกเลิกไปแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
+            onOk: () => {
+              router.reload()
+            },
+            onCancel: () => {
+              router.reload()
+            },
           })
           router.reload()
           return

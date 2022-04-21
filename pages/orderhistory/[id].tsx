@@ -18,7 +18,7 @@ import {
 import { findOrder, requestReportInterface } from '@/services/report'
 import { cancelRider, getRiderDetail } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
-import { Breadcrumb, Col, Divider, Image, message, Modal, Row, Steps, Typography } from 'antd'
+import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { forEach, get, isEmpty, isUndefined, map, size } from 'lodash'
 import Moment from 'moment'
@@ -278,6 +278,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           ) {
             setIsCancelRider(false)
           }
+        }
+
+        if (data.rider_type == 'partner') {
+          setIsCancelRider(true)
         }
 
         if (!isUndefined(status)) {
@@ -553,6 +557,37 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         const body = {
           order_no: String(order_no),
         }
+
+        const request: requestReportInterface = {
+          order_number: String(id),
+          brand_id: String(brand_id),
+          branch_id: Number(outlet_id),
+        }
+        const { result: orderDetail } = await findOrder(request)
+
+        const { data } = orderDetail
+        const { status, rider_status } = data
+
+        if (rider_status === 'waiting') {
+          Modal.confirm({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากไรเดอร์ถูกยกเลิกไปแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
+          })
+          router.reload()
+          return
+        }
+
+        if (status === 'success') {
+          Modal.confirm({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์สำเร็จแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
+          })
+          router.reload()
+          return
+        }
+
         const { result, success } = await cancelRider(body)
         if (success) {
           setIsCancelRider(true)
@@ -582,14 +617,25 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         }
 
         const { result: orderDetail } = await findOrder(request)
-        console.log(orderDetail)
         const { data } = orderDetail
         const { status } = data
-        console.log(status)
         if (status === 'success') {
-          message.error({
+          Modal.confirm({
             content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์สำเร็จแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
           })
+          router.reload()
+          return
+        }
+
+        if (status === 'cancel') {
+          Modal.confirm({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์ถูกยกเลิกไปแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
+          })
+          router.reload()
           return
         }
 

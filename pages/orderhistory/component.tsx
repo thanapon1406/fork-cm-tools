@@ -1,11 +1,15 @@
-import CustomBadge from '@/components/Badge'
 import Table from '@/components/Table'
-import { paymentChannel } from '@/constants/textMapping'
+import {
+  merchantStatusMapping,
+  orderStatusMapping,
+  paymentChannel,
+  riderStatusMapping,
+} from '@/constants/textMapping'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
 import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
-import { Card, TablePaginationConfig } from 'antd'
+import { Badge, Card, TablePaginationConfig } from 'antd'
 import { isEmpty, isNull, isUndefined } from 'lodash'
 import Moment from 'moment'
 import { useRouter } from 'next/router'
@@ -15,6 +19,17 @@ interface Props {
   payload: requestReportInterface
   tableHeader?: ReactElement
   isPagination?: Pagination | false
+}
+
+const bageStatusMapping = (text: string) => {
+  const status =
+    text !== 'success' && text !== 'cancel'
+      ? 'processing'
+      : text === 'success'
+      ? 'success'
+      : 'error'
+
+  return status
 }
 
 const columns = [
@@ -199,7 +214,13 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return <CustomBadge badgeStatus={text} badgeText={text}></CustomBadge>
+      return (
+        <Badge
+          text={orderStatusMapping[text] || 'กำลังดำเนินการ'}
+          status={bageStatusMapping(text)}
+          size="default"
+        />
+      )
     },
   },
   {
@@ -211,7 +232,13 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return <CustomBadge badgeStatus={text} badgeText={text}></CustomBadge>
+      return (
+        <Badge
+          text={merchantStatusMapping[text] || 'กำลังดำเนินการ'}
+          status={bageStatusMapping(text)}
+          size="default"
+        />
+      )
     },
   },
   {
@@ -223,7 +250,13 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return <CustomBadge badgeStatus={text} badgeText={text}></CustomBadge>
+      return (
+        <Badge
+          text={riderStatusMapping[text] || 'กำลังดำเนินการ'}
+          status={bageStatusMapping(text)}
+          size="default"
+        />
+      )
     },
   },
 ]

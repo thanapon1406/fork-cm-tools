@@ -157,3 +157,28 @@ export const paymentChannel: any = {
   PAYMENT_CREDIT: 'บัตรเครดิต',
   PAYMENT_BANK_TRANSFER: 'ชำระผ่านบัญชีธนาคาร',
 }
+
+export const orderStatusMapping: any = {
+  waiting: 'รอรับออเดอร์',
+  waiting_payment: 'รอการจ่ายเงิน',
+  confirm_payment: 'ยืนยันการจ่ายเงิน',
+  success: 'สำเร็จ',
+  cancel: 'ยกเลิก',
+}
+
+export const merchantStatusMapping: any = {
+  waiting: 'รอรับออเดอร์',
+  accept_order: 'รับออเดอร์',
+  cooking: 'กำลังปรุง',
+  success: 'สำเร็จ',
+  cancel: 'ยกเลิก',
+}
+
+export const riderStatusMapping: any = {
+  waiting: 'รอเรียกไรเดอร์',
+  assigning: 'กำลังเรียกไรเดอร์',
+  assigned: 'ไรเดอร์รับงาน',
+  picking_up: 'กำลังจัดส่ง',
+  success: 'สำเร็จ',
+  cancel: 'ยกเลิก',
+}

@@ -164,6 +164,8 @@ export const orderStatusMapping: any = {
   confirm_payment: 'ยืนยันการจ่ายเงิน',
   cooking: 'กำลังปรุง',
   cooked: 'ปรุงสำเร็จ',
+  picked_up: 'กำลังจัดส่ง',
+  arrived: 'จัดส่งแล้ว',
   success: 'สำเร็จ',
   cancel: 'ยกเลิก',
 }
@@ -181,7 +183,10 @@ export const riderStatusMapping: any = {
   waiting: 'รอเรียกไรเดอร์',
   assigning: 'กำลังเรียกไรเดอร์',
   assigned: 'ไรเดอร์รับงาน',
-  picking_up: 'กำลังจัดส่ง',
+  going_merchant: 'กำลังไปที่ร้านอาหาร',
+  picking_up: 'รับอาหารแล้ว',
+  picked_up: 'กำลังจัดส่ง',
+  arrived: 'จัดส่งแล้ว',
   success: 'สำเร็จ',
   cancel: 'ยกเลิก',
 }

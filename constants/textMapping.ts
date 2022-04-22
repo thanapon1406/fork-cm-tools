@@ -184,7 +184,7 @@ export const riderStatusMapping: any = {
   assigning: 'กำลังเรียกไรเดอร์',
   assigned: 'ไรเดอร์รับงาน',
   going_merchant: 'กำลังไปที่ร้านอาหาร',
-  picking_up: 'รับอาหารแล้ว',
+  picking_up: 'รอรับอาหาร',
   picked_up: 'กำลังจัดส่ง',
   arrived: 'จัดส่งแล้ว',
   success: 'สำเร็จ',

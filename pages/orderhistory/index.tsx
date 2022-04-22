@@ -107,6 +107,14 @@ const OrderHistory = (): ReactElement => {
       value: 'confirm_payment',
     },
     {
+      name: 'กำลังปรุง',
+      value: 'cooking',
+    },
+    {
+      name: 'ปรุงสำเร็จ',
+      value: 'cooked',
+    },
+    {
       name: 'สำเร็จ',
       value: 'success',
     },
@@ -132,6 +140,10 @@ const OrderHistory = (): ReactElement => {
     {
       name: 'กำลังปรุง',
       value: 'cooking',
+    },
+    {
+      name: 'ปรุงสำเร็จ',
+      value: 'cooked',
     },
     {
       name: 'สำเร็จ',

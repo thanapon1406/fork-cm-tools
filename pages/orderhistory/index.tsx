@@ -115,6 +115,14 @@ const OrderHistory = (): ReactElement => {
       value: 'cooked',
     },
     {
+      name: 'กำลังจัดส่ง',
+      value: 'picked_up',
+    },
+    {
+      name: 'จัดส่งแล้ว',
+      value: 'arrived',
+    },
+    {
       name: 'สำเร็จ',
       value: 'success',
     },
@@ -173,8 +181,20 @@ const OrderHistory = (): ReactElement => {
       value: 'assigned',
     },
     {
-      name: 'กำลังจัดส่ง',
+      name: 'กำลังไปที่ร้านอาหาร',
+      value: 'going_merchant',
+    },
+    {
+      name: 'รับอาหารแล้ว',
       value: 'picking_up',
+    },
+    {
+      name: 'กำลังจัดส่ง',
+      value: 'picked_up',
+    },
+    {
+      name: 'จัดส่งแล้ว',
+      value: 'arrived',
     },
     {
       name: 'สำเร็จ',

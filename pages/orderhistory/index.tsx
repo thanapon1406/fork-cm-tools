@@ -35,14 +35,14 @@ const OrderHistory = (): ReactElement => {
     page: 1,
     per_page: 10,
     status: null,
-    startdate: '',
-    enddate: '',
-    starttime: '',
-    endtime: '',
+    startdate: moment().startOf('day'),
+    enddate: moment().endOf('day'),
+    starttime: moment().startOf('day'),
+    endtime: moment().endOf('day'),
     order_number: '',
     client_time: {
-      start: '',
-      end: '',
+      start: moment().startOf('day'),
+      end: moment().endOf('day'),
     },
     sso_id: null,
     order_overall_status: null,
@@ -561,7 +561,7 @@ const OrderHistory = (): ReactElement => {
                       onClick={async () => {
                         await exportOrderData(values)
                       }}
-                      disabled={values.client_time.start == '' && values.client_time.end == ''}
+                      disabled={!values.client_time.start && !values.client_time.end}
                     >
                       ดาวน์โหลด
                     </Button>

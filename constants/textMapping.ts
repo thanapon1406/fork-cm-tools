@@ -162,6 +162,8 @@ export const orderStatusMapping: any = {
   waiting: 'รอรับออเดอร์',
   waiting_payment: 'รอการจ่ายเงิน',
   confirm_payment: 'ยืนยันการจ่ายเงิน',
+  cooking: 'กำลังปรุง',
+  cooked: 'ปรุงสำเร็จ',
   success: 'สำเร็จ',
   cancel: 'ยกเลิก',
 }

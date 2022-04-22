@@ -172,6 +172,7 @@ export const merchantStatusMapping: any = {
   waiting: 'รอรับออเดอร์',
   accept_order: 'รับออเดอร์',
   cooking: 'กำลังปรุง',
+  cooked: 'ปรุงสำเร็จ',
   success: 'สำเร็จ',
   cancel: 'ยกเลิก',
 }

@@ -238,6 +238,10 @@ const OrderHistory = (): ReactElement => {
 
   const paymentChannelOption = [
     {
+      name: 'ทุกช่องทาง',
+      value: '',
+    },
+    {
       name: 'เงินสด',
       value: 'PAYMENT_CASH',
     },

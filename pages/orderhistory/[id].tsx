@@ -13,10 +13,10 @@ import {
   cancelOrder,
   cancelOrderInterface,
   findOrdersStatusHistory,
-  orderStatusInterface,
+  orderStatusInterface
 } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
-import { cancelRider, getRiderDetail } from '@/services/rider'
+import { cancelRider, getDeliveryDetail, getRiderDetail, requestDeliveriesInterface } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
@@ -29,6 +29,7 @@ import { ReactElement, useEffect, useState } from 'react'
 import { determineAppId, numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
 import mapIcon from '../../public/maplocation.png'
+
 
 const { confirm } = Modal
 const { Title, Text } = Typography
@@ -55,6 +56,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     rider_phone: '-',
     rider_partner: '-',
     rider_remark: '-',
+    partner_order_id: '-',
   })
 
   let [riderImages, setRiderImages] = useState('')
@@ -168,12 +170,16 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (!isUndefined(rider_remark)) {
             riderRemark = rider_remark
           }
+
+
+
           setRiderInitialValues({
             rider_name: riderName || '-',
             rider_id: riderId || '-',
             rider_partner: rider_info.partner_name || '-',
             rider_phone: rider_info.phone || '-',
             rider_remark: riderRemark || '-',
+            partner_order_id: '-'
           })
         }
         if (!isUndefined(rider_images) && rider_images.length > 0) {
@@ -281,7 +287,30 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         }
 
         if (data.rider_type == 'partner') {
+
           setIsCancelRider(true)
+          const requestDeliveries: requestDeliveriesInterface = {
+            order_no: String(params.order_number)
+          }
+          const { success, result } = await getDeliveryDetail(requestDeliveries)
+          if (success) {
+            const { data } = result
+            let partnerOrderId = '-'
+            let partnerName = '-'
+            if (!isUndefined(data?.partner_order_id)) {
+              partnerOrderId = data.partner_order_id
+            }
+
+            if (!isUndefined(data?.partner_name)) {
+              partnerName = data.partner_name
+            }
+
+            setRiderInitialValues({
+              ...riderInitialValues,
+              rider_partner: partnerName,
+              partner_order_id: partnerOrderId,
+            })
+          }
         }
 
         if (!isUndefined(status)) {
@@ -489,13 +518,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-              Constant.LALAMOVE.toLowerCase()
+            Constant.LALAMOVE.toLowerCase()
           ) {
             partnerName = ' (LLM)'
           } else if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-              Constant.PANDAGO.toLowerCase()
+            Constant.PANDAGO.toLowerCase()
           ) {
             partnerName = ' (PANDAGO)'
           }
@@ -698,6 +727,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         branch_id: Number(outlet_id),
       }
 
+      const requestDeliveries: requestDeliveriesInterface = {
+        order_no: String(id)
+      }
+
       fetchOrderTransaction(request)
       fetchOrdersStatusHistory(request)
       fetchCreditDetail(id as string)
@@ -745,7 +778,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1208,7 +1241,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1291,7 +1324,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1428,13 +1461,40 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
             <Form>
-              <Title level={5}>ข้อมูลไรเดอร์ </Title>
+              <Title level={5}>ข้อมูลไรเดอร์</Title>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'Transaction ID' }}
+                    name="partner_order_id"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="partner_order_id"
+                    placeholder="Transaction ID"
+                    disabled={true}
+                  />
+                </Col>
 
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'พาร์ทเนอร์' }}
+                    name="rider_partner"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="rider_partner"
+                    placeholder="พาร์ทเนอร์"
+                    disabled={true}
+                  />
+                </Col>
+
+              </Row>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
@@ -1475,18 +1535,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   />
                 </Col>
 
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'พาร์ทเนอร์' }}
-                    name="rider_partner"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="rider_partner"
-                    placeholder="พาร์ทเนอร์"
-                    disabled={true}
-                  />
-                </Col>
               </Row>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>

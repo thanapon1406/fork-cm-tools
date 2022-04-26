@@ -34,6 +34,8 @@ export interface requestReportInterface {
   merchant_overall_status?: string
   branch_id?: number
   payment_channel?: string
+  exclude_outlet_ids?: string
+  include_outlet_ids?: string
 }
 
 export const getOrderTransaction = async (params: requestReportInterface) => {

@@ -9,7 +9,7 @@ import { Pagination } from '@/interface/dataTable'
 import { OutletDetail } from '@/interface/outlet'
 import { RiderDetail } from '@/interface/rider'
 import MainLayout from '@/layout/MainLayout'
-import { outletListById } from '@/services/merchant'
+import { findOutletId, outletListById } from '@/services/merchant'
 import { downloadFile, exportOrderTransaction, requestReportInterface } from '@/services/report'
 import { getRider } from '@/services/rider'
 import { DownloadOutlined } from '@ant-design/icons'
@@ -17,7 +17,7 @@ import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import lodash, { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
-import React, { ReactElement, useState } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { consumerList } from '../../services/consumer'
 import OrderHistoryComponent from './component'
@@ -67,9 +67,22 @@ const OrderHistory = (): ReactElement => {
     per_page: pagination.pageSize,
   })
 
+  const [merchantTestId, setMerchantTestId] = useState('')
+
   const handleSubmit = (values: any) => {
     manageParam(values)
   }
+
+  const merchantTestOption = [
+    {
+      name: 'ร้านทดสอบ',
+      value: true
+    },
+    {
+      name: 'ร้านทั่วไป',
+      value: false
+    }
+  ]
 
   const overAllOption = [
     {
@@ -263,6 +276,7 @@ const OrderHistory = (): ReactElement => {
   const onSearchMerchantDebounce = debounce(async (message) => await fetchMerchant(message), 800)
   const onSearchRiderDebounce = debounce(async (message) => await fetchRider(message), 800)
 
+
   const fetchCustomer = async (message: any) => {
     if (!isEmpty(message)) {
       const request = {
@@ -288,6 +302,16 @@ const OrderHistory = (): ReactElement => {
     }
   }
 
+  const fetchMerchatTestId = async () => {
+    const request = {
+      is_merchant_test: true,
+    }
+    const { result, success } = await findOutletId(request)
+    if (success) {
+      const { ids } = result
+      setMerchantTestId(ids.join())
+    }
+  }
   const fetchRider = async (message: any) => {
     if (!isEmpty(message)) {
       const request = {
@@ -358,6 +382,15 @@ const OrderHistory = (): ReactElement => {
     var startDate = values.client_time ? values.client_time.start : ''
     var endDate = values.client_time ? values.client_time.end : ''
 
+    var excludeOutletIds = ''
+    var includeOutletIds = ''
+    if (values?.merchant_test) {
+      includeOutletIds = merchantTestId  // is_merchant_test = true
+    } else {
+      excludeOutletIds = merchantTestId  // is_merchant_test = false
+    }
+
+    console.log(excludeOutletIds)
     setParams({
       ...params,
       brand_id: 'all',
@@ -379,13 +412,21 @@ const OrderHistory = (): ReactElement => {
       enddate: endDate ? moment(endDate).format('YYYY-MM-DD') : '',
       starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
+      exclude_outlet_ids: excludeOutletIds,
+      include_outlet_ids: includeOutletIds
     })
   }
 
   const exportOrderData = async (values: any) => {
     var startDate = values.client_time ? values.client_time.start : ''
     var endDate = values.client_time ? values.client_time.end : ''
-
+    var excludeOutletIds = ''
+    var includeOutletIds = ''
+    if (values?.merchant_test) {
+      includeOutletIds = merchantTestId  // is_merchant_test = true
+    } else {
+      excludeOutletIds = merchantTestId  // is_merchant_test = false
+    }
     const req: object = {
       sort_by: 'ClientTime',
       sort_type: 'asc',
@@ -408,6 +449,8 @@ const OrderHistory = (): ReactElement => {
       starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
       delivery_type: 'delivery',
+      exclude_outlet_ids: excludeOutletIds,
+      include_outlet_ids: includeOutletIds
     }
 
     const { result, success } = await exportOrderTransaction(req)
@@ -424,6 +467,10 @@ const OrderHistory = (): ReactElement => {
       })
     }
   }
+
+  useEffect(() => {
+    fetchMerchatTestId()
+  }, [])
 
   return (
     <MainLayout>
@@ -559,6 +606,16 @@ const OrderHistory = (): ReactElement => {
                     id="payment_channel"
                     placeholder="ช่องทางชำระเงิน"
                     selectOption={paymentChannelOption}
+                  />
+                </Col>
+                <Col span={6}>
+                  <Field
+                    label={{ text: 'ร้านทดสอบ' }}
+                    name="merchant_test"
+                    component={Select}
+                    id="merchant_test"
+                    placeholder="ร้านทดสอบ"
+                    selectOption={merchantTestOption}
                   />
                 </Col>
               </Row>

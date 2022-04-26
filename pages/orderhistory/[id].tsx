@@ -142,6 +142,23 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             outlet_phone: outlet_info.phone || '-',
           })
         }
+        var partnerOrderId = '-'
+        var partnerName = '-'
+        if (!isUndefined(data.rider_type) && !isEmpty(data.rider_type) && data.rider_type === "partner") {
+          const requestDeliveries: requestDeliveriesInterface = {
+            order_no: String(params.order_number)
+          }
+          const { success, result } = await getDeliveryDetail(requestDeliveries)
+          if (success) {
+            const { data } = result
+            if (!isUndefined(data?.partner_order_id)) {
+              partnerOrderId = data.partner_order_id
+            }
+            if (!isUndefined(data?.partner_name)) {
+              partnerName = data.partner_name
+            }
+          }
+        }
 
         if (!isUndefined(rider_info) && !isEmpty(rider_info)) {
           var riderId = '-'
@@ -172,14 +189,23 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           }
 
 
-
+          console.log("riderId : ", riderId)
           setRiderInitialValues({
             rider_name: riderName || '-',
             rider_id: riderId || '-',
-            rider_partner: rider_info.partner_name || '-',
+            rider_partner: partnerName || '-',
             rider_phone: rider_info.phone || '-',
             rider_remark: riderRemark || '-',
-            partner_order_id: '-'
+            partner_order_id: partnerOrderId
+          })
+        } else {
+          setRiderInitialValues({
+            rider_name: '-',
+            rider_id: '-',
+            rider_partner: partnerName || '-',
+            rider_phone: '-',
+            rider_remark: '-',
+            partner_order_id: partnerOrderId
           })
         }
         if (!isUndefined(rider_images) && rider_images.length > 0) {
@@ -287,30 +313,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         }
 
         if (data.rider_type == 'partner') {
-
           setIsCancelRider(true)
-          const requestDeliveries: requestDeliveriesInterface = {
-            order_no: String(params.order_number)
-          }
-          const { success, result } = await getDeliveryDetail(requestDeliveries)
-          if (success) {
-            const { data } = result
-            let partnerOrderId = '-'
-            let partnerName = '-'
-            if (!isUndefined(data?.partner_order_id)) {
-              partnerOrderId = data.partner_order_id
-            }
-
-            if (!isUndefined(data?.partner_name)) {
-              partnerName = data.partner_name
-            }
-
-            setRiderInitialValues({
-              ...riderInitialValues,
-              rider_partner: partnerName,
-              partner_order_id: partnerOrderId,
-            })
-          }
         }
 
         if (!isUndefined(status)) {
@@ -725,10 +728,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         order_number: String(id),
         brand_id: String(brand_id),
         branch_id: Number(outlet_id),
-      }
-
-      const requestDeliveries: requestDeliveriesInterface = {
-        order_no: String(id)
       }
 
       fetchOrderTransaction(request)

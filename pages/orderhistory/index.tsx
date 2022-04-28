@@ -9,7 +9,7 @@ import { Pagination } from '@/interface/dataTable'
 import { OutletDetail } from '@/interface/outlet'
 import { RiderDetail } from '@/interface/rider'
 import MainLayout from '@/layout/MainLayout'
-import { outletListById } from '@/services/merchant'
+import { findOutletId, outletListById } from '@/services/merchant'
 import { downloadFile, exportOrderTransaction, requestReportInterface } from '@/services/report'
 import { getRider } from '@/services/rider'
 import { DownloadOutlined } from '@ant-design/icons'
@@ -17,7 +17,7 @@ import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import lodash, { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
-import React, { ReactElement, useState } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { consumerList } from '../../services/consumer'
 import OrderHistoryComponent from './component'
@@ -34,23 +34,25 @@ const OrderHistory = (): ReactElement => {
     brand_id: 'all',
     page: 1,
     per_page: 10,
-    status: '',
-    startdate: '',
-    enddate: '',
-    starttime: '',
-    endtime: '',
+    status: null,
+    startdate: moment().startOf('day'),
+    enddate: moment().endOf('day'),
+    starttime: moment().startOf('day'),
+    endtime: moment().endOf('day'),
     order_number: '',
     client_time: {
-      start: '',
-      end: '',
+      start: moment().startOf('day'),
+      end: moment().endOf('day'),
     },
     sso_id: null,
     order_overall_status: null,
     rider_id: null,
+    rider_partner_type: null,
     rider_status: null,
     rider_overall_status: null,
     branch_id: null,
     merchant_overall_status: null,
+    merchant_status: null,
   }
 
   let [pagination, setPagination] = useState<Pagination>({
@@ -65,9 +67,22 @@ const OrderHistory = (): ReactElement => {
     per_page: pagination.pageSize,
   })
 
+  const [merchantTestId, setMerchantTestId] = useState('')
+
   const handleSubmit = (values: any) => {
     manageParam(values)
   }
+
+  const merchantTestOption = [
+    {
+      name: 'ร้านทดสอบ',
+      value: true
+    },
+    {
+      name: 'ร้านทั่วไป',
+      value: false
+    }
+  ]
 
   const overAllOption = [
     {
@@ -87,9 +102,180 @@ const OrderHistory = (): ReactElement => {
       value: 'cancel',
     },
   ]
+  const orderStatus = [
+    {
+      name: 'ทุกสถานะ',
+      value: '',
+    },
+    {
+      name: 'รอรับออเดอร์',
+      value: 'waiting',
+    },
+    {
+      name: 'รอการจ่ายเงิน',
+      value: 'waiting_payment',
+    },
+    {
+      name: 'ยืนยันการจ่ายเงิน',
+      value: 'confirm_payment',
+    },
+    {
+      name: 'กำลังปรุง',
+      value: 'cooking',
+    },
+    {
+      name: 'ปรุงสำเร็จ',
+      value: 'cooked',
+    },
+    {
+      name: 'กำลังจัดส่ง',
+      value: 'picked_up',
+    },
+    {
+      name: 'จัดส่งแล้ว',
+      value: 'arrived',
+    },
+    {
+      name: 'สำเร็จ',
+      value: 'success',
+    },
+    {
+      name: 'ยกเลิก',
+      value: 'cancel',
+    },
+  ]
+
+  const merchantStatus = [
+    {
+      name: 'ทุกสถานะ',
+      value: '',
+    },
+    {
+      name: 'รอรับออเดอร์',
+      value: 'waiting',
+    },
+    {
+      name: 'รับออเดอร์',
+      value: 'accept_order',
+    },
+    {
+      name: 'กำลังปรุง',
+      value: 'cooking',
+    },
+    {
+      name: 'ปรุงสำเร็จ',
+      value: 'cooked',
+    },
+    {
+      name: 'สำเร็จ',
+      value: 'success',
+    },
+    {
+      name: 'ยกเลิก',
+      value: 'cancel',
+    },
+  ]
+
+  const riderStatus = [
+    {
+      name: 'ทุกสถานะ',
+      value: '',
+    },
+    {
+      name: 'รอเรียกไรเดอร์',
+      value: 'waiting',
+    },
+    {
+      name: 'กำลังเรียกไรเดอร์',
+      value: 'assigning',
+    },
+    {
+      name: 'ไรเดอร์รับงาน',
+      value: 'assigned',
+    },
+    {
+      name: 'กำลังไปที่ร้านอาหาร',
+      value: 'going_merchant',
+    },
+    {
+      name: 'รับอาหารแล้ว',
+      value: 'picking_up',
+    },
+    {
+      name: 'กำลังจัดส่ง',
+      value: 'picked_up',
+    },
+    {
+      name: 'จัดส่งแล้ว',
+      value: 'arrived',
+    },
+    {
+      name: 'สำเร็จ',
+      value: 'success',
+    },
+    {
+      name: 'ยกเลิก',
+      value: 'cancel',
+    },
+  ]
+
+  const riderPartnerTypeOption = [
+    {
+      name: 'ทุกประเภท',
+      value: '',
+    },
+    {
+      name: 'Lalamove',
+      value: 'LALAMOVE',
+    },
+    {
+      name: 'PandaGo',
+      value: 'PANDAGO',
+    },
+  ]
+
+  const riderTypeOption = [
+    {
+      name: 'ทุกประเภท',
+      value: '',
+    },
+    {
+      name: 'Default Rider',
+      value: 'outlet',
+    },
+    {
+      name: 'Partner',
+      value: 'partner',
+    },
+  ]
+
+  const paymentChannelOption = [
+    {
+      name: 'ทุกช่องทาง',
+      value: '',
+    },
+    {
+      name: 'เงินสด',
+      value: 'PAYMENT_CASH',
+    },
+    {
+      name: 'พร้อมเพย์',
+      value: 'PAYMENT_PROMTPAY',
+    },
+    {
+      name: 'บัตรเครดิต',
+      value: 'PAYMENT_CREDIT',
+    },
+    {
+      name: 'ชำระผ่านบัญชีธนาคาร',
+      value: 'PAYMENT_BANK_TRANSFER',
+    },
+  ]
+
   const onSearchCustomerDebounce = debounce(async (message) => await fetchCustomer(message), 800)
   const onSearchMerchantDebounce = debounce(async (message) => await fetchMerchant(message), 800)
   const onSearchRiderDebounce = debounce(async (message) => await fetchRider(message), 800)
+
 
   const fetchCustomer = async (message: any) => {
     if (!isEmpty(message)) {
@@ -116,6 +302,16 @@ const OrderHistory = (): ReactElement => {
     }
   }
 
+  const fetchMerchatTestId = async () => {
+    const request = {
+      is_merchant_test: true,
+    }
+    const { result, success } = await findOutletId(request)
+    if (success) {
+      const { ids } = result
+      setMerchantTestId(ids.join())
+    }
+  }
   const fetchRider = async (message: any) => {
     if (!isEmpty(message)) {
       const request = {
@@ -186,6 +382,15 @@ const OrderHistory = (): ReactElement => {
     var startDate = values.client_time ? values.client_time.start : ''
     var endDate = values.client_time ? values.client_time.end : ''
 
+    var excludeOutletIds = ''
+    var includeOutletIds = ''
+    if (values?.merchant_test) {
+      includeOutletIds = merchantTestId  // is_merchant_test = true
+    } else {
+      excludeOutletIds = merchantTestId  // is_merchant_test = false
+    }
+
+    console.log(excludeOutletIds)
     setParams({
       ...params,
       brand_id: 'all',
@@ -194,8 +399,12 @@ const OrderHistory = (): ReactElement => {
       status: values.status || '',
       order_overall_status: values.order_overall_status || '',
       rider_id: values.rider_id || '',
+      payment_channel: values.payment_channel || '',
+      rider_partner_type: values.rider_partner_type || '',
+      rider_type: values.rider_type || '',
       branch_id: values.branch_id || '',
       merchant_overall_status: values.merchant_overall_status || '',
+      merchant_status: values.merchant_status || '',
       rider_status: values.rider_status || '',
       rider_overall_status: values.rider_overall_status || '',
       order_number: values.order_number || '',
@@ -203,13 +412,21 @@ const OrderHistory = (): ReactElement => {
       enddate: endDate ? moment(endDate).format('YYYY-MM-DD') : '',
       starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
+      exclude_outlet_ids: excludeOutletIds,
+      include_outlet_ids: includeOutletIds
     })
   }
 
   const exportOrderData = async (values: any) => {
     var startDate = values.client_time ? values.client_time.start : ''
     var endDate = values.client_time ? values.client_time.end : ''
-
+    var excludeOutletIds = ''
+    var includeOutletIds = ''
+    if (values?.merchant_test) {
+      includeOutletIds = merchantTestId  // is_merchant_test = true
+    } else {
+      excludeOutletIds = merchantTestId  // is_merchant_test = false
+    }
     const req: object = {
       sort_by: 'ClientTime',
       sort_type: 'asc',
@@ -219,7 +436,11 @@ const OrderHistory = (): ReactElement => {
       order_overall_status: values.order_overall_status || '',
       rider_id: values.rider_id || '',
       branch_id: values.branch_id || '',
+      payment_channel: values.payment_channel || '',
+      rider_partner_type: values.rider_partner_type || '',
+      rider_type: values.rider_type || '',
       merchant_overall_status: values.merchant_overall_status || '',
+      merchant_status: values.merchant_status || '',
       rider_status: values.rider_status || '',
       rider_overall_status: values.rider_overall_status || '',
       order_number: values.order_number || '',
@@ -228,6 +449,8 @@ const OrderHistory = (): ReactElement => {
       starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
       delivery_type: 'delivery',
+      exclude_outlet_ids: excludeOutletIds,
+      include_outlet_ids: includeOutletIds
     }
 
     const { result, success } = await exportOrderTransaction(req)
@@ -244,6 +467,10 @@ const OrderHistory = (): ReactElement => {
       })
     }
   }
+
+  useEffect(() => {
+    fetchMerchatTestId()
+  }, [])
 
   return (
     <MainLayout>
@@ -268,11 +495,11 @@ const OrderHistory = (): ReactElement => {
 
                   <Field
                     label={{ text: 'สถานะออเดอร์' }}
-                    name="order_overall_status"
+                    name="status"
                     component={Select}
-                    id="order_overall_status"
+                    id="status"
                     placeholder="สถานะออเดอร์"
-                    selectOption={overAllOption}
+                    selectOption={orderStatus}
                   />
                 </Col>
 
@@ -294,11 +521,11 @@ const OrderHistory = (): ReactElement => {
 
                   <Field
                     label={{ text: 'สถานะร้านค้า' }}
-                    name="merchant_overall_status"
+                    name="merchant_status"
                     component={Select}
-                    id="merchant_overall_status"
+                    id="merchant_status"
                     placeholder="สถานะร้านค้า"
-                    selectOption={overAllOption}
+                    selectOption={merchantStatus}
                   />
                 </Col>
 
@@ -317,14 +544,13 @@ const OrderHistory = (): ReactElement => {
                     allowClear={true}
                     onClear={onClearRider}
                   />
-
                   <Field
                     label={{ text: 'สถานะไรเดอร์' }}
-                    name="rider_overall_status"
+                    name="rider_status"
                     component={Select}
-                    id="rider_overall_status"
+                    id="rider_status"
                     placeholder="สถานะไรเดอร์"
-                    selectOption={overAllOption}
+                    selectOption={riderStatus}
                   />
                 </Col>
 
@@ -352,25 +578,67 @@ const OrderHistory = (): ReactElement => {
                     placeholder="วันเวลาที่ทำรายการ"
                   />
                 </Col>
-
+                <Col span={6}>
+                  <Field
+                    label={{ text: 'ประเภทไรเดอร์' }}
+                    name="rider_type"
+                    component={Select}
+                    id="rider_type"
+                    placeholder="ประเภทไรเดอร์"
+                    selectOption={riderTypeOption}
+                  />
+                </Col>
+                <Col span={6}>
+                  <Field
+                    label={{ text: 'ประเภทไรเดอร์พาทเนอร์' }}
+                    name="rider_partner_type"
+                    component={Select}
+                    id="rider_partner_type"
+                    placeholder="ประเภทไรเดอร์พาทเนอร์"
+                    selectOption={riderPartnerTypeOption}
+                  />
+                </Col>
+                <Col span={6}>
+                  <Field
+                    label={{ text: 'ช่องทางชำระเงิน' }}
+                    name="payment_channel"
+                    component={Select}
+                    id="payment_channel"
+                    placeholder="ช่องทางชำระเงิน"
+                    selectOption={paymentChannelOption}
+                  />
+                </Col>
+                <Col span={6}>
+                  <Field
+                    label={{ text: 'ร้านทดสอบ' }}
+                    name="merchant_test"
+                    component={Select}
+                    id="merchant_test"
+                    placeholder="ร้านทดสอบ"
+                    selectOption={merchantTestOption}
+                  />
+                </Col>
+              </Row>
+              <Row>
                 <Col className="gutter-row" span={6}>
                   <div className="ant-form ant-form-vertical">
                     <Button
                       style={{ width: '120px', marginTop: '27px' }}
+                      type="primary"
+                      size="middle"
+                      htmlType="submit"
+                    >
+                      ค้นหา
+                    </Button>
+
+                    <Button
+                      style={{ width: '120px', marginTop: '27px', marginLeft: '10px' }}
                       type="default"
                       size="middle"
                       htmlType="reset"
                       onClick={() => resetForm()}
                     >
                       เคลียร์
-                    </Button>
-                    <Button
-                      style={{ width: '120px', marginTop: '27px', marginLeft: '10px' }}
-                      type="primary"
-                      size="middle"
-                      htmlType="submit"
-                    >
-                      ค้นหา
                     </Button>
                   </div>
                 </Col>
@@ -386,7 +654,7 @@ const OrderHistory = (): ReactElement => {
                       onClick={async () => {
                         await exportOrderData(values)
                       }}
-                      disabled={values.client_time.start == '' && values.client_time.end == ''}
+                      disabled={!values.client_time.start && !values.client_time.end}
                     >
                       ดาวน์โหลด
                     </Button>

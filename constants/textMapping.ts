@@ -150,3 +150,43 @@ export const creditUsed: any = {
   gross_profit: 'ค่าดำเนินการ',
   delivery_fee: 'ค่าจัดส่ง',
 }
+
+export const paymentChannel: any = {
+  PAYMENT_CASH: 'เงินสด',
+  PAYMENT_PROMTPAY: 'พร้อมเพย์',
+  PAYMENT_CREDIT: 'บัตรเครดิต',
+  PAYMENT_BANK_TRANSFER: 'ชำระผ่านบัญชีธนาคาร',
+}
+
+export const orderStatusMapping: any = {
+  waiting: 'รอรับออเดอร์',
+  waiting_payment: 'รอการจ่ายเงิน',
+  confirm_payment: 'ยืนยันการจ่ายเงิน',
+  cooking: 'กำลังปรุง',
+  cooked: 'ปรุงสำเร็จ',
+  picked_up: 'กำลังจัดส่ง',
+  arrived: 'จัดส่งแล้ว',
+  success: 'สำเร็จ',
+  cancel: 'ยกเลิก',
+}
+
+export const merchantStatusMapping: any = {
+  waiting: 'รอรับออเดอร์',
+  accept_order: 'รับออเดอร์',
+  cooking: 'กำลังปรุง',
+  cooked: 'ปรุงสำเร็จ',
+  success: 'สำเร็จ',
+  cancel: 'ยกเลิก',
+}
+
+export const riderStatusMapping: any = {
+  waiting: 'รอเรียกไรเดอร์',
+  assigning: 'กำลังเรียกไรเดอร์',
+  assigned: 'ไรเดอร์รับงาน',
+  going_merchant: 'กำลังไปที่ร้านอาหาร',
+  picking_up: 'รอรับอาหาร',
+  picked_up: 'กำลังจัดส่ง',
+  arrived: 'จัดส่งแล้ว',
+  success: 'สำเร็จ',
+  cancel: 'ยกเลิก',
+}

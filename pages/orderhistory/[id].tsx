@@ -16,16 +16,20 @@ import {
   orderStatusInterface
 } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
-import { cancelRider, getRiderDetail } from '@/services/rider'
+import { cancelRider, getDeliveryDetail, getRiderDetail, requestDeliveriesInterface } from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { forEach, get, isEmpty, isUndefined, map, size } from 'lodash'
 import Moment from 'moment'
+import ImageNext from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { determineAppId, numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
+import mapIcon from '../../public/maplocation.png'
+
 
 const { confirm } = Modal
 const { Title, Text } = Typography
@@ -52,6 +56,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     rider_phone: '-',
     rider_partner: '-',
     rider_remark: '-',
+    partner_order_id: '-',
   })
 
   let [riderImages, setRiderImages] = useState('')
@@ -137,6 +142,23 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             outlet_phone: outlet_info.phone || '-',
           })
         }
+        var partnerOrderId = '-'
+        var partnerName = '-'
+        if (!isUndefined(data.rider_type) && !isEmpty(data.rider_type) && data.rider_type === "partner") {
+          const requestDeliveries: requestDeliveriesInterface = {
+            order_no: String(params.order_number)
+          }
+          const { success, result } = await getDeliveryDetail(requestDeliveries)
+          if (success) {
+            const { data } = result
+            if (!isUndefined(data?.partner_order_id)) {
+              partnerOrderId = data.partner_order_id
+            }
+            if (!isUndefined(data?.partner_name)) {
+              partnerName = data.partner_name
+            }
+          }
+        }
 
         if (!isUndefined(rider_info) && !isEmpty(rider_info)) {
           var riderId = '-'
@@ -165,12 +187,25 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (!isUndefined(rider_remark)) {
             riderRemark = rider_remark
           }
+
+
+          console.log("riderId : ", riderId)
           setRiderInitialValues({
             rider_name: riderName || '-',
             rider_id: riderId || '-',
-            rider_partner: rider_info.partner_name || '-',
+            rider_partner: partnerName || '-',
             rider_phone: rider_info.phone || '-',
             rider_remark: riderRemark || '-',
+            partner_order_id: partnerOrderId
+          })
+        } else {
+          setRiderInitialValues({
+            rider_name: '-',
+            rider_id: '-',
+            rider_partner: partnerName || '-',
+            rider_phone: '-',
+            rider_remark: '-',
+            partner_order_id: partnerOrderId
           })
         }
         if (!isUndefined(rider_images) && rider_images.length > 0) {
@@ -277,6 +312,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           }
         }
 
+        if (data.rider_type == 'partner') {
+          setIsCancelRider(true)
+        }
+
         if (!isUndefined(status)) {
           if (status != 'cancel' && status != 'success') {
             setIsOrderStatus(false)
@@ -375,13 +414,40 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             </>
           )
         } else {
+          let dataMap = (
+            <div>
+              {data.current_rider_info.first_name + ' '}
+              {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
+            </div>
+          )
+
+          if (
+            data.current_rider_info &&
+            data.current_rider_info.tracking_link != '' &&
+            data.current_rider_info.tracking_link != undefined
+          ) {
+            dataMap = (
+              <div>
+                <Link
+                  href={
+                    data.current_rider_info?.tracking_link
+                      ? data.current_rider_info?.tracking_link
+                      : ''
+                  }
+                >
+                  <a target="_blank" style={{ color: '#000000', textDecoration: 'underline' }}>
+                    {data.current_rider_info.first_name + ' '}
+                    {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
+                    <ImageNext src={mapIcon} alt="" width={15} height={15} />
+                  </a>
+                </Link>
+              </div>
+            )
+          }
           return (
             <>
               <div>
-                <div>
-                  {data.current_rider_info.first_name + ' '}
-                  {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
-                </div>
+                {dataMap}
                 <div>
                   {Moment(data.current_rider_info?.assigned_time).format(Constant.DATE_FORMAT)}
                 </div>
@@ -458,6 +524,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             Constant.LALAMOVE.toLowerCase()
           ) {
             partnerName = ' (LLM)'
+          } else if (
+            orderHistoryData?.current_rider_info?.partner_name &&
+            orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
+            Constant.PANDAGO.toLowerCase()
+          ) {
+            partnerName = ' (PANDAGO)'
           }
         }
 
@@ -487,14 +559,19 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       } else if (rider_status === Constant.ARRIVED) {
         respObj.status = 'ไรเดอร์ถึงจุดหมาย'
         respObj.imagePath = '/asset/images/placeholder.png'
-      } else if (merchant_status === Constant.ACCEPT_ORDER && order_status === Constant.WAITING_PAYMENT) {
+      } else if (
+        merchant_status === Constant.ACCEPT_ORDER &&
+        order_status === Constant.WAITING_PAYMENT
+      ) {
         respObj.status = 'ร้านรับออเดอร์'
         respObj.imagePath = '/asset/images/receive-order-icon.png'
-      } else if (merchant_status === Constant.ACCEPT_ORDER && order_status === Constant.CONFIRM_PAYMENT) {
+      } else if (
+        merchant_status === Constant.ACCEPT_ORDER &&
+        order_status === Constant.CONFIRM_PAYMENT
+      ) {
         respObj.status = 'ลูกค้าแจ้งชำระเงิน'
         respObj.imagePath = '/asset/images/cash.png'
-      }
-      else if (merchant_status === Constant.ACCEPT_ORDER) {
+      } else if (merchant_status === Constant.ACCEPT_ORDER) {
         respObj.status = 'ร้านรับออเดอร์'
         respObj.imagePath = '/asset/images/receive-order-icon.png'
       }
@@ -512,6 +589,48 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         const body = {
           order_no: String(order_no),
         }
+
+        const request: requestReportInterface = {
+          order_number: String(id),
+          brand_id: String(brand_id),
+          branch_id: Number(outlet_id),
+        }
+        const { result: orderDetail } = await findOrder(request)
+
+        const { data } = orderDetail
+        const { status, rider_status } = data
+
+        if (rider_status === 'waiting') {
+          Modal.confirm({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากไรเดอร์ถูกยกเลิกไปแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
+            onOk: () => {
+              router.reload()
+            },
+            onCancel: () => {
+              router.reload()
+            },
+          })
+
+          return
+        }
+
+        if (status === 'success') {
+          Modal.confirm({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์สำเร็จแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
+            onOk: () => {
+              router.reload()
+            },
+            onCancel: () => {
+              router.reload()
+            },
+          })
+          return
+        }
+
         const { result, success } = await cancelRider(body)
         if (success) {
           setIsCancelRider(true)
@@ -534,6 +653,57 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           cancellation_id: String(0),
           cancellation_reason: 'ยกเลิกโดยผู้ดูเเลระบบ',
         }
+        const request: requestReportInterface = {
+          order_number: String(id),
+          brand_id: String(brand_id),
+          branch_id: Number(outlet_id),
+        }
+
+        const { result: orderDetail } = await findOrder(request)
+        const { data } = orderDetail
+        const { status } = data
+        if (status === 'success') {
+          Modal.confirm({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์สำเร็จแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
+            onOk: () => {
+              router.reload()
+            },
+            onCancel: () => {
+              router.reload()
+            },
+          })
+
+          return
+        }
+
+        if (status === 'cancel') {
+          Modal.confirm({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์ถูกยกเลิกไปแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
+            onOk: () => {
+              router.reload()
+            },
+            onCancel: () => {
+              router.reload()
+            },
+          })
+          router.reload()
+          return
+        }
+
+        if (status === 'cancel') {
+          Modal.confirm({
+            content: 'ไม่สามารถยกเลิกได้เนื่องจากออเดอร์ถูกยกเลิกไปแล้ว',
+            okText: 'ตกลง',
+            cancelText: 'ปิด',
+          })
+          router.reload()
+          return
+        }
+
         const { result, success } = await cancelOrder(body)
         if (success) {
           setIsOrderStatus(true)
@@ -895,6 +1065,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             description={determineDescription(val)}
                             icon={
                               <Image
+                                alt="order-tracking-icon"
                                 className="order-tracking-icon"
                                 width={24}
                                 height={24}
@@ -920,6 +1091,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         description={Moment(orderData?.created_at).format(Constant.DATE_FORMAT)}
                         icon={
                           <Image
+                            alt="order-tracking-icon"
                             className="order-tracking-icon"
                             width={24}
                             height={24}
@@ -1293,8 +1465,35 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         >
           {(values) => (
             <Form>
-              <Title level={5}>ข้อมูลไรเดอร์ </Title>
+              <Title level={5}>ข้อมูลไรเดอร์</Title>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'Transaction ID' }}
+                    name="partner_order_id"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="partner_order_id"
+                    placeholder="Transaction ID"
+                    disabled={true}
+                  />
+                </Col>
 
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'พาร์ทเนอร์' }}
+                    name="rider_partner"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="rider_partner"
+                    placeholder="พาร์ทเนอร์"
+                    disabled={true}
+                  />
+                </Col>
+
+              </Row>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
@@ -1335,18 +1534,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   />
                 </Col>
 
-                <Col className="gutter-row" span={6}>
-                  <Field
-                    label={{ text: 'พาร์ทเนอร์' }}
-                    name="rider_partner"
-                    type="text"
-                    component={Input}
-                    className="form-control round"
-                    id="rider_partner"
-                    placeholder="พาร์ทเนอร์"
-                    disabled={true}
-                  />
-                </Col>
               </Row>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>

@@ -56,8 +56,23 @@ const CustomBadge = ({
     error: 'ไม่สำเร็จ',
   }
 
+  const statusMapping: any = {
+    waiting: 'รอรับออเดอร์',
+    waiting_payment: 'รอการจ่ายเงิน',
+    confirm_payment: 'ยืนยันการจ่ายเงิน',
+    success: 'สำเร็จ',
+    cancel: 'ยกเลิก',
+    value: 'cancel',
+    accept_order: 'รับออเดอร์',
+    cooking: 'กำลังปรุง',
+    cooked: 'ปรุงสำเร็จ',
+    assigning: 'รอเรียกไรเดอร์',
+    assigned: 'ไรเดอร์รับงาน',
+    picking_up: 'กำลังจัดส่ง',
+  }
+
   let status = badgeStatusMapping[badgeStatus] || 'warning'
-  let text = orderStatusMapping[badgeText] || 'ดำเนินการ'
+  let text = statusMapping[badgeText] || 'ดำเนินการ'
 
   if (customMapping) {
     status = badgeStatusMapping[customMapping.status]

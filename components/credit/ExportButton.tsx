@@ -3,17 +3,18 @@ import Input from '@/components/Form/Input'
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons"
 import { Col, Modal, Row, Space, Typography } from 'antd'
 import { Field, FieldArray, Form, Formik } from 'formik'
-import moment from 'moment'
 import React, { ReactElement, useState } from 'react'
 import * as Yup from 'yup'
 
 const { Title, Text } = Typography
 
 interface Props {
-  propsSubmit?: any
+  propsSubmit?: any,
+  title?: string,
+  subtitle?: string
 }
 
-export default function ExportButton({ propsSubmit }: Props): ReactElement {
+export default function ExportButton({ propsSubmit, title, subtitle }: Props): ReactElement {
   const [config, setConfig] = useState({
     visible: false,
   })
@@ -41,22 +42,22 @@ export default function ExportButton({ propsSubmit }: Props): ReactElement {
     propsSubmit(values)
   }
 
-  var date = moment().format("YYYY-MM-DD")
   return (
     <div>
       <Button
         style={{ width: '120px', marginTop: '31px' }}
         type="primary"
         size="middle"
+        htmlType="submit"
         onClick={showModal}
       >
         Export
       </Button>
       <Modal visible={config.visible} centered title={null} footer={null} onCancel={hideModal}>
-        <Title level={4} style={{ display: "flex", justifyContent: "center" }}>ส่งข้อมูลบัญชีร้านค้าไปยังอีเมล</Title>
-        <Title style={{ margin: 0, display: "flex", justifyContent: "center", fontWeight: 300 }} level={5}>
-          ข้อมูลบัญชีร้านค้าวันที่ {date}
-        </Title>
+        {title !== "" && <Title level={4} style={{ display: "flex", justifyContent: "center" }}>{title}</Title>}
+        {subtitle !== "" && <Title style={{ margin: 0, display: "flex", justifyContent: "center", fontWeight: 300 }} level={5}>
+          {subtitle}
+        </Title>}
         <Title style={{ color: '#818181', marginTop: 10, marginBottom: 0 }} level={5}>
           อีเมลที่ส่งข้อมูล
         </Title>

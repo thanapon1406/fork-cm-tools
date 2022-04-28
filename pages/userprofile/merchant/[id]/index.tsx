@@ -297,6 +297,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
     is_promptpays: false,
     is_cash: false,
     is_cash_active: false,
+    is_merchant_test: false,
   })
 
   const Loading = useLoadingContext()
@@ -461,6 +462,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
             is_banks: is_banks,
             is_promptpays: is_promptpays,
             is_cash_active: is_cash_active,
+            is_merchant_test: outletData?.is_merchant_test
           })
         }
       }
@@ -495,6 +497,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
         id: id,
         status: outletInitialValues.status,
         online_status: outletInitialValues.online_status,
+        is_merchant_test: outletInitialValues.is_merchant_test,
       },
     }
 
@@ -504,6 +507,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
         ...outletInitialValues,
         default_status: outletInitialValues.status,
         default_online_status: outletInitialValues.online_status,
+        is_merchant_test: outletInitialValues.is_merchant_test,
       })
       //Todo: Get After update
       getOutlet()
@@ -523,6 +527,44 @@ export default function MerchantUserView({ }: Props): ReactElement {
   const onlineStatusRender = (status: string) => {
     const mapping = onlineStatusTag[status]
     return status ? <Tag type={mapping?.status}>{mapping?.text}</Tag> : ''
+  }
+
+  const merchantTestRender = () => {
+    var text = "No"
+    if (outletInitialValues.is_merchant_test) {
+      text = "Yes"
+    }
+    return <Tag type={'disable'} >{text}</Tag>
+  }
+
+  const merchantTestEditForm = () => {
+    const onChange = (event: any) => {
+      var is_merchant_test = false
+      if (event == "true") {
+        is_merchant_test = true
+      }
+      setOutletInitialValues({
+        ...outletInitialValues,
+        is_merchant_test: is_merchant_test,
+      })
+    }
+
+    var defaultValue = "false"
+    if (outletInitialValues.is_merchant_test) {
+      defaultValue = "true"
+    }
+
+    return (
+      <Select
+        style={{ width: '60px' }}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        size="small"
+      >
+        <Select.Option value="true">Yes</Select.Option>
+        <Select.Option value="false">No</Select.Option>
+      </Select>
+    )
   }
 
   const outletStatusEditForm = (status: string) => {
@@ -625,6 +667,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
                       ...outletInitialValues,
                       status: outletInitialValues.default_status,
                       online_status: outletInitialValues.default_online_status,
+                      is_merchant_test: outletInitialValues.is_merchant_test,
                     })
                   }}
                 >
@@ -651,6 +694,12 @@ export default function MerchantUserView({ }: Props): ReactElement {
             )}
           </div>
           <Space>
+            <Title style={{ textAlign: 'end', margin: '16px 0px' }} level={5}>
+              ร้านทดสอบ :{' '}
+              {isEdit
+                ? merchantTestEditForm()
+                : merchantTestRender()}
+            </Title>
             <Title style={{ textAlign: 'end', margin: '16px 0px' }} level={5}>
               ร้านเปิด-ปิด :{' '}
               {isEdit

@@ -25,6 +25,7 @@ export interface requestReportInterface {
   sort_type?: string
   rider_id?: string
   rider_type?: string
+  rider_partner_type?: string
   rider_status?: string
   delivery_type?: string
   merchant_status?: string
@@ -32,6 +33,9 @@ export interface requestReportInterface {
   rider_overall_status?: string
   merchant_overall_status?: string
   branch_id?: number
+  payment_channel?: string
+  exclude_outlet_ids?: string
+  include_outlet_ids?: string
 }
 
 export const getOrderTransaction = async (params: requestReportInterface) => {
@@ -64,6 +68,15 @@ export const exportOrderTransaction = async (req: any) => {
 export const getFileDetail = async (req: any) => {
   try {
     const result = await fetch.get(`/api/report/get-file-detail/`, { params: req })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export const exportOrderByEmail = async (req: any) => {
+  try {
+    const result = await fetch.post(`/api/report/export-order-by-email/`, req)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

@@ -11,7 +11,7 @@ import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
 import { Badge, Card, TablePaginationConfig } from 'antd'
 import { isEmpty, isNull, isUndefined } from 'lodash'
-import { default as Moment, default as moment } from 'moment'
+import { default as Moment } from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { numberFormat } from 'utils/helpers'
@@ -292,10 +292,6 @@ const OrderHistoryComponent = ({
 
   const fetchOrderTransaction = async (params: requestReportInterface) => {
     params.sso_id = !isEmpty(params.sso_id) ? params.sso_id : ssoId
-    params.startdate = moment().startOf('day').format('YYYY-MM-DD')
-    params.enddate = moment().endOf('day').format('YYYY-MM-DD')
-    params.starttime = moment().startOf('day').format('HH:mm:ss')
-    params.endtime = moment().endOf('day').format('HH:mm:ss')
     const { result, success } = await getOrderTransaction(params)
     setIsLoading(true)
     if (success) {

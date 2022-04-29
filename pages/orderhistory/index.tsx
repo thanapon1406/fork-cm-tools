@@ -76,6 +76,10 @@ const OrderHistory = (): ReactElement => {
     delivery_type: 'delivery',
     page: pagination.current,
     per_page: pagination.pageSize,
+    startdate: moment().startOf('day').format('YYYY-MM-DD'),
+    enddate: moment().endOf('day').format('YYYY-MM-DD'),
+    starttime: moment().startOf('day').format('HH:mm:ss'),
+    endtime: moment().endOf('day').format('HH:mm:ss'),
   })
 
   const [merchantTestId, setMerchantTestId] = useState('')

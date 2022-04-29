@@ -292,10 +292,6 @@ const OrderHistoryComponent = ({
 
   const fetchOrderTransaction = async (params: requestReportInterface) => {
     params.sso_id = !isEmpty(params.sso_id) ? params.sso_id : ssoId
-    params.startdate = moment().startOf('day').format('YYYY-MM-DD')
-    params.enddate = moment().endOf('day').format('YYYY-MM-DD')
-    params.starttime = moment().startOf('day').format('HH:mm:ss')
-    params.endtime = moment().endOf('day').format('HH:mm:ss')
     const { result, success } = await getOrderTransaction(params)
     setIsLoading(true)
     if (success) {

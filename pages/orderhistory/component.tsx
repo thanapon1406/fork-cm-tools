@@ -3,7 +3,7 @@ import {
   merchantStatusMapping,
   orderStatusMapping,
   paymentChannel,
-  riderStatusMapping,
+  riderStatusMapping
 } from '@/constants/textMapping'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
@@ -11,7 +11,7 @@ import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
 import { Badge, Card, TablePaginationConfig } from 'antd'
 import { isEmpty, isNull, isUndefined } from 'lodash'
-import Moment from 'moment'
+import { default as Moment, default as moment } from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { numberFormat } from 'utils/helpers'
@@ -26,8 +26,8 @@ const bageStatusMapping = (text: string) => {
     text !== 'success' && text !== 'cancel'
       ? 'processing'
       : text === 'success'
-      ? 'success'
-      : 'error'
+        ? 'success'
+        : 'error'
 
   return status
 }
@@ -292,6 +292,10 @@ const OrderHistoryComponent = ({
 
   const fetchOrderTransaction = async (params: requestReportInterface) => {
     params.sso_id = !isEmpty(params.sso_id) ? params.sso_id : ssoId
+    params.startdate = moment().startOf('day').format('YYYY-MM-DD')
+    params.enddate = moment().endOf('day').format('YYYY-MM-DD')
+    params.starttime = moment().startOf('day').format('HH:mm:ss')
+    params.endtime = moment().endOf('day').format('HH:mm:ss')
     const { result, success } = await getOrderTransaction(params)
     setIsLoading(true)
     if (success) {

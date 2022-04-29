@@ -3,6 +3,15 @@ import Card from '@/components/Card'
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
+import {
+  merchantStatus,
+  merchantTestOption,
+  orderStatus,
+  paymentChannelOption,
+  riderPartnerTypeOption,
+  riderStatus,
+  riderTypeOption,
+} from '@/constants/option-order'
 import { SelectOption } from '@/interface/common'
 import { CustomerDetail } from '@/interface/customer'
 import { Pagination } from '@/interface/dataTable'
@@ -21,15 +30,6 @@ import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { consumerList } from '../../services/consumer'
 import OrderHistoryComponent from './component'
-import {
-  merchantStatus,
-  merchantTestOption,
-  orderStatus,
-  paymentChannelOption,
-  riderPartnerTypeOption,
-  riderStatus,
-  riderTypeOption,
-} from './option'
 
 const { Title } = Typography
 

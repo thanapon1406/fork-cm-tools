@@ -24,7 +24,7 @@ import { getRider } from '@/services/rider'
 import { DownloadOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import lodash, { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
+import lodash, { debounce, get, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
@@ -57,6 +57,7 @@ const initialValues = {
   branch_id: null,
   merchant_overall_status: null,
   merchant_status: null,
+  merchant_test: null
 }
 
 const OrderHistory = (): ReactElement => {
@@ -75,6 +76,10 @@ const OrderHistory = (): ReactElement => {
     delivery_type: 'delivery',
     page: pagination.current,
     per_page: pagination.pageSize,
+    startdate: moment().startOf('day').format('YYYY-MM-DD'),
+    enddate: moment().endOf('day').format('YYYY-MM-DD'),
+    starttime: moment().startOf('day').format('HH:mm:ss'),
+    endtime: moment().endOf('day').format('HH:mm:ss'),
   })
 
   const [merchantTestId, setMerchantTestId] = useState('')
@@ -194,9 +199,9 @@ const OrderHistory = (): ReactElement => {
 
     var excludeOutletIds = ''
     var includeOutletIds = ''
-    if (values?.merchant_test) {
+    if (get(values, 'merchant_test') === true) {
       includeOutletIds = merchantTestId // is_merchant_test = true
-    } else {
+    } else if (get(values, 'merchant_test') === false) {
       excludeOutletIds = merchantTestId // is_merchant_test = false
     }
 
@@ -231,9 +236,9 @@ const OrderHistory = (): ReactElement => {
     var endDate = values.client_time ? values.client_time.end : ''
     var excludeOutletIds = ''
     var includeOutletIds = ''
-    if (values?.merchant_test) {
+    if (get(values, 'merchant_test') === true) {
       includeOutletIds = merchantTestId // is_merchant_test = true
-    } else {
+    } else if (get(values, 'merchant_test') === false) {
       excludeOutletIds = merchantTestId // is_merchant_test = false
     }
     const req: object = {
@@ -469,6 +474,7 @@ const OrderHistory = (): ReactElement => {
                           branch_id: null,
                           merchant_overall_status: null,
                           merchant_status: null,
+                          merchant_test: null,
                         })
                       }}
                     >

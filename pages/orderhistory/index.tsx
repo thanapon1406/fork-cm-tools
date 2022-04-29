@@ -57,6 +57,7 @@ const initialValues = {
   branch_id: null,
   merchant_overall_status: null,
   merchant_status: null,
+  merchant_test: null
 }
 
 const OrderHistory = (): ReactElement => {
@@ -231,9 +232,9 @@ const OrderHistory = (): ReactElement => {
     var endDate = values.client_time ? values.client_time.end : ''
     var excludeOutletIds = ''
     var includeOutletIds = ''
-    if (values?.merchant_test) {
+    if (values?.merchant_test === true) {
       includeOutletIds = merchantTestId // is_merchant_test = true
-    } else {
+    } else if (values?.merchant_test === false) {
       excludeOutletIds = merchantTestId // is_merchant_test = false
     }
     const req: object = {
@@ -469,6 +470,7 @@ const OrderHistory = (): ReactElement => {
                           branch_id: null,
                           merchant_overall_status: null,
                           merchant_status: null,
+                          merchant_test: null,
                         })
                       }}
                     >

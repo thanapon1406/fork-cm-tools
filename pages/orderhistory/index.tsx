@@ -10,7 +10,7 @@ import {
   paymentChannelOption,
   riderPartnerTypeOption,
   riderStatus,
-  riderTypeOption,
+  riderTypeOption
 } from '@/constants/option-order'
 import { SelectOption } from '@/interface/common'
 import { CustomerDetail } from '@/interface/customer'

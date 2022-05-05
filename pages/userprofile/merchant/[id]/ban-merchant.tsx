@@ -15,9 +15,9 @@ const { confirm } = Modal
 
 const { Title, Text } = Typography
 
-interface Props { }
+interface Props {}
 
-export default function BanOutlet({ }: Props): ReactElement {
+export default function BanOutlet({}: Props): ReactElement {
   const router = useRouter()
   const { id } = router.query
   const [isLoadingPage, setIsLoading] = useState(true)
@@ -70,19 +70,19 @@ export default function BanOutlet({ }: Props): ReactElement {
   ): { status: 'processing' | 'success' | 'error' | 'waiting'; text: string } => {
     return isBan
       ? {
-        status: 'error',
-        text: 'ถูกแบน',
-      }
+          status: 'error',
+          text: 'ถูกแบน',
+        }
       : {
-        status: 'success',
-        text: 'ปกติ',
-      }
+          status: 'success',
+          text: 'ปกติ',
+        }
   }
 
   const Schema = Yup.object().shape({})
 
   const handleSubmit = async (values: typeof outletInitialValues) => {
-    if (values.is_ban && values.ban_detail == outletInitialValues.default_ban_detail) {
+    if (!values.is_ban && values.ban_detail == outletInitialValues.default_ban_detail) {
       const modal = Modal.error({
         title: 'แจ้งเตือน',
         content: `กรุณาใส่เหตุผลเพื่อแบนร้านค้า`,
@@ -143,7 +143,7 @@ export default function BanOutlet({ }: Props): ReactElement {
             <Breadcrumb.Item>บัญชีผู้ใช้งาน</Breadcrumb.Item>
             <Breadcrumb.Item>บัญชีร้านค้า</Breadcrumb.Item>
             <Breadcrumb.Item>ข้อมูลบัญชีร้านค้า</Breadcrumb.Item>
-            <Breadcrumb.Item>ระงับผู้ใช้งาน</Breadcrumb.Item>
+            <Breadcrumb.Item>ระงับร้านค้า</Breadcrumb.Item>
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}></Col>
@@ -195,11 +195,11 @@ export default function BanOutlet({ }: Props): ReactElement {
                 <Col span={4} md={4} xs={24} style={{ padding: '0 19px' }}>
                   {values.is_ban ? (
                     <Button type="primary" block htmlType="submit">
-                      ยกเลิกแบนผู้ใช้งาน
+                      ยกเลิกแบนร้านค้า
                     </Button>
                   ) : (
                     <Button type="primary" block htmlType="submit" isDanger={true}>
-                      แบนผู้ใช้งาน
+                      แบนร้านค้า
                     </Button>
                   )}
                 </Col>

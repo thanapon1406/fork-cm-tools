@@ -4,13 +4,16 @@ import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import MainLayout from '@/layout/MainLayout'
 import { banOutlet, outletDetail } from '@/services/merchant'
+import { findOrders } from '@/services/order'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Modal, notification, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
+import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
+
 const { confirm } = Modal
 
 const { Title, Text } = Typography
@@ -29,6 +32,7 @@ export default function BanOutlet({}: Props): ReactElement {
     shop_id: '',
     is_ban: false,
     default_ban_detail: '',
+    brand_id: 0,
   })
 
   useEffect(() => {
@@ -59,6 +63,7 @@ export default function BanOutlet({}: Props): ReactElement {
         is_ban: isBan,
         ban_detail: ban_detail,
         default_ban_detail: get(data, 'ban_detail'),
+        brand_id: get(data, 'brand_id'),
       })
     } else {
       router.push(`/userprofile/merchant/${id}`)
@@ -82,7 +87,29 @@ export default function BanOutlet({}: Props): ReactElement {
   const Schema = Yup.object().shape({})
 
   const handleSubmit = async (values: typeof outletInitialValues) => {
-    if (!values.is_ban && values.ban_detail == outletInitialValues.default_ban_detail) {
+    //check order
+    const date = moment()
+    const filterOrder = {
+      outlet_id: values.outlet_id,
+      brand_id: values.brand_id,
+      start_date: date.startOf('day').format('YYYY-MM-DD HH:mm'),
+      end_date: date.endOf('day').format('YYYY-MM-DD HH:mm'),
+      status: ['waiting', 'waiting_payment', 'confirm_payment', 'cooking', 'cooked', 'picked_up'],
+    }
+    const { result, success } = await findOrders(filterOrder)
+    if (success) {
+      const { data = [] } = result
+      if (data.length > 0) {
+        Modal.error({
+          title: 'แจ้งเตือน',
+          content: `ไม่สามารถระงับร้านค้าได้ในขณะนี้ เนื่องจากมีออเดอร์ที่กำลังดำเนินการยังไม่เสร็จสิ้น`,
+        })
+        return
+      }
+    }
+
+    // values.ban_detail == outletInitialValues.default_ban_detail
+    if (!values.is_ban && values.ban_detail === '') {
       const modal = Modal.error({
         title: 'แจ้งเตือน',
         content: `กรุณาใส่เหตุผลเพื่อแบนร้านค้า`,
@@ -124,10 +151,11 @@ export default function BanOutlet({}: Props): ReactElement {
         message: `สำเร็จ`,
         description: '',
       })
-      router.reload()
+      setIsLoading(true)
+      getOutlet(id)
     } else {
       // Handle Case : Not Success
-      notification.success({
+      notification.error({
         message: `ไม่สำเร็จ`,
         description: '',
       })

@@ -112,23 +112,23 @@ export default function Sidebar({ }: Props): ReactElement {
     },
     {
       index: 3,
-      title: 'User Profile',
+      title: 'บัญชีผู้ใช้งาน',
       icon: <TeamOutlined />,
       key: 'userProfile',
       link: '/userprofile',
       sub: [
         {
-          title: 'Consumer Profile',
+          title: 'บัญชีลูกค้า',
           link: '/consumer',
           key: '/consumer',
         },
         {
-          title: 'Rider Profile',
+          title: 'บัญชีไรเดอร์',
           link: '/userprofile/rider',
           key: '/userprofile/rider',
         },
         {
-          title: 'Merchant Profile',
+          title: 'บัญชีร้านค้า',
           link: '/userprofile/merchant',
           key: '/userprofile/merchant',
         },

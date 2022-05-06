@@ -8,6 +8,8 @@ export interface orderStatusInterface {
   sort_by?: string
   sort_type?: string
   order_no?: string
+  status?: Array<string>
+  brand_id?: number
 }
 
 export interface cancelOrderInterface {
@@ -34,5 +36,13 @@ const cancelOrder = async (body: cancelOrderInterface) => {
   }
 }
 
-export { findOrdersStatusHistory, cancelOrder }
+const findOrders = async (body: orderStatusInterface) => {
+  try {
+    const result = await fetch.post(`/api/order/find-orders`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
 
+export { findOrdersStatusHistory, cancelOrder, findOrders }

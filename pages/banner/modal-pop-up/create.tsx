@@ -1,0 +1,528 @@
+
+import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker';
+import Input from '@/components/Form/Input';
+import Select from '@/components/Form/Select';
+import TextArea from '@/components/Form/TextArea';
+import MainLayout from '@/layout/MainLayout';
+import { uploadImage } from '@/services/cdn';
+import { createModalPopUp } from '@/services/modalPopUp';
+import { LoadingOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Card, Col, Modal, Radio, Row, Space, Switch, Typography, Upload } from 'antd';
+import { Field, Form, Formik } from 'formik';
+import { omit } from 'lodash';
+import moment from 'moment';
+import { useRouter } from 'next/router';
+import { ReactElement, useState } from 'react';
+import { SketchPicker } from 'react-color';
+import * as Yup from 'yup';
+import noImage from '../../../public/asset/images/no-image-available.svg';
+
+const { Title } = Typography
+const { confirm, warning } = Modal
+
+const BannerModalPopUpCreate = (): ReactElement => {
+  const router = useRouter()
+
+  const [isActive, setActive] = useState('active')
+  const [loadingImage, setloadingImage] = useState(false)
+  const [imageUrl, setImageUrl] = useState('')
+  const [typeModal, setTypeModal] = useState(1)
+
+  const handleSetTypeModal = (event: any) => {
+    setColorButton1("#ffffff")
+    setTextColorButton1("#000000")
+    setColorButton2("#ffffff")
+    setTextColorButton2("#000000")
+    setTypeModal(event)
+  }
+
+  const [textColorButton1, setTextColorButton1] = useState("#000000");
+  const [colorButton1, setColorButton1] = useState("#ffffff");
+
+  const handleTextColorButton1 = (event: any) => {
+    setTextColorButton1(event.hex)
+  }
+  const handleColorButton1 = (event: any) => {
+    setColorButton1(event.hex)
+  }
+
+  const [textColorButton2, setTextColorButton2] = useState("#000000");
+  const [colorButton2, setColorButton2] = useState("#ffffff");
+  const handleTextColorButton2 = (event: any) => {
+    setTextColorButton2(event.hex)
+  }
+  const handleColorButton2 = (event: any) => {
+    setColorButton2(event.hex)
+  }
+
+  const uploadButton = (
+    <div>
+      {loadingImage ? <LoadingOutlined /> : <PlusOutlined />}
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
+
+
+  const button1 = {
+    text: '',
+    text_color: '',
+    background_color: '',
+    action_url: ''
+  }
+
+  const button2 = {
+    text: '',
+    text_color: '',
+    background_color: '',
+    action_url: ''
+  }
+
+  const initialValues = {
+    name: '',
+    status: '',
+    type: 1,
+    image: '',
+    image_action_url: '',
+    start_date: '',
+    end_date: '',
+    priority: 0,
+    app_id: '',
+    content: {
+      title: "",
+      text: ""
+    },
+    show_date: {
+      start: moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
+      end: moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
+    },
+    buttons: [button1, button2],
+    textButton1: '',
+    actionButton1: '',
+    textButton2: '',
+    actionButton2: ''
+  }
+
+
+  const Schema = Yup.object().shape({
+    app_id: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
+    name: Yup.string().trim().required('กรุณากรอกชื่อ modal pop up')
+  })
+
+  const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
+
+  const handleSubmit = async (values: typeof initialValues) => {
+    if (imageUrl == '') {
+      warning({
+        title: `กรุณาเลือกรูปภาพ`,
+        afterClose() {
+        }
+      })
+      return null
+    }
+
+    values.image = imageUrl
+    values.status = isActive
+
+    if (values.show_date.start != '') {
+      values.start_date = moment(values.show_date.start).format(dateFormat)
+    }
+    if (values.show_date.end != '') {
+      values.end_date = moment(values.show_date.end).format(dateFormat)
+    }
+
+    if (typeModal == 3) {
+      button1.text = values.textButton1
+      button1.text_color = textColorButton1
+      button1.background_color = colorButton1
+      button1.action_url = values.actionButton1
+      values.buttons[0] = button1
+    }
+    if (typeModal == 4) {
+      button1.text = values.textButton1
+      button1.text_color = textColorButton1
+      button1.background_color = colorButton1
+      button1.action_url = values.actionButton1
+      button2.text = values.textButton2
+      button2.text_color = textColorButton2
+      button2.background_color = colorButton2
+      button2.action_url = values.actionButton2
+      values.buttons[0] = button1
+      values.buttons[1] = button2
+    }
+    const value = omit(values, ['show_date'], ['textButton1'], ['actionButton1'], ['textButton2'], ['actionButton2']);
+    console.log(value)
+    const { result, success } = await createModalPopUp(value)
+    if (success) {
+      router.push('/banner/modal-pop-up');
+    }
+  }
+
+  const handleStatus = (event: any) => {
+    const checkStatus = isActive == 'active' ? 'inactive' : 'active'
+    setActive(checkStatus)
+  }
+
+  const handleChangeImage = async (info: any) => {
+    setloadingImage(true)
+    console.log(handleChangeImage, info)
+    const res = await uploadImage(info)
+    setloadingImage(false)
+    setImageUrl(res.upload_success.modal_pop_up)
+  };
+
+  const renderTitle = () => {
+    if (typeModal > 2) {
+      return (
+        <>
+          <Row gutter={16} style={{ marginTop: 20 }}>
+            <Col className="gutter-row" span={8}>
+              <Field
+                label={{ text: "ชื่อเรื่อง" }}
+                name="content.title"
+                type="text"
+                component={Input}
+                rows={2}
+                className="form-control round"
+                id="content.title"
+              />
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col className="gutter-row" span={8} >
+              <Field
+                label={{ text: "รายละเอียด" }}
+                name="content.text"
+                type="text"
+                component={TextArea}
+                className="form-control round"
+                id="content.text"
+              />
+            </Col>
+          </Row>
+        </>
+      )
+    }
+  }
+
+  const renderButtons = () => {
+    if (typeModal == 3) {
+      return (
+        <>
+          <Row gutter={16} style={{ marginTop: 20 }}>
+            <Col className="gutter-row" span={8}>
+              <Field
+                label={{ text: "คำบนปุ่ม" }}
+                name="textButton1"
+                type="text"
+                component={Input}
+                rows={2}
+                className="form-control round"
+                id="textButton1"
+              />
+            </Col>
+            <Col className="gutter-row" span={8}>
+              <Field
+                label={{ text: "Action ของปุ่ม" }}
+                name="actionButton1"
+                type="text"
+                component={Input}
+                rows={2}
+                className="form-control round"
+                id="actionButton1"
+              />
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col className="gutter-row" span={8}>
+              <label>สีปุ่ม</label>
+              <SketchPicker color={colorButton1} onChangeComplete={handleColorButton1} />
+            </Col>
+            <Col className="gutter-row" span={8}>
+              <label>สีคำของปุ่ม</label>
+              <SketchPicker color={textColorButton1} onChangeComplete={handleTextColorButton1} />
+            </Col>
+          </Row>
+        </>
+      )
+    }
+    if (typeModal == 4) {
+      return (
+        <>
+          <Row gutter={16} style={{ marginTop: 20 }}>
+            <Col className="gutter-row" span={8}>
+              <Field
+                label={{ text: "คำบนปุ่ม 1" }}
+                name="textButton1"
+                type="text"
+                component={Input}
+                rows={2}
+                className="form-control round"
+                id="textButton1"
+              />
+            </Col>
+            <Col className="gutter-row" span={8}>
+              <Field
+                label={{ text: "Action ของปุ่ม 1" }}
+                name="actionButton1"
+                type="text"
+                component={Input}
+                rows={2}
+                className="form-control round"
+                id="actionButton1"
+              />
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col className="gutter-row" span={8}>
+              <label>สีปุ่ม 1</label>
+              <SketchPicker color={colorButton1} onChangeComplete={handleColorButton1} />
+            </Col>
+            <Col className="gutter-row" span={8}>
+              <label>สีคำของปุ่ม 1</label>
+              <SketchPicker color={textColorButton1} onChangeComplete={handleTextColorButton1} />
+            </Col>
+          </Row>
+          <Row gutter={16} style={{ marginTop: 20 }}>
+            <Col className="gutter-row" span={8}>
+              <Field
+                label={{ text: "คำบนปุ่ม 2" }}
+                name="textButton2"
+                type="text"
+                component={Input}
+                rows={2}
+                className="form-control round"
+                id="textButton2"
+              />
+            </Col>
+            <Col className="gutter-row" span={8}>
+              <Field
+                label={{ text: "Action ของปุ่ม 2" }}
+                name="actionButton2"
+                type="text"
+                component={Input}
+                rows={2}
+                className="form-control round"
+                id="actionButton2"
+              />
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col className="gutter-row" span={8}>
+              <label>สีปุ่ม 2</label>
+              <SketchPicker color={colorButton2} onChangeComplete={handleColorButton2} />
+            </Col>
+            <Col className="gutter-row" span={8}>
+              <label>สีคำของปุ่ม 2</label>
+              <SketchPicker color={textColorButton2} onChangeComplete={handleTextColorButton2} />
+            </Col>
+          </Row>
+        </>
+      )
+    }
+  }
+
+  return (
+    <MainLayout>
+      <Row justify="space-around" align="middle">
+        <Col span={8}>
+          <Title level={4}>Banner</Title>
+          <Breadcrumb style={{ margin: '16px 0' }}>
+            <Breadcrumb.Item>Banner</Breadcrumb.Item>
+            <Breadcrumb.Item>Modal Pop Up Create</Breadcrumb.Item>
+          </Breadcrumb>
+        </Col>
+        <Col span={8} offset={8} style={{ textAlign: 'end' }}></Col>
+      </Row>
+      <Card>
+        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
+          {({ values, resetForm, setFieldValue }) => (
+            <Form>
+              <Row gutter={24}>
+                <Col className="gutter-row" span={8}>
+                  <Field
+                    label={{ text: "ชื่อ modal pop up" }}
+                    name="name"
+                    type="text"
+                    component={Input}
+                    rows={2}
+                    className="form-control round"
+                    id="name"
+                  />
+                </Col>
+                <Col className="gutter-row" span={8} >
+                  <Field
+                    label={{ text: 'แอพที่ต้องการส่ง' }}
+                    name="app_id"
+                    component={Select}
+                    id="app_id"
+                    placeholder="แอพที่ต้องการส่ง"
+                    defaultValue=""
+                    selectOption={[
+                      {
+                        name: 'Consumer',
+                        value: 1,
+                      },
+                      {
+                        name: 'Merchant',
+                        value: 2,
+                      },
+                      {
+                        name: 'Rider',
+                        value: 3,
+                      },
+                    ]}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={24}>
+                <label>รูปภาพ : </label>
+                <Upload
+                  name="file"
+                  onRemove={e => { setImageUrl('') }}
+                  beforeUpload={handleChangeImage}
+                >
+                  <Button style={{ marginLeft: 10 }} icon={<UploadOutlined />}>เลือกรูป</Button>
+                </Upload>
+              </Row>
+              <Row gutter={16} style={{ marginTop: 20 }}>
+                <Col className="gutter-row" span={24} >
+                  <Radio.Group name="type"
+                    defaultValue={values.type}
+                    value={values.type}
+                    onChange={e => {
+                      setFieldValue("type", e.target.value)
+                      handleSetTypeModal(e.target.value)
+                    }}>
+                    <Space direction='vertical'>
+                      <Row gutter={24}>
+                        <Col className="gutter-row" span={6}>
+                          <Radio name="type" value={1}>
+                            <Card
+                              hoverable
+                              style={{ width: 240, height: 240, borderRadius: '50%' }}
+                              cover={<img style={{ width: 240, height: 240, borderRadius: '50%' }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
+                            >
+                            </Card>
+                          </Radio>
+                        </Col>
+                        <Col className="gutter-row" span={6}>
+                          <Radio name="type" value={2}>
+                            <Card
+                              hoverable
+                              style={{ width: 240, height: 240 }}
+                              cover={<img style={{ width: 240, height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
+                            >
+                            </Card>
+                          </Radio>
+                        </Col>
+                        <Col className="gutter-row" span={6}>
+                          <Radio name="type" value={3}>
+                            <Card
+                              hoverable
+                              style={{ width: 240 }}
+                              cover={<img alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
+                            >
+                              <p>Title</p>
+                              <p>Description</p>
+                              <Button style={{ backgroundColor: colorButton1, color: textColorButton1 }}>ปุ่ม 1</Button>
+                            </Card>
+                          </Radio>
+                        </Col>
+                        <Col className="gutter-row" span={6}>
+                          <Radio name="type" value={4}>
+                            <Card
+                              hoverable
+                              style={{ width: 240 }}
+                              cover={<img alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
+                            >
+                              <p>Title</p>
+                              <p>Description</p>
+                              <div style={{ display: 'flex', flexDirection: "row", justifyContent: "space-between" }}>
+                                <Button style={{ backgroundColor: colorButton1, color: textColorButton1 }}>ปุ่ม 1</Button>
+                                <Button style={{ backgroundColor: colorButton2, color: textColorButton2 }}>ปุ่ม 2</Button>
+                              </div>
+                            </Card>
+                          </Radio>
+                        </Col>
+                      </Row>
+                    </Space>
+                  </Radio.Group>
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginTop: 20 }}>
+                <Col className="gutter-row" span={8}>
+                  <Field
+                    label={{ text: "image action url" }}
+                    name="image_action_url"
+                    type="text"
+                    component={Input}
+                    rows={2}
+                    className="form-control round"
+                    id="image_action_url"
+                  />
+                </Col>
+              </Row>
+              {renderTitle()}
+              {renderButtons()}
+              <Row gutter={16}>
+                <Col className="gutter-row" span={16}>
+                  สถานะ
+                  <Row gutter={16}>
+                    <Col className="gutter-row" span={16} style={{ marginTop: "10px" }}>
+                      <span >
+                        <Switch
+                          onClick={handleStatus}
+                          checkedChildren="active"
+                          unCheckedChildren="inactive"
+                          defaultChecked={isActive == 'active' ? true : false}
+                        />
+                      </span>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginTop: 20 }}>
+                <Col className="gutter-row" span={8}>
+                  <Field
+                    label={{ text: "priority" }}
+                    name="priority"
+                    type="number"
+                    component={Input}
+                    rows={2}
+                    className="form-control round"
+                    id="priority"
+                  />
+                </Col>
+                <Col className="gutter-row" span={8}>
+                  <Field
+                    label={{ text: 'วันเวลาแสดง Modal Popup' }}
+                    name="show_date"
+                    component={DateTimeRangePicker}
+                    id="show_date"
+                    placeholder="show_date"
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col className="gutter-row" span={8}>
+                  <Button
+                    style={{ width: '120px', marginTop: '31px' }}
+                    type="primary"
+                    size="middle"
+                    htmlType="submit"
+                  >
+                    บันทึก
+                  </Button>
+                </Col>
+              </Row>
+            </Form>
+          )}
+        </Formik>
+
+      </Card >
+    </MainLayout >
+  )
+}
+
+
+export default BannerModalPopUpCreate

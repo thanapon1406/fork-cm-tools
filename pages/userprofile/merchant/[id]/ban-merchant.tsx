@@ -152,6 +152,7 @@ export default function BanOutlet({}: Props): ReactElement {
         description: '',
       })
       setIsLoading(true)
+      getOutlet(id)
     } else {
       // Handle Case : Not Success
       notification.error({

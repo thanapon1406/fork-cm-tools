@@ -1,8 +1,7 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
 import {
-  FileTextOutlined,
-  LogoutOutlined, NotificationOutlined, SolutionOutlined,
+  FileTextOutlined, LayoutOutlined, LogoutOutlined, NotificationOutlined, SolutionOutlined,
   TeamOutlined,
   UserOutlined,
   WalletOutlined
@@ -113,23 +112,23 @@ export default function Sidebar({ }: Props): ReactElement {
     },
     {
       index: 3,
-      title: 'User Profile',
+      title: 'บัญชีผู้ใช้งาน',
       icon: <TeamOutlined />,
       key: 'userProfile',
       link: '/userprofile',
       sub: [
         {
-          title: 'Consumer Profile',
+          title: 'บัญชีลูกค้า',
           link: '/consumer',
           key: '/consumer',
         },
         {
-          title: 'Rider Profile',
+          title: 'บัญชีไรเดอร์',
           link: '/userprofile/rider',
           key: '/userprofile/rider',
         },
         {
-          title: 'Merchant Profile',
+          title: 'บัญชีร้านค้า',
           link: '/userprofile/merchant',
           key: '/userprofile/merchant',
         },
@@ -222,7 +221,21 @@ export default function Sidebar({ }: Props): ReactElement {
           title: 'Broadcast News ',
           link: '/notifications/broadcast_news',
           key: '/notifications/broadcast_news',
-        },
+        }
+      ],
+    },
+    {
+      index: 8,
+      title: 'Banner',
+      icon: <LayoutOutlined />,
+      key: 'Banner',
+      link: '/banner',
+      sub: [
+        {
+          title: 'Modal Pop Up',
+          link: '/banner/modal-pop-up',
+          key: '/banner/modal-pop-up',
+        }
       ],
     },
   ]

@@ -18,7 +18,7 @@ import * as Yup from 'yup';
 import noImage from '../../../public/asset/images/no-image-available.svg';
 
 const { Title } = Typography
-const { confirm, warning } = Modal
+const { warning } = Modal
 
 const BannerModalPopUpCreate = (): ReactElement => {
   const router = useRouter()
@@ -422,9 +422,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                               style={{ width: 240 }}
                               cover={<img alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
                             >
-                              <p>Title</p>
-                              <p>Description</p>
-                              <Button style={{ backgroundColor: colorButton1, color: textColorButton1 }}>ปุ่ม 1</Button>
+                              <p>{values.content.title == "" ? "ชื่อเรื่อง" : values.content.title}</p>
+                              <p>{values.content.text == "" ? "รายละเอียด" : values.content.text}</p>
+                              <Button style={{ backgroundColor: colorButton1, color: textColorButton1 }}>{values.textButton1 == "" ? "ปุ่ม 1" : values.textButton1}</Button>
                             </Card>
                           </Radio>
                         </Col>
@@ -435,11 +435,11 @@ const BannerModalPopUpCreate = (): ReactElement => {
                               style={{ width: 240 }}
                               cover={<img alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
                             >
-                              <p>Title</p>
-                              <p>Description</p>
+                              <p>{values.content.title == "" ? "ชื่อเรื่อง" : values.content.title}</p>
+                              <p>{values.content.text == "" ? "รายละเอียด" : values.content.text}</p>
                               <div style={{ display: 'flex', flexDirection: "row", justifyContent: "space-between" }}>
-                                <Button style={{ backgroundColor: colorButton1, color: textColorButton1 }}>ปุ่ม 1</Button>
-                                <Button style={{ backgroundColor: colorButton2, color: textColorButton2 }}>ปุ่ม 2</Button>
+                                <Button style={{ backgroundColor: colorButton1, color: textColorButton1 }}>{values.textButton1 == "" ? "ปุ่ม 1" : values.textButton1}</Button>
+                                <Button style={{ backgroundColor: colorButton2, color: textColorButton2 }}>{values.textButton2 == "" ? "ปุ่ม 2" : values.textButton2}</Button>
                               </div>
                             </Card>
                           </Radio>

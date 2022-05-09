@@ -6,7 +6,7 @@ import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
 import { getModalPopUpList } from '@/services/modalPopUp'
-import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
+import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
 import { useRouter } from 'next/router'
@@ -37,8 +37,8 @@ export default function Merchant({ }: Props): ReactElement {
     status: '',
     app_id: '',
     create_date: {
-      start: moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
-      end: moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
+      start: '',
+      end: ''
     },
   }
 
@@ -235,7 +235,7 @@ export default function Merchant({ }: Props): ReactElement {
       </Row>
       <Card>
         <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-          {(values) => (
+          {({ values, resetForm, setValues }) => (
             <Form>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -248,18 +248,42 @@ export default function Merchant({ }: Props): ReactElement {
                     id="keyword"
                     placeholder="ค้นหา"
                   />
-                  <div className="ant-form ant-form-vertical">
-                    <Space>
-                      <Button
-                        style={{ width: '120px', marginTop: '31px' }}
-                        type="primary"
-                        size="middle"
-                        htmlType="submit"
-                      >
-                        ค้นหา
-                      </Button>
-                    </Space>
-                  </div>
+                  <Row>
+                    <Col className="gutter-row" span={6}>
+                      <div className="ant-form ant-form-vertical">
+                        <Button
+                          style={{ width: '120px', marginTop: '27px' }}
+                          type="primary"
+                          size="middle"
+                          htmlType="submit"
+                        >
+                          ค้นหา
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <div className="ant-form ant-form-vertical">
+                        <Button
+                          style={{ width: '120px', marginTop: '27px', marginLeft: '70px' }}
+                          type="default"
+                          size="middle"
+                          onClick={() => {
+                            setValues({
+                              keyword: '',
+                              status: '',
+                              app_id: '',
+                              create_date: {
+                                start: '',
+                                end: ''
+                              },
+                            })
+                          }}
+                        >
+                          เคลียร์
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
                 </Col>
                 <Col className="gutter-row" span={5}>
                   <Field
@@ -317,7 +341,7 @@ export default function Merchant({ }: Props): ReactElement {
             </Form>
           )}
         </Formik>
-      </Card>
+      </Card >
       <Card>
         <Table
           config={{
@@ -346,6 +370,6 @@ export default function Merchant({ }: Props): ReactElement {
           }}
         />
       </Card>
-    </MainLayout>
+    </MainLayout >
   )
 }

@@ -72,10 +72,10 @@ export default function Merchant({ }: Props): ReactElement {
 
   const fetchDataActive = async (filterObj: filterObject = filter, paging: Pagination = paginationActive) => {
     const reqBody = {
+      ...filterObj,
       is_eligible: true,
       page: paging.current,
       per_page: paging.pageSize,
-      ...filterObj,
     }
     console.log(`reqBody Active`, reqBody)
     setIsLoading(true)
@@ -95,10 +95,10 @@ export default function Merchant({ }: Props): ReactElement {
 
   const fetchDataInactive = async (filterObj: filterObject = filter, paging: Pagination = paginationActive) => {
     const reqBody = {
+      ...filterObj,
       is_eligible: false,
       page: paging.current,
       per_page: paging.pageSize,
-      ...filterObj,
     }
     console.log(`reqBody Inactive`, reqBody)
     setIsLoadingInactive(true)

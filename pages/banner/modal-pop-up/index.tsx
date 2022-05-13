@@ -8,7 +8,7 @@ import MainLayout from '@/layout/MainLayout'
 import { getModalPopUpList } from '@/services/modalPopUp'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { toNumber } from 'lodash'
+import { get, toNumber } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
@@ -187,11 +187,14 @@ export default function Merchant({ }: Props): ReactElement {
       dataIndex: 'updated_at',
       align: 'center',
       render: (row: any) => {
-        const start = moment(row['start_date']).format('YYYY-MM-DD HH:mm')
-        const end = moment(row['end_date']).format('YYYY-MM-DD HH:mm')
+        if (!row?.start_date && !row?.end_date) {
+          return "ไม่ได้ระบุ"
+        }
+        const start = `${get(row, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(row['start_date']).format('YYYY-MM-DD HH:mm')
+        const end = `${get(row, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(row['end_date']).format('YYYY-MM-DD HH:mm')
         return (<>
-          <div>{start}</div>
-          <div>{end}</div>
+          <div>ตั้งแต่วันที่: {start}</div>
+          <div>ถึงวันที่: {end}</div>
         </>)
       },
     },

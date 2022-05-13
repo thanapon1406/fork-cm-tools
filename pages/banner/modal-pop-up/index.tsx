@@ -192,8 +192,8 @@ export default function Merchant({ }: Props): ReactElement {
         const start = `${get(row, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(row['start_date']).format('YYYY-MM-DD HH:mm')
         const end = `${get(row, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(row['end_date']).format('YYYY-MM-DD HH:mm')
         return (<>
-          <div>ตั้งแต่วันที่: {start}</div>
-          <div>ถึงวันที่: {end}</div>
+          <div><b>ตั้งแต่วันที่:</b> {start}</div>
+          <div><b>ถึงวันที่:</b> {end}</div>
         </>)
       },
     },

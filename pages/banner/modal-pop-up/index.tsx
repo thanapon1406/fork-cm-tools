@@ -184,7 +184,6 @@ export default function Merchant({ }: Props): ReactElement {
     },
     {
       title: 'วันที่แสดง modal',
-      dataIndex: 'updated_at',
       align: 'center',
       render: (row: any) => {
         if (!row?.start_date && !row?.end_date) {

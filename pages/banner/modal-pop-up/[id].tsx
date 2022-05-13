@@ -65,14 +65,16 @@ export default function View({ }: Props): ReactElement {
     text: '',
     text_color: '',
     background_color: '',
-    action_url: ''
+    action_url: '',
+    action_type: ''
   }
 
   const button2 = {
     text: '',
     text_color: '',
     background_color: '',
-    action_url: ''
+    action_url: '',
+    action_type: ''
   }
 
   const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
@@ -83,6 +85,7 @@ export default function View({ }: Props): ReactElement {
     app_id: '',
     image: '',
     image_action_url: '',
+    image_action_type: '',
     name: '',
     priority: '',
     status: '',
@@ -100,8 +103,10 @@ export default function View({ }: Props): ReactElement {
     buttons: [],
     textButton1: '',
     actionButton1: '',
+    actionType1: '',
     textButton2: '',
-    actionButton2: ''
+    actionButton2: '',
+    actionType2: ''
   })
 
   useEffect(() => {
@@ -125,6 +130,7 @@ export default function View({ }: Props): ReactElement {
         app_id: data.app_id,
         image: data.image,
         image_action_url: data.image_action_url,
+        image_action_type: data.image_action_type,
         name: data.name,
         priority: data.priority,
         type: data.type,
@@ -143,12 +149,14 @@ export default function View({ }: Props): ReactElement {
       if (data.type > 2) {
         d.textButton1 = data.buttons[0].text
         d.actionButton1 = data.buttons[0].action_url
+        d.actionType1 = data.buttons[0].action_type
         setColorButton1(data.buttons[0].background_color)
         setTextColorButton1(data.buttons[0].text_color)
       }
       if (data.type > 3) {
         d.textButton2 = data.buttons[1].text
         d.actionButton2 = data.buttons[1].action_url
+        d.actionType2 = data.buttons[1].action_type
         setColorButton2(data.buttons[1].background_color)
         setTextColorButton2(data.buttons[1].text_color)
       }
@@ -181,6 +189,7 @@ export default function View({ }: Props): ReactElement {
       button1.text_color = textColorButton1
       button1.background_color = colorButton1
       button1.action_url = values.actionButton1
+      button1.action_type = values.actionType1
       values.buttons[0] = button1
     }
     if (typeModal == 4) {
@@ -188,14 +197,16 @@ export default function View({ }: Props): ReactElement {
       button1.text_color = textColorButton1
       button1.background_color = colorButton1
       button1.action_url = values.actionButton1
+      button1.action_type = values.actionType1
       button2.text = values.textButton2
       button2.text_color = textColorButton2
       button2.background_color = colorButton2
       button2.action_url = values.actionButton2
+      button2.action_type = values.actionType2
       values.buttons[0] = button1
       values.buttons[1] = button2
     }
-    const value = omit(values, ['show_date'], ['textButton1'], ['actionButton1'], ['textButton2'], ['actionButton2']);
+    const value = omit(values, ['show_date'], ['textButton1'], ['actionButton1'], ['actionType1'], ['textButton2'], ['actionButton2'], ['actionType2']);
     console.log(value)
 
     const { result, success } = await updateModalPopUp(value)
@@ -258,7 +269,7 @@ export default function View({ }: Props): ReactElement {
     if (typeModal == 3) {
       return (
         <>
-          <Row gutter={16}>
+          <Row gutter={24}>
             <Col className="gutter-row" span={8}>
               <Field
                 disabled={(isEdit) ? false : true}
@@ -283,6 +294,25 @@ export default function View({ }: Props): ReactElement {
                 id="actionButton1"
               />
             </Col>
+            <Col className="gutter-row" span={8} >
+              <Field
+                disabled={(isEdit) ? false : true}
+                label={{ text: 'Action type ของปุ่ม' }}
+                name="actionType1"
+                component={Select}
+                id="actionType1"
+                selectOption={[
+                  {
+                    name: 'external url',
+                    value: 'external_url',
+                  },
+                  {
+                    name: 'internal url',
+                    value: 'internal_url',
+                  },
+                ]}
+              />
+            </Col>
           </Row>
           <Row gutter={16}>
             <Col className="gutter-row" span={8}>
@@ -300,7 +330,7 @@ export default function View({ }: Props): ReactElement {
     if (typeModal == 4) {
       return (
         <>
-          <Row gutter={16}>
+          <Row gutter={24}>
             <Col className="gutter-row" span={8}>
               <Field
                 disabled={(isEdit) ? false : true}
@@ -325,6 +355,25 @@ export default function View({ }: Props): ReactElement {
                 id="actionButton1"
               />
             </Col>
+            <Col className="gutter-row" span={8} >
+              <Field
+                disabled={(isEdit) ? false : true}
+                label={{ text: 'Action type ของปุ่ม 1' }}
+                name="actionType1"
+                component={Select}
+                id="actionType1"
+                selectOption={[
+                  {
+                    name: 'external url',
+                    value: 'external_url',
+                  },
+                  {
+                    name: 'internal url',
+                    value: 'internal_url',
+                  },
+                ]}
+              />
+            </Col>
           </Row>
           <Row gutter={16}>
             <Col className="gutter-row" span={8}>
@@ -336,7 +385,7 @@ export default function View({ }: Props): ReactElement {
               <SketchPicker color={textColorButton1} onChangeComplete={handleTextColorButton1} />
             </Col>
           </Row>
-          <Row gutter={16} style={{ marginTop: 20 }}>
+          <Row gutter={24} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <Field
                 disabled={(isEdit) ? false : true}
@@ -359,6 +408,25 @@ export default function View({ }: Props): ReactElement {
                 rows={2}
                 className="form-control round"
                 id="actionButton2"
+              />
+            </Col>
+            <Col className="gutter-row" span={8} >
+              <Field
+                disabled={(isEdit) ? false : true}
+                label={{ text: 'Action type ของปุ่ม 2' }}
+                name="actionType2"
+                component={Select}
+                id="actionType2"
+                selectOption={[
+                  {
+                    name: 'external url',
+                    value: 'external_url',
+                  },
+                  {
+                    name: 'internal url',
+                    value: 'internal_url',
+                  },
+                ]}
               />
             </Col>
           </Row>
@@ -572,6 +640,25 @@ export default function View({ }: Props): ReactElement {
                         rows={2}
                         className="form-control round"
                         id="image_action_url"
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={8} >
+                      <Field
+                        disabled={(isEdit) ? false : true}
+                        label={{ text: 'image action type' }}
+                        name="image_action_type"
+                        component={Select}
+                        id="image_action_type"
+                        selectOption={[
+                          {
+                            name: 'external url',
+                            value: 'external_url',
+                          },
+                          {
+                            name: 'internal url',
+                            value: 'internal_url',
+                          },
+                        ]}
                       />
                     </Col>
                   </Row>

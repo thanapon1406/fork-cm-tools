@@ -8,6 +8,7 @@ import MainLayout from '@/layout/MainLayout'
 import { getModalPopUpList } from '@/services/modalPopUp'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import { toNumber } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
@@ -73,11 +74,11 @@ export default function Merchant({ }: Props): ReactElement {
   const fetchDataActive = async (filterObj: filterObject = filter, paging: Pagination = paginationActive) => {
     const reqBody = {
       ...filterObj,
+      app_id: toNumber(filterObj.app_id),
       is_eligible: true,
       page: paging.current,
       per_page: paging.pageSize,
     }
-    console.log(`reqBody Active`, reqBody)
     setIsLoading(true)
     const { result, success } = await getModalPopUpList(reqBody)
     if (success) {
@@ -96,11 +97,11 @@ export default function Merchant({ }: Props): ReactElement {
   const fetchDataInactive = async (filterObj: filterObject = filter, paging: Pagination = paginationActive) => {
     const reqBody = {
       ...filterObj,
+      app_id: toNumber(filterObj.app_id),
       is_eligible: false,
       page: paging.current,
       per_page: paging.pageSize,
     }
-    console.log(`reqBody Inactive`, reqBody)
     setIsLoadingInactive(true)
     const { result, success } = await getModalPopUpList(reqBody)
     if (success) {
@@ -118,7 +119,6 @@ export default function Merchant({ }: Props): ReactElement {
 
 
   const handleSubmit = (values: any) => {
-    console.log(`values`, values)
     let reqFilter: filterObject = {
       keyword: values.keyword,
       status: values.status,

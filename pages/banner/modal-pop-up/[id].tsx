@@ -141,8 +141,8 @@ export default function View({ }: Props): ReactElement {
           end: data.end_date
         },
         content: {
-          text: data.content.text,
-          title: data.content.title
+          text: data?.content?.text,
+          title: data?.content?.title
         }
       }
 

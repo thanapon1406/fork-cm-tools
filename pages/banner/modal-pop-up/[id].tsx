@@ -522,14 +522,14 @@ export default function View({ }: Props): ReactElement {
     <MainLayout>
       {!_isLoading && (
         <>
-          <Formik enableReinitialize={true} initialValues={initialValues} validationSchema={Schema} onSubmit={handleSubmit}>
+          <Formik enableReinitialize={true} initialValues={initialValues} validationSchema={Schema} onSubmit={handleSubmit} validateOnBlur validateOnChange validateOnMount>
             {({ values, resetForm, setFieldValue }: any) => (
               <Form>
                 <Row gutter={16}>
                   <Col span={20}>
-                    <Title level={4}>Banner</Title>
+                    <Title level={4}>Modal Pop Up</Title>
                     <Breadcrumb style={{ margin: '16px 0' }}>
-                      <Breadcrumb.Item>Banner</Breadcrumb.Item>
+                      <Breadcrumb.Item>Content</Breadcrumb.Item>
                       <Breadcrumb.Item>Modal Pop Up</Breadcrumb.Item>
                       <Breadcrumb.Item>Modal Pop Up Details</Breadcrumb.Item>
                     </Breadcrumb>
@@ -542,7 +542,7 @@ export default function View({ }: Props): ReactElement {
                           size="middle"
                           type="primary"
                           className="confirm-button"
-                          htmlType="submit"
+                          htmlType='submit'
                         >
                           บันทึก
                         </Button1>
@@ -558,16 +558,14 @@ export default function View({ }: Props): ReactElement {
                         </Button1>
                       </>
                     ) : (
-                      <Button1
-                        style={{ float: 'right', backGroundColor: 'forestgreen !important' }}
-                        type="primary"
-                        size="middle"
+                      <Button
+                        style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
                         onClick={() => {
                           setIsEdit(true)
                         }}
                       >
                         แก้ไข
-                      </Button1>
+                      </Button>
                     )}
                   </Col>
                 </Row>

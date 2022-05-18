@@ -452,9 +452,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
     <MainLayout>
       <Row justify="space-around" align="middle">
         <Col span={8}>
-          <Title level={4}>Banner</Title>
+          <Title level={4}>Modal Pop Up</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>Banner</Breadcrumb.Item>
+            <Breadcrumb.Item>Content</Breadcrumb.Item>
             <Breadcrumb.Item>Modal Pop Up Create</Breadcrumb.Item>
           </Breadcrumb>
         </Col>

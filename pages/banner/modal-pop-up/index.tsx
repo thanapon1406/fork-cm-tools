@@ -141,9 +141,9 @@ export default function Merchant({ }: Props): ReactElement {
   }
 
   const appNameMapping: any = {
-    1: 'consumer',
-    2: 'merchant',
-    3: 'rider',
+    1: 'Consumer',
+    2: 'Merchant',
+    3: 'Rider',
   }
 
   const column = [
@@ -204,7 +204,7 @@ export default function Merchant({ }: Props): ReactElement {
     },
     {
       title: 'วันที่สร้าง',
-      dataIndex: 'create_at',
+      dataIndex: 'created_at',
       align: 'center',
       render: (row: any) => {
         return moment(row).format('YYYY-MM-DD HH:mm')

@@ -110,7 +110,15 @@ const BannerModalPopUpCreate = (): ReactElement => {
 
   const Schema = Yup.object().shape({
     app_id: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
-    name: Yup.string().trim().required('กรุณากรอกชื่อ modal pop up')
+    name: Yup.string().trim().required('กรุณากรอกชื่อ modal pop up'),
+    textButton1: Yup.string().when("type", {
+      is: (v: number) => v > 2,
+      then: Yup.string().required("กรุณากรอกคำบนปุ่ม"),
+    }),
+    textButton2: Yup.string().when("type", {
+      is: (v: number) => v > 3,
+      then: Yup.string().required("กรุณากรอกคำบนปุ่ม"),
+    })
   })
 
   const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
@@ -178,7 +186,8 @@ const BannerModalPopUpCreate = (): ReactElement => {
     setImageUrl(res.upload_success.modal_pop_up)
   };
 
-  const renderTitle = () => {
+  const renderTitle = (type: number) => {
+
     if (typeModal > 2) {
       return (
         <>
@@ -192,6 +201,13 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 rows={2}
                 className="form-control round"
                 id="content.title"
+                validate={(value: string) => {
+                  if (type > 2) {
+                    if (value == "") {
+                      return "กรุณากรอชื่อเรื่อง"
+                    }
+                  }
+                }}
               />
             </Col>
           </Row>
@@ -230,7 +246,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
             </Col>
             <Col className="gutter-row" span={8}>
               <Field
-                label={{ text: "Action ของปุ่ม" }}
+                label={{ text: "Action ของปุ่ม URL" }}
                 name="actionButton1"
                 type="text"
                 component={Input}
@@ -289,7 +305,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
             </Col>
             <Col className="gutter-row" span={8}>
               <Field
-                label={{ text: "Action ของปุ่ม 1" }}
+                label={{ text: "Action ของปุ่ม 1 URL" }}
                 name="actionButton1"
                 type="text"
                 component={Input}
@@ -342,7 +358,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
             </Col>
             <Col className="gutter-row" span={8}>
               <Field
-                label={{ text: "Action ของปุ่ม 2" }}
+                label={{ text: "Action ของปุ่ม 2 URL" }}
                 name="actionButton2"
                 type="text"
                 component={Input}
@@ -546,7 +562,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
                   />
                 </Col>
               </Row>
-              {renderTitle()}
+              {renderTitle(values.type)}
               {renderButtons()}
               <Row gutter={16}>
                 <Col className="gutter-row" span={16}>

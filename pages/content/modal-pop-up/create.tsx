@@ -85,7 +85,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
     type: 1,
     image: '',
     image_action_url: '',
-    image_action_type: 'external_url',
+    image_action_type: '',
     start_date: '',
     end_date: '',
     priority: 0,
@@ -101,16 +101,24 @@ const BannerModalPopUpCreate = (): ReactElement => {
     buttons: [button1, button2],
     textButton1: '',
     actionButton1: '',
-    actionType1: 'external_url',
+    actionType1: '',
     textButton2: '',
     actionButton2: '',
-    actionType2: 'external_url',
+    actionType2: '',
   }
 
 
   const Schema = Yup.object().shape({
     app_id: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
-    name: Yup.string().trim().required('กรุณากรอกชื่อ modal pop up')
+    name: Yup.string().trim().required('กรุณากรอกชื่อ modal pop up'),
+    textButton1: Yup.string().when("type", {
+      is: (v: number) => v > 2,
+      then: Yup.string().required("กรุณากรอกคำบนปุ่ม"),
+    }),
+    textButton2: Yup.string().when("type", {
+      is: (v: number) => v > 3,
+      then: Yup.string().required("กรุณากรอกคำบนปุ่ม"),
+    })
   })
 
   const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
@@ -171,14 +179,28 @@ const BannerModalPopUpCreate = (): ReactElement => {
   }
 
   const handleChangeImage = async (info: any) => {
+    const isJPNG = info.type === 'image/jpeg';
+    const isJPG = info.type === 'image/jpg';
+    const isPNG = info.type === 'image/png';
+
+    if (!isJPNG && !isJPG && !isPNG) {
+      warning({
+        title: `กรุณาเลือกรูปภาพ`,
+        afterClose() {
+        }
+      })
+      return null
+    }
+
     setloadingImage(true)
     console.log(handleChangeImage, info)
     const res = await uploadImage(info)
     setloadingImage(false)
     setImageUrl(res.upload_success.modal_pop_up)
-  };
+  }
 
-  const renderTitle = () => {
+  const renderTitle = (type: number) => {
+
     if (typeModal > 2) {
       return (
         <>
@@ -192,6 +214,13 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 rows={2}
                 className="form-control round"
                 id="content.title"
+                validate={(value: string) => {
+                  if (type > 2) {
+                    if (value == "") {
+                      return "กรุณากรอกชื่อเรื่อง"
+                    }
+                  }
+                }}
               />
             </Col>
           </Row>
@@ -212,7 +241,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
     }
   }
 
-  const renderButtons = () => {
+  const renderButtons = (values: any) => {
     if (typeModal == 3) {
       return (
         <>
@@ -230,13 +259,20 @@ const BannerModalPopUpCreate = (): ReactElement => {
             </Col>
             <Col className="gutter-row" span={8}>
               <Field
-                label={{ text: "Action ของปุ่ม" }}
+                label={{ text: "Action ของปุ่ม URL" }}
                 name="actionButton1"
                 type="text"
                 component={Input}
                 rows={2}
                 className="form-control round"
                 id="actionButton1"
+                validate={(value: string) => {
+                  if (values.actionType1 != '') {
+                    if (value == "") {
+                      return "กรุณากรอก Action ของปุ่ม 1"
+                    }
+                  }
+                }}
               />
             </Col>
             <Col className="gutter-row" span={8} >
@@ -245,8 +281,12 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 name="actionType1"
                 component={Select}
                 id="actionType1"
-                defaultValue="external_url"
+                defaultValue=""
                 selectOption={[
+                  {
+                    name: 'ไม่ระบุ',
+                    value: '',
+                  },
                   {
                     name: 'external url',
                     value: 'external_url',
@@ -289,13 +329,20 @@ const BannerModalPopUpCreate = (): ReactElement => {
             </Col>
             <Col className="gutter-row" span={8}>
               <Field
-                label={{ text: "Action ของปุ่ม 1" }}
+                label={{ text: "Action ของปุ่ม 1 URL" }}
                 name="actionButton1"
                 type="text"
                 component={Input}
                 rows={2}
                 className="form-control round"
                 id="actionButton1"
+                validate={(value: string) => {
+                  if (values.actionType1 != '') {
+                    if (value == "") {
+                      return "กรุณากรอก Action ของปุ่ม 1"
+                    }
+                  }
+                }}
               />
             </Col>
             <Col className="gutter-row" span={8} >
@@ -304,8 +351,12 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 name="actionType1"
                 component={Select}
                 id="actionType1"
-                defaultValue="external_url"
+                defaultValue=""
                 selectOption={[
+                  {
+                    name: 'ไม่ระบุ',
+                    value: '',
+                  },
                   {
                     name: 'external url',
                     value: 'external_url',
@@ -342,13 +393,20 @@ const BannerModalPopUpCreate = (): ReactElement => {
             </Col>
             <Col className="gutter-row" span={8}>
               <Field
-                label={{ text: "Action ของปุ่ม 2" }}
+                label={{ text: "Action ของปุ่ม 2 URL" }}
                 name="actionButton2"
                 type="text"
                 component={Input}
                 rows={2}
                 className="form-control round"
                 id="actionButton2"
+                validate={(value: string) => {
+                  if (values.actionType2 != '') {
+                    if (value == "") {
+                      return "กรุณากรอก Action ของปุ่ม 2"
+                    }
+                  }
+                }}
               />
             </Col>
             <Col className="gutter-row" span={8} >
@@ -357,8 +415,12 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 name="actionType2"
                 component={Select}
                 id="actionType2"
-                defaultValue="external_url"
+                defaultValue=""
                 selectOption={[
+                  {
+                    name: 'ไม่ระบุ',
+                    value: '',
+                  },
                   {
                     name: 'external url',
                     value: 'external_url',
@@ -390,9 +452,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
     <MainLayout>
       <Row justify="space-around" align="middle">
         <Col span={8}>
-          <Title level={4}>Banner</Title>
+          <Title level={4}>Modal Pop Up</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>Banner</Breadcrumb.Item>
+            <Breadcrumb.Item>Content</Breadcrumb.Item>
             <Breadcrumb.Item>Modal Pop Up Create</Breadcrumb.Item>
           </Breadcrumb>
         </Col>
@@ -448,6 +510,11 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 >
                   <Button style={{ marginLeft: 10 }} icon={<UploadOutlined />}>เลือกรูป</Button>
                 </Upload>
+                {values.type < 3 ? (
+                  <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ แนะนำ รูปภาพ ขนาด 9:16 1080x1920px</label>
+                ) : (
+                  <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ  แนะนำ รูปภาพ ขนาด 1:1 1080x1080px</label>
+                )}
               </Row>
               <Row gutter={16} style={{ marginTop: 20 }}>
                 <Col className="gutter-row" span={24} >
@@ -524,6 +591,13 @@ const BannerModalPopUpCreate = (): ReactElement => {
                     rows={2}
                     className="form-control round"
                     id="image_action_url"
+                    validate={(value: string) => {
+                      if (values.image_action_type != '') {
+                        if (value == "") {
+                          return "กรุณากรอก image action url"
+                        }
+                      }
+                    }}
                   />
                 </Col>
                 <Col className="gutter-row" span={8} >
@@ -532,8 +606,12 @@ const BannerModalPopUpCreate = (): ReactElement => {
                     name="image_action_type"
                     component={Select}
                     id="image_action_type"
-                    defaultValue="external_url"
+                    defaultValue=""
                     selectOption={[
+                      {
+                        name: 'ไม่ระบุ',
+                        value: '',
+                      },
                       {
                         name: 'external url',
                         value: 'external_url',
@@ -546,8 +624,8 @@ const BannerModalPopUpCreate = (): ReactElement => {
                   />
                 </Col>
               </Row>
-              {renderTitle()}
-              {renderButtons()}
+              {renderTitle(values.type)}
+              {renderButtons(values)}
               <Row gutter={16}>
                 <Col className="gutter-row" span={16}>
                   สถานะ

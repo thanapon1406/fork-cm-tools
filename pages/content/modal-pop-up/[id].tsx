@@ -229,7 +229,7 @@ export default function View({ }: Props): ReactElement {
     setActive(checkStatus)
   }
 
-  const renderTitle = () => {
+  const renderTitle = (type: number) => {
     if (typeModal > 2) {
       return (
         <>
@@ -244,6 +244,13 @@ export default function View({ }: Props): ReactElement {
                 rows={2}
                 className="form-control round"
                 id="content.title"
+                validate={(value: string) => {
+                  if (type > 2) {
+                    if (value == "") {
+                      return "กรุณากรอกชื่อเรื่อง"
+                    }
+                  }
+                }}
               />
             </Col>
           </Row>
@@ -265,7 +272,7 @@ export default function View({ }: Props): ReactElement {
     }
   }
 
-  const renderButtons = () => {
+  const renderButtons = (values: any) => {
     if (typeModal == 3) {
       return (
         <>
@@ -292,6 +299,13 @@ export default function View({ }: Props): ReactElement {
                 rows={2}
                 className="form-control round"
                 id="actionButton1"
+                validate={(value: string) => {
+                  if (values.actionType1 != '') {
+                    if (value == "") {
+                      return "กรุณากรอก Action ของปุ่ม 1"
+                    }
+                  }
+                }}
               />
             </Col>
             <Col className="gutter-row" span={8} >
@@ -302,6 +316,10 @@ export default function View({ }: Props): ReactElement {
                 component={Select}
                 id="actionType1"
                 selectOption={[
+                  {
+                    name: 'ไม่ระบุ',
+                    value: '',
+                  },
                   {
                     name: 'external url',
                     value: 'external_url',
@@ -353,6 +371,13 @@ export default function View({ }: Props): ReactElement {
                 rows={2}
                 className="form-control round"
                 id="actionButton1"
+                validate={(value: string) => {
+                  if (values.actionType1 != '') {
+                    if (value == "") {
+                      return "กรุณากรอก Action ของปุ่ม 1"
+                    }
+                  }
+                }}
               />
             </Col>
             <Col className="gutter-row" span={8} >
@@ -363,6 +388,10 @@ export default function View({ }: Props): ReactElement {
                 component={Select}
                 id="actionType1"
                 selectOption={[
+                  {
+                    name: 'ไม่ระบุ',
+                    value: '',
+                  },
                   {
                     name: 'external url',
                     value: 'external_url',
@@ -408,6 +437,13 @@ export default function View({ }: Props): ReactElement {
                 rows={2}
                 className="form-control round"
                 id="actionButton2"
+                validate={(value: string) => {
+                  if (values.actionType2 != '') {
+                    if (value == "") {
+                      return "กรุณากรอก Action ของปุ่ม 2"
+                    }
+                  }
+                }}
               />
             </Col>
             <Col className="gutter-row" span={8} >
@@ -418,6 +454,10 @@ export default function View({ }: Props): ReactElement {
                 component={Select}
                 id="actionType2"
                 selectOption={[
+                  {
+                    name: 'ไม่ระบุ',
+                    value: '',
+                  },
                   {
                     name: 'external url',
                     value: 'external_url',
@@ -446,6 +486,18 @@ export default function View({ }: Props): ReactElement {
   }
 
   const handleChangeImage = async (info: any) => {
+    const isJPNG = info.type === 'image/jpeg';
+    const isJPG = info.type === 'image/jpg';
+    const isPNG = info.type === 'image/png';
+
+    if (!isJPNG && !isJPG && !isPNG) {
+      warning({
+        title: `กรุณาเลือกรูปภาพ`,
+        afterClose() {
+        }
+      })
+      return null
+    }
     setloadingImage(true)
     console.log(handleChangeImage, info)
     const res = await uploadImage(info)
@@ -455,22 +507,29 @@ export default function View({ }: Props): ReactElement {
 
   const Schema = Yup.object().shape({
     app_id: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
-    name: Yup.string().trim().required('กรุณากรอกชื่อ modal pop up')
+    name: Yup.string().trim().required('กรุณากรอกชื่อ modal pop up'),
+    textButton1: Yup.string().when("type", {
+      is: (v: number) => v > 2,
+      then: Yup.string().required("กรุณากรอกคำบนปุ่ม"),
+    }),
+    textButton2: Yup.string().when("type", {
+      is: (v: number) => v > 3,
+      then: Yup.string().required("กรุณากรอกคำบนปุ่ม"),
+    })
   })
-
 
   return (
     <MainLayout>
       {!_isLoading && (
         <>
-          <Formik enableReinitialize={true} initialValues={initialValues} validationSchema={Schema} onSubmit={() => { }}>
+          <Formik enableReinitialize={true} initialValues={initialValues} validationSchema={Schema} onSubmit={handleSubmit} validateOnBlur validateOnChange validateOnMount>
             {({ values, resetForm, setFieldValue }: any) => (
               <Form>
                 <Row gutter={16}>
                   <Col span={20}>
-                    <Title level={4}>Banner</Title>
+                    <Title level={4}>Modal Pop Up</Title>
                     <Breadcrumb style={{ margin: '16px 0' }}>
-                      <Breadcrumb.Item>Banner</Breadcrumb.Item>
+                      <Breadcrumb.Item>Content</Breadcrumb.Item>
                       <Breadcrumb.Item>Modal Pop Up</Breadcrumb.Item>
                       <Breadcrumb.Item>Modal Pop Up Details</Breadcrumb.Item>
                     </Breadcrumb>
@@ -481,10 +540,9 @@ export default function View({ }: Props): ReactElement {
                         <Button1
                           style={{ float: 'right', backGroundColor: 'forestgreen !important' }}
                           size="middle"
+                          type="primary"
                           className="confirm-button"
-                          onClick={() => {
-                            handleSubmit(values)
-                          }}
+                          htmlType='submit'
                         >
                           บันทึก
                         </Button1>
@@ -500,16 +558,14 @@ export default function View({ }: Props): ReactElement {
                         </Button1>
                       </>
                     ) : (
-                      <Button1
-                        style={{ float: 'right', backGroundColor: 'forestgreen !important' }}
-                        type="primary"
-                        size="middle"
+                      <Button
+                        style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
                         onClick={() => {
                           setIsEdit(true)
                         }}
                       >
                         แก้ไข
-                      </Button1>
+                      </Button>
                     )}
                   </Col>
                 </Row>
@@ -640,6 +696,13 @@ export default function View({ }: Props): ReactElement {
                         rows={2}
                         className="form-control round"
                         id="image_action_url"
+                        validate={(value: string) => {
+                          if (values.image_action_type != '') {
+                            if (value == "") {
+                              return "กรุณากรอก image action url"
+                            }
+                          }
+                        }}
                       />
                     </Col>
                     <Col className="gutter-row" span={8} >
@@ -650,6 +713,10 @@ export default function View({ }: Props): ReactElement {
                         component={Select}
                         id="image_action_type"
                         selectOption={[
+                          {
+                            name: 'ไม่ระบุ',
+                            value: '',
+                          },
                           {
                             name: 'external url',
                             value: 'external_url',
@@ -662,8 +729,8 @@ export default function View({ }: Props): ReactElement {
                       />
                     </Col>
                   </Row>
-                  {renderTitle()}
-                  {renderButtons()}
+                  {renderTitle(values.type)}
+                  {renderButtons(values)}
                   <Row gutter={16} >
                     <Col className="gutter-row" span={16}>
                       สถานะ

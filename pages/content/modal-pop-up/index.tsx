@@ -141,9 +141,9 @@ export default function Merchant({ }: Props): ReactElement {
   }
 
   const appNameMapping: any = {
-    1: 'consumer',
-    2: 'merchant',
-    3: 'rider',
+    1: 'Consumer',
+    2: 'Merchant',
+    3: 'Rider',
   }
 
   const column = [
@@ -190,7 +190,7 @@ export default function Merchant({ }: Props): ReactElement {
           return "ไม่ได้ระบุ"
         }
         const start = `${get(row, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(row['start_date']).format('YYYY-MM-DD HH:mm')
-        const end = `${get(row, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(row['end_date']).format('YYYY-MM-DD HH:mm')
+        const end = `${get(row, 'end_date')}` == "" ? "ไม่ได้ระบุ" : moment(row['end_date']).format('YYYY-MM-DD HH:mm')
         return (<>
           <div><b>ตั้งแต่วันที่:</b> {start}</div>
           <div><b>ถึงวันที่:</b> {end}</div>
@@ -204,7 +204,7 @@ export default function Merchant({ }: Props): ReactElement {
     },
     {
       title: 'วันที่สร้าง',
-      dataIndex: 'create_at',
+      dataIndex: 'created_at',
       align: 'center',
       render: (row: any) => {
         return moment(row).format('YYYY-MM-DD HH:mm')
@@ -216,9 +216,9 @@ export default function Merchant({ }: Props): ReactElement {
     <MainLayout>
       <Row justify="space-around" align="middle">
         <Col span={8}>
-          <Title level={4}>Banner</Title>
+          <Title level={4}>Modal Pop Up</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>Banner</Breadcrumb.Item>
+            <Breadcrumb.Item>Content</Breadcrumb.Item>
             <Breadcrumb.Item>Modal Pop Up</Breadcrumb.Item>
           </Breadcrumb>
         </Col>

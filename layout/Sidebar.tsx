@@ -226,15 +226,15 @@ export default function Sidebar({ }: Props): ReactElement {
     },
     {
       index: 8,
-      title: 'Banner',
+      title: 'Content',
       icon: <LayoutOutlined />,
-      key: 'Banner',
-      link: '/banner',
+      key: 'Content',
+      link: '/content',
       sub: [
         {
           title: 'Modal Pop Up',
-          link: '/banner/modal-pop-up',
-          key: '/banner/modal-pop-up',
+          link: '/content/modal-pop-up',
+          key: '/content/modal-pop-up',
         }
       ],
     },

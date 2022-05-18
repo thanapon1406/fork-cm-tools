@@ -228,7 +228,7 @@ export default function Merchant({ }: Props): ReactElement {
             type="primary"
             size="middle"
             onClick={() => {
-              Router.push('/banner/modal-pop-up/create', `/banner/modal-pop-up/create`);
+              Router.push('/content/modal-pop-up/create', `/content/modal-pop-up/create`);
             }}
           >
             สร้าง Modal Pop Up

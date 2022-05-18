@@ -215,7 +215,7 @@ export default function View({ }: Props): ReactElement {
         message: `ดำเนินการอัพเดตสถานะสำเร็จ`,
         description: '',
       })
-      router.push('/banner/modal-pop-up');
+      router.push('/content/modal-pop-up');
     } else {
       notification.error({
         message: `ไม่สามารถทำการ อัพเดตได้`,

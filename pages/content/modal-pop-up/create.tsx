@@ -161,7 +161,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
     console.log(value)
     const { result, success } = await createModalPopUp(value)
     if (success) {
-      router.push('/banner/modal-pop-up');
+      router.push('/content/modal-pop-up');
     }
   }
 

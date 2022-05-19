@@ -34,6 +34,7 @@ interface PersonalInfo {
   line_id: string
   phone: string
   photo: string
+  partner_name: string
   assigned_time: Date
   tracking_link: string
 }

@@ -3,7 +3,7 @@ import errorHandler from './handler/errorHandler';
 import successHandler from './handler/successHandler';
 
 export {
-  createModalPopUp, updateModalPopUp, getModalPopUp, getModalPopUpList, getModalPopUpActiveList
+  createModalPopUp, updateModalPopUp, getModalPopUp, getModalPopUpList, getModalPopUpActiveList, deleteModalPopUp
 };
 
 export interface requestModalPopUpInterface {
@@ -41,6 +41,15 @@ const updateModalPopUp = async (req: any) => {
 const getModalPopUp = async (id: string) => {
   try {
     const result = await fetch.get(`/api/modal-popup/find?id=${id}`)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const deleteModalPopUp = async (id: number) => {
+  try {
+    const result = await fetch.get(`/api/modal-popup/delete?id=${id}`)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

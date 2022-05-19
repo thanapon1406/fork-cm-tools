@@ -5,16 +5,18 @@ import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
-import { getModalPopUpList } from '@/services/modalPopUp'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { deleteModalPopUp, getModalPopUpList } from '@/services/modalPopUp'
+import { uniqueId } from '@/utils/helpers'
+import {
+  DeleteOutlined, EyeOutlined
+} from '@ant-design/icons'
+import { Breadcrumb, Col, Menu, Modal, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get, toNumber } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
-
 const { Title } = Typography
-
 interface Props { }
 
 interface Pagination {
@@ -210,7 +212,42 @@ export default function Merchant({ }: Props): ReactElement {
         return moment(row).format('YYYY-MM-DD HH:mm')
       },
     },
+    {
+      title: 'action',
+      align: 'center',
+      render: (row: any) => {
+        return (
+          <Menu style={{ border: 'none' }}>
+            <Menu.Item key={`${uniqueId()}`} icon={<EyeOutlined />} onClick={() => View(row.id)}>
+              View
+            </Menu.Item>
+            <Menu.Item key={`${uniqueId()}`} icon={<DeleteOutlined />} onClick={() => Delete(row.id)} >
+              Delete
+            </Menu.Item>
+          </Menu>
+        )
+      },
+    },
   ]
+
+  let View = (id: number) => {
+    Router.push(`/content/modal-pop-up/${id}`)
+  }
+
+  let Delete = (id: number) => {
+    Modal.confirm({
+      title: `คุณแน่ใจหรือไม่ที่จะลบ modal pop up`,
+      async onOk() {
+        handleDelete(id)
+      },
+      onCancel() { },
+    })
+  }
+
+  const handleDelete = async (id: number) => {
+    const { result, success } = await deleteModalPopUp(id)
+    Router.reload()
+  }
 
   return (
     <MainLayout>
@@ -349,9 +386,8 @@ export default function Merchant({ }: Props): ReactElement {
           config={{
             dataTableTitle: 'Pop Up Online',
             loading: _isLoading,
-            tableName: 'banner/modal-pop-up',
+            tableName: 'content/modal-pop-up',
             tableColumns: column,
-            action: ['view'],
             dataSource: dataTableActive,
             handelDataTableLoad: handelDataTableLoadActive,
             pagination: paginationActive,
@@ -363,9 +399,8 @@ export default function Merchant({ }: Props): ReactElement {
           config={{
             dataTableTitle: 'Pop Up Offline',
             loading: _isLoadingInactive,
-            tableName: 'banner/modal-pop-up',
+            tableName: 'content/modal-pop-up',
             tableColumns: column,
-            action: ['view'],
             dataSource: dataTableInactive,
             handelDataTableLoad: handelDataTableLoadInactive,
             pagination: paginationInactive,

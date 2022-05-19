@@ -19,9 +19,11 @@ interface Props extends FormikProps {
   };
   minDate?: Moment;
   maxDate?: Moment;
+  disabled?: boolean;
 }
 
 export default function DateTimeRangePicker({
+  disabled,
   label,
   field,
   minDate,
@@ -65,6 +67,7 @@ export default function DateTimeRangePicker({
     <div className="ant-form ant-form-vertical">
       <Form.Item label={label?.text}>
         <RangePicker
+          disabled={disabled}
           showTime={{ format: 'HH:mm' }}
           format="YYYY-MM-DD HH:mm"
           value={defaultValue}

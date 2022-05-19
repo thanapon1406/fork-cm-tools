@@ -335,11 +335,11 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={16}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม</label>
-              <SketchPicker color={colorButton1} onChangeComplete={handleColorButton1} />
+              <SketchPicker disableAlpha={true} color={colorButton1} onChangeComplete={handleColorButton1} />
             </Col>
             <Col className="gutter-row" span={8}>
               <label>สีคำของปุ่ม</label>
-              <SketchPicker color={textColorButton1} onChangeComplete={handleTextColorButton1} />
+              <SketchPicker disableAlpha={true} color={textColorButton1} onChangeComplete={handleTextColorButton1} />
             </Col>
           </Row>
         </>
@@ -407,11 +407,11 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={16}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม 1</label>
-              <SketchPicker color={colorButton1} onChangeComplete={handleColorButton1} />
+              <SketchPicker disableAlpha={true} color={colorButton1} onChangeComplete={handleColorButton1} />
             </Col>
             <Col className="gutter-row" span={8}>
               <label>สีคำของปุ่ม 1</label>
-              <SketchPicker color={textColorButton1} onChangeComplete={handleTextColorButton1} />
+              <SketchPicker disableAlpha={true} color={textColorButton1} onChangeComplete={handleTextColorButton1} />
             </Col>
           </Row>
           <Row gutter={24} style={{ marginTop: 20 }}>
@@ -473,11 +473,11 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={16}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม 2</label>
-              <SketchPicker color={colorButton2} onChangeComplete={handleColorButton2} />
+              <SketchPicker disableAlpha={true} color={colorButton2} onChangeComplete={handleColorButton2} />
             </Col>
             <Col className="gutter-row" span={8}>
               <label>สีคำของปุ่ม 2</label>
-              <SketchPicker color={textColorButton2} onChangeComplete={handleTextColorButton2} />
+              <SketchPicker disableAlpha={true} color={textColorButton2} onChangeComplete={handleTextColorButton2} />
             </Col>
           </Row>
         </>
@@ -560,6 +560,7 @@ export default function View({ }: Props): ReactElement {
                     ) : (
                       <Button
                         style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
+                        type="primary"
                         onClick={() => {
                           setIsEdit(true)
                         }}

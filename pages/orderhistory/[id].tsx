@@ -49,6 +49,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   let [orderStatusHistory, setOrderStatusHistory] = useState<Array<OrderStatusHistoryDetail>>([])
 
   const [creditDetail, setCreditDetail] = useState<Credit>()
+  let [pandagoLink, setPandagoLink] = useState('')
 
   let [riderInitialValues, setRiderInitialValues] = useState({
     rider_name: '-',
@@ -156,6 +157,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             }
             if (!isUndefined(data?.partner_name)) {
               partnerName = data.partner_name
+            }
+            if (!isUndefined(data?.rider_info?.tracking_link)) {
+              setPandagoLink(data?.rider_info.tracking_link)
             }
           }
         }
@@ -421,19 +425,22 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             </div>
           )
 
+          let all_tracking_link = ''
           if (
             data.current_rider_info &&
             data.current_rider_info.tracking_link != '' &&
             data.current_rider_info.tracking_link != undefined
           ) {
+            all_tracking_link = data.current_rider_info?.tracking_link
+          } else if (pandagoLink != '') {
+            all_tracking_link = pandagoLink
+          }
+
+          if (all_tracking_link != '') {
             dataMap = (
               <div>
                 <Link
-                  href={
-                    data.current_rider_info?.tracking_link
-                      ? data.current_rider_info?.tracking_link
-                      : ''
-                  }
+                  href={all_tracking_link}
                 >
                   <a target="_blank" style={{ color: '#000000', textDecoration: 'underline' }}>
                     {data.current_rider_info.first_name + ' '}
@@ -444,6 +451,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
               </div>
             )
           }
+
           return (
             <>
               <div>

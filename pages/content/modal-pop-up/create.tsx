@@ -185,7 +185,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
 
     if (!isJPNG && !isJPG && !isPNG) {
       warning({
-        title: `กรุณาเลือกรูปภาพ`,
+        title: `ไฟล์รูปภาพที่เลือกไม่ถูกต้อง`,
         afterClose() {
         }
       })
@@ -511,9 +511,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                   <Button style={{ marginLeft: 10 }} icon={<UploadOutlined />}>เลือกรูป</Button>
                 </Upload>
                 {values.type < 3 ? (
-                  <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ แนะนำ รูปภาพ ขนาด 9:16 1080x1920px</label>
+                  <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ แนะนำ รูปภาพ ขนาด 9:16 1080x1920px และไฟล์ jpeg,jpg,png</label>
                 ) : (
-                  <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ  แนะนำ รูปภาพ ขนาด 1:1 1080x1080px</label>
+                  <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ  แนะนำ รูปภาพ ขนาด 1:1 1080x1080px และไฟล์ jpeg,jpg,png</label>
                 )}
               </Row>
               <Row gutter={16} style={{ marginTop: 20 }}>

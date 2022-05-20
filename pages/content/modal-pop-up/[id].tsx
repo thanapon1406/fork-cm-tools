@@ -492,14 +492,13 @@ export default function View({ }: Props): ReactElement {
 
     if (!isJPNG && !isJPG && !isPNG) {
       warning({
-        title: `กรุณาเลือกรูปภาพ`,
+        title: `ไฟล์รูปภาพที่เลือกไม่ถูกต้อง`,
         afterClose() {
         }
       })
       return null
     }
     setloadingImage(true)
-    console.log(handleChangeImage, info)
     const res = await uploadImage(info)
     setloadingImage(false)
     setImageUrl(res.upload_success.modal_pop_up)
@@ -619,6 +618,11 @@ export default function View({ }: Props): ReactElement {
                     >
                       <Button style={{ marginLeft: 10 }} icon={<UploadOutlined />}>เลือกรูป</Button>
                     </Upload>
+                    {values.type < 3 ? (
+                      <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ แนะนำ รูปภาพ ขนาด 9:16 1080x1920px และไฟล์ jpeg,jpg,png</label>
+                    ) : (
+                      <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ  แนะนำ รูปภาพ ขนาด 1:1 1080x1080px และไฟล์ jpeg,jpg,png</label>
+                    )}
                   </Row>
                   <Row gutter={16} style={{ marginTop: 20 }}>
                     <Col className="gutter-row" span={24} >

@@ -9,6 +9,7 @@ import { deliveryInfo, userServiceType } from '@/constants/textMapping'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
 import { getOutletType, outletList } from '@/services/merchant'
+import { currency } from '@/utils/helpers'
 import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _ from 'lodash'
@@ -139,6 +140,9 @@ export default function MerchantProfileList({}: Props): ReactElement {
       title: 'เครดิต',
       dataIndex: 'available_credit',
       align: 'center',
+      render: (row: number) => {
+        return currency.format(row).replace('฿', '')
+      },
     },
     {
       title: 'สถานะร้านค้า',

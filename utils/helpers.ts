@@ -81,6 +81,11 @@ const humanFileSize = (size: number | any | bigint) => {
   return fileType
 }
 
+const currency = new Intl.NumberFormat('th-TH', {
+  style: 'currency',
+  currency: 'THB',
+})
+
 export {
   numberFormat,
   uniqueId,
@@ -91,4 +96,5 @@ export {
   determineAppId,
   monthFormat,
   humanFileSize,
+  currency,
 }

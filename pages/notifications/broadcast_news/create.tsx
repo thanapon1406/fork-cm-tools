@@ -7,7 +7,7 @@ import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
 import { createBroadcastNew } from '@/services/broadcastNews';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Divider, Modal, Radio, Row, Switch, Typography } from 'antd';
+import { Breadcrumb, Button, Col, Divider, Input as InputAntd, Modal, Radio, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import { range } from 'lodash';
 import moment, { Moment } from "moment";
@@ -46,7 +46,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
     news_type_id: Yup.string().trim().required('กรุณาเลือกประเภทแจ้งเตือน'),
     title: Yup.string().trim().max(50).required('กรุณากรอกชื่อเรื่อง'),
     body: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียดแบบย่อ'),
-    body_full: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียดแบบเต็ม'),
+    body_full: Yup.string().trim().required('กรุณากรอกรายละเอียดแบบเต็ม'),
     schedule_at: Yup.mixed().test('is-42', 'กรุณาตั้งเวลาส่ง', (value: string, form: any) => {
       let customDate = moment().format("YYYY-MM-DD HH:mm");
       let newValue = moment(value).add(-4, "minute").format("YYYY-MM-DD HH:mm")
@@ -73,10 +73,13 @@ const NotificationsBroadcastNews = (): ReactElement => {
 
   const handleSubmit = (values: typeof initialValues) => {
     let scheduleAt = values.schedule_at
+    let fullLink = ""
     if (scheduleAt == "") {
       scheduleAt = String(moment().format());
     }
-
+    if (values.link != "") {
+      fullLink = `https://${values.link}`
+    }
     confirm({
       title: `ยืนยันการส่ง Broadcast News (${values.title})`,
       icon: <ExclamationCircleOutlined />,
@@ -94,7 +97,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
           push_noti: values.push_noti,
           status: String("submit"),
           link_type: String(values.link_type),
-          link: String(values.link),
+          link: String(fullLink),
           active_status: isActive,
           send_now: isShedule
         }
@@ -264,7 +267,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                 <Col className="gutter-row" span={8}>
                   <Field
                     label={{ text: "ชื่อเรื่อง" }}
-                    style={{ color: "red" }}
+                    // style={{ color: "red" }}
                     name="title"
                     type="text"
                     component={Input}
@@ -334,7 +337,16 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       <Radio name="link_type" value={'inapp'} >ลิ้งค์เข้าในแอพพลิเคชัน</Radio>
                       <Radio name="link_type" value={'outapp'} >ลิ้งค์ไปนอกแอพพลิเคชัน</Radio>
                     </Radio.Group>
-                    <Field
+                    <InputAntd
+                      name="link"
+                      id="link"
+                      className="form-control round"
+                      onChange={e => {
+                        setFieldValue("link", e?.target?.value)
+                      }}
+                      addonBefore="https://" defaultValue="" placeholder="ลิงค์"
+                    />
+                    {/* <Field
                       label={{ text: "" }}
                       name="link"
                       type="text"
@@ -343,7 +355,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       className="form-control round"
                       id="link"
                       placeholder="ลิงค์"
-                    />
+                    /> */}
                   </div>
 
                 </Col>

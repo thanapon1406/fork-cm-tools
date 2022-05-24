@@ -36,6 +36,11 @@ export interface requestReportInterface {
   payment_channel?: string
   exclude_outlet_ids?: string
   include_outlet_ids?: string
+  district_id?: string
+  sub_district_id?: string
+  province_id?: string
+  order_status?: string
+  food_type?: string
 }
 
 export const getOrderTransaction = async (params: requestReportInterface) => {

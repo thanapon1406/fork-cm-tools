@@ -87,7 +87,7 @@ export default function View({ }: Props): ReactElement {
     image_action_url: '',
     image_action_type: '',
     name: '',
-    priority: '',
+    priority: 0,
     status: '',
     type: '',
     start_date: '',
@@ -289,7 +289,9 @@ export default function View({ }: Props): ReactElement {
                 id="textButton1"
               />
             </Col>
-            <Col className="gutter-row" span={8}>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col className="gutter-row" span={12}>
               <Field
                 disabled={(isEdit) ? false : true}
                 label={{ text: "Action ของปุ่ม" }}
@@ -307,8 +309,9 @@ export default function View({ }: Props): ReactElement {
                   }
                 }}
               />
+              <label style={{ marginBottom: 10, color: 'red' }}>{values.actionType1 == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.actionType1 == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
             </Col>
-            <Col className="gutter-row" span={8} >
+            <Col className="gutter-row" span={12} >
               <Field
                 disabled={(isEdit) ? false : true}
                 label={{ text: 'Action type ของปุ่ม' }}
@@ -332,7 +335,7 @@ export default function View({ }: Props): ReactElement {
               />
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม</label>
               <SketchPicker disableAlpha={true} color={colorButton1} onChangeComplete={handleColorButton1} />
@@ -361,7 +364,9 @@ export default function View({ }: Props): ReactElement {
                 id="textButton1"
               />
             </Col>
-            <Col className="gutter-row" span={8}>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col className="gutter-row" span={12}>
               <Field
                 disabled={(isEdit) ? false : true}
                 label={{ text: "Action ของปุ่ม 1" }}
@@ -379,8 +384,9 @@ export default function View({ }: Props): ReactElement {
                   }
                 }}
               />
+              <label style={{ marginBottom: 10, color: 'red' }}>{values.actionType1 == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.actionType1 == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
             </Col>
-            <Col className="gutter-row" span={8} >
+            <Col className="gutter-row" span={12} >
               <Field
                 disabled={(isEdit) ? false : true}
                 label={{ text: 'Action type ของปุ่ม 1' }}
@@ -404,7 +410,7 @@ export default function View({ }: Props): ReactElement {
               />
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม 1</label>
               <SketchPicker disableAlpha={true} color={colorButton1} onChangeComplete={handleColorButton1} />
@@ -427,7 +433,9 @@ export default function View({ }: Props): ReactElement {
                 id="textButton2"
               />
             </Col>
-            <Col className="gutter-row" span={8}>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col className="gutter-row" span={12}>
               <Field
                 disabled={(isEdit) ? false : true}
                 label={{ text: "Action ของปุ่ม 2" }}
@@ -445,8 +453,9 @@ export default function View({ }: Props): ReactElement {
                   }
                 }}
               />
+              <label style={{ marginBottom: 10, color: 'red' }}>{values.actionType2 == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.actionType2 == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
             </Col>
-            <Col className="gutter-row" span={8} >
+            <Col className="gutter-row" span={12} >
               <Field
                 disabled={(isEdit) ? false : true}
                 label={{ text: 'Action type ของปุ่ม 2' }}
@@ -470,7 +479,7 @@ export default function View({ }: Props): ReactElement {
               />
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม 2</label>
               <SketchPicker disableAlpha={true} color={colorButton2} onChangeComplete={handleColorButton2} />
@@ -616,7 +625,7 @@ export default function View({ }: Props): ReactElement {
                       onRemove={e => { setImageUrl('') }}
                       beforeUpload={handleChangeImage}
                     >
-                      <Button style={{ marginLeft: 10 }} icon={<UploadOutlined />}>เลือกรูป</Button>
+                      <Button disabled={(isEdit) ? false : true} style={{ marginLeft: 10 }} icon={<UploadOutlined />}>เลือกรูป</Button>
                     </Upload>
                     {values.type < 3 ? (
                       <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ แนะนำ รูปภาพ ขนาด 9:16 1080x1920px และไฟล์ jpeg,jpg,png</label>

@@ -72,7 +72,7 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
                 component={Input}
                 className="form-control round"
                 id="email"
-                placeholder="Please enter email"
+                placeholder="example@email.com"
               />
               <div style={{ textAlign: 'center' }}>
                 <Space>

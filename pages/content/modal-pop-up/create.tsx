@@ -590,8 +590,8 @@ const BannerModalPopUpCreate = (): ReactElement => {
                   </Radio.Group>
                 </Col>
               </Row>
-              <Row gutter={16} style={{ marginTop: 20 }}>
-                <Col className="gutter-row" span={8}>
+              <Row gutter={[16, 16]} style={{ marginTop: 20, marginBottom: 20 }}>
+                <Col className="gutter-row" span={12}>
                   <Field
                     label={{ text: "image action url" }}
                     name="image_action_url"
@@ -608,8 +608,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                       }
                     }}
                   />
+                  <label style={{ marginBottom: 10, color: 'red' }}>{values.image_action_type == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.image_action_type == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
                 </Col>
-                <Col className="gutter-row" span={8} >
+                <Col className="gutter-row" span={12} >
                   <Field
                     label={{ text: 'image action type' }}
                     name="image_action_type"

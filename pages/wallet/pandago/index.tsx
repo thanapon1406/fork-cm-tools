@@ -1,6 +1,5 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
-import DownloadButton from '@/components/credit/DownloadButton'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
@@ -139,12 +138,13 @@ export default function Pandago({}: Props): ReactElement {
 
   return (
     <MainLayout>
-      <Title level={4}>บัญชีผู้ใช้งาน</Title>
+      <Title level={4}>กระเป๋าตังค์</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>บัญชีผู้ใช้งาน</Breadcrumb.Item>
-        <Breadcrumb.Item>บัญชีร้านค้า</Breadcrumb.Item>
+        <Breadcrumb.Item>กระเป๋าตังค์</Breadcrumb.Item>
+        <Breadcrumb.Item>PANDAGO</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
+        <Title level={4}>กรุณากรอกข้อมูลที่ต้องการค้นหา</Title>
         <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
           {({ values, resetForm }) => (
             <Form>
@@ -230,21 +230,18 @@ export default function Pandago({}: Props): ReactElement {
         </Formik>
       </Card>
       <Card>
-        <Row gutter={[8, 24]}>
-          <Col className="gutter-row" offset={16} span={8} style={{ textAlign: 'end' }}>
-            <DownloadButton handelSubmit={handleDownloadClick} />
-          </Col>
-        </Row>
-
         <Table
           config={{
-            dataTableTitle: 'บัญชีร้านค้า',
+            dataTableTitle: 'รายการ',
             loading: isLoading,
             tableName: 'wallet/pandago',
             tableColumns: column,
             dataSource: dataTable,
             handelDataTableLoad: handelDataTableChange,
             pagination: pagination,
+            isExport: true,
+            handelDataExport: handleDownloadClick,
+            isExportByEmail: true,
           }}
         />
       </Card>

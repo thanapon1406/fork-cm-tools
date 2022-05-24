@@ -1,3 +1,4 @@
+import DownloadButton from '@/components/credit/DownloadButton'
 import { ScrollTable } from '@/interface/dataTable'
 import { uniqueId } from '@/utils/helpers'
 import {
@@ -38,6 +39,7 @@ interface Config {
   scrollTable?: ScrollTable
   mappingPath?: (rowData: any) => string
   isExport?: boolean
+  isExportByEmail?: boolean
   isTableTitle?: boolean
   handelDataExport?: any
   isShowRowNumber?: boolean
@@ -54,6 +56,7 @@ export default function Table({ config }: Props): ReactElement {
     scrollTable,
     mappingPath,
     isExport,
+    isExportByEmail,
     handelDataExport,
     isShowRowNumber = false,
   } = config
@@ -177,20 +180,24 @@ export default function Table({ config }: Props): ReactElement {
   return (
     <>
       {isExport ? (
-        <Row gutter={16}>
+        <Row gutter={16} align="middle">
           <Col span={8}>
             {dataTableTitle && <PageHeader title={dataTableTitle} ghost={false}></PageHeader>}
           </Col>
           <Col span={16} style={{ textAlign: 'right' }}>
-            <Button
-              style={{ width: '120px' }}
-              type="primary"
-              size="middle"
-              icon={<DownloadOutlined />}
-              onClick={handelDataExport}
-            >
-              ดาวน์โหลด
-            </Button>
+            {isExportByEmail === false ? (
+              <Button
+                style={{ width: '120px' }}
+                type="primary"
+                size="middle"
+                icon={<DownloadOutlined />}
+                onClick={handelDataExport}
+              >
+                ดาวน์โหลด
+              </Button>
+            ) : (
+              <DownloadButton handelSubmit={handelDataExport} />
+            )}
           </Col>
         </Row>
       ) : (

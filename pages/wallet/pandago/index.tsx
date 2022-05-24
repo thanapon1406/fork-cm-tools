@@ -1,17 +1,18 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import DownloadButton from '@/components/credit/DownloadButton'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
 import useFetchTable from '@/hooks/useFetchTable'
 import MainLayout from '@/layout/MainLayout'
-import { getDeliveries } from '@/services/rider'
-import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
+import { exportDelivery, getDeliveries } from '@/services/rider'
+import { Breadcrumb, Col, notification, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
 import moment from 'moment'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useState } from 'react'
 import * as Yup from 'yup'
 
 const { Title } = Typography
@@ -36,6 +37,15 @@ export default function Pandago({}: Props): ReactElement {
     status: '',
     partner_order_id: '',
   }
+  const [filterSearch, setFilterSearch] = useState<any>({
+    export_email: '',
+    partner_order_id: '',
+    rider_info: '',
+    status: '',
+    start_date: '',
+    end_date: '',
+    partner_name: 'PANDAGO',
+  })
 
   const filterRequest: filterObject = {
     partner_name: 'PANDAGO',
@@ -59,6 +69,7 @@ export default function Pandago({}: Props): ReactElement {
     if (reqFilter.start_date != '' && reqFilter.end_date != '') {
       reqFilter.period_type = 'specific_time'
     }
+    setFilterSearch(reqFilter)
     handleFetchData(reqFilter)
   }
 
@@ -101,6 +112,30 @@ export default function Pandago({}: Props): ReactElement {
       },
     },
   ]
+
+  const handleDownloadClick = async (values: any) => {
+    const request = {
+      export_email: get(values, 'email'),
+      partner_order_id: filterSearch.partner_order_id,
+      rider_info: filterSearch.rider_info,
+      status: filterSearch.status,
+      start_date: filterSearch.start_date,
+      end_date: filterSearch.end_date,
+      partner_name: 'PANDAGO',
+    }
+
+    if (request.start_date != '' && request.end_date != '') {
+      values.period_type = 'specific_time'
+    }
+    console.log(`request`, request)
+    const { result, success } = await exportDelivery(request)
+    if (success) {
+      notification.success({
+        message: `ส่งรายงานไปยังอีเมลที่ระบุใว้เรียบร้อยแล้ว`,
+        description: '',
+      })
+    }
+  }
 
   return (
     <MainLayout>
@@ -195,6 +230,12 @@ export default function Pandago({}: Props): ReactElement {
         </Formik>
       </Card>
       <Card>
+        <Row gutter={[8, 24]}>
+          <Col className="gutter-row" offset={16} span={8} style={{ textAlign: 'end' }}>
+            <DownloadButton handelSubmit={handleDownloadClick} />
+          </Col>
+        </Row>
+
         <Table
           config={{
             dataTableTitle: 'บัญชีร้านค้า',

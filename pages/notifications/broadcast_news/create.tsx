@@ -6,7 +6,7 @@ import Select from '@/components/Form/Select';
 import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
 import { createBroadcastNew } from '@/services/broadcastNews';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, LinkOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Col, Divider, Input as InputAntd, Modal, Radio, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import { range } from 'lodash';
@@ -24,7 +24,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
 
   const [isActive, setActive] = useState('active')
   const [isShedule, setSchedule] = useState(true)
-
+  const [placeholderLink, setPlaceholderLink] = useState('ลิงค์')
   const initialValues = {
     app_type: '',
     news_type_id: '',
@@ -42,7 +42,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
   }
 
   const Schema = Yup.object().shape({
-    app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
+    app_type: Yup.string().trim().required('กรุณาเลือกแอพพลิเคชัน'),
     news_type_id: Yup.string().trim().required('กรุณาเลือกประเภทแจ้งเตือน'),
     title: Yup.string().trim().max(50).required('กรุณากรอกชื่อเรื่อง'),
     body: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียดแบบย่อ'),
@@ -73,13 +73,10 @@ const NotificationsBroadcastNews = (): ReactElement => {
 
   const handleSubmit = (values: typeof initialValues) => {
     let scheduleAt = values.schedule_at
-    let fullLink = ""
     if (scheduleAt == "") {
       scheduleAt = String(moment().format());
     }
-    if (values.link != "") {
-      fullLink = `https://${values.link}`
-    }
+
     confirm({
       title: `ยืนยันการส่ง Broadcast News (${values.title})`,
       icon: <ExclamationCircleOutlined />,
@@ -97,7 +94,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
           push_noti: values.push_noti,
           status: String("submit"),
           link_type: String(values.link_type),
-          link: String(fullLink),
+          link: String(values.link),
           active_status: isActive,
           send_now: isShedule
         }
@@ -153,14 +150,14 @@ const NotificationsBroadcastNews = (): ReactElement => {
     <MainLayout>
       <Row justify="space-around" align="middle">
         <Col span={8}>
-          <Title level={4}>Broadcast News</Title>
+          <Title level={4}>แจ้งเตือน</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>
               <Link href="/notifications/broadcast_news">
-                Notifications
+                แจ้งเตือน
               </Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>Create Broadcast News </Breadcrumb.Item>
+            <Breadcrumb.Item>สร้างการแจ้งเตือน </Breadcrumb.Item>
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}></Col>
@@ -173,11 +170,11 @@ const NotificationsBroadcastNews = (): ReactElement => {
               <Row gutter={16}>
                 <Col className="gutter-row" span={8} >
                   <Field
-                    label={{ text: 'แอพที่ต้องการส่ง' }}
+                    label={{ text: 'แอพพลิเคชัน' }}
                     name="app_type"
                     component={Select}
                     id="app_type"
-                    placeholder="แอพที่ต้องการส่ง"
+                    placeholder="แอพพลิเคชัน"
                     defaultValue=""
                     selectOption={[
                       {
@@ -238,7 +235,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                     defaultValue=""
                     selectOption={[
                       {
-                        name: 'กรุณาเลือก',
+                        name: 'เลือกประเภทแจ้งเตือน',
                         value: '',
                       },
                       {
@@ -332,6 +329,13 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       value={values.link_type}
                       onChange={e => {
                         setFieldValue("link_type", e.target.value)
+                        if (e.target.value === "inapp") {
+                          setPlaceholderLink('khconsumer://host?outletId=368')
+                        } else if (e.target.value === "outapp") {
+                          setPlaceholderLink('https://www.kitchenhub-th.com/')
+                        } else {
+                          setPlaceholderLink('ลิงค์')
+                        }
                       }}>
                       {/* <Radio value={1}>A</Radio> */}
                       <Radio name="link_type" value={'inapp'} >ลิ้งค์เข้าในแอพพลิเคชัน</Radio>
@@ -344,7 +348,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       onChange={e => {
                         setFieldValue("link", e?.target?.value)
                       }}
-                      addonBefore="https://" defaultValue="" placeholder="ลิงค์"
+                      addonBefore={<LinkOutlined />} defaultValue="" placeholder={placeholderLink}
                     />
                     {/* <Field
                       label={{ text: "" }}

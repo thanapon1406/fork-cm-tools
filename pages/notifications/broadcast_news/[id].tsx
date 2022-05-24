@@ -6,7 +6,7 @@ import Select from '@/components/Form/Select';
 import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
 import { getBroadcastNew, requestBroadcastNewInterface, updateBroadcastNew } from '@/services/broadcastNews';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, LinkOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Col, Divider, Input as InputAntd, Modal, Radio, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import { range } from 'lodash';
@@ -50,13 +50,11 @@ const EditBroadcastNew = (): ReactElement => {
 
   const handleSubmit = (values: typeof initialValues) => {
     let scheduleAt = values.schedule_at
-    let fullLink = ""
+
     if (scheduleAt == "") {
       scheduleAt = String(moment().format());
     }
-    if (values.link != "") {
-      fullLink = `https://${values.link}`
-    }
+
     confirm({
       title: `ยืนยันการส่ง Broadcast News (${values.title})`,
       icon: <ExclamationCircleOutlined />,
@@ -75,7 +73,7 @@ const EditBroadcastNew = (): ReactElement => {
           push_noti: values.push_noti,
           // status: String("submit"),
           link_type: String(values.link_type),
-          link: String(fullLink),
+          link: String(values.link),
           active_status: isActive,
           send_now: isShedule
 
@@ -211,14 +209,14 @@ const EditBroadcastNew = (): ReactElement => {
       <Row justify="space-around" align="middle">
         <Col span={8}>
 
-          <Title level={4}>Broadcast News</Title>
+          <Title level={4}>แจ้งเตือน</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>
               <Link href="/notifications/broadcast_news">
-                Notifications
+                แจ้งเตือน
               </Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>Edit Broadcast News </Breadcrumb.Item>
+            <Breadcrumb.Item>แก้ไขการแจ้งเตือน </Breadcrumb.Item>
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}>
@@ -435,7 +433,7 @@ const EditBroadcastNew = (): ReactElement => {
                       onChange={e => {
                         setFieldValue("link", e?.target?.value)
                       }}
-                      addonBefore="https://" defaultValue={values.link.replace('https://', '')} value={values.link.replace('https://', '')} placeholder="ลิงค์"
+                      addonBefore={<LinkOutlined />} defaultValue={values.link} value={values.link} placeholder="ลิงค์"
                       disabled={!isEdit}
                     />
 

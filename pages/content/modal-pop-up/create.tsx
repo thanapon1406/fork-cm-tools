@@ -257,9 +257,11 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 id="textButton1"
               />
             </Col>
-            <Col className="gutter-row" span={8}>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col className="gutter-row" span={12}>
               <Field
-                label={{ text: "Action ของปุ่ม URL" }}
+                label={{ text: "Action ของปุ่ม URL " }}
                 name="actionButton1"
                 type="text"
                 component={Input}
@@ -274,8 +276,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                   }
                 }}
               />
+              <label style={{ marginBottom: 10, color: 'red' }}>{values.actionType1 == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.actionType1 == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
             </Col>
-            <Col className="gutter-row" span={8} >
+            <Col className="gutter-row" span={12} >
               <Field
                 label={{ text: 'Action type ของปุ่ม' }}
                 name="actionType1"
@@ -299,7 +302,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
               />
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม</label>
               <SketchPicker color={colorButton1} onChangeComplete={handleColorButton1} />
@@ -327,7 +330,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 id="textButton1"
               />
             </Col>
-            <Col className="gutter-row" span={8}>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col className="gutter-row" span={12}>
               <Field
                 label={{ text: "Action ของปุ่ม 1 URL" }}
                 name="actionButton1"
@@ -344,8 +349,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                   }
                 }}
               />
+              <label style={{ marginBottom: 10, color: 'red' }}>{values.actionType1 == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.actionType1 == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
             </Col>
-            <Col className="gutter-row" span={8} >
+            <Col className="gutter-row" span={12} >
               <Field
                 label={{ text: 'Action type ของปุ่ม 1' }}
                 name="actionType1"
@@ -369,7 +375,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
               />
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม 1</label>
               <SketchPicker color={colorButton1} onChangeComplete={handleColorButton1} />
@@ -391,7 +397,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 id="textButton2"
               />
             </Col>
-            <Col className="gutter-row" span={8}>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col className="gutter-row" span={12}>
               <Field
                 label={{ text: "Action ของปุ่ม 2 URL" }}
                 name="actionButton2"
@@ -408,8 +416,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                   }
                 }}
               />
+              <label style={{ marginBottom: 10, color: 'red' }}>{values.actionType2 == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.actionType2 == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
             </Col>
-            <Col className="gutter-row" span={8} >
+            <Col className="gutter-row" span={12} >
               <Field
                 label={{ text: 'Action type ของปุ่ม 2' }}
                 name="actionType2"
@@ -433,7 +442,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
               />
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม 2</label>
               <SketchPicker color={colorButton2} onChangeComplete={handleColorButton2} />
@@ -581,8 +590,8 @@ const BannerModalPopUpCreate = (): ReactElement => {
                   </Radio.Group>
                 </Col>
               </Row>
-              <Row gutter={16} style={{ marginTop: 20 }}>
-                <Col className="gutter-row" span={8}>
+              <Row gutter={[16, 16]} style={{ marginTop: 20, marginBottom: 20 }}>
+                <Col className="gutter-row" span={12}>
                   <Field
                     label={{ text: "image action url" }}
                     name="image_action_url"
@@ -599,8 +608,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                       }
                     }}
                   />
+                  <label style={{ marginBottom: 10, color: 'red' }}>{values.image_action_type == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.image_action_type == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
                 </Col>
-                <Col className="gutter-row" span={8} >
+                <Col className="gutter-row" span={12} >
                   <Field
                     label={{ text: 'image action type' }}
                     name="image_action_type"

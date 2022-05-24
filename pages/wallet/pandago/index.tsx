@@ -74,7 +74,7 @@ export default function Pandago({}: Props): ReactElement {
 
   const column = [
     {
-      title: 'Transaction Id',
+      title: 'เลขที่รายการ',
       dataIndex: 'partner_order_id',
       align: 'center',
     },
@@ -151,7 +151,7 @@ export default function Pandago({}: Props): ReactElement {
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'Transaction Id' }}
+                    label={{ text: 'เลขที่รายการ' }}
                     name="partner_order_id"
                     type="text"
                     component={Input}

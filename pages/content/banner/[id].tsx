@@ -181,7 +181,7 @@ export default function BannerView({ }: Props): ReactElement {
       })
     }
   }
-  console.log('render')
+
   return (
     <MainLayout>
       <Formik enableReinitialize initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>

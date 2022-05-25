@@ -86,7 +86,7 @@ export default function Pandago({}: Props): ReactElement {
     },
     {
       title: 'สถานะ',
-      dataIndex: 'status',
+      dataIndex: 'delivery_status',
       align: 'center',
     },
     {

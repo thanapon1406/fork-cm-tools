@@ -19,23 +19,6 @@ import * as Yup from 'yup';
 const { Title, Text } = Typography
 const { confirm } = Modal
 
-let initalVaulues = {
-  app_type: '',
-  news_type_id: '',
-  news_type_name: '',
-  title: '',
-  body: '',
-  body_full: '',
-  schedule_at: '',
-  active_status: '',
-  send_now: false,
-  msg_app: false,
-  push_noti: false,
-  status: '',
-  button_name: '',
-  link_type: '',
-  link: ''
-}
 const EditBroadcastNew = (): ReactElement => {
   const router = useRouter()
   const { id } = router.query
@@ -47,7 +30,23 @@ const EditBroadcastNew = (): ReactElement => {
   const [isShedule, setSchedule] = useState(true)
   const [placeholderLink, setPlaceholderLink] = useState('ลิงค์')
   const [isLink, setIsLink] = useState(true)
-  let [initialValues, setInitialValues] = useState(initalVaulues)
+  let [initialValues, setInitialValues] = useState({
+    app_type: '',
+    news_type_id: '',
+    news_type_name: '',
+    title: '',
+    body: '',
+    body_full: '',
+    schedule_at: '',
+    active_status: '',
+    send_now: false,
+    msg_app: false,
+    push_noti: false,
+    status: '',
+    button_name: '',
+    link_type: '',
+    link: ''
+  })
 
 
 

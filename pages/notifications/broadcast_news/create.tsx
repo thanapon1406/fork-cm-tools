@@ -372,20 +372,11 @@ const NotificationsBroadcastNews = (): ReactElement => {
                           setIsLink(true)
                         }
                       }}>
-                      {/* <Radio value={1}>A</Radio> */}
+
                       <Radio name="link_type" value={'inapp'} >ลิ้งค์เข้าในแอพพลิเคชัน</Radio>
                       <Radio name="link_type" value={'outapp'} >ลิ้งค์ไปนอกแอพพลิเคชัน</Radio>
                     </Radio.Group>
-                    {/* <InputAntd
-                      name="link"
-                      id="link"
-                      className="form-control round"
-                      onChange={e => {
-                        setFieldValue("link", e?.target?.value)
-                      }}
-                      addonBefore={<LinkOutlined />} defaultValue="" placeholder={placeholderLink}
-                      disabled={isLink}
-                    /> */}
+
                     <Field
                       label={{ text: "" }}
                       name="link"

@@ -294,12 +294,7 @@ const EditBroadcastNew = (): ReactElement => {
         </Col>
       </Row>
       <Card>
-        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema} enableReinitialize={true}
-        // enableReinitialize={true}
-        //   initialValues={initialValues}
-        //   onSubmit={handleSubmit}
-        //   validationSchema={Schema}
-        >
+        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema} enableReinitialize={true}>
           {({ values, resetForm, setFieldValue }) => (
             <Form id="form1">
               <Row gutter={16}>
@@ -445,17 +440,6 @@ const EditBroadcastNew = (): ReactElement => {
               <Title level={5}>ตั้งค่าปุ่มรายละเอียด</Title>
               <Row gutter={16}>
                 <Col className="gutter-row" span={8} >
-                  {/* <Field
-                    label={{ text: "ชื่อปุ่ม" }}
-                    name="button_name"
-                    type="text"
-                    component={Input}
-                    rows={2}
-                    className="form-control round"
-                    id="button_name"
-                    placeholder="ชื่อในปุ่มที่ต้องการใช้ เช่น ตกลง"
-                    disabled={!isEdit}
-                  /> */}
                   <Field
                     label={{ text: "ชื่อปุ่ม" }}
                     name="button_name"
@@ -465,6 +449,7 @@ const EditBroadcastNew = (): ReactElement => {
                     className="form-control round"
                     id="button_name"
                     placeholder="ชื่อในปุ่มที่ต้องการใช้ เช่น ตกลง"
+                    disabled={!isEdit}
                   />
                 </Col>
               </Row>
@@ -496,17 +481,6 @@ const EditBroadcastNew = (): ReactElement => {
                       <Radio name="link_type" value={'outapp'} >ลิ้งค์ไปนอกแอพพลิเคชัน</Radio>
                     </Radio.Group>
 
-                    {/* <InputAntd
-                      name="link"
-                      id="link"
-                      className="form-control round"
-                      onChange={e => {
-                        setFieldValue("link", e?.target?.value)
-                      }}
-                      addonBefore={<LinkOutlined />} defaultValue={values.link} value={values.link} placeholder={placeholderLink}
-                      disabled={!isEdit || isLink}
-
-                    /> */}
                     <Field
                       label={{ text: "" }}
                       name="link"

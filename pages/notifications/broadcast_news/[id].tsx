@@ -2,14 +2,15 @@ import Card from '@/components/Card';
 import CheckBox2 from '@/components/Form/CheckBox2';
 import DatePicker from '@/components/Form/DatePicker';
 import Input from '@/components/Form/Input';
+import InputLink from '@/components/Form/InputLink';
 import Select from '@/components/Form/Select';
 import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
 import { getBroadcastNew, requestBroadcastNewInterface, updateBroadcastNew } from '@/services/broadcastNews';
-import { ExclamationCircleOutlined, LinkOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Divider, Input as InputAntd, Modal, Radio, Row, Switch, Typography } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, Divider, Modal, Radio, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
-import { range } from 'lodash';
+import _, { range } from 'lodash';
 import moment, { Moment } from "moment";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -17,7 +18,6 @@ import { ReactElement, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 const { Title, Text } = Typography
 const { confirm } = Modal
-
 
 const EditBroadcastNew = (): ReactElement => {
   const router = useRouter()
@@ -91,8 +91,6 @@ const EditBroadcastNew = (): ReactElement => {
   }
 
   const Schema = Yup.object().shape({
-
-
     app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
     news_type_id: Yup.string().trim().required('กรุณาเลือกประเภทแจ้งเตือน'),
     title: Yup.string().trim().max(50).required('กรุณากรอกชื่อเรื่อง'),
@@ -120,6 +118,36 @@ const EditBroadcastNew = (): ReactElement => {
       })
 
     }),
+    button_name: Yup.string().when('link_type', (link_type: any, schema: any) => {
+      return schema.test({
+        test: (button_name: any) => {
+          if (link_type == 'inapp' || link_type == 'outapp') {
+            if (button_name == undefined) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "กรุณาใส่ชื่อปุ่ม",
+      })
+    }),
+    link: Yup.string().when('link_type', (link_type: any, schema: any) => {
+      return schema.test({
+        test: (link: any) => {
+          if (link_type == 'inapp' || link_type == 'outapp') {
+            if (link == undefined) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "กรุณาใส่ลิงค์",
+      })
+    })
   })
 
   const disabledDate = (d: Moment) => {
@@ -171,7 +199,24 @@ const EditBroadcastNew = (): ReactElement => {
       const { meta, data } = result
       let customDate = moment().format("YYYY-MM-DD HH:mm");
 
-      setInitialValues(data)
+      let objData = {
+        app_type: _.get(data, "app_type") ? _.get(data, "app_type") : "",
+        news_type_id: _.get(data, "news_type_id") ? _.get(data, "news_type_id") : 0,
+        news_type_name: _.get(data, "news_type_name") ? _.get(data, "news_type_name") : "",
+        title: _.get(data, "title") ? _.get(data, "title") : "",
+        body: _.get(data, "body") ? _.get(data, "body") : "",
+        body_full: _.get(data, "body_full") ? _.get(data, "body_full") : "",
+        button_name: _.get(data, "button_name") ? _.get(data, "button_name") : "",
+        schedule_at: _.get(data, "schedule_at") ? _.get(data, "schedule_at") : "",
+        active_status: _.get(data, "active_status") ? _.get(data, "active_status") : "",
+        send_now: _.get(data, "send_now") ? _.get(data, "send_now") : false,
+        status: _.get(data, "status") ? _.get(data, "status") : "",
+        msg_app: _.get(data, "msg_app") ? _.get(data, "msg_app") : false,
+        push_noti: _.get(data, "push_noti") ? _.get(data, "push_noti") : false,
+        link_type: _.get(data, "link_type") ? _.get(data, "link_type") : "",
+        link: _.get(data, "link") ? _.get(data, "link") : ""
+      }
+      setInitialValues(objData)
       setSchedule(data.send_now)
 
       setActive(data.active_status)
@@ -249,11 +294,7 @@ const EditBroadcastNew = (): ReactElement => {
         </Col>
       </Row>
       <Card>
-        <Formik enableReinitialize={true}
-          initialValues={initialValues}
-          onSubmit={handleSubmit}
-          validationSchema={Schema}
-        >
+        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema} enableReinitialize={true}>
           {({ values, resetForm, setFieldValue }) => (
             <Form id="form1">
               <Row gutter={16}>
@@ -440,29 +481,17 @@ const EditBroadcastNew = (): ReactElement => {
                       <Radio name="link_type" value={'outapp'} >ลิ้งค์ไปนอกแอพพลิเคชัน</Radio>
                     </Radio.Group>
 
-                    <InputAntd
-                      name="link"
-                      id="link"
-                      className="form-control round"
-                      onChange={e => {
-                        setFieldValue("link", e?.target?.value)
-                      }}
-                      addonBefore={<LinkOutlined />} defaultValue={values.link} value={values.link} placeholder={placeholderLink}
-                      disabled={!isEdit || isLink}
-
-                    />
-
-                    {/* <Field
+                    <Field
                       label={{ text: "" }}
                       name="link"
                       type="text"
-                      component={Input}
+                      component={InputLink}
                       rows={2}
                       className="form-control round"
                       id="link"
-                      placeholder="ลิงค์"
-                      disabled={!isEdit}
-                    /> */}
+                      placeholder={placeholderLink}
+                      disabled={!isEdit || isLink}
+                    />
                   </div>
 
                 </Col>
@@ -529,7 +558,7 @@ const EditBroadcastNew = (): ReactElement => {
                         htmlType="submit"
                         disabled={!isEdit}
                       >
-                        แก้ไข
+                        บันทึก
                       </Button>
                       <Button
                         style={{ width: '120px', marginTop: '31px' }}

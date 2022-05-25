@@ -1,93 +1,27 @@
 import Card from '@/components/Card'
+import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
-import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
 import Tag from '@/components/Tag'
 import MainLayout from '@/layout/MainLayout'
-import { getBannerList } from '@/services/Banner'
-import { Breadcrumb, Button, Col, Row, Typography } from 'antd'
+import { deleteBanner, getBannerList } from '@/services/banner'
+import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined, LinkOutlined, PlusOutlined } from '@ant-design/icons'
+import { Breadcrumb, Button, Col, Modal, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
+import noImage from '../../../public/asset/images/no-image-available.svg'
 
 const { Title } = Typography
+const { confirm } = Modal
 interface Props { }
-
-const column = [
-  {
-    title: 'id',
-    dataIndex: 'id',
-    align: 'center',
-  },
-  {
-    title: 'Name',
-    align: 'center',
-    dataIndex: 'name'
-  },
-  {
-    title: 'รูปภาพ',
-    align: 'center',
-    dataIndex: 'action_url',
-    render: (reccord: any) => {
-      return (
-        <>
-          <img src={reccord} style={{ width: '100%', maxWidth: '120px' }} />
-        </>
-      )
-    }
-  },
-  {
-    title: 'Priority',
-    dataIndex: 'priority',
-    align: 'center',
-  },
-  {
-    title: 'วันที่แสดง Banner',
-    align: 'center',
-    render: (reccord: any) => {
-      if (!reccord?.start_date && !reccord?.end_date) {
-        return "ไม่ได้ระบุ"
-      }
-      const start = `${get(reccord, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(reccord['start_date']).format('YYYY-MM-DD HH:mm')
-      const end = `${get(reccord, 'end_date')}` == "" ? "ไม่ได้ระบุ" : moment(reccord['end_date']).format('YYYY-MM-DD HH:mm')
-      return (<>
-        <div><b>ตั้งแต่วันที่:</b> {start}</div>
-        <div><b>ถึงวันที่:</b> {end}</div>
-      </>)
-    },
-  },
-  {
-    title: 'Status',
-    align: 'center',
-    render: (reccord: any) => {
-      if(reccord.status === 'active'){
-        return (
-          <Tag type="success">{reccord.status}</Tag>
-        )
-      }else{
-        return (
-          <Tag type="error">{reccord.status}</Tag>
-        )
-      }
-    }
-  },
-  {
-    title: 'วันที่สร้าง',
-    dataIndex: 'created_at',
-    align: 'center',
-    render: (reccord: any) => {
-      return moment(reccord).format('YYYY-MM-DD HH:mm')
-    },
-  },
-]
 
 interface filterObject {
   keyword?: string
-  status?: string,
-  create_date_start?: string,
-  create_date_end?: string
+  start_date?: string,
+  end_date?: string
 }
 
 interface Pagination {
@@ -103,22 +37,20 @@ export default function Banner({ }: Props): ReactElement {
 
   const [filter, setFilter] = useState<filterObject>({
     keyword: '',
-    status: '',
-    create_date_start: '',
-    create_date_end: '',
+    start_date: '',
+    end_date: '',
   })
 
   const [paginationActive, setPaginationActive] = useState<Pagination>({
     total: 0,
     current: 1,
-    pageSize: 5,
+    pageSize: 10,
   })
 
   const Router = useRouter()
   const initialValues = {
     keyword: '',
-    status: '',
-    create_date: {
+    show_date: {
       start: '',
       end: ''
     },
@@ -128,37 +60,173 @@ export default function Banner({ }: Props): ReactElement {
     fetchBannerList()
   }, [])
 
+  const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
+
   const fetchBannerList = async (filterObj: filterObject = filter, paging: Pagination = paginationActive) => {
     const reqBody = {
       ...filterObj,
-      is_eligible: true,
+      start_date: filterObj.start_date != '' ? moment(filterObj.start_date).format(dateFormat) : '',
+      end_date: filterObj.end_date != '' ? moment(filterObj.end_date).format(dateFormat) : '',
       page: paging.current,
       per_page: paging.pageSize,
     }
+
     setIsLoading(true)
+    let row = (paging.current-1)*paging.pageSize
     const { result, success } = await getBannerList(reqBody)
-    console.log(result)
+    
     if (success) {
-      const { meta, data } = result
-      setPaginationActive({
-        pageSize: paging.pageSize,
-        current: meta.page,
-        total: meta.total_count,
-      })
-      setDataTable(data)
+      if(typeof result.data !== 'undefined'){
+        const { meta, data } = result
+        let bannerList = []
+
+        if(data.length > 0){
+          bannerList = data.map((banner: any) => {
+            row++
+            return { ...banner, no: row }
+          })
+        }
+  
+        setPaginationActive({
+          pageSize: paging.pageSize,
+          current: meta.page,
+          total: meta.total_count,
+        })
+        setDataTable(bannerList)
+      }else{
+        setDataTable([])
+      }
       setIsLoading(false)
       setFilter(filterObj)
     }
   }
 
+  const showDeleteConfirm = (id: any, name: string) => {
+    confirm({
+      title: 'Delete Banner',
+      icon: <ExclamationCircleOutlined />,
+      content: `คุณต้องการลบ Banner ${name} ใช่หรือไม่?`,
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        fetchDelete(id)
+      },
+    });
+  };
+
+  const fetchDelete = async (id: number) => {
+    const { result, success } = await deleteBanner({id})
+
+    if(success){
+      fetchBannerList()
+    }
+  }
+
   const handelDataTableLoadActive = (pagination: any) => {
-    console.log(`pagination`, pagination)
     fetchBannerList(filter, pagination)
   }
 
   const handleSubmit = (values: any) => {
 
+    let reqFilter: filterObject = {
+      keyword: values.keyword,
+      start_date: values.show_date.start,
+      end_date: values.show_date.end
+    }
+
+    fetchBannerList(reqFilter, { current: 1, total: 0, pageSize: 10 })
   }
+
+
+const column = [
+  {
+    title: 'ลำดับ',
+    dataIndex: 'no',
+    align: 'center'
+  },
+  {
+    title: 'ชื่อ Banner',
+    align: 'center',
+    dataIndex: 'name'
+  },
+  {
+    title: 'รูปภาพ',
+    align: 'center',
+    dataIndex: 'image_url',
+    render: (record: any) => {
+      return (
+        <>
+          <img src={ record != '' ? record : noImage.src } style={{ width: '100%', maxWidth: '100px' }} />
+        </>
+      )
+    }
+  },
+  {
+    title: 'ลำดับการแสดงผล',
+    dataIndex: 'priority',
+    align: 'center',
+    render: (priority: any) => {
+      return ( <b>{ !priority ? '-' : priority }</b> )
+    }
+  },
+  {
+    title: 'สถานะ',
+    align: 'center',
+    render: (record: any) => {
+      return (
+        <Tag type={ record.status == 'active' ? "success" : "error" }>{record.status}</Tag>
+      )
+    }
+  },
+  {
+    title: 'วันที่แสดง Banner',
+    align: 'center',
+    render: (record: any) => {
+      if (!record?.start_date && !record?.end_date) {
+        return "ไม่ได้ระบุ"
+      }
+      const start = `${get(record, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(record['start_date']).format('YYYY-MM-DD HH:mm')
+      const end = `${get(record, 'end_date')}` == "" ? "ไม่ได้ระบุ" : moment(record['end_date']).format('YYYY-MM-DD HH:mm')
+      return (<>
+        <div><b>ตั้งแต่วันที่:</b> {start}</div>
+        <div><b>ถึงวันที่:</b> {end}</div>
+      </>)
+    },
+  },
+  {
+    title: 'วันที่สร้าง',
+    dataIndex: 'created_at',
+    align: 'center',
+    render: (record: any) => {
+      return moment(record).format('YYYY-MM-DD HH:mm')
+    },
+  },
+  {
+    title: 'Action',
+    align: 'left',
+    render: (record: any) => {
+      if(record.action_url != '' && record.action_url != undefined){
+        return (
+          <>
+            <Button onClick={() => { Router.push(`/content/banner/${ record.id }`) }} icon={<EditOutlined />} size={`middle`} style={{ marginRight: '5px', backgroundColor: '#ffe58f', borderColor: '#faad14' }} />
+            <Button type="primary" danger onClick={()=> { showDeleteConfirm(record.id, record.name) }} icon={<DeleteOutlined />} size={`middle`} style={{ marginRight: '15px' }} />
+            <a href={record.action_url} target="_blank">
+              <LinkOutlined style={{ fontSize: '16px' }} /> Link
+            </a>
+          </>
+        )
+      }else{
+        return (
+          <>
+            <Button onClick={() => { Router.push(`/content/banner/${ record.id }`) }} icon={<EditOutlined />} size={`middle`} style={{ marginRight: '5px', backgroundColor: '#ffe58f', borderColor: '#faad14' }} />
+            <Button type="primary" danger onClick={()=> { showDeleteConfirm(record.id, record.name) }} icon={<DeleteOutlined />} size={`middle`} style={{ marginRight: '15px' }} />
+          </>
+        )
+      }
+    },
+  },
+]
 
   return (
     <MainLayout>
@@ -176,9 +244,10 @@ export default function Banner({ }: Props): ReactElement {
             type="primary"
             size="middle"
             onClick={() => {
-              Router.push('/content/modal-pop-up/create', `/content/modal-pop-up/create`);
+              Router.push('/content/banner/create', `/content/banner/create`);
             }}
           >
+            <PlusOutlined />
             สร้าง Banner
           </Button>
         </Col>
@@ -197,7 +266,7 @@ export default function Banner({ }: Props): ReactElement {
                     component={Input}
                     className="form-control round"
                     id="keyword"
-                    placeholder="ค้นหา"
+                    placeholder="ชื่อ Banner"
                   />
               
                 <Row>
@@ -222,8 +291,7 @@ export default function Banner({ }: Props): ReactElement {
                         onClick={() => {
                           setValues({
                             keyword: '',
-                            status: '',
-                            create_date: {
+                            show_date: {
                               start: '',
                               end: ''
                             },
@@ -239,21 +307,10 @@ export default function Banner({ }: Props): ReactElement {
 
               <Col className="gutter-row" span={5}>
                 <Field
-                  label={{ text: 'สถานะ' }}
-                  name="status"
-                  id="status"
-                  component={Select}
-                  placeholder="สถานะ"
-                  selectOption={[
-                    {
-                      name: 'active',
-                      value: 'active',
-                    },
-                    {
-                      name: 'Inactive',
-                      value: 'Inactive',
-                    },
-                  ]}
+                  label={{ text: 'วันที่แสดง Banner' }}
+                  name="show_date"
+                  id="show_date"
+                  component={ DateTimeRangePicker }
                 />
 
               </Col>
@@ -270,7 +327,6 @@ export default function Banner({ }: Props): ReactElement {
             loading: _isLoading,
             tableName: 'content/banner',
             tableColumns: column,
-            action: ['view'],
             dataSource: dataTable,
             handelDataTableLoad: handelDataTableLoadActive,
             pagination: paginationActive,

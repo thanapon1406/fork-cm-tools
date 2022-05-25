@@ -235,6 +235,11 @@ export default function Sidebar({ }: Props): ReactElement {
           title: 'Modal Pop Up',
           link: '/content/modal-pop-up',
           key: '/content/modal-pop-up',
+        },
+        {
+          title: 'Banner',
+          link: '/content/banner',
+          key: '/content/banner',
         }
       ],
     },

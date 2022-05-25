@@ -31,6 +31,7 @@ export default function View({ }: Props): ReactElement {
   const id = router.query.id as string
 
   let [initialValues, setInitialValues] = useState({
+    email_login: '',
     email: '',
     ssoId: '',
     tel: '',
@@ -47,6 +48,7 @@ export default function View({ }: Props): ReactElement {
     merchant: 'No',
     rider: 'No',
     isBan: false,
+    customer_profile_line_id: ''
   })
 
   let [paramsHistory, setparamsHistory] = useState<requestReportInterface>({
@@ -75,6 +77,7 @@ export default function View({ }: Props): ReactElement {
       const {
         data: [data],
       } = result
+
       if (data) {
         setInitialAddress(
           map(data.addresses, (address) => {
@@ -108,6 +111,7 @@ export default function View({ }: Props): ReactElement {
         setInitialValues({
           ...initialValues,
           email: data.email,
+          email_login: data.email_login,
           ssoId: data.sso_id,
           tel: data.tel,
           socialName: (data.social_login_first_name == undefined ? '' : data.social_login_first_name) + ' ' + (data.social_login_last_name == undefined ? '' : data.social_login_last_name),
@@ -123,6 +127,7 @@ export default function View({ }: Props): ReactElement {
           merchant: merchant,
           rider: rider,
           isBan: data.is_ban,
+          customer_profile_line_id: data.customer_profile_line_id
         })
 
         setparamsHistory({
@@ -141,6 +146,7 @@ export default function View({ }: Props): ReactElement {
   const handleSubmit = async (values: any) => {
     const request = {
       id: id,
+      email: values.email,
       status: isActive,
       last_name: values.lastName,
       first_name: values.firstName,
@@ -451,12 +457,24 @@ export default function View({ }: Props): ReactElement {
                     </Col>
                     <Col className="gutter-row" span={6}>
                       <Field
-                        label={{ text: 'อีเมล' }}
+                        label={{ text: 'อีเมล (สำหรับอัพเดทข่าวสาร)' }}
                         name="email"
                         type="text"
                         component={Input}
                         className="form-control round"
-                        placeholder="อีเมล"
+                        placeholder="อีเมล (สำหรับอัพเดทข่าวสาร)"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'อีเมล (สำหรับ log in)' }}
+                        name="email_login"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="อีเมล (สำหรับ log in)"
                         isRange={true}
                         disabled={true}
                       />
@@ -481,6 +499,18 @@ export default function View({ }: Props): ReactElement {
                         component={Input}
                         className="form-control round"
                         placeholder="Point"
+                        isRange={true}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <Field
+                        label={{ text: 'Line ID' }}
+                        name="customer_profile_line_id"
+                        type="text"
+                        component={Input}
+                        className="form-control round"
+                        placeholder="Line ID"
                         isRange={true}
                         disabled={true}
                       />

@@ -59,7 +59,7 @@ export default function Pandago({}: Props): ReactElement {
     let reqFilter: filterObject = {
       partner_order_id: values.partner_order_id,
       rider_info: values.rider_info,
-      status: values.status && [values.status],
+      status: values.status ? [values.status] : ['success', 'cancel'],
       start_date: values.date_create.start || '',
       end_date: values.date_create.end || '',
       partner_name: 'PANDAGO',

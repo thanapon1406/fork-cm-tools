@@ -19,7 +19,23 @@ const { warning } = Modal
 
 interface Props { }
 
-const initialValues = {
+interface FormInterface {
+  name: string
+  status: string
+  type: string
+  action: string
+  action_url: string
+  image_url: string
+  start_date?: string | null | undefined
+  end_date?: string | null | undefined
+  priority?: number | null | undefined
+  show_date: {
+    start: any
+    end: any
+  },
+}
+
+const initialValues: FormInterface = {
   name: '',
   status: '',
   type: 'type',
@@ -103,9 +119,13 @@ export default function BannerCreate({ }: Props): ReactElement {
 
     if (values.show_date.start != '') {
       values.start_date = moment(values.show_date.start).format(dateFormat)
+    } else {
+      values.start_date = null
     }
     if (values.show_date.end != '') {
       values.end_date = moment(values.show_date.end).format(dateFormat)
+    } else {
+      values.end_date = null
     }
     if (values.action_url == '') {
       values.action = ''
@@ -226,7 +246,7 @@ export default function BannerCreate({ }: Props): ReactElement {
                   <Field
                     label={{ text: "Priority" }}
                     name="priority"
-                    type="text"
+                    type="number"
                     component={Input}
                     rows={2}
                     className="form-control round"

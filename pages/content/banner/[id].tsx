@@ -20,6 +20,23 @@ const { warning } = Modal
 
 interface Props { }
 
+interface FormInterface {
+  id: number
+  name: string
+  status: string
+  type: string
+  action: string
+  action_url: string
+  image_url: string
+  start_date?: string | null | undefined
+  end_date?: string | null | undefined
+  priority?: number | null | undefined
+  show_date: {
+    start: any
+    end: any
+  },
+}
+
 const initialValuesDefault = {
   id: 0,
   name: '',

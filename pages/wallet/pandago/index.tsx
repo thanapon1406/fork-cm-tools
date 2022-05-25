@@ -126,7 +126,7 @@ export default function Pandago({}: Props): ReactElement {
     if (request.start_date != '' && request.end_date != '') {
       values.period_type = 'specific_time'
     }
-    console.log(`request`, request)
+
     const { result, success } = await exportDelivery(request)
     if (success) {
       notification.success({

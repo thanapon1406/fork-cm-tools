@@ -25,6 +25,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
   const [isActive, setActive] = useState('active')
   const [isShedule, setSchedule] = useState(true)
   const [placeholderLink, setPlaceholderLink] = useState('ลิงค์')
+  const [isLink, setIsLink] = useState(true)
   const initialValues = {
     app_type: '',
     news_type_id: '',
@@ -331,10 +332,13 @@ const NotificationsBroadcastNews = (): ReactElement => {
                         setFieldValue("link_type", e.target.value)
                         if (e.target.value === "inapp") {
                           setPlaceholderLink('khconsumer://host?outletId=368')
+                          setIsLink(false)
                         } else if (e.target.value === "outapp") {
                           setPlaceholderLink('https://www.kitchenhub-th.com/')
+                          setIsLink(false)
                         } else {
                           setPlaceholderLink('ลิงค์')
+                          setIsLink(true)
                         }
                       }}>
                       {/* <Radio value={1}>A</Radio> */}
@@ -349,6 +353,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                         setFieldValue("link", e?.target?.value)
                       }}
                       addonBefore={<LinkOutlined />} defaultValue="" placeholder={placeholderLink}
+                      disabled={isLink}
                     />
                     {/* <Field
                       label={{ text: "" }}

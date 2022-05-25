@@ -72,28 +72,28 @@ export default function Banner({ }: Props): ReactElement {
     }
 
     setIsLoading(true)
-    let row = (paging.current-1)*paging.pageSize
+    let row = (paging.current - 1) * paging.pageSize
     const { result, success } = await getBannerList(reqBody)
-    
+
     if (success) {
-      if(typeof result.data !== 'undefined'){
+      if (typeof result.data !== 'undefined') {
         const { meta, data } = result
         let bannerList = []
 
-        if(data.length > 0){
+        if (data.length > 0) {
           bannerList = data.map((banner: any) => {
             row++
             return { ...banner, no: row }
           })
         }
-  
+
         setPaginationActive({
           pageSize: paging.pageSize,
           current: meta.page,
           total: meta.total_count,
         })
         setDataTable(bannerList)
-      }else{
+      } else {
         setDataTable([])
       }
       setIsLoading(false)
@@ -116,9 +116,9 @@ export default function Banner({ }: Props): ReactElement {
   };
 
   const fetchDelete = async (id: number) => {
-    const { result, success } = await deleteBanner({id})
+    const { result, success } = await deleteBanner({ id })
 
-    if(success){
+    if (success) {
       fetchBannerList()
     }
   }
@@ -139,94 +139,94 @@ export default function Banner({ }: Props): ReactElement {
   }
 
 
-const column = [
-  {
-    title: 'ลำดับ',
-    dataIndex: 'no',
-    align: 'center'
-  },
-  {
-    title: 'ชื่อ Banner',
-    align: 'center',
-    dataIndex: 'name'
-  },
-  {
-    title: 'รูปภาพ',
-    align: 'center',
-    dataIndex: 'image_url',
-    render: (record: any) => {
-      return (
-        <>
-          <img src={ record != '' ? record : noImage.src } style={{ width: '100%', maxWidth: '100px' }} />
-        </>
-      )
-    }
-  },
-  {
-    title: 'ลำดับการแสดงผล',
-    dataIndex: 'priority',
-    align: 'center',
-    render: (priority: any) => {
-      return ( <b>{ !priority ? '-' : priority }</b> )
-    }
-  },
-  {
-    title: 'สถานะ',
-    align: 'center',
-    render: (record: any) => {
-      return (
-        <Tag type={ record.status == 'active' ? "success" : "error" }>{record.status}</Tag>
-      )
-    }
-  },
-  {
-    title: 'วันที่แสดง Banner',
-    align: 'center',
-    render: (record: any) => {
-      if (!record?.start_date && !record?.end_date) {
-        return "ไม่ได้ระบุ"
-      }
-      const start = `${get(record, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(record['start_date']).format('YYYY-MM-DD HH:mm')
-      const end = `${get(record, 'end_date')}` == "" ? "ไม่ได้ระบุ" : moment(record['end_date']).format('YYYY-MM-DD HH:mm')
-      return (<>
-        <div><b>ตั้งแต่วันที่:</b> {start}</div>
-        <div><b>ถึงวันที่:</b> {end}</div>
-      </>)
+  const column = [
+    {
+      title: 'ลำดับ',
+      dataIndex: 'no',
+      align: 'center'
     },
-  },
-  {
-    title: 'วันที่สร้าง',
-    dataIndex: 'created_at',
-    align: 'center',
-    render: (record: any) => {
-      return moment(record).format('YYYY-MM-DD HH:mm')
+    {
+      title: 'ชื่อ Banner',
+      align: 'center',
+      dataIndex: 'name'
     },
-  },
-  {
-    title: 'Action',
-    align: 'left',
-    render: (record: any) => {
-      if(record.action_url != '' && record.action_url != undefined){
+    {
+      title: 'รูปภาพ',
+      align: 'center',
+      dataIndex: 'image_url',
+      render: (record: any) => {
         return (
           <>
-            <Button onClick={() => { Router.push(`/content/banner/${ record.id }`) }} icon={<EditOutlined />} size={`middle`} style={{ marginRight: '5px', backgroundColor: '#ffe58f', borderColor: '#faad14' }} />
-            <Button type="primary" danger onClick={()=> { showDeleteConfirm(record.id, record.name) }} icon={<DeleteOutlined />} size={`middle`} style={{ marginRight: '15px' }} />
-            <a href={record.action_url} target="_blank">
-              <LinkOutlined style={{ fontSize: '16px' }} /> Link
-            </a>
-          </>
-        )
-      }else{
-        return (
-          <>
-            <Button onClick={() => { Router.push(`/content/banner/${ record.id }`) }} icon={<EditOutlined />} size={`middle`} style={{ marginRight: '5px', backgroundColor: '#ffe58f', borderColor: '#faad14' }} />
-            <Button type="primary" danger onClick={()=> { showDeleteConfirm(record.id, record.name) }} icon={<DeleteOutlined />} size={`middle`} style={{ marginRight: '15px' }} />
+            <img src={record != '' ? record : noImage.src} style={{ width: '100%', maxWidth: '100px' }} />
           </>
         )
       }
     },
-  },
-]
+    {
+      title: 'ลำดับการแสดงผล',
+      dataIndex: 'priority',
+      align: 'center',
+      render: (priority: any) => {
+        return (<b>{!priority ? '-' : priority}</b>)
+      }
+    },
+    {
+      title: 'สถานะ',
+      align: 'center',
+      render: (record: any) => {
+        return (
+          <Tag type={record.status == 'active' ? "success" : "error"}>{record.status}</Tag>
+        )
+      }
+    },
+    {
+      title: 'วันที่แสดง Banner',
+      align: 'center',
+      render: (record: any) => {
+        if (!record?.start_date && !record?.end_date) {
+          return "ไม่ได้ระบุ"
+        }
+        const start = `${get(record, 'start_date')}` == "" ? "ไม่ได้ระบุ" : moment(record['start_date']).format('YYYY-MM-DD HH:mm')
+        const end = `${get(record, 'end_date')}` == "" ? "ไม่ได้ระบุ" : moment(record['end_date']).format('YYYY-MM-DD HH:mm')
+        return (<>
+          <div><b>ตั้งแต่วันที่:</b> {start}</div>
+          <div><b>ถึงวันที่:</b> {end}</div>
+        </>)
+      },
+    },
+    {
+      title: 'วันที่สร้าง',
+      dataIndex: 'created_at',
+      align: 'center',
+      render: (record: any) => {
+        return moment(record).format('YYYY-MM-DD HH:mm')
+      },
+    },
+    {
+      title: 'Action',
+      align: 'left',
+      render: (record: any) => {
+        if (record.action_url != '' && record.action_url != undefined) {
+          return (
+            <>
+              <Button onClick={() => { Router.push(`/content/banner/${record.id}`) }} icon={<EditOutlined />} size={`middle`} style={{ marginRight: '5px', backgroundColor: '#ffe58f', borderColor: '#faad14' }} />
+              <Button type="primary" danger onClick={() => { showDeleteConfirm(record.id, record.name) }} icon={<DeleteOutlined />} size={`middle`} style={{ marginRight: '15px' }} />
+              <a href={record.action_url} target="_blank">
+                <LinkOutlined style={{ fontSize: '16px' }} /> Link
+              </a>
+            </>
+          )
+        } else {
+          return (
+            <>
+              <Button onClick={() => { Router.push(`/content/banner/${record.id}`) }} icon={<EditOutlined />} size={`middle`} style={{ marginRight: '5px', backgroundColor: '#ffe58f', borderColor: '#faad14' }} />
+              <Button type="primary" danger onClick={() => { showDeleteConfirm(record.id, record.name) }} icon={<DeleteOutlined />} size={`middle`} style={{ marginRight: '15px' }} />
+            </>
+          )
+        }
+      },
+    },
+  ]
 
   return (
     <MainLayout>
@@ -255,11 +255,11 @@ const column = [
 
       <Card>
         <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-        {({ values, resetForm, setValues }) => (
-          <Form>
-            <Row gutter={16}>
-              <Col className="gutter-row" span={6}>
-                <Field
+          {({ values, resetForm, setValues }) => (
+            <Form>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <Field
                     label={{ text: 'ค้นหา' }}
                     name="keyword"
                     type="text"
@@ -268,54 +268,54 @@ const column = [
                     id="keyword"
                     placeholder="ชื่อ Banner"
                   />
-              
-                <Row>
-                  <Col className="gutter-row" span={6}>
-                    <div className="ant-form ant-form-vertical">
-                      <Button
-                        style={{ width: '120px', marginTop: '27px' }}
-                        type="primary"
-                        size="middle"
-                        htmlType="submit"
-                      >
-                        ค้นหา
-                      </Button>
-                    </div>
-                  </Col>
-                  <Col className="gutter-row" span={6}>
-                    <div className="ant-form ant-form-vertical">
-                      <Button
-                        style={{ width: '120px', marginTop: '27px', marginLeft: '70px' }}
-                        type="default"
-                        size="middle"
-                        onClick={() => {
-                          setValues({
-                            keyword: '',
-                            show_date: {
-                              start: '',
-                              end: ''
-                            },
-                          })
-                        }}
-                      >
-                        เคลียร์
-                      </Button>
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
 
-              <Col className="gutter-row" span={5}>
-                <Field
-                  label={{ text: 'วันที่แสดง Banner' }}
-                  name="show_date"
-                  id="show_date"
-                  component={ DateTimeRangePicker }
-                />
+                  <Row>
+                    <Col className="gutter-row" span={6}>
+                      <div className="ant-form ant-form-vertical">
+                        <Button
+                          style={{ width: '120px', marginTop: '27px' }}
+                          type="primary"
+                          size="middle"
+                          htmlType="submit"
+                        >
+                          ค้นหา
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                      <div className="ant-form ant-form-vertical">
+                        <Button
+                          style={{ width: '120px', marginTop: '27px', marginLeft: '70px' }}
+                          type="default"
+                          size="middle"
+                          onClick={() => {
+                            setValues({
+                              keyword: '',
+                              show_date: {
+                                start: '',
+                                end: ''
+                              },
+                            })
+                          }}
+                        >
+                          เคลียร์
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+                </Col>
 
-              </Col>
-            </Row>
-          </Form>
+                <Col className="gutter-row" span={5}>
+                  <Field
+                    label={{ text: 'วันที่แสดง Banner' }}
+                    name="show_date"
+                    id="show_date"
+                    component={DateTimeRangePicker}
+                  />
+
+                </Col>
+              </Row>
+            </Form>
           )}
         </Formik>
       </Card>

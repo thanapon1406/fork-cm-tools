@@ -52,7 +52,7 @@ const getBannerList = async (req: requestBannerInterface) => {
 
 const findBanner = async (req: any) => {
   try {
-    const result = await fetch.get(`/api/banner/find?id=${ req }`)
+    const result = await fetch.get(`/api/banner/find?id=${req}`)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

@@ -48,6 +48,7 @@ export default function Pandago({}: Props): ReactElement {
 
   const filterRequest: filterObject = {
     partner_name: 'PANDAGO',
+    status: ['success', 'cancel'],
   }
   const requestApi: Function = getDeliveries
   const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } =

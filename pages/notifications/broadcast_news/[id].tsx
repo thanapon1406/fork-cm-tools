@@ -28,6 +28,8 @@ const EditBroadcastNew = (): ReactElement => {
   const [isdone, setIsdone] = useState(false)
   const [isSendnow, setIsSendnow] = useState(true)
   const [isShedule, setSchedule] = useState(true)
+  const [placeholderLink, setPlaceholderLink] = useState('ลิงค์')
+  const [isLink, setIsLink] = useState(true)
   let [initialValues, setInitialValues] = useState({
     app_type: '',
     news_type_id: '',
@@ -296,6 +298,7 @@ const EditBroadcastNew = (): ReactElement => {
                       component={CheckBox2}
                       className="form-control round"
                       id="msg_app"
+                      disabled={!isEdit}
                     />
 
                   </div>
@@ -308,6 +311,7 @@ const EditBroadcastNew = (): ReactElement => {
                       component={CheckBox2}
                       className="form-control round"
                       id="push_noti"
+                      disabled={!isEdit}
                     />
                   </div>
                 </Col>
@@ -420,6 +424,16 @@ const EditBroadcastNew = (): ReactElement => {
                       disabled={!isEdit}
                       onChange={e => {
                         setFieldValue("link_type", e.target.value)
+                        if (e.target.value === "inapp") {
+                          setPlaceholderLink('khconsumer://host?outletId=368')
+                          setIsLink(false)
+                        } else if (e.target.value === "outapp") {
+                          setPlaceholderLink('https://www.kitchenhub-th.com/')
+                          setIsLink(false)
+                        } else {
+                          setPlaceholderLink('ลิงค์')
+                          setIsLink(true)
+                        }
                       }}>
                       {/* <Radio value={1}>A</Radio> */}
                       <Radio name="link_type" value={'inapp'} >ลิ้งค์เข้าในแอพพลิเคชัน</Radio>
@@ -433,8 +447,9 @@ const EditBroadcastNew = (): ReactElement => {
                       onChange={e => {
                         setFieldValue("link", e?.target?.value)
                       }}
-                      addonBefore={<LinkOutlined />} defaultValue={values.link} value={values.link} placeholder="ลิงค์"
-                      disabled={!isEdit}
+                      addonBefore={<LinkOutlined />} defaultValue={values.link} value={values.link} placeholder={placeholderLink}
+                      disabled={!isEdit || isLink}
+
                     />
 
                     {/* <Field

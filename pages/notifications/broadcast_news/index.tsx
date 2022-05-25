@@ -304,18 +304,18 @@ const NotificationsBroadcastNews = (): ReactElement => {
                     ]}
                   />
                   <Field
-                    label={{ text: 'แอปพลิเคชันที่ทำการส่ง' }}
+                    label={{ text: 'แอพพลิเคชันที่ทำการส่ง' }}
                     name="app_type"
                     component={Select}
                     id="app_type"
-                    placeholder="แอปพลิเคชันที่ทำการส่ง"
+                    placeholder="แอพพลิเคชันที่ทำการส่ง"
                     selectOption={[
                       {
                         name: 'ทั้งหมด',
                         value: '',
                       },
                       {
-                        name: 'all',
+                        name: 'ทุกแอพพลิเคชัน',
                         value: 'all',
                       },
                       {

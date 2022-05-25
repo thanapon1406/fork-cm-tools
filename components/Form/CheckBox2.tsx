@@ -16,6 +16,7 @@ interface Props extends FormikProps {
   }
   selectOption: Array<SelectOption>
   onChange?: any
+  disabled?: boolean | false
 }
 
 interface SelectOption {
@@ -45,6 +46,7 @@ function CheckBox({ label, field, selectOption, ...props }: Props): ReactElement
         <Checkboxs
           onChange={onChangeHandle}
           checked={field.value}
+          disabled={props.disabled}
         >
           {label?.text}
         </Checkboxs>

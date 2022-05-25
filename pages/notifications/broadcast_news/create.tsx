@@ -6,8 +6,8 @@ import Select from '@/components/Form/Select';
 import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
 import { createBroadcastNew } from '@/services/broadcastNews';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Divider, Modal, Radio, Row, Switch, Typography } from 'antd';
+import { ExclamationCircleOutlined, LinkOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, Divider, Input as InputAntd, Modal, Radio, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import { range } from 'lodash';
 import moment, { Moment } from "moment";
@@ -24,7 +24,8 @@ const NotificationsBroadcastNews = (): ReactElement => {
 
   const [isActive, setActive] = useState('active')
   const [isShedule, setSchedule] = useState(true)
-
+  const [placeholderLink, setPlaceholderLink] = useState('ลิงค์')
+  const [isLink, setIsLink] = useState(true)
   const initialValues = {
     app_type: '',
     news_type_id: '',
@@ -42,11 +43,11 @@ const NotificationsBroadcastNews = (): ReactElement => {
   }
 
   const Schema = Yup.object().shape({
-    app_type: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
+    app_type: Yup.string().trim().required('กรุณาเลือกแอพพลิเคชัน'),
     news_type_id: Yup.string().trim().required('กรุณาเลือกประเภทแจ้งเตือน'),
     title: Yup.string().trim().max(50).required('กรุณากรอกชื่อเรื่อง'),
     body: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียดแบบย่อ'),
-    body_full: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียดแบบเต็ม'),
+    body_full: Yup.string().trim().required('กรุณากรอกรายละเอียดแบบเต็ม'),
     schedule_at: Yup.mixed().test('is-42', 'กรุณาตั้งเวลาส่ง', (value: string, form: any) => {
       let customDate = moment().format("YYYY-MM-DD HH:mm");
       let newValue = moment(value).add(-4, "minute").format("YYYY-MM-DD HH:mm")
@@ -150,14 +151,14 @@ const NotificationsBroadcastNews = (): ReactElement => {
     <MainLayout>
       <Row justify="space-around" align="middle">
         <Col span={8}>
-          <Title level={4}>Broadcast News</Title>
+          <Title level={4}>แจ้งเตือน</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>
               <Link href="/notifications/broadcast_news">
-                Notifications
+                แจ้งเตือน
               </Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>Create Broadcast News </Breadcrumb.Item>
+            <Breadcrumb.Item>สร้างการแจ้งเตือน </Breadcrumb.Item>
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}></Col>
@@ -170,11 +171,11 @@ const NotificationsBroadcastNews = (): ReactElement => {
               <Row gutter={16}>
                 <Col className="gutter-row" span={8} >
                   <Field
-                    label={{ text: 'แอพที่ต้องการส่ง' }}
+                    label={{ text: 'แอพพลิเคชัน' }}
                     name="app_type"
                     component={Select}
                     id="app_type"
-                    placeholder="แอพที่ต้องการส่ง"
+                    placeholder="แอพพลิเคชัน"
                     defaultValue=""
                     selectOption={[
                       {
@@ -235,7 +236,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                     defaultValue=""
                     selectOption={[
                       {
-                        name: 'กรุณาเลือก',
+                        name: 'เลือกประเภทแจ้งเตือน',
                         value: '',
                       },
                       {
@@ -264,7 +265,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                 <Col className="gutter-row" span={8}>
                   <Field
                     label={{ text: "ชื่อเรื่อง" }}
-                    style={{ color: "red" }}
+                    // style={{ color: "red" }}
                     name="title"
                     type="text"
                     component={Input}
@@ -329,12 +330,32 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       value={values.link_type}
                       onChange={e => {
                         setFieldValue("link_type", e.target.value)
+                        if (e.target.value === "inapp") {
+                          setPlaceholderLink('khconsumer://host?outletId=368')
+                          setIsLink(false)
+                        } else if (e.target.value === "outapp") {
+                          setPlaceholderLink('https://www.kitchenhub-th.com/')
+                          setIsLink(false)
+                        } else {
+                          setPlaceholderLink('ลิงค์')
+                          setIsLink(true)
+                        }
                       }}>
                       {/* <Radio value={1}>A</Radio> */}
                       <Radio name="link_type" value={'inapp'} >ลิ้งค์เข้าในแอพพลิเคชัน</Radio>
                       <Radio name="link_type" value={'outapp'} >ลิ้งค์ไปนอกแอพพลิเคชัน</Radio>
                     </Radio.Group>
-                    <Field
+                    <InputAntd
+                      name="link"
+                      id="link"
+                      className="form-control round"
+                      onChange={e => {
+                        setFieldValue("link", e?.target?.value)
+                      }}
+                      addonBefore={<LinkOutlined />} defaultValue="" placeholder={placeholderLink}
+                      disabled={isLink}
+                    />
+                    {/* <Field
                       label={{ text: "" }}
                       name="link"
                       type="text"
@@ -343,7 +364,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       className="form-control round"
                       id="link"
                       placeholder="ลิงค์"
-                    />
+                    /> */}
                   </div>
 
                 </Col>

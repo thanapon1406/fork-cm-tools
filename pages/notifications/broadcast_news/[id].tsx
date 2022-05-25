@@ -6,8 +6,8 @@ import Select from '@/components/Form/Select';
 import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
 import { getBroadcastNew, requestBroadcastNewInterface, updateBroadcastNew } from '@/services/broadcastNews';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Divider, Modal, Radio, Row, Switch, Typography } from 'antd';
+import { ExclamationCircleOutlined, LinkOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, Divider, Input as InputAntd, Modal, Radio, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import { range } from 'lodash';
 import moment, { Moment } from "moment";
@@ -28,6 +28,8 @@ const EditBroadcastNew = (): ReactElement => {
   const [isdone, setIsdone] = useState(false)
   const [isSendnow, setIsSendnow] = useState(true)
   const [isShedule, setSchedule] = useState(true)
+  const [placeholderLink, setPlaceholderLink] = useState('ลิงค์')
+  const [isLink, setIsLink] = useState(true)
   let [initialValues, setInitialValues] = useState({
     app_type: '',
     news_type_id: '',
@@ -50,6 +52,7 @@ const EditBroadcastNew = (): ReactElement => {
 
   const handleSubmit = (values: typeof initialValues) => {
     let scheduleAt = values.schedule_at
+
     if (scheduleAt == "") {
       scheduleAt = String(moment().format());
     }
@@ -94,7 +97,7 @@ const EditBroadcastNew = (): ReactElement => {
     news_type_id: Yup.string().trim().required('กรุณาเลือกประเภทแจ้งเตือน'),
     title: Yup.string().trim().max(50).required('กรุณากรอกชื่อเรื่อง'),
     body: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียดแบบย่อ'),
-    body_full: Yup.string().trim().max(255).required('กรุณากรอกรายละเอียดแบบเต็ม'),
+    body_full: Yup.string().trim().required('กรุณากรอกรายละเอียดแบบเต็ม'),
     schedule_at: Yup.mixed().test('is-42', 'กรุณาตั้งเวลาส่ง', (value: string, form: any) => {
       let customDate = moment().format("YYYY-MM-DD HH:mm");
       let newValue = moment(value).add(-4, "minute").format("YYYY-MM-DD HH:mm")
@@ -167,6 +170,7 @@ const EditBroadcastNew = (): ReactElement => {
     if (success) {
       const { meta, data } = result
       let customDate = moment().format("YYYY-MM-DD HH:mm");
+
       setInitialValues(data)
       setSchedule(data.send_now)
 
@@ -207,14 +211,14 @@ const EditBroadcastNew = (): ReactElement => {
       <Row justify="space-around" align="middle">
         <Col span={8}>
 
-          <Title level={4}>Broadcast News</Title>
+          <Title level={4}>แจ้งเตือน</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>
               <Link href="/notifications/broadcast_news">
-                Notifications
+                แจ้งเตือน
               </Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>Edit Broadcast News </Breadcrumb.Item>
+            <Breadcrumb.Item>แก้ไขการแจ้งเตือน </Breadcrumb.Item>
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}>
@@ -294,6 +298,7 @@ const EditBroadcastNew = (): ReactElement => {
                       component={CheckBox2}
                       className="form-control round"
                       id="msg_app"
+                      disabled={!isEdit}
                     />
 
                   </div>
@@ -306,6 +311,7 @@ const EditBroadcastNew = (): ReactElement => {
                       component={CheckBox2}
                       className="form-control round"
                       id="push_noti"
+                      disabled={!isEdit}
                     />
                   </div>
                 </Col>
@@ -418,12 +424,35 @@ const EditBroadcastNew = (): ReactElement => {
                       disabled={!isEdit}
                       onChange={e => {
                         setFieldValue("link_type", e.target.value)
+                        if (e.target.value === "inapp") {
+                          setPlaceholderLink('khconsumer://host?outletId=368')
+                          setIsLink(false)
+                        } else if (e.target.value === "outapp") {
+                          setPlaceholderLink('https://www.kitchenhub-th.com/')
+                          setIsLink(false)
+                        } else {
+                          setPlaceholderLink('ลิงค์')
+                          setIsLink(true)
+                        }
                       }}>
                       {/* <Radio value={1}>A</Radio> */}
                       <Radio name="link_type" value={'inapp'} >ลิ้งค์เข้าในแอพพลิเคชัน</Radio>
                       <Radio name="link_type" value={'outapp'} >ลิ้งค์ไปนอกแอพพลิเคชัน</Radio>
                     </Radio.Group>
-                    <Field
+
+                    <InputAntd
+                      name="link"
+                      id="link"
+                      className="form-control round"
+                      onChange={e => {
+                        setFieldValue("link", e?.target?.value)
+                      }}
+                      addonBefore={<LinkOutlined />} defaultValue={values.link} value={values.link} placeholder={placeholderLink}
+                      disabled={!isEdit || isLink}
+
+                    />
+
+                    {/* <Field
                       label={{ text: "" }}
                       name="link"
                       type="text"
@@ -433,7 +462,7 @@ const EditBroadcastNew = (): ReactElement => {
                       id="link"
                       placeholder="ลิงค์"
                       disabled={!isEdit}
-                    />
+                    /> */}
                   </div>
 
                 </Col>

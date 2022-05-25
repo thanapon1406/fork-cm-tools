@@ -1,7 +1,11 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
 import {
-  FileTextOutlined, LayoutOutlined, LogoutOutlined, NotificationOutlined, SolutionOutlined,
+  FileTextOutlined,
+  LayoutOutlined,
+  LogoutOutlined,
+  NotificationOutlined,
+  SolutionOutlined,
   TeamOutlined,
   UserOutlined,
   WalletOutlined
@@ -156,6 +160,11 @@ export default function Sidebar({ }: Props): ReactElement {
           link: '/download-order',
           key: '/download-order',
         },
+        {
+          title: 'สรุปข้อมูลออเดอร์รายประเภทอาหาร',
+          link: '/orderhistory-food-type',
+          key: '/orderhistory-food-type',
+        },
       ],
     },
     {
@@ -194,6 +203,11 @@ export default function Sidebar({ }: Props): ReactElement {
           link: '/wallet/lalamove',
           key: '/wallet/lalamove',
         },
+        {
+          title: 'PANDAGO',
+          link: '/wallet/pandago',
+          key: '/wallet/pandago',
+        },
       ],
     },
     {
@@ -221,7 +235,7 @@ export default function Sidebar({ }: Props): ReactElement {
           title: 'Broadcast News ',
           link: '/notifications/broadcast_news',
           key: '/notifications/broadcast_news',
-        }
+        },
       ],
     },
     {

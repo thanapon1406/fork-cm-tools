@@ -2,12 +2,13 @@ import Card from '@/components/Card';
 import CheckBox2 from '@/components/Form/CheckBox2';
 import DatePicker from '@/components/Form/DatePicker';
 import Input from '@/components/Form/Input';
+import InputLink from '@/components/Form/InputLink';
 import Select from '@/components/Form/Select';
 import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
 import { createBroadcastNew } from '@/services/broadcastNews';
-import { ExclamationCircleOutlined, LinkOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Divider, Input as InputAntd, Modal, Radio, Row, Switch, Typography } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, Divider, Modal, Radio, Row, Switch, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import { range } from 'lodash';
 import moment, { Moment } from "moment";
@@ -70,6 +71,36 @@ const NotificationsBroadcastNews = (): ReactElement => {
       })
 
     }),
+    button_name: Yup.string().when('link_type', (link_type: any, schema: any) => {
+      return schema.test({
+        test: (button_name: any) => {
+          if (link_type == 'inapp' || link_type == 'outapp') {
+            if (button_name == undefined) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "กรุณาใส่ชื่อปุ่ม",
+      })
+    }),
+    link: Yup.string().when('link_type', (link_type: any, schema: any) => {
+      return schema.test({
+        test: (link: any) => {
+          if (link_type == 'inapp' || link_type == 'outapp') {
+            if (link == undefined) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "กรุณาใส่ลิงค์",
+      })
+    })
   })
 
   const handleSubmit = (values: typeof initialValues) => {
@@ -345,7 +376,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       <Radio name="link_type" value={'inapp'} >ลิ้งค์เข้าในแอพพลิเคชัน</Radio>
                       <Radio name="link_type" value={'outapp'} >ลิ้งค์ไปนอกแอพพลิเคชัน</Radio>
                     </Radio.Group>
-                    <InputAntd
+                    {/* <InputAntd
                       name="link"
                       id="link"
                       className="form-control round"
@@ -354,17 +385,17 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       }}
                       addonBefore={<LinkOutlined />} defaultValue="" placeholder={placeholderLink}
                       disabled={isLink}
-                    />
-                    {/* <Field
+                    /> */}
+                    <Field
                       label={{ text: "" }}
                       name="link"
                       type="text"
-                      component={Input}
+                      component={InputLink}
                       rows={2}
                       className="form-control round"
                       id="link"
-                      placeholder="ลิงค์"
-                    /> */}
+                      placeholder={placeholderLink}
+                    />
                   </div>
 
                 </Col>

@@ -227,7 +227,7 @@ const column = [
     },
   },
 ]
-
+  console.log('render')
   return (
     <MainLayout>
       <Row justify="space-around" align="middle">

@@ -42,7 +42,7 @@ const urlMatch = /^((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_
 const Schema = Yup.object().shape({
   name: Yup.string().trim().required('กรุณากรอกชื่อ Banner'),
   action_url: Yup.string()
-              .matches(urlMatch, 'Enter correct url!')
+    .matches(urlMatch, 'Enter correct url!')
 })
 
 export default function BannerView({ }: Props): ReactElement {
@@ -56,12 +56,15 @@ export default function BannerView({ }: Props): ReactElement {
   const { id } = router.query
 
   useEffect(() => {
-    fetchDataBanner()
-  }, [])
+    if (id != undefined) {
+      fetchDataBanner()
+    }
+
+  }, [id])
 
   const fetchDataBanner = async () => {
     const { result, success } = await findBanner(id)
-    if(success){
+    if (success) {
       const { data } = result
       let dataBanner = {
         id: data.id,
@@ -99,7 +102,7 @@ export default function BannerView({ }: Props): ReactElement {
     const isJPNG = info.type === 'image/jpeg';
     const isJPG = info.type === 'image/jpg';
     const isPNG = info.type === 'image/png';
-    const fileSize = (info.size/1024)/1024
+    const fileSize = (info.size / 1024) / 1024
 
     if (!isJPNG && !isJPG && !isPNG) {
       warning({
@@ -111,7 +114,7 @@ export default function BannerView({ }: Props): ReactElement {
       return null
     }
 
-    if(fileSize > 1){
+    if (fileSize > 1) {
       warning({
         title: `กรุณาเลือกรูปภาพขนาดไม่เกิน 1MB`,
         afterClose() {
@@ -125,11 +128,11 @@ export default function BannerView({ }: Props): ReactElement {
     setloadingImage(false)
     setImageUrl(res.upload_success.modal_pop_up)
   }
-  
+
   const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
-  
+
   const handleSubmit = async (values: typeof initialValues) => {
-    if(imageUrl == ''){
+    if (imageUrl == '') {
       warning({
         title: `กรุณาเลือกรูปภาพ`,
         afterClose() {
@@ -147,10 +150,10 @@ export default function BannerView({ }: Props): ReactElement {
     if (values.show_date.end != '') {
       values.end_date = moment(values.show_date.end).format(dateFormat)
     }
-    if(values.action_url == ''){
+    if (values.action_url == '') {
       values.action = ''
-    }else{
-      if(isAction == ''){
+    } else {
+      if (isAction == '') {
         warning({
           title: `กรุณาเลือก Action Link`,
           afterClose() {
@@ -163,7 +166,7 @@ export default function BannerView({ }: Props): ReactElement {
     }
 
     const dataCreate = { data: omit(values, ['show_date']) }
-    const { result, success } = await updateBanner(dataCreate)
+    const { success } = await updateBanner(dataCreate)
 
     if (success) {
       notification.success({
@@ -178,184 +181,194 @@ export default function BannerView({ }: Props): ReactElement {
       })
     }
   }
-
+  console.log('render')
   return (
     <MainLayout>
-    <Formik enableReinitialize initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
-      {({ values, resetForm, setFieldValue }) => (
-      <Form>
-          <Row justify="space-around" align="middle">
-            <Col span={20}>
-              <Title level={4}>Banner</Title>
-              <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item>Content</Breadcrumb.Item>
-                <Breadcrumb.Item>Banner Create</Breadcrumb.Item>
-              </Breadcrumb>
-            </Col>
-            <Col span={4}>
-              {isEdit ? (
-                <>
-                  <Button1
-                    style={{ float: 'right', backGroundColor: 'forestgreen !important' }}
-                    size="middle"
+      <Formik enableReinitialize initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
+        {({ values, resetForm, setFieldValue }) => (
+          <Form>
+            <Row justify="space-around" align="middle">
+              <Col span={20}>
+                <Title level={4}>Banner</Title>
+                <Breadcrumb style={{ margin: '16px 0' }}>
+                  <Breadcrumb.Item>Content</Breadcrumb.Item>
+                  <Breadcrumb.Item>Banner Create</Breadcrumb.Item>
+                </Breadcrumb>
+              </Col>
+              <Col span={4}>
+                {isEdit ? (
+                  <>
+                    <Button1
+                      style={{ float: 'right', backGroundColor: 'forestgreen !important' }}
+                      size="middle"
+                      type="primary"
+                      className="confirm-button"
+                      htmlType='submit'
+                    >
+                      บันทึก
+                    </Button1>
+                    <Button1
+                      style={{ float: 'right', marginRight: '10px' }}
+                      type="default"
+                      size="middle"
+                      onClick={() => {
+                        setIsEdit(!isEdit)
+                      }}
+                    >
+                      ยกเลิก
+                    </Button1>
+                  </>
+                ) : (
+                  <Button
+                    style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
                     type="primary"
-                    className="confirm-button"
-                    htmlType='submit'
-                  >
-                    บันทึก
-                  </Button1>
-                  <Button1
-                    style={{ float: 'right', marginRight: '10px' }}
-                    type="default"
-                    size="middle"
                     onClick={() => {
-                      setIsEdit(!isEdit)
+                      setIsEdit(true)
                     }}
                   >
-                    ยกเลิก
-                  </Button1>
-                </>
-              ) : (
-                <Button
-                  style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
-                  type="primary"
-                  onClick={() => {
-                    setIsEdit(true)
-                  }}
-                >
-                  แก้ไข
-                </Button>
-              )}
-            </Col>
-          </Row>
-
-          <Card>
-            <Row gutter={24}>
-              <Col className="gutter-row" span={24}>
-                <Field 
-                disabled={(isEdit) ? false : true}
-                label={{ text: "ชื่อ Banner" }}
-                name="name"
-                type="text"
-                component={Input}
-                rows={2}
-                className="form-control round"
-                id="name" />
+                    แก้ไข
+                  </Button>
+                )}
               </Col>
+            </Row>
 
-              <Col className="gutter-row" span={24} 
-              style={{ borderTop: "2px solid #f2f2f2", 
-              paddingTop: "15px",
-              paddingBottom: "15px" }}>
-                <b>สถานะ</b>
-                <Row gutter={24}>
-                  <Col className="gutter-row" span={24} style={{ marginTop: "10px" }}>
-                    <span >
-                      <Switch
-                        disabled={(isEdit) ? false : true}
-                        onClick={handleStatus}
-                        checkedChildren="active"
-                        unCheckedChildren="inactive"
-                        checked={isActive == 'active' ? true : false}
-                      />
-                    </span>
-                  </Col>
-                </Row>
-              </Col>
-
-              <Col className="gutter-row" span={24}
-              style={{ borderTop: "2px solid #f2f2f2", 
-              paddingTop: "15px",
-              paddingBottom: "15px" }}>
-                <Row gutter={24}>
-                  <Col span={24}>
-                    <b>ลิงค์</b><span style={{ color: "#9999" }}> (ไม่บังคับ)</span>
-                  </Col>
-                </Row>
-
-                <Row gutter={24} style={{ marginTop: "5px" }}>
-                  <Col span={24}>
-                    <Radio.Group disabled={(isEdit) ? false : true} onChange={ handleAction } value={ isAction }>
-                      <Radio value="external">External</Radio>
-                      <Radio value="internal">Internal</Radio>
-                    </Radio.Group>
-                  </Col>
-                </Row>
-
-                <Row gutter={24} style={{ marginTop: "10px" }}>
-                  <Col span={1} style={{ textAlign: "right" }}>
-                    <LinkOutlined style={{ fontSize: "20px", marginTop: "7px", color: "#4dd2ff" }} />
-                  </Col>
-                  <Col span={23}>
-                    <Field 
+            <Card>
+              <Row gutter={24}>
+                <Col className="gutter-row" span={24}>
+                  <Field
                     disabled={(isEdit) ? false : true}
-                    name="action_url"
+                    label={{ text: "ชื่อ Banner" }}
+                    name="name"
                     type="text"
                     component={Input}
                     rows={2}
                     className="form-control round"
-                    placeholder="ลิงค์"
-                    id="action_url" />
-                  </Col>
-                </Row>
-              </Col>
-              
-              <Col className="gutter-row" span={12}
-              style={{ borderTop: "2px solid #f2f2f2", 
-              paddingTop: "15px",
-              paddingBottom: "15px" }}>
-                <Field 
-                disabled={(isEdit) ? false : true}
-                label={{ text: "Priority" }}
-                name="priority"
-                type="text"
-                component={Input}
-                rows={2}
-                className="form-control round"
-                id="priority" />
-              </Col>
+                    id="name" />
+                </Col>
 
-              <Col className="gutter-row" span={12}
-              style={{ borderTop: "2px solid #f2f2f2", 
-              paddingTop: "15px",
-              paddingBottom: "15px" }}>
-                <Field
-                  disabled={(isEdit) ? false : true}
-                  label={{ text: 'วันเวลาแสดง Banner' }}
-                  name="show_date"
-                  component={DateTimeRangePicker}
-                  id="show_date"
-                  placeholder="show_date"
-                />
-              </Col>
-            </Row>
+                <Col className="gutter-row" span={24}
+                  style={{
+                    borderTop: "2px solid #f2f2f2",
+                    paddingTop: "15px",
+                    paddingBottom: "15px"
+                  }}>
+                  <b>สถานะ</b>
+                  <Row gutter={24}>
+                    <Col className="gutter-row" span={24} style={{ marginTop: "10px" }}>
+                      <span >
+                        <Switch
+                          disabled={(isEdit) ? false : true}
+                          onClick={handleStatus}
+                          checkedChildren="active"
+                          unCheckedChildren="inactive"
+                          checked={isActive == 'active' ? true : false}
+                        />
+                      </span>
+                    </Col>
+                  </Row>
+                </Col>
 
-            <Row gutter={24}>
-              <Col className="gutter-row" span={24}
-              style={{ borderTop: "2px solid #f2f2f2", 
-              paddingTop: "15px",
-              paddingBottom: "15px" }}>
-                <label style={{ display: "block", marginBottom: "10px" }}>อัพโหลดรูปภาพ</label>
-              </Col>
-              
-              <Upload 
-                name="file" 
-                onRemove={e => { setImageUrl('') }} 
-                beforeUpload={handleChangeImage} 
-                maxCount={1}
-              >
+                <Col className="gutter-row" span={24}
+                  style={{
+                    borderTop: "2px solid #f2f2f2",
+                    paddingTop: "15px",
+                    paddingBottom: "15px"
+                  }}>
+                  <Row gutter={24}>
+                    <Col span={24}>
+                      <b>ลิงค์</b><span style={{ color: "#9999" }}> (ไม่บังคับ)</span>
+                    </Col>
+                  </Row>
 
-                <Button disabled={(isEdit) ? false : true} style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูปภาพ</Button>
-              </Upload>
-              <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ ควรเลือกรูปภาพขนาดไม่เกิน 1MB</label>
+                  <Row gutter={24} style={{ marginTop: "5px" }}>
+                    <Col span={24}>
+                      <Radio.Group disabled={(isEdit) ? false : true} onChange={handleAction} value={isAction}>
+                        <Radio value="external">External</Radio>
+                        <Radio value="internal">Internal</Radio>
+                      </Radio.Group>
+                    </Col>
+                  </Row>
 
-              <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
-                <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />
-              </Col>
-            </Row>
-          </Card>
-        </Form>
-      )}
+                  <Row gutter={24} style={{ marginTop: "10px" }}>
+                    <Col span={1} style={{ textAlign: "right" }}>
+                      <LinkOutlined style={{ fontSize: "20px", marginTop: "7px", color: "#4dd2ff" }} />
+                    </Col>
+                    <Col span={23}>
+                      <Field
+                        disabled={(isEdit) ? false : true}
+                        name="action_url"
+                        type="text"
+                        component={Input}
+                        rows={2}
+                        className="form-control round"
+                        placeholder="ลิงค์"
+                        id="action_url" />
+                    </Col>
+                  </Row>
+                </Col>
+
+                <Col className="gutter-row" span={12}
+                  style={{
+                    borderTop: "2px solid #f2f2f2",
+                    paddingTop: "15px",
+                    paddingBottom: "15px"
+                  }}>
+                  <Field
+                    disabled={(isEdit) ? false : true}
+                    label={{ text: "Priority" }}
+                    name="priority"
+                    type="text"
+                    component={Input}
+                    rows={2}
+                    className="form-control round"
+                    id="priority" />
+                </Col>
+
+                <Col className="gutter-row" span={12}
+                  style={{
+                    borderTop: "2px solid #f2f2f2",
+                    paddingTop: "15px",
+                    paddingBottom: "15px"
+                  }}>
+                  <Field
+                    disabled={(isEdit) ? false : true}
+                    label={{ text: 'วันเวลาแสดง Banner' }}
+                    name="show_date"
+                    component={DateTimeRangePicker}
+                    id="show_date"
+                    placeholder="show_date"
+                  />
+                </Col>
+              </Row>
+
+              <Row gutter={24}>
+                <Col className="gutter-row" span={24}
+                  style={{
+                    borderTop: "2px solid #f2f2f2",
+                    paddingTop: "15px",
+                    paddingBottom: "15px"
+                  }}>
+                  <label style={{ display: "block", marginBottom: "10px" }}>อัพโหลดรูปภาพ</label>
+                </Col>
+
+                <Upload
+                  name="file"
+                  onRemove={e => { setImageUrl('') }}
+                  beforeUpload={handleChangeImage}
+                  maxCount={1}
+                >
+
+                  <Button disabled={(isEdit) ? false : true} style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูปภาพ</Button>
+                </Upload>
+                <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ ควรเลือกรูปภาพขนาดไม่เกิน 1MB</label>
+
+                <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
+                  <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />
+                </Col>
+              </Row>
+            </Card>
+          </Form>
+        )}
       </Formik>
     </MainLayout>
   )

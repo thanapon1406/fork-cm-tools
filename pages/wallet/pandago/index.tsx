@@ -40,7 +40,7 @@ export default function Pandago({}: Props): ReactElement {
     export_email: '',
     partner_order_id: '',
     rider_info: '',
-    status: '',
+    status: ['success', 'cancel'],
     start_date: '',
     end_date: '',
     partner_name: 'PANDAGO',

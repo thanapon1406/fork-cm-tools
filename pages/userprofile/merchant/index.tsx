@@ -20,7 +20,7 @@ import * as Yup from 'yup'
 
 const { Title } = Typography
 
-interface Props {}
+interface Props { }
 
 interface filterObject {
   keyword?: string
@@ -31,7 +31,7 @@ interface filterObject {
   online_status?: string
 }
 
-export default function MerchantProfileList({}: Props): ReactElement {
+export default function MerchantProfileList({ }: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     keyword: '',
@@ -141,7 +141,7 @@ export default function MerchantProfileList({}: Props): ReactElement {
       dataIndex: 'available_credit',
       align: 'center',
       render: (row: number) => {
-        return currency.format(row).replace('฿', '')
+        return currency.format(isNaN(row) ? 0 : row).replace('฿', '')
       },
     },
     {

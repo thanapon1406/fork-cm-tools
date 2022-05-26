@@ -40,7 +40,7 @@ export default function Pandago({}: Props): ReactElement {
     export_email: '',
     partner_order_id: '',
     rider_info: '',
-    status: '',
+    status: ['success', 'cancel'],
     start_date: '',
     end_date: '',
     partner_name: 'PANDAGO',
@@ -122,10 +122,11 @@ export default function Pandago({}: Props): ReactElement {
       start_date: filterSearch.start_date,
       end_date: filterSearch.end_date,
       partner_name: 'PANDAGO',
+      period_type: '',
     }
 
     if (request.start_date != '' && request.end_date != '') {
-      values.period_type = 'specific_time'
+      request.period_type = 'specific_time'
     }
 
     const { result, success } = await exportDelivery(request)

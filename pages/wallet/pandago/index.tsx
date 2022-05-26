@@ -122,11 +122,13 @@ export default function Pandago({}: Props): ReactElement {
       start_date: filterSearch.start_date,
       end_date: filterSearch.end_date,
       partner_name: 'PANDAGO',
+      period_type: '',
     }
 
     if (request.start_date != '' && request.end_date != '') {
-      values.period_type = 'specific_time'
+      request.period_type = 'specific_time'
     }
+
     console.log(`request`, request)
     const { result, success } = await exportDelivery(request)
     if (success) {

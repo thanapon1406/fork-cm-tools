@@ -386,6 +386,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       className="form-control round"
                       id="link"
                       placeholder={placeholderLink}
+                      disabled={isLink}
                     />
                   </div>
 

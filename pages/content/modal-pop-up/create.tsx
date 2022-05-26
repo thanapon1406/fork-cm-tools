@@ -219,7 +219,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
                     if (value == "") {
                       return "กรุณากรอกชื่อเรื่อง"
                     }
-                    if (value.length > 2) {
+                    if (value.length > 255) {
                       return "ชื่อเรื่องความยาวเกิน 255 ตัวอักษร"
                     }
                   }
@@ -238,7 +238,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
                 id="content.text"
                 validate={(value: string) => {
                   if (type > 2) {
-                    if (value.length > 2) {
+                    if (value.length > 255) {
                       return "รายละเอียดความยาวเกิน 255 ตัวอักษร"
                     }
                   }

@@ -20,7 +20,7 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
   })
 
   const Schema = Yup.object().shape({
-    username: Yup.string().trim().email('กรุณากรอกอีเมลให้ถูกต้อง').required('กรุณากรอกอีเมล'),
+    email: Yup.string().trim().email('กรุณากรอกอีเมลให้ถูกต้อง').required('กรุณากรอกอีเมล'),
   })
 
   const showModal = () => {
@@ -37,8 +37,17 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
 
   const handleOk = () => {}
 
-  const handleSubmitDownload = async (values: typeof downloadInitialValues) => {
+  const handleSubmitDownload = async (
+    values: typeof downloadInitialValues,
+    errors: any,
+    resetForm: any
+  ) => {
+    if (errors?.email) {
+      return
+    }
     handelSubmit(values)
+    hideModal()
+    resetForm()
   }
 
   return (
@@ -58,17 +67,13 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
           กรุณากรอกอีเมลที่ต้องการรับรายงาน
         </Title>
         <br />
-        <Formik
-          initialValues={downloadInitialValues}
-          onSubmit={handleSubmitDownload}
-          validationSchema={Schema}
-        >
-          {({ values, resetForm }) => (
+        <Formik initialValues={downloadInitialValues} onSubmit={() => {}} validationSchema={Schema}>
+          {({ values, resetForm, errors }) => (
             <Form>
               <Field
                 // label={{ text: 'เหตุผล' }}
                 name="email"
-                type="text"
+                type="email"
                 component={Input}
                 className="form-control round"
                 id="email"
@@ -89,9 +94,7 @@ export default function DownloadButton({ handelSubmit }: Props): ReactElement {
                     type="primary"
                     onClick={() => {
                       if (values.email) {
-                        handleSubmitDownload(values)
-                        hideModal()
-                        resetForm()
+                        handleSubmitDownload(values, errors, resetForm)
                       }
                     }}
                     size="middle"

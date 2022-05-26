@@ -39,6 +39,15 @@ const postServerSide = async (url: string, body = {}, headers = {}) => {
   return await axiosInstance.post(url, _body, options)
 }
 
+const postRawServerSide = async (url: string, body = {}, headers = {}) => {
+  const options = {
+    headers: {
+      Authorization: _.get(headers, 'authorization'),
+    },
+  }
+  return await axiosInstance.post(url, body, options)
+}
+
 const putServerSide = async (url: string, body = {}, headers = {}) => {
   const options = {
     headers: {
@@ -117,6 +126,7 @@ const apiFetch = {
   putRest: putServerSideRest,
   deleteRest: deleteServerSideRest,
   postSso: postServerSideSso,
+  postRaw: postRawServerSide,
 }
 
 export default apiFetch

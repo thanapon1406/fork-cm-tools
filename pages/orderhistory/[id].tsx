@@ -193,7 +193,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           }
 
 
-          console.log("riderId : ", riderId)
+
           setRiderInitialValues({
             rider_name: riderName || '-',
             rider_id: riderId || '-',
@@ -424,7 +424,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
               {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
             </div>
           )
-
           let all_tracking_link = ''
           if (
             data.current_rider_info &&

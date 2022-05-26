@@ -3,7 +3,7 @@ import {
   merchantStatusMapping,
   orderStatusMapping,
   paymentChannel,
-  riderStatusMapping,
+  riderStatusMapping
 } from '@/constants/textMapping'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
@@ -11,7 +11,7 @@ import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
 import { Badge, Card, TablePaginationConfig } from 'antd'
 import { isEmpty, isNull, isUndefined } from 'lodash'
-import Moment from 'moment'
+import { default as Moment } from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { numberFormat } from 'utils/helpers'
@@ -26,8 +26,8 @@ const bageStatusMapping = (text: string) => {
     text !== 'success' && text !== 'cancel'
       ? 'processing'
       : text === 'success'
-      ? 'success'
-      : 'error'
+        ? 'success'
+        : 'error'
 
   return status
 }

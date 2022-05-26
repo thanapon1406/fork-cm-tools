@@ -36,10 +36,10 @@ const mapQueryParams = (params = {}): string => {
   return isEmpty(params)
     ? ''
     : '?' +
-        map(
-          params,
-          (param, key) => `${key}=${typeof param === 'object' ? join(param, ',') : param}`
-        ).join('&')
+    map(
+      params,
+      (param, key) => `${key}=${typeof param === 'object' ? join(param, ',') : param}`
+    ).join('&')
 }
 
 const convertDateToString = (date: string, format: string = 'YYYY-MM-DD HH:mm') => {
@@ -81,6 +81,21 @@ const humanFileSize = (size: number | any | bigint) => {
   return fileType
 }
 
+const currency = new Intl.NumberFormat('th-TH', {
+  style: 'currency',
+  currency: 'THB',
+})
+
+const generateQueryParams = (obj: any): string => {
+  const str = []
+  for (const p in obj)
+    if (obj.hasOwnProperty(p)) {
+      str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]))
+    }
+  return str.join('&')
+}
+
+
 export {
   numberFormat,
   uniqueId,
@@ -91,4 +106,6 @@ export {
   determineAppId,
   monthFormat,
   humanFileSize,
+  generateQueryParams,
+  currency,
 }

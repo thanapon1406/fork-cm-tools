@@ -9,7 +9,7 @@ import MainLayout from '@/layout/MainLayout'
 import { getBroadcastNewList } from '@/services/broadcastNews'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import _ from 'lodash'
+import _, { isEmpty, isUndefined } from 'lodash'
 import Moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
@@ -27,6 +27,7 @@ interface SearchValue {
   active_status?: string
   status?: string
   app_type?: string
+  news_type_id?: string
   page?: number;
   per_page?: number;
   sort_by?: string;
@@ -48,6 +49,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
     schedule_end_date: '',
     created_start_date: '',
     created_end_date: '',
+    news_type_id: '',
   }
   let [filter, setFilter] = useState<SearchValue>(initialValues)
   const Schema = Yup.object().shape({})
@@ -106,6 +108,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
       active_status: values.active_status,
       status: values.status,
       app_type: values.app_type,
+      news_type_id: values.news_type_id,
       schedule_start_date: schedule_start_date,
       schedule_end_date: schedule_end_date,
       created_start_date: created_start_date,
@@ -198,6 +201,18 @@ const NotificationsBroadcastNews = (): ReactElement => {
       dataIndex: 'app_type',
       align: 'center',
     },
+    {
+      title: 'ประเภท',
+      dataIndex: 'news_type_name',
+      align: 'center',
+      render: (row: any, record: any) => {
+
+        if (isUndefined(row) && isEmpty(row)) return "-"
+        if (row === "" || row === undefined) return "-"
+        return row
+
+      },
+    },
   ]
 
   return (
@@ -225,7 +240,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
       </Row>
       <Card>
         <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
-          {({ values, resetForm }) => (
+          {({ values, resetForm, setFieldValue }) => (
             <Form>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -289,18 +304,18 @@ const NotificationsBroadcastNews = (): ReactElement => {
                     ]}
                   />
                   <Field
-                    label={{ text: 'แอปพลิเคชันที่ทำการส่ง' }}
+                    label={{ text: 'แอพพลิเคชันที่ทำการส่ง' }}
                     name="app_type"
                     component={Select}
                     id="app_type"
-                    placeholder="แอปพลิเคชันที่ทำการส่ง"
+                    placeholder="แอพพลิเคชันที่ทำการส่ง"
                     selectOption={[
                       {
                         name: 'ทั้งหมด',
                         value: '',
                       },
                       {
-                        name: 'all',
+                        name: 'ทุกแอพพลิเคชัน',
                         value: 'all',
                       },
                       {
@@ -317,6 +332,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       }
                     ]}
                   />
+
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
@@ -326,7 +342,38 @@ const NotificationsBroadcastNews = (): ReactElement => {
                     id="created_at"
                     placeholder="scheduleAt"
                   />
-
+                  <Field
+                    label={{ text: 'ประเภทแจ้งเตือน' }}
+                    name="news_type_id"
+                    component={Select}
+                    id="news_type_id"
+                    placeholder="เลือกประเภทแจ้งเตือน"
+                    defaultValue=""
+                    selectOption={[
+                      {
+                        name: 'กรุณาเลือก',
+                        value: '',
+                      },
+                      {
+                        name: 'ประกาศข่าว',
+                        value: 1,
+                      },
+                      {
+                        name: 'โปรโมชัน',
+                        value: 2,
+                      },
+                      {
+                        name: 'อื่นๆ',
+                        value: 3,
+                      },
+                    ]}
+                    onChange={(event: any, form: any) => {
+                      setFieldValue('news_type_id', event)
+                      // if (form.children != undefined && form.children != "กรุณาเลือก") {
+                      //   setFieldValue('news_type_name', form.children)
+                      // }
+                    }}
+                  />
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field

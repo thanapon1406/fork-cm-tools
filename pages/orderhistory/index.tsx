@@ -3,6 +3,15 @@ import Card from '@/components/Card'
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
+import {
+  merchantStatus,
+  merchantTestOption,
+  orderStatus,
+  paymentChannelOption,
+  riderPartnerTypeOption,
+  riderStatus,
+  riderTypeOption
+} from '@/constants/option-order'
 import { SelectOption } from '@/interface/common'
 import { CustomerDetail } from '@/interface/customer'
 import { Pagination } from '@/interface/dataTable'
@@ -15,45 +24,47 @@ import { getRider } from '@/services/rider'
 import { DownloadOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import lodash, { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
+import lodash, { debounce, get, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { consumerList } from '../../services/consumer'
 import OrderHistoryComponent from './component'
+
 const { Title } = Typography
+
+const initialValues = {
+  delivery_type: 'delivery',
+  brand_id: 'all',
+  page: 1,
+  per_page: 10,
+  status: null,
+  startdate: moment().startOf('day').format('YYYY-MM-DD'),
+  enddate: moment().endOf('day').format('YYYY-MM-DD'),
+  starttime: moment().startOf('day').format('HH:mm:ss'),
+  endtime: moment().endOf('day').format('HH:mm:ss'),
+  order_number: '',
+  client_time: {
+    start: moment().startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+    end: moment().endOf('day').format('YYYY-MM-DD HH:mm:ss'),
+  },
+  sso_id: null,
+  order_overall_status: null,
+  rider_id: null,
+  rider_partner_type: null,
+  rider_status: null,
+  rider_overall_status: null,
+  branch_id: null,
+  merchant_overall_status: null,
+  merchant_status: null,
+  merchant_test: null
+}
 
 const OrderHistory = (): ReactElement => {
   const Schema = Yup.object().shape({})
   const [customerDropDown, setCustomerDropDown] = useState<Array<SelectOption>>([])
   const [merchantDropDown, setMerchantDropDown] = useState<Array<SelectOption>>([])
   const [riderDropDown, setRiderDropDown] = useState<Array<SelectOption>>([])
-
-  const initialValues = {
-    delivery_type: 'delivery',
-    brand_id: 'all',
-    page: 1,
-    per_page: 10,
-    status: null,
-    startdate: moment().startOf('day'),
-    enddate: moment().endOf('day'),
-    starttime: moment().startOf('day'),
-    endtime: moment().endOf('day'),
-    order_number: '',
-    client_time: {
-      start: moment().startOf('day'),
-      end: moment().endOf('day'),
-    },
-    sso_id: null,
-    order_overall_status: null,
-    rider_id: null,
-    rider_partner_type: null,
-    rider_status: null,
-    rider_overall_status: null,
-    branch_id: null,
-    merchant_overall_status: null,
-    merchant_status: null,
-  }
 
   let [pagination, setPagination] = useState<Pagination>({
     total: 0,
@@ -65,6 +76,10 @@ const OrderHistory = (): ReactElement => {
     delivery_type: 'delivery',
     page: pagination.current,
     per_page: pagination.pageSize,
+    startdate: moment().startOf('day').format('YYYY-MM-DD'),
+    enddate: moment().endOf('day').format('YYYY-MM-DD'),
+    starttime: moment().startOf('day').format('HH:mm:ss'),
+    endtime: moment().endOf('day').format('HH:mm:ss'),
   })
 
   const [merchantTestId, setMerchantTestId] = useState('')
@@ -73,209 +88,9 @@ const OrderHistory = (): ReactElement => {
     manageParam(values)
   }
 
-  const merchantTestOption = [
-    {
-      name: 'ร้านทดสอบ',
-      value: true
-    },
-    {
-      name: 'ร้านทั่วไป',
-      value: false
-    }
-  ]
-
-  const overAllOption = [
-    {
-      name: 'ทุกสถานะ',
-      value: '',
-    },
-    {
-      name: 'ดำเนินการ',
-      value: 'waiting',
-    },
-    {
-      name: 'สำเร็จ',
-      value: 'success',
-    },
-    {
-      name: 'ยกเลิก',
-      value: 'cancel',
-    },
-  ]
-  const orderStatus = [
-    {
-      name: 'ทุกสถานะ',
-      value: '',
-    },
-    {
-      name: 'รอรับออเดอร์',
-      value: 'waiting',
-    },
-    {
-      name: 'รอการจ่ายเงิน',
-      value: 'waiting_payment',
-    },
-    {
-      name: 'ยืนยันการจ่ายเงิน',
-      value: 'confirm_payment',
-    },
-    {
-      name: 'กำลังปรุง',
-      value: 'cooking',
-    },
-    {
-      name: 'ปรุงสำเร็จ',
-      value: 'cooked',
-    },
-    {
-      name: 'กำลังจัดส่ง',
-      value: 'picked_up',
-    },
-    {
-      name: 'จัดส่งแล้ว',
-      value: 'arrived',
-    },
-    {
-      name: 'สำเร็จ',
-      value: 'success',
-    },
-    {
-      name: 'ยกเลิก',
-      value: 'cancel',
-    },
-  ]
-
-  const merchantStatus = [
-    {
-      name: 'ทุกสถานะ',
-      value: '',
-    },
-    {
-      name: 'รอรับออเดอร์',
-      value: 'waiting',
-    },
-    {
-      name: 'รับออเดอร์',
-      value: 'accept_order',
-    },
-    {
-      name: 'กำลังปรุง',
-      value: 'cooking',
-    },
-    {
-      name: 'ปรุงสำเร็จ',
-      value: 'cooked',
-    },
-    {
-      name: 'สำเร็จ',
-      value: 'success',
-    },
-    {
-      name: 'ยกเลิก',
-      value: 'cancel',
-    },
-  ]
-
-  const riderStatus = [
-    {
-      name: 'ทุกสถานะ',
-      value: '',
-    },
-    {
-      name: 'รอเรียกไรเดอร์',
-      value: 'waiting',
-    },
-    {
-      name: 'กำลังเรียกไรเดอร์',
-      value: 'assigning',
-    },
-    {
-      name: 'ไรเดอร์รับงาน',
-      value: 'assigned',
-    },
-    {
-      name: 'กำลังไปที่ร้านอาหาร',
-      value: 'going_merchant',
-    },
-    {
-      name: 'รับอาหารแล้ว',
-      value: 'picking_up',
-    },
-    {
-      name: 'กำลังจัดส่ง',
-      value: 'picked_up',
-    },
-    {
-      name: 'จัดส่งแล้ว',
-      value: 'arrived',
-    },
-    {
-      name: 'สำเร็จ',
-      value: 'success',
-    },
-    {
-      name: 'ยกเลิก',
-      value: 'cancel',
-    },
-  ]
-
-  const riderPartnerTypeOption = [
-    {
-      name: 'ทุกประเภท',
-      value: '',
-    },
-    {
-      name: 'Lalamove',
-      value: 'LALAMOVE',
-    },
-    {
-      name: 'PandaGo',
-      value: 'PANDAGO',
-    },
-  ]
-
-  const riderTypeOption = [
-    {
-      name: 'ทุกประเภท',
-      value: '',
-    },
-    {
-      name: 'Default Rider',
-      value: 'outlet',
-    },
-    {
-      name: 'Partner',
-      value: 'partner',
-    },
-  ]
-
-  const paymentChannelOption = [
-    {
-      name: 'ทุกช่องทาง',
-      value: '',
-    },
-    {
-      name: 'เงินสด',
-      value: 'PAYMENT_CASH',
-    },
-    {
-      name: 'พร้อมเพย์',
-      value: 'PAYMENT_PROMTPAY',
-    },
-    {
-      name: 'บัตรเครดิต',
-      value: 'PAYMENT_CREDIT',
-    },
-    {
-      name: 'ชำระผ่านบัญชีธนาคาร',
-      value: 'PAYMENT_BANK_TRANSFER',
-    },
-  ]
-
   const onSearchCustomerDebounce = debounce(async (message) => await fetchCustomer(message), 800)
   const onSearchMerchantDebounce = debounce(async (message) => await fetchMerchant(message), 800)
   const onSearchRiderDebounce = debounce(async (message) => await fetchRider(message), 800)
-
 
   const fetchCustomer = async (message: any) => {
     if (!isEmpty(message)) {
@@ -384,13 +199,12 @@ const OrderHistory = (): ReactElement => {
 
     var excludeOutletIds = ''
     var includeOutletIds = ''
-    if (values?.merchant_test) {
-      includeOutletIds = merchantTestId  // is_merchant_test = true
-    } else {
-      excludeOutletIds = merchantTestId  // is_merchant_test = false
+    if (get(values, 'merchant_test') === true) {
+      includeOutletIds = merchantTestId // is_merchant_test = true
+    } else if (get(values, 'merchant_test') === false) {
+      excludeOutletIds = merchantTestId // is_merchant_test = false
     }
 
-    console.log(excludeOutletIds)
     setParams({
       ...params,
       brand_id: 'all',
@@ -413,7 +227,7 @@ const OrderHistory = (): ReactElement => {
       starttime: startDate ? moment(startDate).format('HH:mm:ss') : '',
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
       exclude_outlet_ids: excludeOutletIds,
-      include_outlet_ids: includeOutletIds
+      include_outlet_ids: includeOutletIds,
     })
   }
 
@@ -422,10 +236,10 @@ const OrderHistory = (): ReactElement => {
     var endDate = values.client_time ? values.client_time.end : ''
     var excludeOutletIds = ''
     var includeOutletIds = ''
-    if (values?.merchant_test) {
-      includeOutletIds = merchantTestId  // is_merchant_test = true
-    } else {
-      excludeOutletIds = merchantTestId  // is_merchant_test = false
+    if (get(values, 'merchant_test') === true) {
+      includeOutletIds = merchantTestId // is_merchant_test = true
+    } else if (get(values, 'merchant_test') === false) {
+      excludeOutletIds = merchantTestId // is_merchant_test = false
     }
     const req: object = {
       sort_by: 'ClientTime',
@@ -450,7 +264,7 @@ const OrderHistory = (): ReactElement => {
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
       delivery_type: 'delivery',
       exclude_outlet_ids: excludeOutletIds,
-      include_outlet_ids: includeOutletIds
+      include_outlet_ids: includeOutletIds,
     }
 
     const { result, success } = await exportOrderTransaction(req)
@@ -481,7 +295,7 @@ const OrderHistory = (): ReactElement => {
       </Breadcrumb>
       <Card>
         <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
-          {({ values, resetForm }) => (
+          {({ values, resetForm, setValues }) => (
             <Form>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -635,8 +449,34 @@ const OrderHistory = (): ReactElement => {
                       style={{ width: '120px', marginTop: '27px', marginLeft: '10px' }}
                       type="default"
                       size="middle"
-                      htmlType="reset"
-                      onClick={() => resetForm()}
+                      onClick={() => {
+                        setValues({
+                          delivery_type: 'delivery',
+                          brand_id: 'all',
+                          page: 1,
+                          per_page: 10,
+                          status: null,
+                          startdate: '',
+                          enddate: '',
+                          starttime: '',
+                          endtime: '',
+                          order_number: '',
+                          client_time: {
+                            start: '',
+                            end: '',
+                          },
+                          sso_id: null,
+                          order_overall_status: null,
+                          rider_id: null,
+                          rider_partner_type: null,
+                          rider_status: null,
+                          rider_overall_status: null,
+                          branch_id: null,
+                          merchant_overall_status: null,
+                          merchant_status: null,
+                          merchant_test: null,
+                        })
+                      }}
                     >
                       เคลียร์
                     </Button>

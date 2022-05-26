@@ -2,7 +2,10 @@ import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
 import {
   FileTextOutlined,
-  LogoutOutlined, NotificationOutlined, SolutionOutlined,
+  LayoutOutlined,
+  LogoutOutlined,
+  NotificationOutlined,
+  SolutionOutlined,
   TeamOutlined,
   UserOutlined,
   WalletOutlined
@@ -113,23 +116,23 @@ export default function Sidebar({ }: Props): ReactElement {
     },
     {
       index: 3,
-      title: 'User Profile',
+      title: 'บัญชีผู้ใช้งาน',
       icon: <TeamOutlined />,
       key: 'userProfile',
       link: '/userprofile',
       sub: [
         {
-          title: 'Consumer Profile',
+          title: 'บัญชีลูกค้า',
           link: '/consumer',
           key: '/consumer',
         },
         {
-          title: 'Rider Profile',
+          title: 'บัญชีไรเดอร์',
           link: '/userprofile/rider',
           key: '/userprofile/rider',
         },
         {
-          title: 'Merchant Profile',
+          title: 'บัญชีร้านค้า',
           link: '/userprofile/merchant',
           key: '/userprofile/merchant',
         },
@@ -156,6 +159,11 @@ export default function Sidebar({ }: Props): ReactElement {
           title: 'ดาวน์โหลดไฟล์รายการออเดอร์',
           link: '/download-order',
           key: '/download-order',
+        },
+        {
+          title: 'สรุปข้อมูลออเดอร์รายประเภทอาหาร',
+          link: '/orderhistory-food-type',
+          key: '/orderhistory-food-type',
         },
       ],
     },
@@ -195,6 +203,11 @@ export default function Sidebar({ }: Props): ReactElement {
           link: '/wallet/lalamove',
           key: '/wallet/lalamove',
         },
+        {
+          title: 'PANDAGO',
+          link: '/wallet/pandago',
+          key: '/wallet/pandago',
+        },
       ],
     },
     {
@@ -223,6 +236,25 @@ export default function Sidebar({ }: Props): ReactElement {
           link: '/notifications/broadcast_news',
           key: '/notifications/broadcast_news',
         },
+      ],
+    },
+    {
+      index: 8,
+      title: 'Content',
+      icon: <LayoutOutlined />,
+      key: 'Content',
+      link: '/content',
+      sub: [
+        {
+          title: 'Modal Pop Up',
+          link: '/content/modal-pop-up',
+          key: '/content/modal-pop-up',
+        },
+        {
+          title: 'Banner',
+          link: '/content/banner',
+          key: '/content/banner',
+        }
       ],
     },
   ]

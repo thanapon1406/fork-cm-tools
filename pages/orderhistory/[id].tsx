@@ -451,7 +451,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             )
           }
 
-
           return (
             <>
               <div>

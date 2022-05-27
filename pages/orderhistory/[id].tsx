@@ -58,6 +58,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     rider_partner: '-',
     rider_remark: '-',
     partner_order_id: '-',
+    app_client_rider: '',
+    device_rider: '',
   })
 
   let [riderImages, setRiderImages] = useState('')
@@ -68,6 +70,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     outlet_latitude: '',
     outlet_longitude: '',
     outlet_phone: '',
+    app_client_merchant: '',
+    device_merchant: ''
   })
 
   let [customerInitialValues, setCustomerInitialValues] = useState({
@@ -141,6 +145,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             outlet_latitude: outlet_info.location?.latitude || '-',
             outlet_longitude: outlet_info.location?.longitude || '-',
             outlet_phone: outlet_info.phone || '-',
+            app_client_merchant: data.app_client_merchant,
+            device_merchant: data.device_merchant,
           })
         }
         var partnerOrderId = '-'
@@ -200,7 +206,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             rider_partner: partnerName || '-',
             rider_phone: rider_info.phone || '-',
             rider_remark: riderRemark || '-',
-            partner_order_id: partnerOrderId
+            partner_order_id: partnerOrderId,
+            app_client_rider: data.app_client_rider,
+            device_rider: data.device_rider,
           })
         } else {
           setRiderInitialValues({
@@ -209,7 +217,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             rider_partner: partnerName || '-',
             rider_phone: '-',
             rider_remark: '-',
-            partner_order_id: partnerOrderId
+            partner_order_id: partnerOrderId,
+            app_client_rider: data.app_client_rider,
+            device_rider: data.device_rider,
           })
         }
         if (!isUndefined(rider_images) && rider_images.length > 0) {
@@ -450,7 +460,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
               </div>
             )
           }
-
 
           return (
             <>
@@ -1322,6 +1331,31 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                   />
                 </Col>
               </Row>
+
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'Device' }}
+                    name="device_merchant"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="device_merchant"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={18}>
+                  <Field
+                    label={{ text: 'App Client' }}
+                    name="app_client_merchant"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="app_client_merchant"
+                    disabled={true}
+                  />
+                </Col>
+              </Row>
             </Form>
           )}
         </Formik>
@@ -1568,6 +1602,30 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       disabled={true}
                     />
                   </div>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'Device' }}
+                    name="device_rider"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="device_rider"
+                    disabled={true}
+                  />
+                </Col>
+                <Col className="gutter-row" span={18}>
+                  <Field
+                    label={{ text: 'App Client' }}
+                    name="app_client_rider"
+                    type="text"
+                    component={Input}
+                    className="form-control round"
+                    id="app_client_rider"
+                    disabled={true}
+                  />
                 </Col>
               </Row>
             </Form>

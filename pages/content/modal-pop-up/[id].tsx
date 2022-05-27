@@ -249,6 +249,9 @@ export default function View({ }: Props): ReactElement {
                     if (value == "") {
                       return "กรุณากรอกชื่อเรื่อง"
                     }
+                    if (value.length > 255) {
+                      return "ชื่อเรื่องความยาวเกิน 255 ตัวอักษร"
+                    }
                   }
                 }}
               />
@@ -264,6 +267,13 @@ export default function View({ }: Props): ReactElement {
                 component={TextArea}
                 className="form-control round"
                 id="content.text"
+                validate={(value: string) => {
+                  if (type > 2) {
+                    if (value.length > 255) {
+                      return "รายละเอียดความยาวเกิน 255 ตัวอักษร"
+                    }
+                  }
+                }}
               />
             </Col>
           </Row>
@@ -566,15 +576,27 @@ export default function View({ }: Props): ReactElement {
                         </Button1>
                       </>
                     ) : (
-                      <Button
-                        style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
-                        type="primary"
-                        onClick={() => {
-                          setIsEdit(true)
-                        }}
-                      >
-                        แก้ไข
-                      </Button>
+                      <>
+                        <Button
+                          style={{ float: 'right' }}
+                          type="primary"
+                          onClick={() => {
+                            setIsEdit(true)
+                          }}
+                        >
+                          แก้ไข
+                        </Button>
+                        <Button
+                          style={{ float: 'right', marginRight: '10px' }}
+                          type="default"
+                          size="middle"
+                          onClick={() => {
+                            router.back()
+                          }}
+                        >
+                          ย้อนกลับ
+                        </Button>
+                      </>
                     )}
                   </Col>
                 </Row>

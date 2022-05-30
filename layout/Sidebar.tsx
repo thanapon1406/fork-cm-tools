@@ -160,11 +160,11 @@ export default function Sidebar({ }: Props): ReactElement {
           link: '/download-order',
           key: '/download-order',
         },
-        {
-          title: 'สรุปข้อมูลออเดอร์รายประเภทอาหาร',
-          link: '/orderhistory-food-type',
-          key: '/orderhistory-food-type',
-        },
+        // {
+        //   title: 'สรุปข้อมูลออเดอร์รายประเภทอาหาร',
+        //   link: '/orderhistory-food-type',
+        //   key: '/orderhistory-food-type',
+        // },
       ],
     },
     {

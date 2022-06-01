@@ -88,6 +88,15 @@ export const exportOrderByEmail = async (req: any) => {
   }
 }
 
+export const exportOrderWithProductByEmail = async (req: any) => {
+  try {
+    const result = await fetch.post(`/api/report/export-order-with-product-by-email/`, req)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 export const downloadFile = async (req: any) => {
   try {
     let filename = ''

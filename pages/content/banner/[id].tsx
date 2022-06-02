@@ -386,7 +386,7 @@ export default function BannerView({ }: Props): ReactElement {
 
                   <Button disabled={(isEdit) ? false : true} style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูปภาพ</Button>
                 </Upload>
-                <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ ควรเลือกรูปภาพขนาดไม่เกิน 1MB</label>
+                <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ แนะนำ รูปภาพ ขนาด 3:1 หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png</label>
 
                 <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
                   <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />

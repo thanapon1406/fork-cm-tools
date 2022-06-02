@@ -71,9 +71,9 @@ export default function BannerCreate({ }: Props): ReactElement {
   const handleAction = (event: any) => {
     setAction(event.target.value)
     
-    if(event.target.value == 'external'){
+    if(event.target.value == 'external_url'){
       setExampleLink('* ตัวอย่าง https://www.google.com/')
-    }else if(event.target.value == 'internal'){
+    }else if(event.target.value == 'internal_url'){
       setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
     }
   }
@@ -221,8 +221,8 @@ export default function BannerCreate({ }: Props): ReactElement {
                   <Row gutter={24} style={{ marginTop: "5px" }}>
                     <Col span={24}>
                       <Radio.Group onChange={handleAction} value={isAction}>
-                        <Radio value="external">External</Radio>
-                        <Radio value="internal">Internal</Radio>
+                        <Radio value="external_url">External</Radio>
+                        <Radio value="internal_url">Internal</Radio>
                       </Radio.Group>
                     </Col>
                   </Row>
@@ -240,15 +240,6 @@ export default function BannerCreate({ }: Props): ReactElement {
                         prefix={<LinkOutlined style={{ fontSize: "20px", color: "#4dd2ff" }} />} 
                       />
                       <span style={{ fontSize: "12px", color: "red" }}>{ exampleLink }</span>
-                        {/* <Field
-                          style={{ display: "inline-block", width: "95%" }}
-                          name="action_url"
-                          type="text"
-                          component={Input}
-                          rows={2}
-                          className="form-control round"
-                          placeholder="ลิงค์"
-                          id="action_url" /> */}
                     </Col>
                   </Row>
                 </Col>

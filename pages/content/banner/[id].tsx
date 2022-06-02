@@ -96,10 +96,17 @@ export default function BannerView({ }: Props): ReactElement {
           end: moment(data.end_date).endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
         }
       }
+
       setActive(data.status)
       setAction(data.action)
       setInitialValues(dataBanner)
       setImageUrl(data.image_url)
+
+      if(data.action == 'external_url'){
+        setExampleLink('* ตัวอย่าง https://www.google.com/')
+      }else if(data.action == 'internal_url'){
+        setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
+      }
     }
   }
 
@@ -111,9 +118,9 @@ export default function BannerView({ }: Props): ReactElement {
   const handleAction = (event: any) => {
     setAction(event.target.value)
 
-    if(event.target.value == 'external'){
+    if(event.target.value == 'external_url'){
       setExampleLink('* ตัวอย่าง https://www.google.com/')
-    }else if(event.target.value == 'internal'){
+    }else if(event.target.value == 'internal_url'){
       setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
     }
   }
@@ -303,8 +310,8 @@ export default function BannerView({ }: Props): ReactElement {
                   <Row gutter={24} style={{ marginTop: "5px" }}>
                     <Col span={24}>
                       <Radio.Group disabled={(isEdit) ? false : true} onChange={handleAction} value={isAction}>
-                        <Radio value="external">External</Radio>
-                        <Radio value="internal">Internal</Radio>
+                        <Radio value="external_url">External</Radio>
+                        <Radio value="internal_url">Internal</Radio>
                       </Radio.Group>
                     </Col>
                   </Row>

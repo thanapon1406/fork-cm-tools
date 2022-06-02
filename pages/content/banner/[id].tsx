@@ -219,7 +219,7 @@ export default function BannerView({ }: Props): ReactElement {
                 <Title level={4}>Banner</Title>
                 <Breadcrumb style={{ margin: '16px 0' }}>
                   <Breadcrumb.Item>Content</Breadcrumb.Item>
-                  <Breadcrumb.Item>Banner Create</Breadcrumb.Item>
+                  <Breadcrumb.Item>Banner Update</Breadcrumb.Item>
                 </Breadcrumb>
               </Col>
               <Col span={4}>
@@ -246,15 +246,29 @@ export default function BannerView({ }: Props): ReactElement {
                     </Button1>
                   </>
                 ) : (
-                  <Button
-                    style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
-                    type="primary"
-                    onClick={() => {
-                      setIsEdit(true)
-                    }}
-                  >
-                    แก้ไข
-                  </Button>
+                  <>
+                    <Button
+                      style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
+                      type="primary"
+                      onClick={() => {
+                        setIsEdit(true)
+                      }}
+                    >
+                      แก้ไข
+                    </Button>
+                    
+                    <Button1
+                      style={{ float: 'right', marginRight: '10px' }}
+                      type="default"
+                      size="middle"
+                      onClick={() => {
+                        router.push('/content/banner')
+                      }}
+                    >
+                      กลับ
+                    </Button1>
+                  </>
+                  
                 )}
               </Col>
             </Row>

@@ -167,7 +167,7 @@ export default function Banner({ }: Props): ReactElement {
       dataIndex: 'priority',
       align: 'center',
       render: (priority: any) => {
-        return (<b>{!priority ? '-' : priority}</b>)
+        return (<b>{!priority ? 0 : priority}</b>)
       }
     },
     {

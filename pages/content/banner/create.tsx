@@ -5,7 +5,7 @@ import MainLayout from '@/layout/MainLayout';
 import { createBanner } from '@/services/banner';
 import { uploadImage } from '@/services/cdn';
 import { LinkOutlined, PlusOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Modal, Radio, Row, Switch, Typography, Upload } from 'antd';
+import { Breadcrumb, Button, Col, Input as AntdInput, Modal, Radio, Row, Switch, Typography, Upload } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import { omit } from 'lodash';
 import moment from 'moment';
@@ -61,6 +61,7 @@ export default function BannerCreate({ }: Props): ReactElement {
   const [loadingImage, setloadingImage] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [isAction, setAction] = useState('')
+  const [exampleLink, setExampleLink] = useState('')
 
   const handleStatus = (event: any) => {
     const checkStatus = isActive == 'active' ? 'inactive' : 'active'
@@ -69,6 +70,12 @@ export default function BannerCreate({ }: Props): ReactElement {
 
   const handleAction = (event: any) => {
     setAction(event.target.value)
+    
+    if(event.target.value == 'external'){
+      setExampleLink('* ตัวอย่าง https://www.google.com/')
+    }else if(event.target.value == 'internal'){
+      setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
+    }
   }
 
   const handleChangeImage = async (info: any) => {
@@ -113,7 +120,6 @@ export default function BannerCreate({ }: Props): ReactElement {
       })
       return false
     }
-
     values.image_url = imageUrl
     values.status = isActive
 
@@ -127,6 +133,7 @@ export default function BannerCreate({ }: Props): ReactElement {
     } else {
       values.end_date = null
     }
+
     if (values.action_url == '') {
       values.action = ''
     } else {
@@ -221,18 +228,27 @@ export default function BannerCreate({ }: Props): ReactElement {
                   </Row>
 
                   <Row gutter={24} style={{ marginTop: "10px" }}>
-                    <Col span={1} style={{ textAlign: "right" }}>
-                      <LinkOutlined style={{ fontSize: "20px", marginTop: "7px", color: "#4dd2ff" }} />
-                    </Col>
-                    <Col span={23}>
-                      <Field
+                    <Col span={24}>
+                      <AntdInput 
+                        placeholder="ลิงค์" 
                         name="action_url"
+                        id="action_url"
                         type="text"
-                        component={Input}
-                        rows={2}
-                        className="form-control round"
-                        placeholder="ลิงค์"
-                        id="name" />
+                        onChange={(e: any) => {
+                          setFieldValue('action_url', e?.target?.value)
+                        }}
+                        prefix={<LinkOutlined style={{ fontSize: "20px", color: "#4dd2ff" }} />} 
+                      />
+                      <span style={{ fontSize: "12px", color: "red" }}>{ exampleLink }</span>
+                        {/* <Field
+                          style={{ display: "inline-block", width: "95%" }}
+                          name="action_url"
+                          type="text"
+                          component={Input}
+                          rows={2}
+                          className="form-control round"
+                          placeholder="ลิงค์"
+                          id="action_url" /> */}
                     </Col>
                   </Row>
                 </Col>

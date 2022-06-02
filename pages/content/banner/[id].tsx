@@ -6,7 +6,7 @@ import MainLayout from '@/layout/MainLayout';
 import { findBanner, updateBanner } from '@/services/banner';
 import { uploadImage } from '@/services/cdn';
 import { LinkOutlined, PlusOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Modal, notification, Radio, Row, Switch, Typography, Upload } from 'antd';
+import { Breadcrumb, Button, Col, Input as AntdInput, Modal, notification, Radio, Row, Switch, Typography, Upload } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import { omit } from 'lodash';
 import moment from 'moment';
@@ -66,6 +66,7 @@ export default function BannerView({ }: Props): ReactElement {
   const [isAction, setAction] = useState('')
   const [initialValues, setInitialValues] = useState(initialValuesDefault)
   const [isEdit, setIsEdit] = useState(false)
+  const [exampleLink, setExampleLink] = useState('')
   const { id } = router.query
 
   useEffect(() => {
@@ -109,6 +110,12 @@ export default function BannerView({ }: Props): ReactElement {
 
   const handleAction = (event: any) => {
     setAction(event.target.value)
+
+    if(event.target.value == 'external'){
+      setExampleLink('* ตัวอย่าง https://www.google.com/')
+    }else if(event.target.value == 'internal'){
+      setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
+    }
   }
 
   const handleChangeImage = async (info: any) => {
@@ -303,20 +310,19 @@ export default function BannerView({ }: Props): ReactElement {
                   </Row>
 
                   <Row gutter={24} style={{ marginTop: "10px" }}>
-                    <Col span={1} style={{ textAlign: "right" }}>
-                      <LinkOutlined style={{ fontSize: "20px", marginTop: "7px", color: "#4dd2ff" }} />
-                    </Col>
-                    <Col span={23}>
-                      <Field
-                        disabled={(isEdit) ? false : true}
+                      <AntdInput 
+                        placeholder="ลิงค์" 
                         name="action_url"
+                        id="action_url"
                         type="text"
-                        component={Input}
-                        rows={2}
-                        className="form-control round"
-                        placeholder="ลิงค์"
-                        id="action_url" />
-                    </Col>
+                        onChange={(e: any) => {
+                          setFieldValue('action_url', e?.target?.value)
+                        }}
+                        value={values.action_url}
+                        disabled={(isEdit) ? false : true}
+                        prefix={<LinkOutlined style={{ fontSize: "20px", color: "#4dd2ff" }} />} 
+                      />
+                      <span style={{ fontSize: "12px", color: "red" }}>{ exampleLink }</span>
                   </Row>
                 </Col>
 

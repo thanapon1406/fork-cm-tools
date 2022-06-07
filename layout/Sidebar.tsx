@@ -1,7 +1,7 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
 import {
-  FileTextOutlined,
+  CalculatorOutlined, FileTextOutlined,
   LayoutOutlined,
   LogoutOutlined,
   NotificationOutlined,
@@ -257,6 +257,14 @@ export default function Sidebar({ }: Props): ReactElement {
         }
       ],
     },
+    {
+      index: 8,
+      title: 'ค่าส่งตามระยะทาง',
+      icon: <CalculatorOutlined />,
+      key: 'config-delivery-fee',
+      link: 'config-delivery-fee',
+      sub: [],
+    }
   ]
 
   return (

@@ -42,7 +42,7 @@ export default function HeaderContent() {
       return v.id == value
     })
 
-    if (selectedBrands.length) {
+    if (edBrands.length) {
       setBrandState(selectedBrands[0])
     }
   }

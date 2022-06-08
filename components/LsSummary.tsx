@@ -1,6 +1,6 @@
 import Table from '@/components/Table'
 import { Pagination } from '@/interface/dataTable'
-import { requestReportInterface } from '@/services/report'
+import { lsSummaryInterface } from '@/services/ls'
 import { Button, Card, Col, Row, Typography } from 'antd'
 import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
@@ -9,7 +9,7 @@ import { numberFormat } from 'utils/helpers'
 const { Title, Text } = Typography
 
 interface Props {
-  payload: requestReportInterface
+  payload: lsSummaryInterface
   tableHeader?: ReactElement
   isPagination?: Pagination | false
 }
@@ -49,14 +49,14 @@ const columns = [
   },
   {
     title: 'ค่าจัดส่ง (เดิม)',
-    dataIndex: '',
+    dataIndex: 'normal_price',
     align: 'center',
-    key: '',
+    key: 'normal_price',
     width: '100px',
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return numberFormat(0)
+      return numberFormat(text)
     },
   },
   {
@@ -130,6 +130,7 @@ const LsSummaryComponent = ({
 }: Props): ReactElement => {
   let [dataTable, setDataTable] = useState([])
   let [_isLoading, setIsLoading] = useState(true)
+  let [primeName, setPrimeName] = useState('')
 
   const router = useRouter()
   const ssoId = router.query.sso_id as string
@@ -139,28 +140,54 @@ const LsSummaryComponent = ({
   }
 
 
-  const fetchData = async (params: requestReportInterface) => {
-    // params.sso_id = !isEmpty(params.sso_id) ? params.sso_id : ssoId
-    // const { result, success } = await getOrderTransaction(params)
+  const fetchData = async (params: lsSummaryInterface) => {
+    // Tier
     setIsLoading(true)
-    // if (success) {
-    //   const { meta, data } = result
-    const array: any = [
-      { 'distance': '0 - 5' },
-      { 'distance': '>5 - 10' },
-      { 'distance': '>10 - 15' },
-      { 'distance': '>15 - 20' }
-    ]
-    console.log(array)
-    setDataTable(array)
-    setIsLoading(false)
-
-    //   validatePagination({
-    //     per_page: parseInt(meta.per_page),
-    //     page: parseInt(meta.page),
-    //     total: parseInt(meta.total),
-    //   })
-    // }
+    // call here
+    const data: any = [{
+      "name": "tier_price 7",
+      "tier_prices": [
+        {
+          "min": 0,
+          "max": 5,
+          "price": 10
+        },
+        {
+          "min": 5,
+          "max": 10,
+          "price": 20
+        },
+        {
+          "min": 10,
+          "max": 15,
+          "price": 30
+        },
+        {
+          "min": 15,
+          "max": 20,
+          "price": 40
+        },
+      ]
+    }]
+    if (true) {
+      const array: any = []
+      data?.map((d: any) => {
+        d?.tier_prices?.map((value: any, key: number) => {
+          if (key > 0) {
+            value.min = ">" + " " + value.min
+          }
+          array.push({
+            'distance': value.min + " - " + value.max,
+            'normal_price': value.price
+          })
+        })
+        setPrimeName(d.name)
+      })
+      console.log("array: ", array)
+      setDataTable(array)
+      setIsLoading(false)
+    }
+    // End Tier
   }
 
   useEffect(() => {
@@ -176,7 +203,7 @@ const LsSummaryComponent = ({
       <Title level={4}>LS Summary</Title>
       <Title level={5}>ยอดสุทธิได้ตั้งแต่ ... บาท ขึ้นไป</Title>
       <Title level={5}>ระยะทาง (กม.)</Title>
-      <Title level={5}>Prime ... <Text style={{ color: '#d9d9d9' }}>(... ร้านอาหาร)</Text></Title>
+      <Title level={5}>Prime {primeName} <Text style={{ color: '#d9d9d9' }}>(... ร้านอาหาร)</Text></Title>
       <br />
       <Table
         config={{

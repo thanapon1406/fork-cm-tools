@@ -2,6 +2,7 @@ import Card from '@/components/Card'
 import ExportButton from '@/components/credit/ExportButton'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Select from "@/components/Form/Select"
+import LsSummaryComponent from '@/components/LsSummary'
 import { Pagination } from '@/interface/dataTable'
 import MainLayout from '@/layout/MainLayout'
 import {
@@ -357,6 +358,9 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
           )}
         </Formik>
       </Card>
+
+      <LsSummaryComponent payload={{ ...params }} isPagination={pagination} />
+
 
     </MainLayout>
   )

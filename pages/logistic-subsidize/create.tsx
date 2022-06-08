@@ -5,7 +5,7 @@ import Select from '@/components/Form/Select';
 import OutletSelecter from '@/components/OutletSelecter';
 import MainLayout from '@/layout/MainLayout';
 import { getBrandListV2 } from '@/services/pos-profile';
-import { Breadcrumb, Col, Collapse, Divider, Radio, Row, Skeleton, Typography } from 'antd';
+import { Breadcrumb, Checkbox, Col, Collapse, Divider, Radio, Row, Skeleton, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import _, { filter, get, intersection, size } from 'lodash';
 import { useRouter } from 'next/router';
@@ -752,43 +752,82 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
 
     logicOutletElements.push(
       <>
-        <div className="fancy-checkbox">
-          <label>
-            <Field
-              id="is_apply_all_brand"
-              className="form-control"
-              type="checkbox"
-              name="is_apply_all_brand"
-            />
-            <span> เข้าร่วมทุกร้านอาหาร</span>
-          </label>
-        </div>
-        < Collapse
-          accordion
-          collapsible={values.is_apply_all_brand ? 'disabled' : 'header'}
-        >
-          <Panel key="outlet_joined" header="ร้านค้าที่เข้าร่วม">
-            <OutletSelecter
-              handleChange={handleChange}
-              disabled={values.is_apply_all_brand}
-              selectedList={filterOutletSelected}
-              formValue={values}
-              setFieldValue={setFieldValue}
-              userSelectedOutlet={userSelectedOutlet}
-              brandList={brandList}
-            />
-          </Panel>
-        </Collapse >
+        <Row gutter={24}>
+          <Col className="gutter-row" span={24}>
+            <Checkbox onChange={(e) => {
+              setFieldValue("is_apply_all_brand", e.target.checked)
+            }}>เข้าร่วมทุกร้านอาหาร
+            </Checkbox>
+          </Col>
+        </Row>
+        <Row gutter={24}>
+          <Col className="gutter-row" span={24}>
+            < Collapse
+              accordion
+              collapsible={values.is_apply_all_brand ? 'disabled' : 'header'}
+            >
+              <Panel key="outlet_joined" header="ร้านอาหารที่เข้าร่วม">
+                <OutletSelecter
+                  handleChange={handleChange}
+                  disabled={values.is_apply_all_brand}
+                  selectedList={filterOutletSelected}
+                  formValue={values}
+                  setFieldValue={setFieldValue}
+                  userSelectedOutlet={userSelectedOutlet}
+                  brandList={brandList}
+                />
+              </Panel>
+            </Collapse >
+          </Col>
+        </Row>
       </>
     )
 
     // Footer
     logicOutletElements.push(<Divider style={{
-      marginTop: '5px',
+      marginTop: '20px',
       marginBottom: '20px'
     }} />)
 
     return logicOutletElements
+  }
+
+  const renderLogicSummary = (values: any, setFieldValue: any) => {
+    let logicSummaryElements = []
+    // Header
+    logicSummaryElements.push(
+      <>
+        <Row gutter={24}>
+          <Col className="gutter-row" span={24}>
+            <Title level={4}>LS Summary</Title>
+          </Col>
+        </Row>
+      </>
+    )
+
+    logicSummaryElements.push(
+      <>
+      </>
+    )
+
+    // Footer
+    logicSummaryElements.push(<Divider style={{
+      marginTop: '20px',
+      marginBottom: '20px'
+    }} />)
+
+    return logicSummaryElements
+  }
+
+  const renderLogicDetail = (values: any, setFieldValue: any) => {
+    let logicDetailElements = []
+
+    logicDetailElements.push(
+      <>
+      </>
+    )
+
+    return logicDetailElements
   }
 
   return (
@@ -836,6 +875,12 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
 
                 {/* Logic Outlet */}
                 {renderLogicOutlet(values, setFieldValue, handleChange)}
+
+                {/* Logic Summary */}
+                {renderLogicSummary(values, setFieldValue)}
+
+                {/* Logic Detail */}
+                {renderLogicDetail(values, setFieldValue)}
 
               </Card>
             </Form>

@@ -90,7 +90,7 @@ export default function CustomSelect({
         value={field.value}
         options={options}
         onChange={handleChange}
-        placeholder={'Select Item...'}
+        placeholder={'เลือกสาขา'}
         maxTagCount={'responsive'}
         optionLabelProp={'label'}
         optionFilterProp={'label'}

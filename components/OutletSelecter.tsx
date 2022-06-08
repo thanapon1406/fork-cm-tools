@@ -24,7 +24,12 @@ export default function OutletSelecter({
   selectedList = [],
 }: Props) {
   return (
-    <Row gutter={24}>
+    <Row gutter={{
+      xs: 24,
+      sm: 24,
+      md: 24,
+      lg: 24
+    }}>
       {!isEmpty(brandList) && (
         <FieldArray
           name="brands"
@@ -33,7 +38,7 @@ export default function OutletSelecter({
               {brandList.map((brand: any, index: any) => (
                 <>
                   {index > 0 && index % 2 === 0 && <Divider />}
-                  <Col key={`brand-${index}`} className="gutter-row" span={12} >
+                  <Col key={`brand-${index}`} className="gutter-row" xs={24} sm={24} md={12} lg={12} >
                     <div className="col">
                       <div>
                         <Field

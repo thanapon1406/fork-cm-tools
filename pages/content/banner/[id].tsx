@@ -6,7 +6,7 @@ import MainLayout from '@/layout/MainLayout';
 import { findBanner, updateBanner } from '@/services/banner';
 import { uploadImage } from '@/services/cdn';
 import { LinkOutlined, PlusOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Modal, notification, Radio, Row, Switch, Typography, Upload } from 'antd';
+import { Breadcrumb, Button, Col, Input as AntdInput, Modal, notification, Radio, Row, Switch, Typography, Upload } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import { omit } from 'lodash';
 import moment from 'moment';
@@ -66,6 +66,7 @@ export default function BannerView({ }: Props): ReactElement {
   const [isAction, setAction] = useState('')
   const [initialValues, setInitialValues] = useState(initialValuesDefault)
   const [isEdit, setIsEdit] = useState(false)
+  const [exampleLink, setExampleLink] = useState('')
   const { id } = router.query
 
   useEffect(() => {
@@ -95,10 +96,17 @@ export default function BannerView({ }: Props): ReactElement {
           end: moment(data.end_date).endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
         }
       }
+
       setActive(data.status)
       setAction(data.action)
       setInitialValues(dataBanner)
       setImageUrl(data.image_url)
+
+      if(data.action == 'external_url'){
+        setExampleLink('* ตัวอย่าง https://www.google.com/')
+      }else if(data.action == 'internal_url'){
+        setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
+      }
     }
   }
 
@@ -109,6 +117,12 @@ export default function BannerView({ }: Props): ReactElement {
 
   const handleAction = (event: any) => {
     setAction(event.target.value)
+
+    if(event.target.value == 'external_url'){
+      setExampleLink('* ตัวอย่าง https://www.google.com/')
+    }else if(event.target.value == 'internal_url'){
+      setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
+    }
   }
 
   const handleChangeImage = async (info: any) => {
@@ -205,7 +219,7 @@ export default function BannerView({ }: Props): ReactElement {
                 <Title level={4}>Banner</Title>
                 <Breadcrumb style={{ margin: '16px 0' }}>
                   <Breadcrumb.Item>Content</Breadcrumb.Item>
-                  <Breadcrumb.Item>Banner Create</Breadcrumb.Item>
+                  <Breadcrumb.Item>Banner Update</Breadcrumb.Item>
                 </Breadcrumb>
               </Col>
               <Col span={4}>
@@ -232,15 +246,29 @@ export default function BannerView({ }: Props): ReactElement {
                     </Button1>
                   </>
                 ) : (
-                  <Button
-                    style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
-                    type="primary"
-                    onClick={() => {
-                      setIsEdit(true)
-                    }}
-                  >
-                    แก้ไข
-                  </Button>
+                  <>
+                    <Button
+                      style={{ float: 'right', backgroundColor: 'forestgreen !important' }}
+                      type="primary"
+                      onClick={() => {
+                        setIsEdit(true)
+                      }}
+                    >
+                      แก้ไข
+                    </Button>
+                    
+                    <Button1
+                      style={{ float: 'right', marginRight: '10px' }}
+                      type="default"
+                      size="middle"
+                      onClick={() => {
+                        router.push('/content/banner')
+                      }}
+                    >
+                      กลับ
+                    </Button1>
+                  </>
+                  
                 )}
               </Col>
             </Row>
@@ -296,27 +324,26 @@ export default function BannerView({ }: Props): ReactElement {
                   <Row gutter={24} style={{ marginTop: "5px" }}>
                     <Col span={24}>
                       <Radio.Group disabled={(isEdit) ? false : true} onChange={handleAction} value={isAction}>
-                        <Radio value="external">External</Radio>
-                        <Radio value="internal">Internal</Radio>
+                        <Radio value="external_url">External</Radio>
+                        <Radio value="internal_url">Internal</Radio>
                       </Radio.Group>
                     </Col>
                   </Row>
 
                   <Row gutter={24} style={{ marginTop: "10px" }}>
-                    <Col span={1} style={{ textAlign: "right" }}>
-                      <LinkOutlined style={{ fontSize: "20px", marginTop: "7px", color: "#4dd2ff" }} />
-                    </Col>
-                    <Col span={23}>
-                      <Field
-                        disabled={(isEdit) ? false : true}
+                      <AntdInput 
+                        placeholder="ลิงค์" 
                         name="action_url"
+                        id="action_url"
                         type="text"
-                        component={Input}
-                        rows={2}
-                        className="form-control round"
-                        placeholder="ลิงค์"
-                        id="action_url" />
-                    </Col>
+                        onChange={(e: any) => {
+                          setFieldValue('action_url', e?.target?.value)
+                        }}
+                        value={values.action_url}
+                        disabled={(isEdit) ? false : true}
+                        prefix={<LinkOutlined style={{ fontSize: "20px", color: "#4dd2ff" }} />} 
+                      />
+                      <span style={{ fontSize: "12px", color: "red" }}>{ exampleLink }</span>
                   </Row>
                 </Col>
 
@@ -373,7 +400,7 @@ export default function BannerView({ }: Props): ReactElement {
 
                   <Button disabled={(isEdit) ? false : true} style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูปภาพ</Button>
                 </Upload>
-                <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ ควรเลือกรูปภาพขนาดไม่เกิน 1MB</label>
+                <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ แนะนำ รูปภาพ ขนาด 3:1 หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png</label>
 
                 <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
                   <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />

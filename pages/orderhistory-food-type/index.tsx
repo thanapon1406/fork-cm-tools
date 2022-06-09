@@ -1,6 +1,6 @@
 import Card from '@/components/Card'
 import ExportButton from '@/components/credit/ExportButton'
-import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
+import DateRangePicker from '@/components/Form/DateRangePicker'
 import Select from "@/components/Form/Select"
 import { Pagination } from '@/interface/dataTable'
 import MainLayout from '@/layout/MainLayout'
@@ -9,7 +9,8 @@ import {
   getDistrict,
   getProvince
 } from '@/services/pos-profile'
-import { requestReportInterface } from '@/services/report'
+import { getProductTypes } from '@/services/product-type'
+import { exportOrderWithProductByEmail, requestReportInterface } from '@/services/report'
 import { Breadcrumb, Col, message, notification, Row, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _, { map } from 'lodash'
@@ -32,7 +33,7 @@ interface filterObject {
   is_all_status?: boolean
 }
 
-interface AddressInterfaceOption {
+interface InterfaceOption {
   value: string | number
   name: string
 }
@@ -61,9 +62,10 @@ interface CityInterface {
 
 export default function OrderHistoryFoodType({ }: Props): ReactElement {
   const Schema = Yup.object().shape({})
-  const [provinceList, setProvinceList] = useState<Array<AddressInterfaceOption>>([])
-  const [cityList, setCityList] = useState<Array<AddressInterfaceOption>>([])
-  const [districtList, setDistrictList] = useState<Array<AddressInterfaceOption>>([])
+  const [provinceList, setProvinceList] = useState<Array<InterfaceOption>>([])
+  const [cityList, setCityList] = useState<Array<InterfaceOption>>([])
+  const [districtList, setDistrictList] = useState<Array<InterfaceOption>>([])
+  const [productTypeList, setProductTypeList] = useState<Array<InterfaceOption>>([])
   const [districtData, setDistrciData] = useState<Array<DistrictInterface>>([])
 
   const initialValues = {
@@ -184,8 +186,21 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
     }
   }
 
+  const fetchProductTypes = async () => {
+    const { success, result } = await getProductTypes({})
+    if (success) {
+      const productTypeOption = map(result?.data, (item: any) => ({
+        value: item.name.th,
+        name: item.name.th,
+      }))
+      setProductTypeList(productTypeOption)
+    } else {
+      message.error({ content: 'ไม่สามารถดึงค่าที่อยู่ได้กรุณาลองใหม่อีกครั้ง' })
+    }
+  }
   useEffect(() => {
     fetchProvince()
+    fetchProductTypes()
     return () => {
       setProvinceList([])
       setCityList([])
@@ -212,12 +227,7 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
                     label={{ text: 'ประเภทอาหาร' }}
                     placeholder="ประเภทอาหาร"
                     name="food_type"
-                    selectOption={[
-                      {
-                        name: 'ทุกประเภท',
-                        value: '',
-                      },
-                    ]}
+                    selectOption={productTypeList}
                   />
                 </Col>
                 <Col span={2}>
@@ -301,9 +311,9 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'วันเวลาที่ทำรายการ' }}
+                    label={{ text: 'วันที่ทำรายการ *' }}
                     name="client_time"
-                    component={DateTimeRangePicker}
+                    component={DateRangePicker}
                     id="client_time"
                     placeholder="วันเวลาที่ทำรายการ"
                   />
@@ -318,19 +328,20 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
                       // subtitle={`ข้อมูลออเดอร์วันที่ ` + moment().format("YYYY-MM-DD")} 
                       propsSubmit={async (value: any) => {
                         _.pull(value.emails, "")
-                        var success = true
 
                         console.log("value: ", value)
                         console.log("params: ", params)
-                        // const { result, success } = await exportOrderByEmail({
-                        //   email: value.emails,
-                        //   outlet_id: (params.branch_id !== undefined) && +params.branch_id,
-                        //   rider_id: (params.rider_id !== undefined) && +params.rider_id,
-                        //   start_date: params.startdate,
-                        //   end_date: params.enddate,
-                        //   consumer_id: params.sso_id
-                        // }
-                        // )
+                        const { result, success } = await exportOrderWithProductByEmail({
+                          email: value.emails,
+                          start_date: params.startdate,
+                          end_date: params.enddate,
+                          status: params.order_status,
+                          province_id: params.province_id,
+                          district_id: params.district_id,
+                          sub_district_id: params.sub_district_id,
+                          product_type: params.food_type
+                        }
+                        )
                         if (success) {
                           notification.success({
                             message: `ดาวน์โหลดไฟล์สรุปข้อมูลออเดอร์รายประเภทอาหาร เรียบร้อยแล้ว`,

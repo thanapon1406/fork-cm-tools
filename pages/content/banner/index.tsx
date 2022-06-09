@@ -166,9 +166,9 @@ export default function Banner({ }: Props): ReactElement {
       title: 'ลำดับการแสดงผล',
       dataIndex: 'priority',
       align: 'center',
-      render: (priority: any) => {
-        return (<b>{!priority ? '-' : priority}</b>)
-      }
+      // render: (priority: any) => {
+      //   return (<b>{!priority ? 0 : priority}</b>)
+      // }
     },
     {
       title: 'สถานะ',

@@ -8,7 +8,7 @@ import MainLayout from '@/layout/MainLayout';
 import { uploadImage } from '@/services/cdn';
 import { getBrandListV2 } from '@/services/pos-profile';
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
+import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import _, { filter, get, intersection, size } from 'lodash';
 import moment from 'moment';
@@ -77,8 +77,8 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
     ls_outlet: [],
     is_apply_all_brand: false,
     campaign_time: {
-      start: null,
-      end: null,
+      start: "",
+      end: "",
     },
     deep_link: "",
     inapp_link: "",
@@ -88,8 +88,98 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
   }
   const [lsDetail, setLsDetail] = useState(lsInitial)
   const Schema = Yup.object().shape({
-    name: Yup.string().trim().max(255).required('กรุณากรอกชื่อ LS Config'),
-    type: Yup.string().trim().required('กรุณาระบุ LS Logics'),
+    name: Yup.string().trim().max(255).required('ระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    type: Yup.string().trim().required('ระบุ LS Configure'),
+    order_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
+      return schema.test({
+        test: (order_amount: any) => {
+          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+            if (order_amount == undefined) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "ระบุยอดสุทธิ",
+      })
+    }),
+    min_distance: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
+      return schema.test({
+        test: (min_distance: any) => {
+          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+            if (min_distance == undefined) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "ระบุระยะทาง",
+      })
+    }),
+    max_distance: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
+      return schema.test({
+        test: (max_distance: any) => {
+          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+            if (max_distance == undefined) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "ระบุระยะทาง",
+      })
+    }).when('min_distance', (min_distance: any, schema: any) => {
+      return schema.test({
+        test: (max_distance: any) => {
+          if (min_distance != undefined) {
+            if (max_distance < min_distance) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "ข้อมูลไม่ถูกต้อง",
+      })
+    }),
+    ls_platform_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
+      return schema.test({
+        test: (ls_platform_amount: any) => {
+          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+            if (ls_platform_amount == undefined) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "ระบุสัดส่วน LS",
+      })
+    }),
+    ls_merchant_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
+      return schema.test({
+        test: (ls_merchant_amount: any) => {
+          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+            if (ls_merchant_amount == undefined) {
+              return false
+            } else {
+              return true
+            }
+          }
+          return true
+        },
+        message: "ระบุสัดส่วน LS",
+      })
+    }),
+
   })
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const lsLogicsOption = [
@@ -358,7 +448,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                   name="order_amount"
                   type="number"
                   component={Input}
-                  className="form-control"
+                  className="form-control round"
                   id="order_amount"
                 />
               </Col>
@@ -876,20 +966,50 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
               type="primary"
               size="middle"
               onClick={() => {
-                setIsVisibleLsSummary(true)
-                let outlets = []
-                if (size(get(values, 'brands')) > 0) {
-                  for (var brand of values.brands) {
-                    if (get(brand, 'is_selected') == true) {
-                      if (get(brand, 'type') == 'all') {
-                        outlets.push({ brand_id: brand["id"], outlet_ids: [0] })
-                      } else if (size(get(brand, 'outlets')) > 0) {
-                        outlets.push({ brand_id: brand["id"], outlet_ids: get(brand, 'outlets') })
+                // Validate Logic Setup
+                let validLogicSetup = false
+                const type = _.get(values, "type") != undefined && _.get(values, "type") != "" ? true : false
+                const typeName = _.get(values, "type") != undefined && _.get(values, "type") != "" ? _.get(values, "type") : ""
+                const order_amount = _.get(values, "order_amount") != undefined && _.get(values, "order_amount") != "" ? true : false
+                let discount_type = _.get(values, "discount_type") != undefined && _.get(values, "discount_type") != "" ? true : false
+                let discount_amount = _.get(values, "discount_amount") != undefined && _.get(values, "discount_amount") != "" ? true : false
+                const min_distance = _.get(values, "min_distance") != undefined && _.get(values, "min_distance") != "" ? true : false
+                const max_distance = _.get(values, "max_distance") != undefined && _.get(values, "max_distance") != "" ? true : false
+                const ls_type = _.get(values, "ls_type") != undefined && _.get(values, "ls_type") != "" ? true : false
+                const ls_platform_amount = _.get(values, "ls_platform_amount") != undefined && _.get(values, "ls_platform_amount") != "" ? true : false
+                const ls_merchant_amount = _.get(values, "ls_merchant_amount") != undefined && _.get(values, "ls_merchant_amount") != "" ? true : false
+
+                if (typeName == SUBSIDIZE) {
+                  discount_type = true
+                  discount_amount = true
+                }
+
+                if (type && order_amount && discount_type && discount_amount && min_distance && max_distance && ls_type && ls_platform_amount && ls_merchant_amount) {
+                  validLogicSetup = true
+                }
+
+                if (validLogicSetup) {
+                  setIsVisibleLsSummary(true)
+                  let outlets = []
+                  if (size(get(values, 'brands')) > 0) {
+                    for (var brand of values.brands) {
+                      if (get(brand, 'is_selected') == true) {
+                        if (get(brand, 'type') == 'all') {
+                          outlets.push({ brand_id: brand["id"], outlet_ids: [0] })
+                        } else if (size(get(brand, 'outlets')) > 0) {
+                          outlets.push({ brand_id: brand["id"], outlet_ids: get(brand, 'outlets') })
+                        }
                       }
                     }
                   }
+                  setFieldValue("ls_outlet", outlets)
+                } else {
+                  notification.warning({
+                    message: `ไม่สามารถ Preview LS Summary ได้`,
+                    description: 'กรุณาระบุ Logic Setup ให้ครบถ้วน',
+                  })
+                  setIsVisibleLsSummary(false)
                 }
-                setFieldValue("ls_outlet", outlets)
               }}
             >
               Preview LS Summary

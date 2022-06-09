@@ -1,16 +1,22 @@
 import Button from '@/components/Button';
 import Card from '@/components/Card';
+import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker';
 import Input from '@/components/Form/Input';
 import Select from '@/components/Form/Select';
 import OutletSelecter from '@/components/OutletSelecter';
 import MainLayout from '@/layout/MainLayout';
+import { uploadImage } from '@/services/cdn';
 import { getBrandListV2 } from '@/services/pos-profile';
-import { Breadcrumb, Checkbox, Col, Collapse, Divider, Radio, Row, Skeleton, Typography } from 'antd';
+import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import _, { filter, get, intersection, size } from 'lodash';
+import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useState } from 'react';
 import * as Yup from 'yup';
+import noImage from '../../public/asset/images/no-image-available.svg';
+const { warning } = Modal
 
 
 const { Title } = Typography
@@ -21,6 +27,7 @@ const BAHT = "baht"
 const PERCENT = "percent"
 const allValue: any = []
 const { Panel } = Collapse
+const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
 
 interface Props { }
 
@@ -42,6 +49,12 @@ interface CreateLsParam {
   brands: any;
   ls_outlet: any;
   is_apply_all_brand: any;
+  campaign_time: any;
+  deep_link: any;
+  inapp_link: any;
+  image_link: any;
+  total_merchant_add: any;
+  total_merchant_join: any;
 }
 
 export default function CreateLogisticSubsidize({ }: Props): ReactElement {
@@ -62,7 +75,16 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
     end_date: "",
     brands: [],
     ls_outlet: [],
-    is_apply_all_brand: false
+    is_apply_all_brand: false,
+    campaign_time: {
+      start: null,
+      end: null,
+    },
+    deep_link: "",
+    inapp_link: "",
+    image_link: "",
+    total_merchant_add: 0,
+    total_merchant_join: 0
   }
   const [lsDetail, setLsDetail] = useState(lsInitial)
   const Schema = Yup.object().shape({
@@ -101,6 +123,9 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
   const [brandList, setBrandList] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [userSelectedOutlet] = useState([])
+  const [isVisibleLsSummary, setIsVisibleLsSummary] = useState(false)
+  const [imageUrl, setImageUrl] = useState('')
+  const [loadingImage, setloadingImage] = useState(false)
 
   const handleSubmit = async (values: typeof lsDetail) => {
     const type = values["type"]
@@ -111,6 +136,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
       values.discount_type = ""
     }
 
+    // Construct Outlets
     let outlets = []
     if (size(get(values, 'brands')) > 0) {
       for (var brand of values.brands) {
@@ -122,6 +148,18 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
           }
         }
       }
+    }
+
+    // Reformat Date
+    if (values.campaign_time.start != '') {
+      values.start_date = moment(values.campaign_time.start).format(dateFormat)
+    } else {
+      values.start_date = null
+    }
+    if (values.campaign_time.end != '') {
+      values.end_date = moment(values.campaign_time.end).format(dateFormat)
+    } else {
+      values.end_date = null
     }
 
     values.ls_outlet = outlets
@@ -144,6 +182,37 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
       setBrandList(filterBrand)
     }
     setIsLoading(false)
+  }
+
+  const handleChangeImage = async (info: any) => {
+    const fileSize = (info.size / 1024) / 1024
+    const isJPNG = info.type === 'image/jpeg';
+    const isJPG = info.type === 'image/jpg';
+    const isPNG = info.type === 'image/png';
+
+    if (!isJPNG && !isJPG && !isPNG) {
+      warning({
+        title: `กรุณาเลือกรูปภาพ`,
+        afterClose() {
+          setImageUrl('')
+        }
+      })
+      return false
+    }
+
+    if (fileSize > 1) {
+      warning({
+        title: `กรุณาเลือกรูปภาพขนาดไม่เกิน 1MB`,
+        afterClose() {
+        }
+      })
+      return false
+    }
+
+    setloadingImage(true)
+    const res = await uploadImage(info)
+    setloadingImage(false)
+    setImageUrl(res.upload_success.modal_pop_up)
   }
 
   // const submitCreate = async (values) => {
@@ -798,32 +867,147 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
     logicSummaryElements.push(
       <>
         <Row gutter={24}>
-          <Col className="gutter-row" span={24}>
+          <Col className="gutter-row" sm={12} xs={24}>
             <Title level={4}>LS Summary</Title>
+          </Col>
+          <Col className="gutter-row" sm={12} xs={24} style={{ textAlign: 'end' }}>
+            <Button
+              style={{ width: '200px', marginTop: '0px' }}
+              type="primary"
+              size="middle"
+              onClick={() => {
+                setIsVisibleLsSummary(true)
+                let outlets = []
+                if (size(get(values, 'brands')) > 0) {
+                  for (var brand of values.brands) {
+                    if (get(brand, 'is_selected') == true) {
+                      if (get(brand, 'type') == 'all') {
+                        outlets.push({ brand_id: brand["id"], outlet_ids: [0] })
+                      } else if (size(get(brand, 'outlets')) > 0) {
+                        outlets.push({ brand_id: brand["id"], outlet_ids: get(brand, 'outlets') })
+                      }
+                    }
+                  }
+                }
+                setFieldValue("ls_outlet", outlets)
+              }}
+            >
+              Preview LS Summary
+            </Button>
           </Col>
         </Row>
       </>
     )
-
-    logicSummaryElements.push(
-      <>
-      </>
-    )
+    if (isVisibleLsSummary) {
+      // LS Summary
+      logicSummaryElements.push(
+        <>
+          {JSON.stringify(values)}
+        </>
+      )
+    }
 
     // Footer
     logicSummaryElements.push(<Divider style={{
       marginTop: '20px',
       marginBottom: '20px'
     }} />)
-
     return logicSummaryElements
   }
 
   const renderLogicDetail = (values: any, setFieldValue: any) => {
     let logicDetailElements = []
-
     logicDetailElements.push(
       <>
+        {/* Row#1 Campaign Date */}
+        <Row gutter={24}>
+          <Col className="gutter-row" sm={24} xs={24}>
+            <Field
+              label={{ text: 'วันที่และเวลาของแคมเปญ' }}
+              name="campaign_time"
+              component={DateTimeRangePicker}
+              id="campaign_time"
+              placeholder="วันเวลาที่ทำรายการ"
+            />
+          </Col>
+        </Row>
+        {/* Row#2 Deep Link and In-app Link */}
+        <Row gutter={24}>
+          <Col className="gutter-row" sm={12} xs={24}>
+            <div className="ant-form ant-form-vertical">
+              <FormAntd.Item label={"Deep Link"}>
+                <InputAntd.Group compact>
+                  <InputAntd
+                    style={{
+                      width: 'calc(100% - 92px)',
+                    }}
+                    onChange={(e) => {
+                      setFieldValue("deep_link", e.target.value)
+                    }}
+                    defaultValue={values.deep_link}
+                  />
+                  <Tooltip title="คัดลอก">
+                    <ButtonAntd
+                      icon={<CopyOutlined />}
+                      onClick={() => {
+                        navigator.clipboard.writeText(values.deep_link)
+                      }}
+                    >คัดลอก</ButtonAntd>
+                  </Tooltip>
+                </InputAntd.Group>
+              </FormAntd.Item>
+            </div>
+          </Col>
+          <Col className="gutter-row" sm={12} xs={24}>
+            <div className="ant-form ant-form-vertical">
+              <FormAntd.Item label={"Link In App"}>
+                <InputAntd.Group compact>
+                  <InputAntd
+                    style={{
+                      width: 'calc(100% - 92px)',
+                    }}
+                    onChange={(e) => {
+                      setFieldValue("inapp_link", e.target.value)
+                    }}
+                    defaultValue={values.inapp_link}
+                  />
+                  <Tooltip title="คัดลอก">
+                    <ButtonAntd
+                      icon={<CopyOutlined />}
+                      onClick={() => {
+                        navigator.clipboard.writeText(values.inapp_link)
+                      }}
+                    >คัดลอก</ButtonAntd>
+                  </Tooltip>
+                </InputAntd.Group>
+              </FormAntd.Item>
+            </div>
+          </Col>
+        </Row>
+        {/* Row#3 Deep Link and In-app Link */}
+        <Row gutter={24}>
+          <Col className="gutter-row" span={24}>
+            <label style={{ display: "block", marginBottom: "10px" }}>อัพโหลดรูปภาพ <span style={{ color: "rgb(93, 93, 93)", fontWeight: 500 }}>(ขนาดไม่เกิน 1 MB)</span></label>
+          </Col>
+
+          <Upload
+            name="file"
+            id="file"
+            onRemove={e => { setImageUrl('') }}
+            beforeUpload={handleChangeImage}
+            maxCount={1}
+          >
+
+            <Button style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูป</Button>
+          </Upload>
+
+          {imageUrl != '' ?
+            <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
+              <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />
+            </Col> :
+            <></>
+          }
+        </Row>
       </>
     )
 

@@ -1,6 +1,7 @@
 import Table from '@/components/Table'
 import { Pagination } from '@/interface/dataTable'
 import { lsSummaryInterface } from '@/services/ls'
+import { getDeliveryTiers } from '@/services/rider'
 import { Button, Card, Col, Row, Typography } from 'antd'
 import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
@@ -23,26 +24,28 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
+      console.log("record: ", record)
       return <Row gutter={16}
         style={{ alignItems: "center" }}
         justify="center">
         <Col className="gutter-row" span={12}>
-          {/* <Text>{'5 - 10'}</Text> */}
           <Text>{text}</Text>
         </Col>
         <Col className="gutter-row" span={12}>
-          <Button type="primary"
-            style={{
-              background: '#ffdbc6',
-              borderColor: '#fec4a2',
-              color: '#ffa572',
-              borderRadius: '8px',
-              cursor: 'default',
-              width: '100%'
-            }}
-          >
-            Support Area
-          </Button>
+          {record?.is_support &&
+            <Button type="primary"
+              style={{
+                background: '#ffdbc6',
+                borderColor: '#fec4a2',
+                color: '#ffa572',
+                borderRadius: '8px',
+                cursor: 'default',
+                width: '100%'
+              }}
+            >
+              Support Area
+            </Button>
+          }
         </Col>
       </Row>
     },
@@ -61,14 +64,14 @@ const columns = [
   },
   {
     title: 'ส่วนลดค่าส่งของลูกค้า',
-    dataIndex: '',
+    dataIndex: 'discount',
     align: 'center',
-    key: '',
+    key: 'discount',
     width: '100px',
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return numberFormat(0)
+      return numberFormat(text)
     },
   },
   {
@@ -80,31 +83,31 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return numberFormat(0)
+      return numberFormat(record?.is_support ? (record?.normal_price - record?.discount) : record?.normal_price)
     },
   },
   {
     title: 'Platform LS',
-    dataIndex: '',
+    dataIndex: 'ls_platform_amount',
     align: 'center',
-    key: '',
+    key: 'ls_platform_amount',
     width: '100px',
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return numberFormat(0)
+      return numberFormat(text)
     },
   },
   {
     title: 'Merchant LS',
-    dataIndex: '',
+    dataIndex: 'ls_merchant_amount',
     align: 'center',
-    key: '',
+    key: 'ls_merchant_amount',
     width: '100px',
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return numberFormat(0)
+      return numberFormat(text)
 
     },
   },
@@ -117,7 +120,7 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return numberFormat(0)
+      return numberFormat((record?.ls_platform_amount + record?.ls_merchant_amount) - record?.discount)
     },
   },
 
@@ -130,11 +133,16 @@ const LsSummaryComponent = ({
 }: Props): ReactElement => {
   let [dataTable, setDataTable] = useState([])
   let [_isLoading, setIsLoading] = useState(true)
-  let [primeName, setPrimeName] = useState('')
+  let [primeNameList, setPrimeNameList] = useState([])
+  let [orderAmount, setOrderAmount] = useState('')
+  let [distance, setDistance] = useState('')
+
 
   const router = useRouter()
   const ssoId = router.query.sso_id as string
-
+  const between = (x: any, min: any, max: any) => {
+    return x >= min && x <= max;
+  }
   const handelDataTableLoad = (pagination: any) => {
     fetchData({ ...payload, page: pagination.current, per_page: pagination.pageSize })
   }
@@ -143,47 +151,140 @@ const LsSummaryComponent = ({
   const fetchData = async (params: lsSummaryInterface) => {
     // Tier
     setIsLoading(true)
+
+    // p boss data
+    params = {
+      "name": "Boss Test#1",
+      "type": "customer_discount",
+      "type_name": "กำหนดจากส่วนลดที่ลูกค้าจะได้รับ",
+      "order_amount": "0",
+      "discount_type": "baht",
+      "discount_amount": "5",
+      "min_distance": "0",
+      "max_distance": "5",
+      "ls_type": "baht",
+      "ls_platform_amount": "10",
+      "ls_merchant_amount": "2",
+      "start_date": "",
+      "end_date": "",
+      "province_ids": [],
+      "district_ids": [],
+      "sub_district_ids": [],
+    }
+    //
+
+
+
     // call here
-    const data: any = [{
-      "name": "tier_price 7",
-      "tier_prices": [
-        {
-          "min": 0,
-          "max": 5,
-          "price": 10
-        },
-        {
-          "min": 5,
-          "max": 10,
-          "price": 20
-        },
-        {
-          "min": 10,
-          "max": 15,
-          "price": 30
-        },
-        {
-          "min": 15,
-          "max": 20,
-          "price": 40
-        },
-      ]
-    }]
-    if (true) {
+    const { data, success } = await getDeliveryTiers({
+      "province_ids": params.province_ids,
+      "district_ids": params.district_ids,
+      "sub_district_ids": params.sub_district_ids,
+      "page": 1,
+      "per_page": 100
+    })
+    // const data: any = [{
+    //   "name": "tier_price 7",
+    //   "tier_prices": [
+    //     {
+    //       "min": 0,
+    //       "max": 5,
+    //       "price": 10
+    //     },
+    //     {
+    //       "min": 5,
+    //       "max": 10,
+    //       "price": 20
+    //     },
+    //     {
+    //       "min": 10,
+    //       "max": 15,
+    //       "price": 30
+    //     },
+    //     {
+    //       "min": 15,
+    //       "max": 20,
+    //       "price": 40
+    //     },
+
+    //   ]
+    // },
+    // {
+    //   "name": "tier_price 8",
+    //   "tier_prices": [
+    //     {
+    //       "min": 0,
+    //       "max": 5,
+    //       "price": 10
+    //     },
+    //     {
+    //       "min": 5,
+    //       "max": 10,
+    //       "price": 20
+    //     },
+    //     {
+    //       "min": 10,
+    //       "max": 15,
+    //       "price": 30
+    //     },
+    //     {
+    //       "min": 15,
+    //       "max": 20,
+    //       "price": 40
+    //     },
+
+    //   ]
+    // }]
+    if (success) {
       const array: any = []
-      data?.map((d: any) => {
-        d?.tier_prices?.map((value: any, key: number) => {
-          if (key > 0) {
-            value.min = ">" + " " + value.min
+      const nameArray: any = []
+      let min = parseInt(params.min_distance!)
+      let max = parseInt(params.max_distance!)
+      setOrderAmount(params.order_amount!)
+      setDistance(min + ' - ' + max)
+      data?.map((value: any, key: number) => {
+        array[key] = []
+        value?.tier_prices?.map((tierPricesValue: any, tierPricesKey: number) => {
+          // check is support
+          let is_support = false
+          if (between(min, tierPricesValue.min, tierPricesValue.max) || between(max, tierPricesValue.min, tierPricesValue.max)) {
+            is_support = true
           }
-          array.push({
-            'distance': value.min + " - " + value.max,
-            'normal_price': value.price
+          // end check is support
+
+          if (tierPricesKey > 0) {
+            tierPricesValue.min = ">" + " " + tierPricesValue.min
+          }
+
+          // find discount type percent
+          let discount = parseInt(params.discount_amount!)
+          if (params.discount_type !== "baht") {
+            discount = (parseInt(params.discount_amount!) * parseInt(tierPricesValue.price!)) / 100
+          }
+          // end find discount type percent
+
+          // find ls type percent
+          let lsPlatformAmount = parseInt(params.ls_platform_amount!)
+          let lsMerchantAmount = parseInt(params.ls_merchant_amount!)
+          if (params.ls_type !== "baht") {
+            lsPlatformAmount = (parseInt(params.ls_platform_amount!) * discount) / 100
+            lsMerchantAmount = (parseInt(params.ls_merchant_amount!) * discount) / 100
+          }
+          // end find ls type percent
+
+          array[key]?.push({
+            'distance': tierPricesValue.min + " - " + tierPricesValue.max,
+            'normal_price': parseInt(tierPricesValue.price!),
+            'is_support': is_support,
+            'discount': discount,
+            'ls_platform_amount': lsPlatformAmount,
+            'ls_merchant_amount': lsMerchantAmount
           })
         })
-        setPrimeName(d.name)
+        nameArray?.push(value.name)
       })
-      console.log("array: ", array)
+
+      setPrimeNameList(nameArray)
       setDataTable(array)
       setIsLoading(false)
     }
@@ -201,21 +302,32 @@ const LsSummaryComponent = ({
     <Card>
       {tableHeader}
       <Title level={4}>LS Summary</Title>
-      <Title level={5}>ยอดสุทธิได้ตั้งแต่ ... บาท ขึ้นไป</Title>
-      <Title level={5}>ระยะทาง (กม.)</Title>
-      <Title level={5}>Prime {primeName} <Text style={{ color: '#d9d9d9' }}>(... ร้านอาหาร)</Text></Title>
-      <br />
-      <Table
-        config={{
-          dataTableTitle: '',
-          loading: _isLoading,
-          tableName: 'lsSummary',
-          tableColumns: columns,
-          dataSource: dataTable,
-          handelDataTableLoad: handelDataTableLoad,
-          pagination: false,
-        }}
-      />
+      <Title level={5}>ยอดสุทธิได้ตั้งแต่ {orderAmount} บาท ขึ้นไป</Title>
+      <Title level={5}>ระยะทาง ({distance} กม.)</Title>
+
+      {
+        primeNameList.length > 0 &&
+        primeNameList?.map((primeName: any, primeKet: number) => {
+          return <>
+            <Title level={5}>Prime {primeName}
+              {/* <Text style={{ color: '#d9d9d9' }}>(... ร้านอาหาร)</Text> */}
+            </Title>
+            <br />
+            <Table
+              config={{
+                dataTableTitle: '',
+                loading: _isLoading,
+                tableName: 'lsSummary',
+                tableColumns: columns,
+                dataSource: dataTable[primeKet],
+                handelDataTableLoad: handelDataTableLoad,
+                pagination: false,
+              }}
+            />
+            <br />
+          </>
+        })
+      }
     </Card>
   )
 }

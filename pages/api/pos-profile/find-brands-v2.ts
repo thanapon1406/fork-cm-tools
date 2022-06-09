@@ -6,7 +6,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body, query } = req
   if (method === 'GET') {
     try {
-      const url: string = `${API_PATH_POS_PROFILE_SERVICE}${PREFIX_BRAND}/find-brands-v2?keyword=&page=1&per_page=200`
+      const url: string = `${API_PATH_POS_PROFILE_SERVICE}${PREFIX_BRAND}/find-brands-v2?keyword=&page=1&per_page=1000`
       const { data, status } = await ServerFetch.get(url, headers, query)
       res.status(status).json(data)
     } catch (e: any) {

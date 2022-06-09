@@ -216,6 +216,8 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
   const [isVisibleLsSummary, setIsVisibleLsSummary] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [loadingImage, setloadingImage] = useState(false)
+  const [lsSummaryElementParam, setlsSummaryElementParam] = useState({})
+
 
   const handleSubmit = async (values: typeof lsDetail) => {
     const type = values["type"]
@@ -305,6 +307,70 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
     setImageUrl(res.upload_success.modal_pop_up)
   }
 
+  const handleGetOutletLocations = async (ls_outlets: any, is_apply_all_brand: any) => {
+    let provinceIds: any = []
+    let districtIds: any = []
+    let subDistrictIds: any = []
+    if (is_apply_all_brand) {
+      if (_.size(brandList) > 0) {
+        brandList.map((brand: any) => {
+          let outlets = _.get(brand, "outlets") ? _.get(brand, "outlets") : []
+          if (_.size(outlets) > 0) {
+            outlets.map((outlet: any) => {
+              const provinceId = _.get(outlet, "province_id") ? _.get(outlet, "province_id") : ""
+              const districtId = _.get(outlet, "district_id") ? _.get(outlet, "district_id") : ""
+              const subDistrictId = _.get(outlet, "sub_district_id") ? _.get(outlet, "sub_district_id") : ""
+              if (provinceId) provinceIds.push(provinceId)
+              if (districtId) districtIds.push(districtId)
+              if (subDistrictId) subDistrictIds.push(subDistrictId)
+            })
+          }
+        })
+      }
+    } else {
+      if (_.size(ls_outlets) > 0) {
+        ls_outlets.map((brand: any) => {
+          const brandId = _.get(brand, "brand_id") ? _.get(brand, "brand_id") : ""
+          if (brandId) {
+            let brandDetail = _.find(brandList, { id: brandId })
+            let outlets = _.get(brandDetail, "outlets") ? _.get(brandDetail, "outlets") : []
+            const outletIds = _.get(brand, "outlet_ids") ? _.get(brand, "outlet_ids") : []
+            if (_.size(outletIds) > 0) {
+              outletIds.map((outletId: any) => {
+                if (outletId == 0) {
+                  if (_.size(outlets) > 0) {
+                    outlets.map((outlet: any) => {
+                      const provinceId = _.get(outlet, "province_id") ? _.get(outlet, "province_id") : ""
+                      const districtId = _.get(outlet, "district_id") ? _.get(outlet, "district_id") : ""
+                      const subDistrictId = _.get(outlet, "sub_district_id") ? _.get(outlet, "sub_district_id") : ""
+                      if (provinceId) provinceIds.push(provinceId)
+                      if (districtId) districtIds.push(districtId)
+                      if (subDistrictId) subDistrictIds.push(subDistrictId)
+                    })
+                  }
+                } else {
+                  let outletDetail = _.find(outlets, { id: outletId })
+                  const provinceId = _.get(outletDetail, "province_id") ? _.get(outletDetail, "province_id") : ""
+                  const districtId = _.get(outletDetail, "district_id") ? _.get(outletDetail, "district_id") : ""
+                  const subDistrictId = _.get(outletDetail, "sub_district_id") ? _.get(outletDetail, "sub_district_id") : ""
+                  if (provinceId) provinceIds.push(provinceId)
+                  if (districtId) districtIds.push(districtId)
+                  if (subDistrictId) subDistrictIds.push(subDistrictId)
+                }
+              })
+            }
+          }
+        })
+      }
+    }
+    let outletLocations = {
+      province_ids: _.uniq(provinceIds),
+      district_ids: _.uniq(districtIds),
+      sub_district_ids: _.uniq(subDistrictIds),
+    }
+    return outletLocations
+  }
+
   // const submitCreate = async (values) => {
   //   let outlets = []
   //   if (size(get(values, 'brands')) > 0) {
@@ -354,7 +420,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
   }, [])
 
   const renderLogicInfo = (values: any, setFieldValue: any) => {
-    return (<>
+    return (<div key="logic_info">
       {/* Name */}
       < Row gutter={16} >
         <Col className="gutter-row" span={24}>
@@ -394,45 +460,42 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
         marginTop: '5px',
         marginBottom: '20px'
       }} />
-    </>)
+    </div>)
   }
 
   const renderLogicSetup = (values: any, setFieldValue: any) => {
-    console.log("values", values)
     let logicSetupElements = []
 
     // Header
     logicSetupElements.push(
-      <Row gutter={24}>
-        <Col className="gutter-row" span={24}>
-          <Title level={4}>Logic Setup</Title>
-        </Col>
-      </Row>
+      <div key="logic_setup_header">
+        <Row gutter={24}>
+          <Col className="gutter-row" span={24}>
+            <Title level={4}>Logic Setup</Title>
+          </Col>
+        </Row>
+        <Row gutter={24}>
+          < Col className="gutter-row" span={12} >
+            <Field
+              name="type_name"
+              type="text"
+              component={Input}
+              className="form-control"
+              id="type_name"
+              disabled
+            />
+          </Col >
+        </Row>
+      </div>
     )
-
-    logicSetupElements.push(
-      <Row gutter={24}>
-        < Col className="gutter-row" span={12} >
-          <Field
-            name="type_name"
-            type="text"
-            component={Input}
-            className="form-control"
-            id="type_name"
-            disabled
-          />
-        </Col >
-      </Row>
-    )
-
 
     const logicType = _.get(values, "type") ? _.get(values, "type") : ""
     if (logicType) {
       // Logic Setup
-      let logicSetup = <></>
+      let logicSetup = <div key="logic_setup_UNSELECTED"></div>
       switch (logicType) {
         case CUSTOMER_DISCOUNT:
-          logicSetup = <>
+          logicSetup = <div key="logic_setup_CUSTOMER_DISCOUNT">
             {/* Row#1 */}
             <Row gutter={{
               xs: 24,
@@ -523,10 +586,10 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                 กม.
               </Col>
             </Row>
-          </>
+          </div>
           break;
         case CUSTOMER_PAY:
-          logicSetup = <>
+          logicSetup = <div key="logic_setup_CUSTOMER_PAY">
             {/* Row#1 */}
             <Row gutter={{
               xs: 24,
@@ -611,10 +674,10 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                 กม.
               </Col>
             </Row>
-          </>
+          </div>
           break;
         case SUBSIDIZE:
-          logicSetup = <>
+          logicSetup = <div key="logic_setup_SUBSIDIZE">
             {/* Row#1 */}
             <Row gutter={{
               xs: 24,
@@ -676,21 +739,21 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                 กม.
               </Col>
             </Row>
-          </>
+          </div>
           break;
         default:
-          logicSetup = <></>
+          logicSetup = <div key="logic_setup_UNSELECTED"></div>
       }
       logicSetupElements.push(
         logicSetup
       )
 
       // Logic Subsidize
-      let logicSubsidize = <></>
+      let logicSubsidize = <div key="logic_subsidize_UNSELECTED"></div>
       switch (logicType) {
         case CUSTOMER_DISCOUNT:
           const subsidizeTypeName = _.get(values, "ls_type") == "percent" ? "เปอร์เซ็นต์" : "บาท"
-          logicSubsidize = <>
+          logicSubsidize = <div key="logic_subsidize_CUSTOMER_DISCOUNT">
             <Row gutter={24}>
               <Col className="gutter-row" span={24}>
                 <Title level={5}>สัดส่วน Logic Subsidize</Title>
@@ -752,10 +815,10 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                 {subsidizeTypeName}
               </Col>
             </Row>
-          </>
+          </div>
           break;
         case CUSTOMER_PAY:
-          logicSubsidize = <>
+          logicSubsidize = <div key="logic_subsidize_CUSTOMER_PAY">
             <Row gutter={24}>
               <Col className="gutter-row" span={24} style={{ marginTop: "5px", marginBottom: "10px" }}>
                 <span style={{ fontSize: "15px", fontWeight: 600, marginBottom: "0.5em", lineHeight: 1.5 }}>สัดส่วน Logic Subsidize</span> <span style={{ fontWeight: 500, color: "rgb(93 93 93)" }}>* ถ้ามีการ subsidize เกินมนส่วนของการตั้งค่า LS จะต้องแคปลิมิตค่าของอีกฝั่งนึง</span>
@@ -810,11 +873,11 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                 เปอร์เซ็นต์
               </Col>
             </Row>
-          </>
+          </div>
           break;
         case SUBSIDIZE:
           const subsidizeTypeName2 = _.get(values, "ls_type") == "percent" ? "เปอร์เซ็นต์" : "บาท"
-          logicSubsidize = <>
+          logicSubsidize = <div key="logic_subsidize_SUBSIDIZE">
             <Row gutter={24}>
               <Col className="gutter-row" span={24}>
                 <Title level={5}>สัดส่วน Logic Subsidize</Title>
@@ -876,10 +939,10 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                 {subsidizeTypeName2}
               </Col>
             </Row>
-          </>
+          </div>
           break;
         default:
-          logicSubsidize = <></>
+          logicSubsidize = <div key="logic_subsidize_UNSELECTED"></div>
       }
       logicSetupElements.push(
         logicSubsidize
@@ -888,29 +951,31 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
 
     // Footer
     logicSetupElements.push(
-      <Divider style={{
-        marginTop: '5px',
-        marginBottom: '20px'
-      }} />
+      <div key="logic_setup_footer">
+        <Divider style={{
+          marginTop: '5px',
+          marginBottom: '20px'
+        }} />
+      </div>
     )
-    return logicSetupElements
+    return <div key="logic_setup">{logicSetupElements}</div>
   }
 
   const renderLogicOutlet = (values: any, setFieldValue: any, handleChange: any) => {
     let logicOutletElements = []
     // Header
     logicOutletElements.push(
-      <>
+      <div key="logic_outlet_header">
         <Row gutter={24}>
           <Col className="gutter-row" span={24}>
             <Title level={4}>ร้านอาหารที่ใช้งาน</Title>
           </Col>
         </Row>
-      </>
+      </div>
     )
 
     logicOutletElements.push(
-      <>
+      <div key="logic_outlet_section#1">
         <Row gutter={24}>
           <Col className="gutter-row" span={24}>
             <Checkbox onChange={(e) => {
@@ -939,33 +1004,36 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
             </Collapse >
           </Col>
         </Row>
-      </>
+      </div>
     )
 
     // Footer
-    logicOutletElements.push(<Divider style={{
-      marginTop: '20px',
-      marginBottom: '20px'
-    }} />)
+    logicOutletElements.push(
+      <div key="logic_outlet_footer">
+        <Divider style={{
+          marginTop: '20px',
+          marginBottom: '20px'
+        }} />
+      </div>)
 
-    return logicOutletElements
+    return <div key="logic_outlet">{logicOutletElements}</div>
   }
 
   const renderLogicSummary = (values: any, setFieldValue: any) => {
-    let logicSummaryElements = []
+    let logicSummaryElements: any = []
     // Header
     logicSummaryElements.push(
-      <>
-        <Row gutter={24}>
-          <Col className="gutter-row" sm={12} xs={24}>
+      <div key="logic_summary_header">
+        <Row key="logic_summary_row#1" gutter={24}>
+          <Col key="logic_summary_row#1_col#1" className="gutter-row" sm={12} xs={24}>
             <Title level={4}>LS Summary</Title>
           </Col>
-          <Col className="gutter-row" sm={12} xs={24} style={{ textAlign: 'end' }}>
+          <Col key="logic_summary_row#1_col#2" className="gutter-row" sm={12} xs={24} style={{ textAlign: 'end' }}>
             <Button
               style={{ width: '200px', marginTop: '0px' }}
               type="primary"
               size="middle"
-              onClick={() => {
+              onClick={async () => {
                 // Validate Logic Setup
                 let validLogicSetup = false
                 const type = _.get(values, "type") != undefined && _.get(values, "type") != "" ? true : false
@@ -1003,6 +1071,28 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                     }
                   }
                   setFieldValue("ls_outlet", outlets)
+                  const is_apply_all_brand = _.get(values, "is_apply_all_brand") ? _.get(values, "is_apply_all_brand") : false
+                  const outletLocations = await handleGetOutletLocations(outlets, is_apply_all_brand)
+                  let lsSummaryParam = {
+                    name: _.get(values, "name") ? _.get(values, "name") : "",
+                    type: _.get(values, "type") ? _.get(values, "type") : "",
+                    // type_name: _.get(values, "type_name") ? _.get(values, "type_name") : "",
+                    order_amount: _.get(values, "order_amount") ? _.get(values, "order_amount") : 0,
+                    discount_type: _.get(values, "discount_type") ? _.get(values, "discount_type") : "",
+                    discount_amount: _.get(values, "discount_amount") ? _.get(values, "discount_amount") : 0,
+                    min_distance: _.get(values, "min_distance") ? _.get(values, "min_distance") : 0,
+                    max_distance: _.get(values, "max_distance") ? _.get(values, "max_distance") : 0,
+                    ls_type: _.get(values, "ls_type") ? _.get(values, "ls_type") : "",
+                    ls_platform_amount: _.get(values, "ls_platform_amount") ? _.get(values, "ls_platform_amount") : 0,
+                    ls_merchant_amount: _.get(values, "ls_merchant_amount") ? _.get(values, "ls_merchant_amount") : 0,
+                    // start_date: "",
+                    // end_date: "",
+                    province_ids: _.get(outletLocations, "province_ids") ? _.get(outletLocations, "province_ids") : [],
+                    district_ids: _.get(outletLocations, "district_ids") ? _.get(outletLocations, "district_ids") : [],
+                    sub_district_ids: _.get(outletLocations, "sub_district_ids") ? _.get(outletLocations, "sub_district_ids") : [],
+                  }
+                  // console.log(lsSummaryParam)
+                  setlsSummaryElementParam(lsSummaryParam)
                 } else {
                   notification.warning({
                     message: `ไม่สามารถ Preview LS Summary ได้`,
@@ -1016,31 +1106,34 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
             </Button>
           </Col>
         </Row>
-      </>
+      </div>
     )
     if (isVisibleLsSummary) {
       // LS Summary
       logicSummaryElements.push(
-        <>
+        <Row key="logic_summary_section#1" gutter={24}>
           {JSON.stringify(values)}
-        </>
+        </Row>
       )
     }
 
     // Footer
-    logicSummaryElements.push(<Divider style={{
-      marginTop: '20px',
-      marginBottom: '20px'
-    }} />)
-    return logicSummaryElements
+    logicSummaryElements.push(
+      <div key="logic_summary_footer" >
+        <Divider style={{
+          marginTop: '20px',
+          marginBottom: '20px'
+        }} />
+      </div>)
+    return <div key="logic_summary">{logicSummaryElements}</div>
   }
 
   const renderLogicDetail = (values: any, setFieldValue: any) => {
     let logicDetailElements = []
     logicDetailElements.push(
-      <>
+      <div key="logic_detail_section#1">
         {/* Row#1 Campaign Date */}
-        <Row gutter={24}>
+        <Row key="logic_detail_row#1" gutter={24}>
           <Col className="gutter-row" sm={24} xs={24}>
             <Field
               label={{ text: 'วันที่และเวลาของแคมเปญ' }}
@@ -1052,7 +1145,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
           </Col>
         </Row>
         {/* Row#2 Deep Link and In-app Link */}
-        <Row gutter={24}>
+        <Row key="logic_detail_row#2" gutter={24}>
           <Col className="gutter-row" sm={12} xs={24}>
             <div className="ant-form ant-form-vertical">
               <FormAntd.Item label={"Deep Link"}>
@@ -1105,7 +1198,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
           </Col>
         </Row>
         {/* Row#3 Deep Link and In-app Link */}
-        <Row gutter={24}>
+        <Row key="logic_detail_row#3" gutter={24}>
           <Col className="gutter-row" span={24}>
             <label style={{ display: "block", marginBottom: "10px" }}>อัพโหลดรูปภาพ <span style={{ color: "rgb(93, 93, 93)", fontWeight: 500 }}>(ขนาดไม่เกิน 1 MB)</span></label>
           </Col>
@@ -1128,10 +1221,10 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
             <></>
           }
         </Row>
-      </>
+      </div>
     )
 
-    return logicDetailElements
+    return <div key="logic_detail">{logicDetailElements}</div>
   }
 
   return (

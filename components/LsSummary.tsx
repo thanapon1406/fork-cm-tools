@@ -156,28 +156,6 @@ const LsSummaryComponent = ({
   const fetchData = async (params: lsSummaryInterface) => {
     // Tier
     setIsLoading(true)
-
-    // p boss data
-    params = {
-      "name": "Boss Test#1",
-      "type": "customer_discount",
-      "type_name": "กำหนดจากส่วนลดที่ลูกค้าจะได้รับ",
-      "order_amount": "0",
-      "discount_type": "baht",
-      "discount_amount": "5",
-      "min_distance": "0",
-      "max_distance": "5",
-      "ls_type": "baht",
-      "ls_platform_amount": "10",
-      "ls_merchant_amount": "2",
-      "start_date": "",
-      "end_date": "",
-      "province_ids": [1],
-      "district_ids": [],
-      "sub_district_ids": [],
-    }
-    //
-
     // call here
     const { result, success } = await getDeliveryTiers({
       "province_id": params.province_ids,

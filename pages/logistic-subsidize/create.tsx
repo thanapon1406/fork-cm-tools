@@ -88,7 +88,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
   }
   const [lsDetail, setLsDetail] = useState(lsInitial)
   const Schema = Yup.object().shape({
-    name: Yup.string().trim().max(255).required('ระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    name: Yup.string().trim().max(255).required('ระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
     type: Yup.string().trim().required('ระบุ LS Configure'),
     order_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
       return schema.test({
@@ -163,6 +163,24 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
         },
         message: "ระบุสัดส่วน LS",
       })
+    }).when('ls_type', {
+      is: PERCENT,
+      then: Yup.number().when("ls_merchant_amount", (ls_merchant_amount: any, schema: any) => {
+        return schema.test({
+          test: (ls_platform_amount: any) => {
+            if (ls_merchant_amount != undefined && ls_platform_amount != undefined) {
+              if (Number(ls_merchant_amount) + Number(ls_platform_amount) != 100) {
+                return false
+              }
+            } else {
+              return true
+            }
+
+            return true
+          },
+          message: "ต้องรวมกันได้ 100%",
+        })
+      })
     }),
     ls_merchant_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
       return schema.test({
@@ -178,8 +196,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
         },
         message: "ระบุสัดส่วน LS",
       })
-    }),
-
+    })
   })
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const lsLogicsOption = [
@@ -241,22 +258,94 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
         }
       }
     }
+    values.ls_outlet = outlets
 
     // Reformat Date
     if (values.campaign_time.start != '') {
-      values.start_date = moment(values.campaign_time.start).format(dateFormat)
+      values.start_date = moment(values.campaign_time.start + ":00").format(dateFormat)
     } else {
       values.start_date = null
     }
     if (values.campaign_time.end != '') {
-      values.end_date = moment(values.campaign_time.end).format(dateFormat)
+      values.end_date = moment(values.campaign_time.end + ":59").format(dateFormat)
     } else {
       values.end_date = null
     }
 
-    values.ls_outlet = outlets
-    console.log("Create LS Config! ", values)
-    const payload = {}
+    // Image 
+    values.image_link = imageUrl
+
+    // Calculate Outlet Add
+    const outletLocationDetail = await handleGetOutletLocations(values.ls_outlet, values.is_apply_all_brand)
+
+    // Construct Allow List
+    const lsOutlet = _.get(values, "ls_outlet") ? _.get(values, "ls_outlet") : []
+    let allowedList: any = []
+    if (values.is_apply_all_brand) {
+      const brandData = {
+        brand_id: 0
+      }
+      allowedList.push({ ...brandData })
+    } else {
+      if (_.size(lsOutlet) > 0) {
+        lsOutlet.map((brand: any) => {
+          const brandId = _.get(brand, "brand_id") ? _.get(brand, "brand_id") : ""
+          const outletIds = _.get(brand, "outlet_ids") ? _.get(brand, "outlet_ids") : []
+          const outlets: any = []
+          if (_.size(outletIds) > 0) {
+            outletIds.map((outletId: any) => {
+              const outletData = {
+                outlet_id: outletId
+              }
+              outlets.push(outletData)
+            })
+          }
+          const brandData = {
+            brand_id: brandId,
+            outlets: outlets
+          }
+          allowedList.push({ ...brandData })
+        })
+      }
+    }
+
+
+    const payload = {
+      data: {
+        name: _.get(values, "name") ? _.get(values, "name") : "",
+        type: _.get(values, "type") ? _.get(values, "type") : "",
+        order_amount: _.get(values, "order_amount") ? _.get(values, "order_amount") : 0,
+        discount_type: _.get(values, "discount_type") ? _.get(values, "discount_type") : "",
+        discount_amount: _.get(values, "discount_amount") ? _.get(values, "discount_amount") : 0,
+        min_distance: _.get(values, "min_distance") ? _.get(values, "min_distance") : 0,
+        max_distance: _.get(values, "max_distance") ? _.get(values, "max_distance") : 0,
+        ls_type: _.get(values, "ls_type") ? _.get(values, "ls_type") : "",
+        ls_platform_amount: _.get(values, "ls_platform_amount") ? _.get(values, "ls_platform_amount") : 0,
+        ls_merchant_amount: _.get(values, "ls_merchant_amount") ? _.get(values, "ls_merchant_amount") : 0,
+        start_date: _.get(values, "start_date") ? _.get(values, "start_date") : "",
+        end_date: _.get(values, "end_date") ? _.get(values, "end_date") : "",
+        allowed_list: allowedList,
+        deep_link: _.get(values, "deep_link") ? _.get(values, "deep_link") : "",
+        inapp_link: _.get(values, "inapp_link") ? _.get(values, "inapp_link") : "",
+        image_link: _.get(values, "image_link") ? _.get(values, "image_link") : "",
+        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : ""
+      }
+    }
+    console.log("payload", payload)
+    // const { result, success } = await createLsConfig(payload)
+    // if (success) {
+    //   notification.success({
+    //     message: `ดำเนินการสร้าง LS Config สำเร็จ`,
+    //     description: '',
+    //   })
+    //   Router.push("/logistic-subsidize")
+    // } else {
+    //   notification.warning({
+    //     message: `ผิดพลาด`,
+    //     description: 'ไม่สามารถสร้าง LS Config ได้',
+    //   })
+    // }
+
   }
 
   const filterOutletSelected = (outletSelected: any, outletList: any, brandId: any) => {
@@ -311,6 +400,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
     let provinceIds: any = []
     let districtIds: any = []
     let subDistrictIds: any = []
+    let totalMerchantAdd = 0
     if (is_apply_all_brand) {
       if (_.size(brandList) > 0) {
         brandList.map((brand: any) => {
@@ -323,6 +413,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
               if (provinceId) provinceIds.push(provinceId)
               if (districtId) districtIds.push(districtId)
               if (subDistrictId) subDistrictIds.push(subDistrictId)
+              totalMerchantAdd += 1
             })
           }
         })
@@ -346,6 +437,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                       if (provinceId) provinceIds.push(provinceId)
                       if (districtId) districtIds.push(districtId)
                       if (subDistrictId) subDistrictIds.push(subDistrictId)
+                      totalMerchantAdd += 1
                     })
                   }
                 } else {
@@ -356,6 +448,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                   if (provinceId) provinceIds.push(provinceId)
                   if (districtId) districtIds.push(districtId)
                   if (subDistrictId) subDistrictIds.push(subDistrictId)
+                  totalMerchantAdd += 1
                 }
               })
             }
@@ -367,6 +460,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
       province_ids: _.uniq(provinceIds),
       district_ids: _.uniq(districtIds),
       sub_district_ids: _.uniq(subDistrictIds),
+      total_merchant_add: totalMerchantAdd
     }
     return outletLocations
   }
@@ -452,6 +546,10 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
               const selectedType = _.find(lsLogicsOption, { value: value })
               const typeName = _.get(selectedType, "name") ? _.get(selectedType, "name") : ""
               setFieldValue("type_name", typeName)
+
+              if (value == CUSTOMER_PAY) {
+                setFieldValue("ls_type", PERCENT)
+              }
             }}
           />
         </Col>
@@ -826,7 +924,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
             </Row>
             <Row gutter={16}>
               <Col className="gutter-row" span={24} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                แบบฟอร์มและร้านอาหารต้องรวมกัน 100 เปอร์เซ็นต์
+                แพลตฟอร์มและร้านอาหารต้องรวมกัน 100 เปอร์เซ็นต์
               </Col>
             </Row>
             <Row gutter={{
@@ -1091,7 +1189,6 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
                     district_ids: _.get(outletLocations, "district_ids") ? _.get(outletLocations, "district_ids") : [],
                     sub_district_ids: _.get(outletLocations, "sub_district_ids") ? _.get(outletLocations, "sub_district_ids") : [],
                   }
-                  // console.log(lsSummaryParam)
                   setlsSummaryElementParam(lsSummaryParam)
                 } else {
                   notification.warning({

@@ -24,7 +24,6 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      console.log("record: ", record)
       return <Row gutter={16}
         style={{ alignItems: "center" }}
         justify="center">
@@ -140,8 +139,14 @@ const LsSummaryComponent = ({
 
   const router = useRouter()
   const ssoId = router.query.sso_id as string
-  const between = (x: any, min: any, max: any) => {
-    return x >= min && x <= max;
+
+  const betweenArray = (x: any, y: any, min: any, max: any) => {
+    for (let i = x; i < y; i++) {
+      if (i >= min && x <= max) {
+        return true
+      }
+    }
+    return false
   }
   const handelDataTableLoad = (pagination: any) => {
     fetchData({ ...payload, page: pagination.current, per_page: pagination.pageSize })
@@ -167,75 +172,20 @@ const LsSummaryComponent = ({
       "ls_merchant_amount": "2",
       "start_date": "",
       "end_date": "",
-      "province_ids": [],
+      "province_ids": [1],
       "district_ids": [],
       "sub_district_ids": [],
     }
     //
 
-
-
     // call here
-    const { data, success } = await getDeliveryTiers({
-      "province_ids": params.province_ids,
-      "district_ids": params.district_ids,
-      "sub_district_ids": params.sub_district_ids,
+    const { result, success } = await getDeliveryTiers({
+      "province_id": params.province_ids,
       "page": 1,
       "per_page": 100
     })
-    // const data: any = [{
-    //   "name": "tier_price 7",
-    //   "tier_prices": [
-    //     {
-    //       "min": 0,
-    //       "max": 5,
-    //       "price": 10
-    //     },
-    //     {
-    //       "min": 5,
-    //       "max": 10,
-    //       "price": 20
-    //     },
-    //     {
-    //       "min": 10,
-    //       "max": 15,
-    //       "price": 30
-    //     },
-    //     {
-    //       "min": 15,
-    //       "max": 20,
-    //       "price": 40
-    //     },
-
-    //   ]
-    // },
-    // {
-    //   "name": "tier_price 8",
-    //   "tier_prices": [
-    //     {
-    //       "min": 0,
-    //       "max": 5,
-    //       "price": 10
-    //     },
-    //     {
-    //       "min": 5,
-    //       "max": 10,
-    //       "price": 20
-    //     },
-    //     {
-    //       "min": 10,
-    //       "max": 15,
-    //       "price": 30
-    //     },
-    //     {
-    //       "min": 15,
-    //       "max": 20,
-    //       "price": 40
-    //     },
-
-    //   ]
-    // }]
     if (success) {
+      const { data } = result
       const array: any = []
       const nameArray: any = []
       let min = parseInt(params.min_distance!)
@@ -245,17 +195,10 @@ const LsSummaryComponent = ({
       data?.map((value: any, key: number) => {
         array[key] = []
         value?.tier_prices?.map((tierPricesValue: any, tierPricesKey: number) => {
-          // check is support
-          let is_support = false
-          if (between(min, tierPricesValue.min, tierPricesValue.max) || between(max, tierPricesValue.min, tierPricesValue.max)) {
-            is_support = true
-          }
-          // end check is support
-
+          let is_support = betweenArray(tierPricesValue.min, tierPricesValue.max, min, max)
           if (tierPricesKey > 0) {
             tierPricesValue.min = ">" + " " + tierPricesValue.min
           }
-
           // find discount type percent
           let discount = parseInt(params.discount_amount!)
           if (params.discount_type !== "baht") {

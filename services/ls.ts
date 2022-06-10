@@ -12,9 +12,9 @@ export interface lsSummaryInterface {
   ls_merchant_amount?: string
   start_date?: string
   end_date?: string
-  province_ids?: string[]
-  district_ids?: string[]
-  sub_district_ids?: string[]
+  province_ids?: number[]
+  district_ids?: number[]
+  sub_district_ids?: number[]
   page?: number
   per_page?: number
 }

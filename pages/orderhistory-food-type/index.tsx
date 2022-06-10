@@ -187,7 +187,7 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
   }
 
   const fetchProductTypes = async () => {
-    const { success, result } = await getProductTypes({})
+    const { success, result } = await getProductTypes({ all: true })
     if (success) {
       const productTypeOption = map(result?.data, (item: any) => ({
         value: item.name.th,

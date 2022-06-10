@@ -158,7 +158,7 @@ const LsSummaryComponent = ({
     setIsLoading(true)
     // call here
     const { result, success } = await getDeliveryTiers({
-      "province_id": params.province_ids,
+      "province_ids": params.province_ids,
       "page": 1,
       "per_page": 100
     })

@@ -357,7 +357,6 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
           )}
         </Formik>
       </Card>
-
     </MainLayout>
   )
 }

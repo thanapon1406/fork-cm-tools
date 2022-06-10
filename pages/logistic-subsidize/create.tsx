@@ -3,9 +3,11 @@ import Card from '@/components/Card';
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker';
 import Input from '@/components/Form/Input';
 import Select from '@/components/Form/Select';
+import LsSummaryComponent from '@/components/LsSummary';
 import OutletSelecter from '@/components/OutletSelecter';
 import MainLayout from '@/layout/MainLayout';
 import { uploadImage } from '@/services/cdn';
+import { createLsConfig } from '@/services/ls-config';
 import { getBrandListV2 } from '@/services/pos-profile';
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
@@ -332,19 +334,19 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
       }
     }
     console.log("payload", payload)
-    // const { result, success } = await createLsConfig(payload)
-    // if (success) {
-    //   notification.success({
-    //     message: `ดำเนินการสร้าง LS Config สำเร็จ`,
-    //     description: '',
-    //   })
-    //   Router.push("/logistic-subsidize")
-    // } else {
-    //   notification.warning({
-    //     message: `ผิดพลาด`,
-    //     description: 'ไม่สามารถสร้าง LS Config ได้',
-    //   })
-    // }
+    const { result, success } = await createLsConfig(payload)
+    if (success) {
+      notification.success({
+        message: `ดำเนินการสร้าง LS Config สำเร็จ`,
+        description: '',
+      })
+      Router.push("/logistic-subsidize")
+    } else {
+      notification.warning({
+        message: `ผิดพลาด`,
+        description: 'ไม่สามารถสร้าง LS Config ได้',
+      })
+    }
 
   }
 
@@ -1208,9 +1210,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
     if (isVisibleLsSummary) {
       // LS Summary
       logicSummaryElements.push(
-        <Row key="logic_summary_section#1" gutter={24}>
-          {JSON.stringify(values)}
-        </Row>
+        <LsSummaryComponent payload={lsSummaryElementParam}></LsSummaryComponent>
       )
     }
 

@@ -220,9 +220,13 @@ const LsSummaryComponent = ({
 
 
   return (
-    <Card>
+    <Card
+      bordered={false}
+      bodyStyle={{
+        padding: "0px"
+      }}
+    >
       {tableHeader}
-      <Title level={4}>LS Summary</Title>
       <Title level={5}>ยอดสุทธิได้ตั้งแต่ {orderAmount} บาท ขึ้นไป</Title>
       <Title level={5}>ระยะทาง ({distance} กม.)</Title>
 

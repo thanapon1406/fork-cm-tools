@@ -1380,8 +1380,9 @@ export default function CreateLsConfig({ }: Props): ReactElement {
   }
 
   return (
-    <Skeleton loading={isLoading}>
-      <MainLayout>
+
+    <MainLayout>
+      <Skeleton loading={isLoading}>
         <Formik
           initialValues={lsDetail}
           onSubmit={handleSubmit}
@@ -1413,6 +1414,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   >
                     บันทึก
                   </Button>
+                  <Button
+                    style={{ width: '120px', marginLeft: '10px' }}
+                    type="default"
+                    size="middle"
+                    htmlType="reset"
+                    onClick={() => Router.push('/ls-config')}
+                  >
+                    ย้อนกลับ
+                  </Button>
                 </Col>
               </Row>
               <Card>
@@ -1435,7 +1445,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
             </Form>
           )}
         </Formik>
-      </MainLayout >
-    </Skeleton>
+      </Skeleton>
+    </MainLayout >
   )
 }

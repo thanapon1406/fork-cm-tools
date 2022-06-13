@@ -183,7 +183,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
             type="primary"
             size="middle"
             onClick={() => {
-              Router.push('/ls-config/create', `/ls-config/create`);
+              Router.push('/ls-config/create');
             }}
           >
             สร้าง LS Logic +

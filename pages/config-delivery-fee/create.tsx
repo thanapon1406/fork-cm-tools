@@ -10,8 +10,8 @@ import {
   getDistrictByProvinceId,
   getProvince
 } from '@/services/pos-profile';
-import { DeleteOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Col, message, Modal, Row, Typography } from 'antd';
+import { tierPriceCreate, tierPriceLocationCreate, tierPriceValidate } from '@/services/tierPrices';
+import { Breadcrumb, Button, Col, message, Modal, notification, Row, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import _, { map } from 'lodash';
 import { useRouter } from 'next/router';
@@ -51,7 +51,7 @@ const initialValues = {
   province_id: "",
   district_id: "",
   sub_district_id: [],
-  delivery_fee: [
+  tier_prices: [
     {
       min: 0,
       max: '',
@@ -63,7 +63,24 @@ const initialValues = {
 }
 
 const Schema = Yup.object().shape({
-  //name: Yup.string().trim().required('กรุณากรอกชื่อ Banner')
+  // name: Yup.string().trim().max(100, 'กรุณากรอกชื่อ Tier Price ไม่เกิน 100 ตัวอักษร').required('กรุณากรอกชื่อ Tier Price'),
+  // tier_prices: Yup.array()
+  //   .of(
+  //     Yup.object().shape({
+  //       min: Yup.number().required('กรุณากรอกระยะทางเริ่มต้น').min(0, "กรุณากรอกระยะทางเริ่มต้นให้ถูกต้อง"),
+  //       max: Yup.number().required('กรุณากรอกระยะทางสิ้นสุด').when('min', (min: any, schema: any) => {
+  //         return schema.test({
+  //           test: (max: any) => {
+  //             if (!min) return true
+  //             return (max > min)
+  //           },
+  //           message: "กรุณากรอกระยะทางให้ถูกต้อง",
+  //         })
+  //       }).min(0, "กรุณากรอกระยะทางสิ้นสุดให้ถูกต้อง"),
+  //       price: Yup.number().required('กรุณากรอกค่าโดยสาร').min(0, "กรุณากรอกค่าโดยสารให้ถูกต้อง"),
+  //     })
+  //   )
+  //   .min(1, 'กรุณากรอกค่าโดยสาร')
 })
 
 interface InterfaceOption {
@@ -95,11 +112,11 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     if (deliveryFeeRuleCount > 0) {
       let formValue = values
       if (formValue) {
-        let deliveryFeeValue = _.get(formValue, 'delivery_fee') ? _.get(formValue, 'delivery_fee') : []
+        let deliveryFeeValue = _.get(formValue, 'tier_prices') ? _.get(formValue, 'tier_prices') : []
         if (_.size(deliveryFeeValue) > 0) {
           setDeliveryFeeRuleCount(deliveryFeeRuleCount - 1)
           deliveryFeeValue.pop()
-          setFieldValue("delivery_fee", deliveryFeeValue)
+          setFieldValue("tier_prices", deliveryFeeValue)
           setDeliveryFeeRuleValidate(false)
         }
       }
@@ -144,21 +161,21 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   const renderDeliveryFeeRule = (values: any, setFieldValue: any) => {
     let deliveryFeeRuleElement = []
     for (let i = 0; i < deliveryFeeRuleCount; i++) {
-      const deliveryMinParam = `delivery_fee[${i}].min`
-      const deliveryMaxParam = `delivery_fee[${i}].max`
-      const deliveryPriceParam = `delivery_fee[${i}].price`
+      const deliveryMinParam = `tier_prices[${i}].min`
+      const deliveryMaxParam = `tier_prices[${i}].max`
+      const deliveryPriceParam = `tier_prices[${i}].price`
 
       deliveryFeeRuleElement.push(
-        <div key={`delivery_fee_rule#${i}`}>
-          <Row key={`delivery_fee_rule_title_row#${i}`} gutter={16}>
-            <Col key={`delivery_fee_rule_title#${i}`} className="gutter-row" span={2}>
+        <div key={`tier_prices_rule#${i}`}>
+          <Row key={`tier_prices_rule_title_row#${i}`} gutter={16}>
+            <Col key={`tier_prices_rule_title#${i}`} className="gutter-row" span={2}>
               <Title level={5}>Rule {i + 1}</Title>
             </Col>
             {(i + 1) == deliveryFeeRuleCount ? <Col className="gutter-row" span={8}>
               {deliveryFeeRuleValidate ? <span style={{ "color": "red" }}>{deliveryFeeRuleValidateMessage}</span> : null}
             </Col> : null}
           </Row>
-          <Row key={`delivery_fee_rule#${i}`} gutter={24}>
+          <Row key={`tier_prices_rule#${i}`} gutter={24}>
             <Col style={{ marginTop: 5 }} span={2}>
               <span>ระยะทาง</span>
             </Col>
@@ -213,7 +230,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
             {
               ((i + 1) == deliveryFeeRuleCount) && (i != 0) ?
                 <Button
-                  key={`delivery_fee_rule_button#${i}`}
+                  key={`tier_prices_rule_button#${i}`}
                   style={{ width: '100px', marginBottom: '10px' }}
                   size="middle"
                   onClick={() => {
@@ -271,7 +288,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
         city: city_data.name,
         city_data: city_data,
         city_id: city_data.value,
-        //sub_district: "เทส"
+        location_type: "district",
         sub_district: [],
         sub_district_option: sub_district_list,
         sub_district_selected: sub_district_data,
@@ -293,7 +310,111 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   }
 
   const handleSubmit = async (values: typeof initialValues) => {
-    console.log(mockData, "hello");
+    const reqCreateTierPrice: any = {
+      data: {
+        name: values.name,
+        tier_prices: values.tier_prices
+      }
+    }
+    const responseTierPrice = await tierPriceCreate(reqCreateTierPrice)
+
+
+    if (responseTierPrice.result.tier_id) {
+      let location_type = "province"
+      let locations: any[] = []
+      let location = {}
+      let sub_districts: any[] = []
+      let sub_district: any
+
+      let checkSubDistrict = _.find(mockData, function (obj) {
+        if ("sub_district" == obj.location_type) {
+          return true;
+        }
+      });
+
+      mockData.forEach((data: any) => {
+
+        //sub_district_data
+        data.sub_district_selected.forEach((element: any) => {
+          sub_district = _.find(data.sub_district_option, function (obj) {
+            if (element == obj.value) {
+              return true;
+            }
+          });
+          sub_districts.push(
+            {
+              id: sub_district.value,
+              name: sub_district.name
+            }
+          )
+        });
+
+        //location_type
+        if (cityList.length !== mockData.length || (cityList.length == mockData.length && checkSubDistrict) || checkSubDistrict) {
+          location_type = data.location_type
+        }
+
+        location = {
+          location_type: location_type,
+          province_id: data.province_id,
+          province_data: {
+            id: data.province_data.value,
+            name: data.province_data.name
+          },
+          district_id: data.city_id,
+          district_data: {
+            id: data.city_data.value,
+            name: data.city_data.name
+          },
+          sub_district_id: `|${data.sub_district_selected.join("|")}|`,
+          sub_districts: sub_districts
+        }
+        locations.push(location)
+      });
+
+      const reqCreateTierPriceLocation: any = {
+        data: {
+          tier_id: responseTierPrice.result.tier_id,
+          locations: locations
+        }
+      }
+
+      const { success, result } = await tierPriceLocationCreate(reqCreateTierPriceLocation)
+      console.log(success, result);
+
+    }
+  }
+
+  const validateTierPrice = async () => {
+
+    let location_type: string = "province"
+    if (allCityLocation) {
+      location_type = "province"
+    } else if (params.district_id) {
+      location_type = "district"
+    } else {
+      location_type = "sub_district"
+    }
+
+    let reqValidatetierPrice: any = {
+      location_type: location_type,
+      province_id: params.province_id,
+      district_id: params.district_id || 0,
+      sub_district_id: (params.sub_district_id) ? `|${params.sub_district_id.replaceAll(",", "|")}|` : ""
+    }
+
+    const { success, result } = await tierPriceValidate(reqValidatetierPrice)
+
+    if (success && !result.tier_duplicate_location) {
+      return true
+    } else {
+      notification.warning({
+        message: `ผิดพลาด`,
+        description: 'ไม่สามารถเพิ่มพื้นที่ได้ เนื่องจากมีพื้นที่ซ้อนทับกับ config อื่น',
+      })
+      return false
+    }
+
   }
 
   const handleAddlocation = async () => {
@@ -301,107 +422,130 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     setIsLoading(false)
     let sub_district_data: (string | number)[] = []
     let data: any = []
+    let location_type: string = ""
+    let newData: any
 
-    if (allCityLocation) {
-      const allCityData = await allCity()
-      data = [
-        ...allCityData
-      ]
-    } else {
-      let province_data: any = _.find(provinceList, function (obj) {
-        if (obj.value == params.province_id) {
-          return true;
-        }
-      });
-
-      let city_data: any = _.find(cityList, function (obj) {
-        if (obj.value == params.district_id) {
-          return true;
-        }
-      });
-
-      if (!params.sub_district_id) {
-        sub_district_data = subDistrictList.map(a => a.value);
-      } else {
-        sub_district_data = params.sub_district_id.split(",").map((str: any) => Number(str))
-      }
-
-      let index = _.findIndex(mockData, (e: any) => {
-        return e.city_id == params.district_id;
-      }, 0);
-
-      if (index !== -1) {
-        mockData[index].sub_district_selected = sub_district_data
+    if (await validateTierPrice()) {
+      if (allCityLocation) {
+        const allCityData = await allCity()
         data = [
-          ...mockData
+          ...allCityData
         ]
       } else {
-        data = [
-          ...mockData,
-          {
-            province: province_data.name,
-            province_data: province_data,
-            province_id: province_data.value,
-            city: city_data.name,
-            city_data: city_data,
-            city_id: city_data.value,
-            //sub_district: "เทส"
-            sub_district: [],
-            sub_district_option: subDistrictList,
-            sub_district_selected: sub_district_data,
-            name: Math.floor(Math.random() * 1000).toString()
+        let province_data: any = _.find(provinceList, function (obj) {
+          if (obj.value == params.province_id) {
+            return true;
           }
-        ]
-      }
-    }
-    setMockData(data)
-    setColumn(
-      [{
-        title: 'แขวง',
-        dataIndex: 'sub_district',
-        align: 'center',
-        render: (text: any, record: any) => {
-          return (<Field
-            key={record.id}
-            component={Select}
-            mode="multiple"
-            className="form-control round"
-            onChange={async (value: number, info: any, city_id: number = record.city_id) => {
-              let index = _.findIndex(data, (e: any) => {
-                return e.city_id == city_id;
-              }, 0);
-              data[index].sub_district_selected = value
-              setMockData([...data])
-            }}
-            selectOption={record.sub_district_option}
-            value={record.sub_district_selected}
-            name={record.name}
-          />)
-        },
-      }, {
-        title: '',
-        dataIndex: '',
-        align: 'center',
-        render: (text: any, record: any) => {
-          return (<DeleteOutlined onClick={(e: any) => {
-            let index = _.findIndex(data, (e: any) => {
-              return e.city_id == record.city_id;
-            }, 0);
-            data.splice(index, 1);
-            setMockData([...data])
-          }} />)
+        });
+
+        let city_data: any = _.find(cityList, function (obj) {
+          if (obj.value == params.district_id) {
+            return true;
+          }
+        });
+
+        if (!params.sub_district_id) {
+          sub_district_data = subDistrictList.map(a => a.value);
+          location_type = "district"
+        } else {
+          sub_district_data = params.sub_district_id.split(",").map((str: any) => Number(str))
+          location_type = "sub_district"
+        }
+
+        let index = _.findIndex(mockData, (e: any) => {
+          return e.city_id == params.district_id;
+        }, 0);
+
+        newData = {
+          province: province_data.name,
+          province_data: province_data,
+          province_id: province_data.value,
+          city: city_data.name,
+          city_data: city_data,
+          city_id: city_data.value,
+          location_type: location_type,
+          sub_district: [],
+          sub_district_option: subDistrictList,
+          sub_district_selected: sub_district_data,
+          name: Math.floor(Math.random() * 1000).toString()
+        }
+
+        if (index !== -1) {
+          mockData[index].sub_district_selected = sub_district_data
+          mockData[index].location_type = location_type
+          data = [
+            ...mockData
+          ]
+        } else if (province_data.value !== _.get(mockData[0], 'province_id')) {
+          data = [
+            newData
+          ]
+        } else {
+          data = [
+            ...mockData,
+            newData
+          ]
         }
       }
-      ]
-    )
-    setIsLoading(true)
+
+      setMockData(data)
+      setColumn(
+        [{
+          title: 'แขวง',
+          dataIndex: 'sub_district',
+          align: 'center',
+          render: (text: any, record: any) => {
+            return (<Field
+              key={record.id}
+              component={Select}
+              mode="multiple"
+              className="form-control round"
+              onChange={async (value: number[], info: any, city_id: number = record.city_id) => {
+                let index = _.findIndex(data, (e: any) => {
+                  return e.city_id == city_id;
+                }, 0);
+                //renew selected list
+                data[index].sub_district_selected = value
+
+                //check location_type
+                if (data[index].sub_district_option.length !== value.length) {
+                  data[index].location_type = "sub_district"
+                } else {
+                  data[index].location_type = "district"
+                }
+
+                setMockData([...data])
+              }}
+              selectOption={record.sub_district_option}
+              value={record.sub_district_selected}
+              name={record.name}
+            />)
+          },
+        }, {
+          title: '',
+          dataIndex: '',
+          align: 'center',
+          render: (text: any, record: any) => {
+            return (<DeleteOutlined onClick={(e: any) => {
+              let index = _.findIndex(data, (e: any) => {
+                return e.city_id == record.city_id;
+              }, 0);
+              data.splice(index, 1);
+              setMockData([...data])
+            }} />)
+          }
+        }
+        ]
+      )
+      setIsLoading(true)
+    }
   }
 
   const handleAddDeliveryFeeRule = (values: any, setFieldValue: any) => {
     setDeliveryFeeRuleValidate(false)
     let formValue = values
     if (formValue) {
-      let deliveryFeeValue = _.get(formValue, 'delivery_fee') ? _.get(formValue, 'delivery_fee') : []
+      let deliveryFeeValue = _.get(formValue, 'tier_prices') ? _.get(formValue, 'tier_prices') : []
       if (_.size(deliveryFeeValue) > 0) {
         let deliveryFeeValueSize = _.size(deliveryFeeValue)
         let lastestMaxDistanceValue = _.get(deliveryFeeValue[deliveryFeeValueSize - 1], 'max')
@@ -418,7 +562,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                 max: '',
                 price: '',
               })
-              setFieldValue("delivery_fee", deliveryFeeValue)
+              setFieldValue("tier_prices", deliveryFeeValue)
               setDeliveryFeeRuleValidate(false)
             }
           } else {
@@ -557,7 +701,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     paddingBottom: "15px"
                   }}>
                 </Col>
-                <span>พื้นที่ใช้งาน</span>
+                <span>พื้นที่ใช้งาน<span style={{ color: "red" }}>(สามารถระบุได้ 1 จังหวัดเท่านั้น)</span></span>
 
                 <Col span={24}>
                   <Field

@@ -1,6 +1,6 @@
 import Card from '@/components/Card'
 import ExportButton from '@/components/credit/ExportButton'
-import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
+import DateRangePicker from '@/components/Form/DateRangePicker'
 import Select from '@/components/Form/Select'
 import { SelectOption } from '@/interface/common'
 import { CustomerDetail } from '@/interface/customer'
@@ -265,11 +265,11 @@ export default function MerchantAccount({ }: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'วันเวลาที่ทำรายการ' }}
+                    label={{ text: 'วันที่ทำรายการ *' }}
                     name="client_time"
-                    component={DateTimeRangePicker}
+                    component={DateRangePicker}
                     id="client_time"
-                    placeholder="วันเวลาที่ทำรายการ"
+                    placeholder="วันที่ทำรายการ *"
                   />
                 </Col>
 

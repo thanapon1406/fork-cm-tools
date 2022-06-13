@@ -80,7 +80,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
     is_apply_all_brand: false,
     campaign_time: {
       start: moment().startOf('day'),
-      end: moment().endOf('day'),
+      end: moment().add(15, 'd').endOf('day'),
     },
     deep_link: "",
     inapp_link: "",
@@ -199,6 +199,29 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
         message: "ระบุสัดส่วน LS",
       })
     }),
+    campaign_time: Yup.object()
+      .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
+        const start = this?.parent?.campaign_time["start"]
+        const end = this?.parent?.campaign_time["end"]
+        if (start && end) {
+          return true
+        } else {
+          return false
+        }
+      }).test("15 days period", "วันที่และเวลาของแคมเปญควรมีระยะเวลาอย่างน้อย 15 วัน", function (value: any) {
+        const start = this?.parent?.campaign_time["start"]
+        const end = this?.parent?.campaign_time["end"]
+        if (start && end) {
+          const diffDays = moment(end).diff(moment(start), 'days')
+          if (diffDays < 15) {
+            return false
+          }
+          return true
+        } else {
+          return false
+        }
+      }),
+
     // brands: Yup.array().test('required', function (value: any) {
     //   if (this?.parent?.is_apply_all_brand === false) {
     //     let brandList: any = []

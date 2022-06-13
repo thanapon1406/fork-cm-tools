@@ -12,6 +12,7 @@ import { CopyOutlined } from '@ant-design/icons'
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
+import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
@@ -109,6 +110,28 @@ export default function LsConfigDetail({ }: Props): ReactElement {
 
   const Schema = Yup.object().shape({
     name: Yup.string().trim().max(255).required('ระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    campaign_time: Yup.object()
+      .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
+        const start = this?.parent?.campaign_time["start"]
+        const end = this?.parent?.campaign_time["end"]
+        if (start && end) {
+          return true
+        } else {
+          return false
+        }
+      }).test("15 days period", "วันที่และเวลาของแคมเปญควรมีระยะเวลาอย่างน้อย 15 วัน", function (value: any) {
+        const start = this?.parent?.campaign_time["start"]
+        const end = this?.parent?.campaign_time["end"]
+        if (start && end) {
+          const diffDays = moment(end).diff(moment(start), 'days')
+          if (diffDays < 15) {
+            return false
+          }
+          return true
+        } else {
+          return false
+        }
+      }),
   })
 
   const fetchData = async () => {

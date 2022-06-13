@@ -1,6 +1,6 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
-import DateRangePicker from '@/components/Form/DateRangePicker'
+import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import {
@@ -385,11 +385,11 @@ const OrderHistory = (): ReactElement => {
                   />
 
                   <Field
-                    label={{ text: 'วันที่ทำรายการ*' }}
+                    label={{ text: 'วันเวลาที่ทำรายการ' }}
                     name="client_time"
-                    component={DateRangePicker}
+                    component={DateTimeRangePicker}
                     id="client_time"
-                    placeholder="วันที่ทำรายการ*"
+                    placeholder="วันเวลาที่ทำรายการ"
                   />
 
                 </Col>

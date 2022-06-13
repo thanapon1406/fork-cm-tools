@@ -3,8 +3,9 @@ import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
-import { lsConfigList } from '@/services/ls-config'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { listLsConfig } from '@/services/ls-config'
+import { DeleteFilled, EditFilled } from '@ant-design/icons'
+import { Breadcrumb, Button as ButtonAntd, Col, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
 import { useRouter } from 'next/router'
@@ -56,7 +57,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
     }
     console.log(`reqBody`, reqBody)
     setIsLoading(true)
-    const { result, success } = await lsConfigList(reqBody)
+    const { result, success } = await listLsConfig(reqBody)
     if (success) {
       const { meta, data } = result
       setPagination({
@@ -81,6 +82,10 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
   const handelDataTableLoad = (pagination: any) => {
     console.log(`pagination`, pagination)
     fetchData(filter, pagination)
+  }
+
+  const handleDelete = (id: any) => {
+    console.log(`handle delete ls config id: `, id)
   }
 
   useEffect(() => {
@@ -120,6 +125,43 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
       align: 'center',
       render: (row: any) => {
         return moment(row).format('YYYY-MM-DD HH:mm')
+      },
+    },
+    {
+      title: '',
+      dataIndex: 'id',
+      align: 'center',
+      render: (row: any) => {
+        // const ele = <><Tooltip title="คัดลอก">
+        // <ButtonAntd
+        //   icon={<CopyOutlined />}
+        //   onClick={() => {
+        //     navigator.clipboard.writeText(values.deep_link)
+        //   }}
+        // >คัดลอก</ButtonAntd></>
+        return <>
+          <Tooltip title="แก้ไข">
+            <ButtonAntd
+              icon={<EditFilled />}
+              onClick={() => {
+                console.log("edit ls config id: ", row)
+                Router.push(`ls-config/${row}`)
+              }}
+            ></ButtonAntd>
+          </Tooltip>
+          <Tooltip title="ลบ">
+            <ButtonAntd
+              icon={<DeleteFilled />}
+              onClick={() => {
+                console.log("delete ls config id: ", row)
+                handleDelete(row)
+              }}
+              style={{
+                marginLeft: '5px'
+              }}
+            ></ButtonAntd>
+          </Tooltip>
+        </>
       },
     },
   ]
@@ -195,7 +237,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
           config={{
             dataTableTitle: 'รายการกำหนดค่าจัดส่ง',
             loading: _isLoading,
-            tableName: 'ls_config',
+            tableName: 'ls-config',
             tableColumns: column,
             action: ['view'],
             dataSource: dataTable,

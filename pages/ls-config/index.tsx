@@ -3,8 +3,8 @@ import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
-import { lsConfigList } from '@/services/ls-config'
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
+import { listLsConfig } from '@/services/ls-config'
+import { DeleteFilled, EditFilled } from '@ant-design/icons'
 import { Breadcrumb, Button as ButtonAntd, Col, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
@@ -57,7 +57,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
     }
     console.log(`reqBody`, reqBody)
     setIsLoading(true)
-    const { result, success } = await lsConfigList(reqBody)
+    const { result, success } = await listLsConfig(reqBody)
     if (success) {
       const { meta, data } = result
       setPagination({
@@ -142,7 +142,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
         return <>
           <Tooltip title="แก้ไข">
             <ButtonAntd
-              icon={<EditOutlined />}
+              icon={<EditFilled />}
               onClick={() => {
                 console.log("edit ls config id: ", row)
                 Router.push(`ls-config/${row}`)
@@ -151,7 +151,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
           </Tooltip>
           <Tooltip title="ลบ">
             <ButtonAntd
-              icon={<DeleteOutlined />}
+              icon={<DeleteFilled />}
               onClick={() => {
                 console.log("delete ls config id: ", row)
                 handleDelete(row)

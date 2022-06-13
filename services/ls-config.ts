@@ -8,11 +8,13 @@ export interface queryList {
   keyword?: string
   sort_by?: string
   sort_type?: string
+  id?: string | string[] | undefined
 }
 
 export {
   createLsConfig,
-  lsConfigList
+  listLsConfig,
+  findLsConfig
 };
 
 const createLsConfig = async (req: any) => {
@@ -24,9 +26,18 @@ const createLsConfig = async (req: any) => {
   }
 }
 
-const lsConfigList = async (option: queryList) => {
+const listLsConfig = async (option: queryList) => {
   try {
     const result = await fetch.post(`/api/ls-config/list`, option)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const findLsConfig = async (option: queryList) => {
+  try {
+    const result = await fetch.post(`/api/ls-config/find`, option)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)

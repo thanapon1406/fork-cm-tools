@@ -1,6 +1,6 @@
 import Card from '@/components/Card'
 import ExportButton from '@/components/credit/ExportButton'
-import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
+import DateRangePicker from '@/components/Form/DateRangePicker'
 import Select from '@/components/Form/Select'
 import { SelectOption } from '@/interface/common'
 import { CustomerDetail } from '@/interface/customer'
@@ -40,6 +40,7 @@ export default function MerchantAccount({ }: Props): ReactElement {
   const [customerDropDown, setCustomerDropDown] = useState<Array<SelectOption>>([])
   const [merchantDropDown, setMerchantDropDown] = useState<Array<SelectOption>>([])
   const [riderDropDown, setRiderDropDown] = useState<Array<SelectOption>>([])
+  const kitchenhubBrandId = process.env.KITCHENHUB_BRAND_ID
 
   const initialValues = {
     delivery_type: 'delivery',
@@ -264,11 +265,11 @@ export default function MerchantAccount({ }: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'วันเวลาที่ทำรายการ' }}
+                    label={{ text: 'วันที่ทำรายการ *' }}
                     name="client_time"
-                    component={DateTimeRangePicker}
+                    component={DateRangePicker}
                     id="client_time"
-                    placeholder="วันเวลาที่ทำรายการ"
+                    placeholder="วันที่ทำรายการ *"
                   />
                 </Col>
 
@@ -280,6 +281,7 @@ export default function MerchantAccount({ }: Props): ReactElement {
                     <ExportButton title='ส่งข้อมูลรายการออเดอร์ไปยังอีเมล' subtitle={`ข้อมูลออเดอร์วันที่ ` + moment().format("YYYY-MM-DD")} propsSubmit={async (value: any) => {
                       _.pull(value.emails, "")
                       console.log("params.branch_id: ", params.branch_id)
+                      var brandId: number = +kitchenhubBrandId!;
 
                       const { result, success } = await exportOrderByEmail({
                         email: value.emails,
@@ -287,7 +289,8 @@ export default function MerchantAccount({ }: Props): ReactElement {
                         rider_id: (params.rider_id !== undefined) && +params.rider_id,
                         start_date: params.startdate,
                         end_date: params.enddate,
-                        consumer_id: params.sso_id
+                        consumer_id: params.sso_id,
+                        kitchenhub_brand_id: brandId
                       }
                       )
                       if (success) {

@@ -11,10 +11,7 @@ import { getBrandListV2 } from '@/services/pos-profile'
 import { CopyOutlined } from '@ant-design/icons'
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import _, {
-  filter, forEach,
-  forOwn, get, groupBy, intersection, isUndefined, size
-} from 'lodash'
+import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
@@ -63,9 +60,9 @@ interface lsConfigDetail {
   total_merchant_add?: string;
   total_merchant_join?: string;
   campaign_time?: dateTime
-  brands: any;
-  ls_outlet: any;
-  is_apply_all_brand: any;
+  brands?: any;
+  ls_outlet?: any;
+  is_apply_all_brand?: any;
 }
 
 export default function LsConfigDetail({ }: Props): ReactElement {
@@ -315,6 +312,29 @@ export default function LsConfigDetail({ }: Props): ReactElement {
     }
     return outletLocations
   }
+
+  const buildOutletInitValue = (userSelectedOutlet: any) => {
+    let result: any = {}
+    userSelectedOutlet.forEach((selectOutlet: any) => {
+      let arr: any = []
+      flatMap(allValue, (val: any, key: any) => {
+        if (!isEmpty(val)) {
+          if (val.includes(selectOutlet)) {
+            if (isEmpty(result[key])) {
+              arr.push(selectOutlet)
+              result[key] = arr
+            } else {
+              arr = result[key]
+              arr.push(selectOutlet)
+              result[key] = arr
+            }
+          }
+        }
+      })
+    })
+    return result
+  }
+
 
   const handleSubmit = async (values: any) => {
     console.log("update ls config: ", values)
@@ -1174,7 +1194,10 @@ export default function LsConfigDetail({ }: Props): ReactElement {
     <MainLayout>
       {!_isLoading && (
         <Formik
-          initialValues={lsDetail}
+          initialValues={{
+            ...lsDetail,
+            outlets: buildOutletInitValue(userSelectedOutlet),
+          }}
           onSubmit={handleSubmit}
           validationSchema={Schema}
           enableReinitialize={true}
@@ -1226,7 +1249,8 @@ export default function LsConfigDetail({ }: Props): ReactElement {
             </Form>
           )}
         </Formik>
-      )}
-    </MainLayout>
+      )
+      }
+    </MainLayout >
   )
 }

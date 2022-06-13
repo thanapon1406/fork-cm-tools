@@ -11,7 +11,7 @@ import { createLsConfig } from '@/services/ls-config';
 import { getBrandListV2 } from '@/services/pos-profile';
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
-import { Field, Form, Formik } from 'formik';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 import _, { filter, get, intersection, size } from 'lodash';
 import moment from 'moment';
 import { useRouter } from 'next/router';
@@ -79,8 +79,8 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
     ls_outlet: [],
     is_apply_all_brand: false,
     campaign_time: {
-      start: "",
-      end: "",
+      start: moment().startOf('day'),
+      end: moment().endOf('day'),
     },
     deep_link: "",
     inapp_link: "",
@@ -198,7 +198,31 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
         },
         message: "ระบุสัดส่วน LS",
       })
-    })
+    }),
+    // brands: Yup.array().test('required', function (value: any) {
+    //   if (this?.parent?.is_apply_all_brand === false) {
+    //     let brandList: any = []
+    //     forEach(get(this.parent, 'brands'), (brand: any, index: any) => {
+    //       if (get(brand, 'is_selected') == true) {
+    //         if (get(brand, 'type') == 'all') {
+    //           brandList.push({ brand_id: brand?.id, outlet_ids: [0] })
+    //         } else if (size(get(brand, 'outlets')) > 0) {
+    //           brandList.push({ brand_id: brand?.id, outlet_ids: get(brand, 'outlets') })
+    //         }
+    //       }
+    //     })
+    //     if (size(brandList) > 0) {
+    //       return true
+    //     } else {
+    //       return this.createError({
+    //         message: 'กรุณาเลือกร้านอาหารที่ต้องการให้เข้าร่วม',
+    //         path: 'ls_outlet',
+    //       })
+    //     }
+    //   } else {
+    //     return true
+    //   }
+    // }),
   })
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const lsLogicsOption = [
@@ -1082,6 +1106,11 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
               setFieldValue("is_apply_all_brand", e.target.checked)
             }}>เข้าร่วมทุกร้านอาหาร
             </Checkbox>
+            <ErrorMessage
+              component="div"
+              name="ls_outlet"
+              className="validate-error"
+            />
           </Col>
         </Row>
         <Row gutter={24}>

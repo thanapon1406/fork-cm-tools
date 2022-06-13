@@ -6,7 +6,7 @@ import Select from '@/components/Form/Select'
 import LsSummaryComponent from '@/components/LsSummary'
 import OutletSelecter from '@/components/OutletSelecter'
 import MainLayout from '@/layout/MainLayout'
-import { findLsConfig } from '@/services/ls-config'
+import { findLsConfig, updateLsConfig } from '@/services/ls-config'
 import { getBrandListV2 } from '@/services/pos-profile'
 import { CopyOutlined } from '@ant-design/icons'
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
@@ -66,9 +66,9 @@ interface lsConfigDetail {
   is_apply_all_brand?: any;
 }
 
-export default function LsConfigDetail({ }: Props): ReactElement {
-  const router = useRouter()
-  const { id } = router.query
+export default function UpdateLsConfig({ }: Props): ReactElement {
+  const Router = useRouter()
+  const { id } = Router.query
   let [_isLoading, setIsLoading] = useState(true)
   const [lsDetail, setLsDetail] = useState<lsConfigDetail>({})
   const [brandList, setBrandList] = useState([])
@@ -169,8 +169,8 @@ export default function LsConfigDetail({ }: Props): ReactElement {
 
       // Start date and End date
       LsConfigDetail.campaign_time = {
-        start: _.get(lsDetail, "start_date") ? _.get(lsDetail, "start_date") : "",
-        end: _.get(lsDetail, "end_date") ? _.get(lsDetail, "end_date") : ""
+        start: _.get(lsDetail, "start_date") ? moment(_.get(lsDetail, "start_date")).format("YYYY-MM-DD HH:mm") : "",
+        end: _.get(lsDetail, "end_date") ? moment(_.get(lsDetail, "end_date")).format("YYYY-MM-DD HH:mm") : ""
       }
 
       // Construct Selected Brand
@@ -360,7 +360,93 @@ export default function LsConfigDetail({ }: Props): ReactElement {
 
 
   const handleSubmit = async (values: any) => {
-    console.log("update ls config: ", values)
+    // console.log("update ls config: ", values)
+    // Construct Outlets
+    let outlets = []
+    if (size(get(values, 'brands')) > 0) {
+      for (var brand of values.brands) {
+        if (get(brand, 'is_selected') == true) {
+          if (get(brand, 'type') == 'all') {
+            outlets.push({ brand_id: brand["id"], outlet_ids: [0] })
+          } else if (size(get(brand, 'outlets')) > 0) {
+            outlets.push({ brand_id: brand["id"], outlet_ids: get(brand, 'outlets') })
+          }
+        }
+      }
+    }
+    values.ls_outlet = outlets
+
+    // Reformat Date
+    if (values.campaign_time.start != '') {
+      values.start_date = moment(values.campaign_time.start + ":00").format(dateFormat)
+    } else {
+      values.start_date = null
+    }
+    if (values.campaign_time.end != '') {
+      values.end_date = moment(values.campaign_time.end + ":59").format(dateFormat)
+    } else {
+      values.end_date = null
+    }
+
+    // Calculate Outlet Add
+    const outletLocationDetail = await handleGetOutletLocations(values.ls_outlet, values.is_apply_all_brand)
+
+    // Construct Allow List
+    const lsOutlet = _.get(values, "ls_outlet") ? _.get(values, "ls_outlet") : []
+    let allowedList: any = []
+    if (values.is_apply_all_brand) {
+      const brandData = {
+        brand_id: 0
+      }
+      allowedList.push({ ...brandData })
+    } else {
+      if (_.size(lsOutlet) > 0) {
+        lsOutlet.map((brand: any) => {
+          const brandId = _.get(brand, "brand_id") ? _.get(brand, "brand_id") : ""
+          const outletIds = _.get(brand, "outlet_ids") ? _.get(brand, "outlet_ids") : []
+          const outlets: any = []
+          if (_.size(outletIds) > 0) {
+            outletIds.map((outletId: any) => {
+              const outletData = {
+                outlet_id: outletId
+              }
+              outlets.push(outletData)
+            })
+          }
+          const brandData = {
+            brand_id: brandId,
+            outlets: outlets
+          }
+          allowedList.push({ ...brandData })
+        })
+      }
+    }
+
+    const payload = {
+      data: {
+        id: id,
+        name: _.get(values, "name") ? _.get(values, "name") : "",
+        start_date: _.get(values, "start_date") ? _.get(values, "start_date") : "",
+        end_date: _.get(values, "end_date") ? _.get(values, "end_date") : "",
+        allowed_list: allowedList,
+        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : ""
+      }
+    }
+
+    // console.log("payload", payload)
+    const { result, success } = await updateLsConfig(payload)
+    if (success) {
+      notification.success({
+        message: `ดำเนินการแก้ไข LS Config สำเร็จ`,
+        description: '',
+      })
+      Router.push("/ls-config")
+    } else {
+      notification.warning({
+        message: `ผิดพลาด`,
+        description: 'ไม่สามารถแก้ไข LS Config ได้',
+      })
+    }
   }
 
   useEffect(() => {

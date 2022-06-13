@@ -59,7 +59,7 @@ interface CreateLsParam {
   total_merchant_join: any;
 }
 
-export default function CreateLogisticSubsidize({ }: Props): ReactElement {
+export default function CreateLsConfig({ }: Props): ReactElement {
   const Router = useRouter()
   let lsInitial: CreateLsParam = {
     name: "",
@@ -387,7 +387,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
         message: `ดำเนินการสร้าง LS Config สำเร็จ`,
         description: '',
       })
-      Router.push("/logistic-subsidize")
+      Router.push("/ls-config")
     } else {
       notification.warning({
         message: `ผิดพลาด`,

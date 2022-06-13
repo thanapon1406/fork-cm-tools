@@ -54,3 +54,12 @@ export const getDistrict = async (params: any) => {
     return errorHandler(error)
   }
 }
+
+export const getDistrictByProvinceId = async (body: any) => {
+  try {
+    const result = await fetch.post(`/api/pos-profile/address/district-by-province`, body)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}

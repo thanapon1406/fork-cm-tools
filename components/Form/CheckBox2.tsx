@@ -32,8 +32,10 @@ function CheckBox({ label, field, selectOption, ...props }: Props): ReactElement
     props.form.setFieldValue(field.name, value)
   }
   const onChangeHandle = (e: any) => {
+
+
     if (props.onChange) {
-      return props.onChange
+      return props.onChange(e)
     } else {
       return handleChange(e)
     }

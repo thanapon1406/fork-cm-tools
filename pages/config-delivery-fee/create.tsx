@@ -1,14 +1,16 @@
 import Card from '@/components/Card';
+import CheckBox2 from '@/components/Form/CheckBox2';
 import Input from '@/components/Form/Input';
 import Select from "@/components/Form/Select";
-import { Pagination } from '@/interface/dataTable';
+import Table from '@/components/Table';
 import MainLayout from '@/layout/MainLayout';
 import {
   getCity,
   getDistrict,
+  getDistrictByProvinceId,
   getProvince
 } from '@/services/pos-profile';
-import { requestReportInterface } from '@/services/report';
+import { DeleteOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Col, message, Modal, Row, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import _, { map } from 'lodash';
@@ -46,6 +48,9 @@ interface CityInterface {
 
 const initialValues = {
   name: '',
+  province_id: "",
+  district_id: "",
+  sub_district_id: [],
   delivery_fee: [
     {
       min: 0,
@@ -53,27 +58,37 @@ const initialValues = {
       price: '',
     }
   ],
-  hub_ids: []
+  hub_ids: [],
+  all_city: false
 }
 
 const Schema = Yup.object().shape({
-  name: Yup.string().trim().required('กรุณากรอกชื่อ Banner')
+  //name: Yup.string().trim().required('กรุณากรอกชื่อ Banner')
 })
 
 interface InterfaceOption {
   value: string | number
   name: string
+  city?: string | number
 }
+
+
 
 export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   const router = useRouter()
   const [deliveryFeeRuleCount, setDeliveryFeeRuleCount] = useState(1)
   const [deliveryFeeRuleValidate, setDeliveryFeeRuleValidate] = useState(false)
+  const [allCityLocation, setAllCityLocation] = useState(false)
   const [deliveryFeeRuleValidateMessage, setDeliveryFeeRuleValidateMessage] = useState("")
   const [provinceList, setProvinceList] = useState<Array<InterfaceOption>>([])
+  const [provinceSelected, setProvinceSelected] = useState<Array<InterfaceOption>>([])
   const [cityList, setCityList] = useState<Array<InterfaceOption>>([])
-  const [districtList, setDistrictList] = useState<Array<InterfaceOption>>([])
-  const [districtData, setDistrciData] = useState<Array<DistrictInterface>>([])
+  const [subDistrictList, setSubDistrictList] = useState<Array<InterfaceOption>>([])
+  const [districtData, setSubDistrciData] = useState<Array<DistrictInterface>>([])
+
+  let [mockData, setMockData] = useState<any>([])
+  let [isLoading, setIsLoading] = useState(true)
+  let [selectColumn, setColumn] = useState<any>([])
 
   const handleDeductDeliveryFeeRule = (values: any, setFieldValue: any) => {
     setDeliveryFeeRuleValidate(false)
@@ -91,30 +106,36 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     }
   }
 
-  let [pagination, setPagination] = useState<Pagination>({
-    total: 0,
-    current: 1,
-    pageSize: 10,
-  })
 
-  let [params, setParams] = useState<requestReportInterface>({
-    brand_id: 'all',
-    // delivery_type: 'delivery',
-    page: pagination.current,
-    per_page: pagination.pageSize,
-  })
+  let [params, setParams] = useState<any>({})
 
-  const fetchDistrict = async (cityId: number) => {
+  const fetchSubDistrict = async (cityId: number) => {
     const { success, result } = await getDistrict({ city_id: cityId })
     if (success) {
       const { result: data } = result
       const { items } = data
-      const districtOption = map(items, (item: DistrictInterface) => ({
+      const subDistrictOption = map(items, (item: DistrictInterface) => ({
         value: item.district_id,
         name: item.name_th,
       }))
-      setDistrictList(districtOption)
-      setDistrciData(items)
+      setSubDistrictList(subDistrictOption)
+      setSubDistrciData(items)
+    } else {
+      message.error({ content: 'ไม่สามารถดึงค่าที่อยู่ได้กรุณาลองใหม่อีกครั้ง' })
+    }
+  }
+
+  const fetchSubDistrictByProvinceId = async (proviceId: number) => {
+    const { success, result } = await getDistrictByProvinceId({ province_ids: [proviceId] })
+    if (success) {
+      const { result: data } = result
+      const { items } = data
+      const subDistrictOption = map(items, (item: DistrictInterface) => ({
+        value: item.district_id,
+        name: item.name_th,
+        city: item.city_id
+      }))
+      return subDistrictOption
     } else {
       message.error({ content: 'ไม่สามารถดึงค่าที่อยู่ได้กรุณาลองใหม่อีกครั้ง' })
     }
@@ -210,14 +231,175 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     return deliveryFeeRuleElement
   }
 
+  const allCity = async () => {
+
+    let data: any[] = []
+    let dataRow: any = {}
+
+    let subDistrictProvince = await fetchSubDistrictByProvinceId(parseInt(params.province_id))
+
+    let province_data: any = _.find(provinceList, function (obj) {
+      if (obj.value == params.province_id) {
+        return true;
+      }
+    });
+
+    cityList.forEach(element => {
+
+      let sub_district_data: any = []
+      let city_data: any = _.find(cityList, function (obj) {
+        if (obj.value == element.value) {
+          return true;
+        }
+      });
+
+      let sub_district_list = _.filter(
+        subDistrictProvince, function (o) {
+          return o.city == element.value;
+        }
+      );
+
+      sub_district_list.forEach(element => {
+        sub_district_data.push(parseInt(element.value.toString()))
+      });
+
+      dataRow =
+      {
+        province: province_data.name,
+        province_data: province_data,
+        province_id: province_data.value,
+        city: city_data.name,
+        city_data: city_data,
+        city_id: city_data.value,
+        //sub_district: "เทส"
+        sub_district: [],
+        sub_district_option: sub_district_list,
+        sub_district_selected: sub_district_data,
+        name: Math.floor(Math.random() * 1000).toString()
+      }
+
+      // let index = _.findIndex(data, (e: any) => {
+      //   return e.city_id == city_data.value;
+      // }, 0);
+
+      // if (index !== -1) {
+      //   data[index] = dataRow
+      // } else {
+      data.push(dataRow)
+      //}
+
+    });
+    return data
+  }
 
   const handleSubmit = async (values: typeof initialValues) => {
+    console.log(mockData, "hello");
+  }
+
+  const handleAddlocation = async () => {
+
+    setIsLoading(false)
+    let sub_district_data: (string | number)[] = []
+    let data: any = []
+
+    if (allCityLocation) {
+      const allCityData = await allCity()
+      data = [
+        ...allCityData
+      ]
+    } else {
+      let province_data: any = _.find(provinceList, function (obj) {
+        if (obj.value == params.province_id) {
+          return true;
+        }
+      });
+
+      let city_data: any = _.find(cityList, function (obj) {
+        if (obj.value == params.district_id) {
+          return true;
+        }
+      });
+
+      if (!params.sub_district_id) {
+        sub_district_data = subDistrictList.map(a => a.value);
+      } else {
+        sub_district_data = params.sub_district_id.split(",").map((str: any) => Number(str))
+      }
+
+      let index = _.findIndex(mockData, (e: any) => {
+        return e.city_id == params.district_id;
+      }, 0);
+
+      if (index !== -1) {
+        mockData[index].sub_district_selected = sub_district_data
+        data = [
+          ...mockData
+        ]
+      } else {
+        data = [
+          ...mockData,
+          {
+            province: province_data.name,
+            province_data: province_data,
+            province_id: province_data.value,
+            city: city_data.name,
+            city_data: city_data,
+            city_id: city_data.value,
+            //sub_district: "เทส"
+            sub_district: [],
+            sub_district_option: subDistrictList,
+            sub_district_selected: sub_district_data,
+            name: Math.floor(Math.random() * 1000).toString()
+          }
+        ]
+      }
+    }
+    setMockData(data)
+    setColumn(
+      [{
+        title: 'แขวง',
+        dataIndex: 'sub_district',
+        align: 'center',
+        render: (text: any, record: any) => {
+          return (<Field
+            key={record.id}
+            component={Select}
+            mode="multiple"
+            className="form-control round"
+            onChange={async (value: number, info: any, city_id: number = record.city_id) => {
+              let index = _.findIndex(data, (e: any) => {
+                return e.city_id == city_id;
+              }, 0);
+              data[index].sub_district_selected = value
+              setMockData([...data])
+            }}
+            selectOption={record.sub_district_option}
+            value={record.sub_district_selected}
+            name={record.name}
+          />)
+        },
+      }, {
+        title: '',
+        dataIndex: '',
+        align: 'center',
+        render: (text: any, record: any) => {
+          return (<DeleteOutlined onClick={(e: any) => {
+            let index = _.findIndex(data, (e: any) => {
+              return e.city_id == record.city_id;
+            }, 0);
+            data.splice(index, 1);
+            setMockData([...data])
+          }} />)
+        }
+      }
+      ]
+    )
+    setIsLoading(true)
   }
 
   const handleAddDeliveryFeeRule = (values: any, setFieldValue: any) => {
     setDeliveryFeeRuleValidate(false)
     let formValue = values
-    // console.log("formValue", formValue)
     if (formValue) {
       let deliveryFeeValue = _.get(formValue, 'delivery_fee') ? _.get(formValue, 'delivery_fee') : []
       if (_.size(deliveryFeeValue) > 0) {
@@ -281,33 +463,61 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     }
   }
 
+  const setTest = () => {
+    setIsLoading(false)
+  }
+
+  const column = [
+    {
+      title: 'จังหวัด',
+      dataIndex: 'province',
+      align: 'center',
+    },
+    {
+      title: 'เขต',
+      dataIndex: 'city',
+      align: 'center',
+    },
+    ...selectColumn
+  ]
+
   useEffect(() => {
     fetchProvince()
+    setTest()
     return () => {
       setProvinceList([])
       setCityList([])
-      setDistrictList([])
-      setDistrciData([])
+      setSubDistrictList([])
+      setSubDistrciData([])
     }
   }, [])
 
   return (
     <MainLayout>
-      <Row justify="space-around" align="middle">
-        <Col span={8}>
-          <Title level={4}>Config Delivery Fee</Title>
-          <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>ค่าส่งตามระยะทาง</Breadcrumb.Item>
-            <Breadcrumb.Item>ค่าส่งตามระยะทางทั้งหมด</Breadcrumb.Item>
-          </Breadcrumb>
-        </Col>
-        <Col span={8} offset={8} style={{ textAlign: 'end' }}></Col>
-      </Row>
-
-      <Card>
-        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
-          {({ values, resetForm, setFieldValue }) => (
-            <Form>
+      <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema} enableReinitialize={true}>
+        {({ values, resetForm, setFieldValue }) => (
+          <Form>
+            <Row justify="space-around" align="middle">
+              <Col span={8}>
+                <Title level={4}>Config Delivery Fee</Title>
+                <Breadcrumb style={{ margin: '16px 0' }}>
+                  <Breadcrumb.Item>ค่าส่งตามระยะทาง</Breadcrumb.Item>
+                  <Breadcrumb.Item>ค่าส่งตามระยะทางทั้งหมด</Breadcrumb.Item>
+                </Breadcrumb>
+              </Col>
+              <Col span={8} offset={4} style={{ textAlign: 'end' }}></Col>
+              <Col className="gutter-row" span={4} style={{ textAlign: 'end' }}>
+                <Button
+                  style={{ width: '120px', marginTop: '31px' }}
+                  type="primary"
+                  size="middle"
+                  htmlType="submit"
+                >
+                  บันทึก
+                </Button>
+              </Col>
+            </Row>
+            <Card>
               <Row gutter={24}>
                 <Col className="gutter-row" span={24}>
                   <Field
@@ -348,17 +558,20 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                   }}>
                 </Col>
                 <span>พื้นที่ใช้งาน</span>
+
                 <Col span={24}>
                   <Field
-                    onChange={async (value: number) => {
-                      setParams({ ...params, sub_district_id: undefined, district_id: undefined, province_id: String(value) })
-                      if (setFieldValue) {
-                        setFieldValue("province_id", value)
-                        setFieldValue('district_id', null)
-                        setFieldValue('sub_district_id', [])
-                      }
-                      await fetchCity(value)
-                    }}
+                    onChange={
+                      async (value: number) => {
+                        setParams({ ...params, sub_district_id: undefined, district_id: undefined, province_id: String(value) })
+
+                        if (setFieldValue) {
+                          setFieldValue("province_id", value)
+                          setFieldValue('district_id', null)
+                          setFieldValue('sub_district_id', [])
+                        }
+                        await fetchCity(value)
+                      }}
                     component={Select}
                     className="form-control round"
                     label={{ text: 'จังหวัด' }}
@@ -367,16 +580,35 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     selectOption={provinceList}
                   />
                 </Col>
+                <Col className="gutter-row" span={24}>
+                  <div style={{}}>
+                    <Field
+                      label={{ text: "ครอบคลุมพื้นที่ทั้งจังหวัด" }}
+                      name="all_city"
+                      component={CheckBox2}
+                      onChange={(e: any) => {
+                        let value = e.target.checked
+                        setAllCityLocation(value)
+                        setFieldValue("all_city", value)
+                        setParams({ ...params, sub_district_id: undefined, district_id: undefined })
+                        setFieldValue('district_id', null)
+                        setFieldValue('sub_district_id', [])
+                      }}
+                      className="form-control round"
+                      id="all_city"
+                    />
+                  </div>
+                </Col>
                 <Col span={12}>
                   <Field
-                    disabled={!params.province_id}
+                    disabled={(!params.province_id || values.all_city) && cityList}
                     onChange={async (value: number) => {
                       setParams({ ...params, sub_district_id: undefined, district_id: String(value) })
                       if (setFieldValue) {
                         setFieldValue('district_id', value)
                         setFieldValue('sub_district_id', [])
                       }
-                      await fetchDistrict(value)
+                      await fetchSubDistrict(value)
                     }}
                     component={Select}
                     className="form-control round"
@@ -395,20 +627,43 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                       }
                     }}
                     component={Select}
-                    disabled={!params.district_id}
+                    disabled={(!params.district_id || values.all_city) && subDistrictList}
                     mode="multiple"
                     className="form-control round"
                     label={{ text: 'แขวง/ตำบล' }}
                     placeholder="แขวง/ตำบล"
                     name="sub_district_id"
-                    selectOption={districtList}
+                    selectOption={subDistrictList}
                   />
                 </Col>
               </Row>
-            </Form>
-          )}
-        </Formik>
-      </Card>
+              <Row gutter={16}>
+                <Button
+                  style={{ marginBottom: '10px', marginLeft: '10px' }}
+                  size="middle"
+                  disabled={!values.all_city && !params.district_id}
+                  onClick={handleAddlocation}
+                >
+                  + เพิ่มพื้นที่ใช้งาน
+                </Button>
+              </Row>
+              <Table
+                config={{
+                  dataTableTitle: 'รายการรอตรวจสอบ',
+                  loading: false,
+                  tableName: 'config',
+                  tableColumns: column,
+                  dataSource: mockData,
+                  handelDataTableLoad: [],
+                  pagination: false,
+                  isShowRowNumber: true
+                }}
+              />
+
+            </Card>
+          </Form>
+        )}
+      </Formik>
     </MainLayout>
   )
 }

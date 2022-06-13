@@ -6,13 +6,15 @@ import Select from '@/components/Form/Select'
 import LsSummaryComponent from '@/components/LsSummary'
 import OutletSelecter from '@/components/OutletSelecter'
 import MainLayout from '@/layout/MainLayout'
-import { uploadImage } from '@/services/cdn'
 import { findLsConfig } from '@/services/ls-config'
 import { getBrandListV2 } from '@/services/pos-profile'
 import { CopyOutlined } from '@ant-design/icons'
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import _, { filter, get, intersection, size } from 'lodash'
+import _, {
+  filter, forEach,
+  forOwn, get, groupBy, intersection, isUndefined, size
+} from 'lodash'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
@@ -61,6 +63,9 @@ interface lsConfigDetail {
   total_merchant_add?: string;
   total_merchant_join?: string;
   campaign_time?: dateTime
+  brands: any;
+  ls_outlet: any;
+  is_apply_all_brand: any;
 }
 
 export default function LsConfigDetail({ }: Props): ReactElement {
@@ -122,18 +127,19 @@ export default function LsConfigDetail({ }: Props): ReactElement {
       lsConfigId = data.id
       // console.log(data);
       LsConfigDetail = data
+      const lsDetail = { ...data }
 
       // Type Name
-      const selectedType = _.find(lsLogicsOption, { value: data["type"] })
+      const selectedType = _.find(lsLogicsOption, { value: lsDetail["type"] })
       const typeName = _.get(selectedType, "name") ? _.get(selectedType, "name") : ""
+      LsConfigDetail.type_name = typeName
 
       // Image Url
-      if (data["image_link"]) {
-        setImageUrl(data["image_link"])
+      if (lsDetail["image_link"]) {
+        setImageUrl(lsDetail["image_link"])
       }
 
       // Construct Number
-      const lsDetail = { ...data }
       LsConfigDetail.order_amount = _.get(lsDetail, "order_amount") ? _.get(lsDetail, "order_amount") : 0
       LsConfigDetail.discount_amount = _.get(lsDetail, "discount_amount") ? _.get(lsDetail, "discount_amount") : 0
       LsConfigDetail.min_distance = _.get(lsDetail, "min_distance") ? _.get(lsDetail, "min_distance") : 0
@@ -147,11 +153,81 @@ export default function LsConfigDetail({ }: Props): ReactElement {
         end: _.get(lsDetail, "end_date") ? _.get(lsDetail, "end_date") : ""
       }
 
-      LsConfigDetail.type_name = typeName
+      // Construct Selected Brand
+      let is_apply_all_brand = false
+      if (_.size(lsDetail["allowed_list"]) > 0) {
+        const allowedLists = lsDetail["allowed_list"]// const campaign_outlet = get(data, 'campaign_outlet', [])
+        let lsOutletList: any = []
+        await allowedLists.map(async (list: any) => {
+          if (list["brand_id"] == 0) {
+            is_apply_all_brand = true
+          } else {
+            const outlets = list["outlets"]
+            if (_.size(outlets) > 0) {
+              lsOutletList.push(...outlets)
+            }
+          }
+        })
+        if (_.size(lsOutletList) > 0) {
+          const selectedBrands = await fetchBrandList(lsOutletList)
+          LsConfigDetail.brands = selectedBrands
+        }
+      } else {
+        is_apply_all_brand = true
+      }
+      LsConfigDetail.is_apply_all_brand = is_apply_all_brand
+
 
       setLsDetail(LsConfigDetail)
       setIsLoading(false)
     }
+  }
+
+  const fetchBrandList = async (campaign_outlet: any) => {
+    const { result, success } = await getBrandListV2({})
+    if (!isUndefined(result.data)) {
+      const filterBrand: any = filter(result.data, (item) => {
+        // if (item.outlets) {
+        return item
+        // }
+      })
+      setBrandList(filterBrand)
+      //then -> set form selected brands = [{id: int, is_selected: true, type: 'all'|'specific', outlets: []}]
+
+      let selBrands = groupBy(campaign_outlet, function (b: any) {
+        return b.brand_id
+      })
+      let selectedBrandFieldValue: any = []
+      forEach(filterBrand, (item: any, index: any) => {
+        let find_selected_brand = get(selBrands, item.id)
+        let is_selected = false
+        let type = undefined
+        let outlets: any = []
+        if (find_selected_brand) {
+          is_selected = true
+          forOwn(find_selected_brand, (value: any, key: any) => {
+            if (value.outlet_id === 0) {
+              type = 'all'
+              return
+            } else {
+              type = 'specific'
+              outlets.push(value.outlet_id)
+            }
+          })
+        }
+
+        selectedBrandFieldValue.push({
+          id: item.id,
+          is_selected: is_selected,
+          type: type,
+          outlets: outlets,
+        })
+      })
+      return selectedBrandFieldValue
+    }
+    return []
+    // buildBrandData(get(response, 'data', []))
+    // setBrandList(get(response, 'data', []))
   }
 
   const filterOutletSelected = (outletSelected: any, outletList: any, brandId: any) => {
@@ -238,37 +314,6 @@ export default function LsConfigDetail({ }: Props): ReactElement {
       total_merchant_add: totalMerchantAdd
     }
     return outletLocations
-  }
-
-  const handleChangeImage = async (info: any) => {
-    const fileSize = (info.size / 1024) / 1024
-    const isJPNG = info.type === 'image/jpeg';
-    const isJPG = info.type === 'image/jpg';
-    const isPNG = info.type === 'image/png';
-
-    if (!isJPNG && !isJPG && !isPNG) {
-      warning({
-        title: `กรุณาเลือกรูปภาพ`,
-        afterClose() {
-          setImageUrl('')
-        }
-      })
-      return false
-    }
-
-    if (fileSize > 1) {
-      warning({
-        title: `กรุณาเลือกรูปภาพขนาดไม่เกิน 1MB`,
-        afterClose() {
-        }
-      })
-      return false
-    }
-
-    setloadingImage(true)
-    const res = await uploadImage(info)
-    setloadingImage(false)
-    setImageUrl(res.upload_success.modal_pop_up)
   }
 
   const handleSubmit = async (values: any) => {
@@ -869,9 +914,12 @@ export default function LsConfigDetail({ }: Props): ReactElement {
       <div key="logic_outlet_section#1">
         <Row gutter={24}>
           <Col className="gutter-row" span={24}>
-            <Checkbox onChange={(e) => {
-              setFieldValue("is_apply_all_brand", e.target.checked)
-            }}>เข้าร่วมทุกร้านอาหาร
+            <Checkbox
+              defaultChecked={values.is_apply_all_brand}
+              onChange={(e) => {
+                setFieldValue("is_apply_all_brand", e.target.checked)
+              }}
+            >เข้าร่วมทุกร้านอาหาร
             </Checkbox>
           </Col>
         </Row>

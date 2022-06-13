@@ -1339,6 +1339,15 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                   >
                     บันทึก
                   </Button>
+                  <Button
+                    style={{ width: '120px', marginLeft: '10px' }}
+                    type="default"
+                    size="middle"
+                    htmlType="reset"
+                    onClick={() => Router.push('/ls-config')}
+                  >
+                    ย้อนกลับ
+                  </Button>
                 </Col>
               </Row>
               <Card>

@@ -40,7 +40,7 @@ export default function MerchantAccount({ }: Props): ReactElement {
   const [customerDropDown, setCustomerDropDown] = useState<Array<SelectOption>>([])
   const [merchantDropDown, setMerchantDropDown] = useState<Array<SelectOption>>([])
   const [riderDropDown, setRiderDropDown] = useState<Array<SelectOption>>([])
-  const kitchenhubBrandId = process.env.KITCHENHUB_BRAND_ID
+  const kitchenhubBrandId = process.env.NEXT_PUBLIC_KITCHENHUB_BRAND_ID
 
   const initialValues = {
     delivery_type: 'delivery',

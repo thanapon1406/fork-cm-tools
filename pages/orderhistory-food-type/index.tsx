@@ -1,6 +1,6 @@
 import Card from '@/components/Card'
 import ExportButton from '@/components/credit/ExportButton'
-import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
+import DateRangePicker from '@/components/Form/DateRangePicker'
 import Select from "@/components/Form/Select"
 import { Pagination } from '@/interface/dataTable'
 import MainLayout from '@/layout/MainLayout'
@@ -17,6 +17,7 @@ import _, { map } from 'lodash'
 import moment from 'moment'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
+
 
 const { Title } = Typography
 
@@ -67,6 +68,7 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
   const [districtList, setDistrictList] = useState<Array<InterfaceOption>>([])
   const [productTypeList, setProductTypeList] = useState<Array<InterfaceOption>>([])
   const [districtData, setDistrciData] = useState<Array<DistrictInterface>>([])
+  const kitchenhubBrandId = process.env.NEXT_PUBLIC_KITCHENHUB_BRAND_ID
 
   const initialValues = {
     delivery_type: 'delivery',
@@ -187,7 +189,7 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
   }
 
   const fetchProductTypes = async () => {
-    const { success, result } = await getProductTypes({})
+    const { success, result } = await getProductTypes({ all: true })
     if (success) {
       const productTypeOption = map(result?.data, (item: any) => ({
         value: item.name.th,
@@ -311,9 +313,9 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
-                    label={{ text: 'วันเวลาที่ทำรายการ' }}
+                    label={{ text: 'วันที่ทำรายการ *' }}
                     name="client_time"
-                    component={DateTimeRangePicker}
+                    component={DateRangePicker}
                     id="client_time"
                     placeholder="วันเวลาที่ทำรายการ"
                   />
@@ -331,6 +333,7 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
 
                         console.log("value: ", value)
                         console.log("params: ", params)
+                        var brandId: number = +kitchenhubBrandId!;
                         const { result, success } = await exportOrderWithProductByEmail({
                           email: value.emails,
                           start_date: params.startdate,
@@ -339,7 +342,8 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
                           province_id: params.province_id,
                           district_id: params.district_id,
                           sub_district_id: params.sub_district_id,
-                          product_type: params.food_type
+                          product_type: params.food_type,
+                          kitchenhub_brand_id: brandId
                         }
                         )
                         if (success) {
@@ -357,7 +361,6 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
           )}
         </Formik>
       </Card>
-
     </MainLayout>
   )
 }

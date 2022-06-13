@@ -63,3 +63,12 @@ export const getDistrictByProvinceId = async (body: any) => {
     return errorHandler(error)
   }
 }
+
+export const getBrandListV2 = async (params: requestBrandInterface) => {
+  try {
+    const result = await fetch.get(`/api/pos-profile/find-brands-v2`, { params: params })
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}

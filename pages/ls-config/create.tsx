@@ -11,7 +11,7 @@ import { createLsConfig } from '@/services/ls-config';
 import { getBrandListV2 } from '@/services/pos-profile';
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
-import { Field, Form, Formik } from 'formik';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 import _, { filter, get, intersection, size } from 'lodash';
 import moment from 'moment';
 import { useRouter } from 'next/router';
@@ -59,7 +59,7 @@ interface CreateLsParam {
   total_merchant_join: any;
 }
 
-export default function CreateLogisticSubsidize({ }: Props): ReactElement {
+export default function CreateLsConfig({ }: Props): ReactElement {
   const Router = useRouter()
   let lsInitial: CreateLsParam = {
     name: "",
@@ -79,8 +79,8 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
     ls_outlet: [],
     is_apply_all_brand: false,
     campaign_time: {
-      start: "",
-      end: "",
+      start: moment().startOf('day'),
+      end: moment().add(15, 'd').endOf('day'),
     },
     deep_link: "",
     inapp_link: "",
@@ -198,7 +198,54 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
         },
         message: "ระบุสัดส่วน LS",
       })
-    })
+    }),
+    campaign_time: Yup.object()
+      .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
+        const start = this?.parent?.campaign_time["start"]
+        const end = this?.parent?.campaign_time["end"]
+        if (start && end) {
+          return true
+        } else {
+          return false
+        }
+      }).test("15 days period", "วันที่และเวลาของแคมเปญควรมีระยะเวลาอย่างน้อย 15 วัน", function (value: any) {
+        const start = this?.parent?.campaign_time["start"]
+        const end = this?.parent?.campaign_time["end"]
+        if (start && end) {
+          const diffDays = moment(end).diff(moment(start), 'days')
+          if (diffDays < 15) {
+            return false
+          }
+          return true
+        } else {
+          return false
+        }
+      }),
+
+    // brands: Yup.array().test('required', function (value: any) {
+    //   if (this?.parent?.is_apply_all_brand === false) {
+    //     let brandList: any = []
+    //     forEach(get(this.parent, 'brands'), (brand: any, index: any) => {
+    //       if (get(brand, 'is_selected') == true) {
+    //         if (get(brand, 'type') == 'all') {
+    //           brandList.push({ brand_id: brand?.id, outlet_ids: [0] })
+    //         } else if (size(get(brand, 'outlets')) > 0) {
+    //           brandList.push({ brand_id: brand?.id, outlet_ids: get(brand, 'outlets') })
+    //         }
+    //       }
+    //     })
+    //     if (size(brandList) > 0) {
+    //       return true
+    //     } else {
+    //       return this.createError({
+    //         message: 'กรุณาเลือกร้านอาหารที่ต้องการให้เข้าร่วม',
+    //         path: 'ls_outlet',
+    //       })
+    //     }
+    //   } else {
+    //     return true
+    //   }
+    // }),
   })
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const lsLogicsOption = [
@@ -239,6 +286,7 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
 
 
   const handleSubmit = async (values: typeof lsDetail) => {
+    setDisableSubmitButton(true)
     const type = values["type"]
     if (type == CUSTOMER_PAY) {
       values.discount_type = BAHT
@@ -340,12 +388,14 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
         message: `ดำเนินการสร้าง LS Config สำเร็จ`,
         description: '',
       })
-      Router.push("/logistic-subsidize")
+      Router.push("/ls-config")
+      setDisableSubmitButton(false)
     } else {
       notification.warning({
         message: `ผิดพลาด`,
         description: 'ไม่สามารถสร้าง LS Config ได้',
       })
+      setDisableSubmitButton(false)
     }
 
   }
@@ -1082,6 +1132,11 @@ export default function CreateLogisticSubsidize({ }: Props): ReactElement {
               setFieldValue("is_apply_all_brand", e.target.checked)
             }}>เข้าร่วมทุกร้านอาหาร
             </Checkbox>
+            <ErrorMessage
+              component="div"
+              name="ls_outlet"
+              className="validate-error"
+            />
           </Col>
         </Row>
         <Row gutter={24}>

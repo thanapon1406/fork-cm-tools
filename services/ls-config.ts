@@ -14,7 +14,8 @@ export interface queryList {
 export {
   createLsConfig,
   listLsConfig,
-  findLsConfig
+  findLsConfig,
+  updateLsConfig
 };
 
 const createLsConfig = async (req: any) => {
@@ -39,6 +40,15 @@ const findLsConfig = async (option: queryList) => {
   try {
     const result = await fetch.post(`/api/ls-config/find`, option)
     return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const updateLsConfig = async (req: any) => {
+  try {
+    const response = await fetch.post(`/api/ls-config/update`, req);
+    return successHandler(response)
   } catch (error) {
     return errorHandler(error)
   }

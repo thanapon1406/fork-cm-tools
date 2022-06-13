@@ -6,13 +6,13 @@ import Select from '@/components/Form/Select'
 import LsSummaryComponent from '@/components/LsSummary'
 import OutletSelecter from '@/components/OutletSelecter'
 import MainLayout from '@/layout/MainLayout'
-import { uploadImage } from '@/services/cdn'
-import { findLsConfig } from '@/services/ls-config'
+import { findLsConfig, updateLsConfig } from '@/services/ls-config'
 import { getBrandListV2 } from '@/services/pos-profile'
 import { CopyOutlined } from '@ant-design/icons'
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import _, { filter, get, intersection, size } from 'lodash'
+import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
+import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
@@ -34,6 +34,12 @@ interface Props { }
 interface queryListDetail {
   id?: string | string[] | undefined
 }
+
+interface dateTime {
+  start?: any | undefined;
+  end?: any | undefined;
+}
+
 interface lsConfigDetail {
   id?: string
   name?: string;
@@ -54,11 +60,15 @@ interface lsConfigDetail {
   image_link?: string;
   total_merchant_add?: string;
   total_merchant_join?: string;
+  campaign_time?: dateTime
+  brands?: any;
+  ls_outlet?: any;
+  is_apply_all_brand?: any;
 }
 
-export default function LsConfigDetail({ }: Props): ReactElement {
-  const router = useRouter()
-  const { id } = router.query
+export default function UpdateLsConfig({ }: Props): ReactElement {
+  const Router = useRouter()
+  const { id } = Router.query
   let [_isLoading, setIsLoading] = useState(true)
   const [lsDetail, setLsDetail] = useState<lsConfigDetail>({})
   const [brandList, setBrandList] = useState([])
@@ -100,6 +110,28 @@ export default function LsConfigDetail({ }: Props): ReactElement {
 
   const Schema = Yup.object().shape({
     name: Yup.string().trim().max(255).required('ระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    campaign_time: Yup.object()
+      .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
+        const start = this?.parent?.campaign_time["start"]
+        const end = this?.parent?.campaign_time["end"]
+        if (start && end) {
+          return true
+        } else {
+          return false
+        }
+      }).test("15 days period", "วันที่และเวลาของแคมเปญควรมีระยะเวลาอย่างน้อย 15 วัน", function (value: any) {
+        const start = this?.parent?.campaign_time["start"]
+        const end = this?.parent?.campaign_time["end"]
+        if (start && end) {
+          const diffDays = moment(end).diff(moment(start), 'days')
+          if (diffDays < 15) {
+            return false
+          }
+          return true
+        } else {
+          return false
+        }
+      }),
   })
 
   const fetchData = async () => {
@@ -113,20 +145,21 @@ export default function LsConfigDetail({ }: Props): ReactElement {
     if (success) {
       const { message, data } = result
       lsConfigId = data.id
-      console.log(data);
+      // console.log(data);
       LsConfigDetail = data
+      const lsDetail = { ...data }
 
       // Type Name
-      const selectedType = _.find(lsLogicsOption, { value: data["type"] })
+      const selectedType = _.find(lsLogicsOption, { value: lsDetail["type"] })
       const typeName = _.get(selectedType, "name") ? _.get(selectedType, "name") : ""
+      LsConfigDetail.type_name = typeName
 
       // Image Url
-      if (data["image_link"]) {
-        setImageUrl(data["image_link"])
+      if (lsDetail["image_link"]) {
+        setImageUrl(lsDetail["image_link"])
       }
 
       // Construct Number
-      const lsDetail = { ...data }
       LsConfigDetail.order_amount = _.get(lsDetail, "order_amount") ? _.get(lsDetail, "order_amount") : 0
       LsConfigDetail.discount_amount = _.get(lsDetail, "discount_amount") ? _.get(lsDetail, "discount_amount") : 0
       LsConfigDetail.min_distance = _.get(lsDetail, "min_distance") ? _.get(lsDetail, "min_distance") : 0
@@ -134,11 +167,87 @@ export default function LsConfigDetail({ }: Props): ReactElement {
       LsConfigDetail.ls_platform_amount = _.get(lsDetail, "ls_platform_amount") ? _.get(lsDetail, "ls_platform_amount") : 0
       LsConfigDetail.ls_merchant_amount = _.get(lsDetail, "ls_merchant_amount") ? _.get(lsDetail, "ls_merchant_amount") : 0
 
-      LsConfigDetail.type_name = typeName
+      // Start date and End date
+      LsConfigDetail.campaign_time = {
+        start: _.get(lsDetail, "start_date") ? moment(_.get(lsDetail, "start_date")).format("YYYY-MM-DD HH:mm") : "",
+        end: _.get(lsDetail, "end_date") ? moment(_.get(lsDetail, "end_date")).format("YYYY-MM-DD HH:mm") : ""
+      }
+
+      // Construct Selected Brand
+      let is_apply_all_brand = false
+      if (_.size(lsDetail["allowed_list"]) > 0) {
+        const allowedLists = lsDetail["allowed_list"]// const campaign_outlet = get(data, 'campaign_outlet', [])
+        let lsOutletList: any = []
+        await allowedLists.map(async (list: any) => {
+          if (list["brand_id"] == 0) {
+            is_apply_all_brand = true
+          } else {
+            const outlets = list["outlets"]
+            if (_.size(outlets) > 0) {
+              lsOutletList.push(...outlets)
+            }
+          }
+        })
+        if (_.size(lsOutletList) > 0) {
+          const selectedBrands = await fetchBrandList(lsOutletList)
+          LsConfigDetail.brands = selectedBrands
+        }
+      } else {
+        is_apply_all_brand = true
+      }
+      LsConfigDetail.is_apply_all_brand = is_apply_all_brand
+
 
       setLsDetail(LsConfigDetail)
       setIsLoading(false)
     }
+  }
+
+  const fetchBrandList = async (campaign_outlet: any) => {
+    const { result, success } = await getBrandListV2({})
+    if (!isUndefined(result.data)) {
+      const filterBrand: any = filter(result.data, (item) => {
+        // if (item.outlets) {
+        return item
+        // }
+      })
+      setBrandList(filterBrand)
+      //then -> set form selected brands = [{id: int, is_selected: true, type: 'all'|'specific', outlets: []}]
+
+      let selBrands = groupBy(campaign_outlet, function (b: any) {
+        return b.brand_id
+      })
+      let selectedBrandFieldValue: any = []
+      forEach(filterBrand, (item: any, index: any) => {
+        let find_selected_brand = get(selBrands, item.id)
+        let is_selected = false
+        let type = undefined
+        let outlets: any = []
+        if (find_selected_brand) {
+          is_selected = true
+          forOwn(find_selected_brand, (value: any, key: any) => {
+            if (value.outlet_id === 0) {
+              type = 'all'
+              return
+            } else {
+              type = 'specific'
+              outlets.push(value.outlet_id)
+            }
+          })
+        }
+
+        selectedBrandFieldValue.push({
+          id: item.id,
+          is_selected: is_selected,
+          type: type,
+          outlets: outlets,
+        })
+      })
+      return selectedBrandFieldValue
+    }
+    return []
+    // buildBrandData(get(response, 'data', []))
+    // setBrandList(get(response, 'data', []))
   }
 
   const filterOutletSelected = (outletSelected: any, outletList: any, brandId: any) => {
@@ -227,44 +336,124 @@ export default function LsConfigDetail({ }: Props): ReactElement {
     return outletLocations
   }
 
-  const handleChangeImage = async (info: any) => {
-    const fileSize = (info.size / 1024) / 1024
-    const isJPNG = info.type === 'image/jpeg';
-    const isJPG = info.type === 'image/jpg';
-    const isPNG = info.type === 'image/png';
-
-    if (!isJPNG && !isJPG && !isPNG) {
-      warning({
-        title: `กรุณาเลือกรูปภาพ`,
-        afterClose() {
-          setImageUrl('')
+  const buildOutletInitValue = (userSelectedOutlet: any) => {
+    let result: any = {}
+    userSelectedOutlet.forEach((selectOutlet: any) => {
+      let arr: any = []
+      flatMap(allValue, (val: any, key: any) => {
+        if (!isEmpty(val)) {
+          if (val.includes(selectOutlet)) {
+            if (isEmpty(result[key])) {
+              arr.push(selectOutlet)
+              result[key] = arr
+            } else {
+              arr = result[key]
+              arr.push(selectOutlet)
+              result[key] = arr
+            }
+          }
         }
       })
-      return false
-    }
-
-    if (fileSize > 1) {
-      warning({
-        title: `กรุณาเลือกรูปภาพขนาดไม่เกิน 1MB`,
-        afterClose() {
-        }
-      })
-      return false
-    }
-
-    setloadingImage(true)
-    const res = await uploadImage(info)
-    setloadingImage(false)
-    setImageUrl(res.upload_success.modal_pop_up)
+    })
+    return result
   }
 
+
   const handleSubmit = async (values: any) => {
-    console.log("update ls config: ", values)
+    setDisableSubmitButton(true)
+    // console.log("update ls config: ", values)
+    // Construct Outlets
+    let outlets = []
+    if (size(get(values, 'brands')) > 0) {
+      for (var brand of values.brands) {
+        if (get(brand, 'is_selected') == true) {
+          if (get(brand, 'type') == 'all') {
+            outlets.push({ brand_id: brand["id"], outlet_ids: [0] })
+          } else if (size(get(brand, 'outlets')) > 0) {
+            outlets.push({ brand_id: brand["id"], outlet_ids: get(brand, 'outlets') })
+          }
+        }
+      }
+    }
+    values.ls_outlet = outlets
+
+    // Reformat Date
+    if (values.campaign_time.start != '') {
+      values.start_date = moment(values.campaign_time.start + ":00").format(dateFormat)
+    } else {
+      values.start_date = null
+    }
+    if (values.campaign_time.end != '') {
+      values.end_date = moment(values.campaign_time.end + ":59").format(dateFormat)
+    } else {
+      values.end_date = null
+    }
+
+    // Calculate Outlet Add
+    const outletLocationDetail = await handleGetOutletLocations(values.ls_outlet, values.is_apply_all_brand)
+
+    // Construct Allow List
+    const lsOutlet = _.get(values, "ls_outlet") ? _.get(values, "ls_outlet") : []
+    let allowedList: any = []
+    if (values.is_apply_all_brand) {
+      const brandData = {
+        brand_id: 0
+      }
+      allowedList.push({ ...brandData })
+    } else {
+      if (_.size(lsOutlet) > 0) {
+        lsOutlet.map((brand: any) => {
+          const brandId = _.get(brand, "brand_id") ? _.get(brand, "brand_id") : ""
+          const outletIds = _.get(brand, "outlet_ids") ? _.get(brand, "outlet_ids") : []
+          const outlets: any = []
+          if (_.size(outletIds) > 0) {
+            outletIds.map((outletId: any) => {
+              const outletData = {
+                outlet_id: outletId
+              }
+              outlets.push(outletData)
+            })
+          }
+          const brandData = {
+            brand_id: brandId,
+            outlets: outlets
+          }
+          allowedList.push({ ...brandData })
+        })
+      }
+    }
+
+    const payload = {
+      data: {
+        id: id,
+        name: _.get(values, "name") ? _.get(values, "name") : "",
+        start_date: _.get(values, "start_date") ? _.get(values, "start_date") : "",
+        end_date: _.get(values, "end_date") ? _.get(values, "end_date") : "",
+        allowed_list: allowedList,
+        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : ""
+      }
+    }
+
+    // console.log("payload", payload)
+    const { result, success } = await updateLsConfig(payload)
+    if (success) {
+      notification.success({
+        message: `ดำเนินการแก้ไข LS Config สำเร็จ`,
+        description: '',
+      })
+      Router.push("/ls-config")
+      setDisableSubmitButton(false)
+    } else {
+      notification.warning({
+        message: `ผิดพลาด`,
+        description: 'ไม่สามารถแก้ไข LS Config ได้',
+      })
+      setDisableSubmitButton(false)
+    }
   }
 
   useEffect(() => {
     if (id) {
-      console.log("id", id)
       fetchData()
       getBrand()
     }
@@ -857,9 +1046,12 @@ export default function LsConfigDetail({ }: Props): ReactElement {
       <div key="logic_outlet_section#1">
         <Row gutter={24}>
           <Col className="gutter-row" span={24}>
-            <Checkbox onChange={(e) => {
-              setFieldValue("is_apply_all_brand", e.target.checked)
-            }}>เข้าร่วมทุกร้านอาหาร
+            <Checkbox
+              defaultChecked={values.is_apply_all_brand}
+              onChange={(e) => {
+                setFieldValue("is_apply_all_brand", e.target.checked)
+              }}
+            >เข้าร่วมทุกร้านอาหาร
             </Checkbox>
           </Col>
         </Row>
@@ -1114,7 +1306,10 @@ export default function LsConfigDetail({ }: Props): ReactElement {
     <MainLayout>
       {!_isLoading && (
         <Formik
-          initialValues={lsDetail}
+          initialValues={{
+            ...lsDetail,
+            outlets: buildOutletInitValue(userSelectedOutlet),
+          }}
           onSubmit={handleSubmit}
           validationSchema={Schema}
           enableReinitialize={true}
@@ -1166,7 +1361,8 @@ export default function LsConfigDetail({ }: Props): ReactElement {
             </Form>
           )}
         </Formik>
-      )}
-    </MainLayout>
+      )
+      }
+    </MainLayout >
   )
 }

@@ -68,7 +68,7 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
   const [districtList, setDistrictList] = useState<Array<InterfaceOption>>([])
   const [productTypeList, setProductTypeList] = useState<Array<InterfaceOption>>([])
   const [districtData, setDistrciData] = useState<Array<DistrictInterface>>([])
-  const kitchenhubBrandId = process.env.KITCHENHUB_BRAND_ID
+  const kitchenhubBrandId = process.env.NEXT_PUBLIC_KITCHENHUB_BRAND_ID
 
   const initialValues = {
     delivery_type: 'delivery',

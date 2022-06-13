@@ -286,6 +286,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
 
 
   const handleSubmit = async (values: typeof lsDetail) => {
+    setDisableSubmitButton(true)
     const type = values["type"]
     if (type == CUSTOMER_PAY) {
       values.discount_type = BAHT
@@ -388,11 +389,13 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         description: '',
       })
       Router.push("/ls-config")
+      setDisableSubmitButton(false)
     } else {
       notification.warning({
         message: `ผิดพลาด`,
         description: 'ไม่สามารถสร้าง LS Config ได้',
       })
+      setDisableSubmitButton(false)
     }
 
   }

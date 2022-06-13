@@ -360,6 +360,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
 
 
   const handleSubmit = async (values: any) => {
+    setDisableSubmitButton(true)
     // console.log("update ls config: ", values)
     // Construct Outlets
     let outlets = []
@@ -441,11 +442,13 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         description: '',
       })
       Router.push("/ls-config")
+      setDisableSubmitButton(false)
     } else {
       notification.warning({
         message: `ผิดพลาด`,
         description: 'ไม่สามารถแก้ไข LS Config ได้',
       })
+      setDisableSubmitButton(false)
     }
   }
 

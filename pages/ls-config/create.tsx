@@ -79,8 +79,8 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     ls_outlet: [],
     is_apply_all_brand: false,
     campaign_time: {
-      start: moment().startOf('day'),
-      end: moment().add(15, 'd').endOf('day'),
+      start: moment().startOf('day').format("YYYY-MM-DD HH:mm"),
+      end: moment().add(15, 'd').endOf('day').format("YYYY-MM-DD HH:mm"),
     },
     deep_link: "",
     inapp_link: "",

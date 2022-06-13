@@ -34,6 +34,12 @@ interface Props { }
 interface queryListDetail {
   id?: string | string[] | undefined
 }
+
+interface dateTime {
+  start?: any | undefined;
+  end?: any | undefined;
+}
+
 interface lsConfigDetail {
   id?: string
   name?: string;
@@ -54,6 +60,7 @@ interface lsConfigDetail {
   image_link?: string;
   total_merchant_add?: string;
   total_merchant_join?: string;
+  campaign_time?: dateTime
 }
 
 export default function LsConfigDetail({ }: Props): ReactElement {
@@ -113,7 +120,7 @@ export default function LsConfigDetail({ }: Props): ReactElement {
     if (success) {
       const { message, data } = result
       lsConfigId = data.id
-      console.log(data);
+      // console.log(data);
       LsConfigDetail = data
 
       // Type Name
@@ -133,6 +140,12 @@ export default function LsConfigDetail({ }: Props): ReactElement {
       LsConfigDetail.max_distance = _.get(lsDetail, "max_distance") ? _.get(lsDetail, "max_distance") : 0
       LsConfigDetail.ls_platform_amount = _.get(lsDetail, "ls_platform_amount") ? _.get(lsDetail, "ls_platform_amount") : 0
       LsConfigDetail.ls_merchant_amount = _.get(lsDetail, "ls_merchant_amount") ? _.get(lsDetail, "ls_merchant_amount") : 0
+
+      // Start date and End date
+      LsConfigDetail.campaign_time = {
+        start: _.get(lsDetail, "start_date") ? _.get(lsDetail, "start_date") : "",
+        end: _.get(lsDetail, "end_date") ? _.get(lsDetail, "end_date") : ""
+      }
 
       LsConfigDetail.type_name = typeName
 
@@ -264,7 +277,6 @@ export default function LsConfigDetail({ }: Props): ReactElement {
 
   useEffect(() => {
     if (id) {
-      console.log("id", id)
       fetchData()
       getBrand()
     }

@@ -11,6 +11,7 @@ import {
   getProvince
 } from '@/services/pos-profile';
 import { tierPriceCreate, tierPriceLocationCreate, tierPriceValidate } from '@/services/tierPrices';
+import { DeleteOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Col, message, Modal, notification, Row, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import _, { map } from 'lodash';
@@ -63,24 +64,24 @@ const initialValues = {
 }
 
 const Schema = Yup.object().shape({
-  // name: Yup.string().trim().max(100, 'กรุณากรอกชื่อ Tier Price ไม่เกิน 100 ตัวอักษร').required('กรุณากรอกชื่อ Tier Price'),
-  // tier_prices: Yup.array()
-  //   .of(
-  //     Yup.object().shape({
-  //       min: Yup.number().required('กรุณากรอกระยะทางเริ่มต้น').min(0, "กรุณากรอกระยะทางเริ่มต้นให้ถูกต้อง"),
-  //       max: Yup.number().required('กรุณากรอกระยะทางสิ้นสุด').when('min', (min: any, schema: any) => {
-  //         return schema.test({
-  //           test: (max: any) => {
-  //             if (!min) return true
-  //             return (max > min)
-  //           },
-  //           message: "กรุณากรอกระยะทางให้ถูกต้อง",
-  //         })
-  //       }).min(0, "กรุณากรอกระยะทางสิ้นสุดให้ถูกต้อง"),
-  //       price: Yup.number().required('กรุณากรอกค่าโดยสาร').min(0, "กรุณากรอกค่าโดยสารให้ถูกต้อง"),
-  //     })
-  //   )
-  //   .min(1, 'กรุณากรอกค่าโดยสาร')
+  name: Yup.string().trim().max(100, 'กรุณากรอกชื่อ Tier Price ไม่เกิน 100 ตัวอักษร').required('กรุณากรอกชื่อ Tier Price'),
+  tier_prices: Yup.array()
+    .of(
+      Yup.object().shape({
+        min: Yup.number().required('กรุณากรอกระยะทางเริ่มต้น').min(0, "กรุณากรอกระยะทางเริ่มต้นให้ถูกต้อง"),
+        max: Yup.number().required('กรุณากรอกระยะทางสิ้นสุด').when('min', (min: any, schema: any) => {
+          return schema.test({
+            test: (max: any) => {
+              if (!min) return true
+              return (max > min)
+            },
+            message: "กรุณากรอกระยะทางให้ถูกต้อง",
+          })
+        }).min(0, "กรุณากรอกระยะทางสิ้นสุดให้ถูกต้อง"),
+        price: Yup.number().required('กรุณากรอกค่าโดยสาร').min(0, "กรุณากรอกค่าโดยสารให้ถูกต้อง"),
+      })
+    )
+    .min(1, 'กรุณากรอกค่าโดยสาร')
 })
 
 interface InterfaceOption {

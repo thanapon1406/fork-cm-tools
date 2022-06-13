@@ -4,7 +4,8 @@ import Input from '@/components/Form/Input'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
 import { lsConfigList } from '@/services/ls-config'
-import { Breadcrumb, Col, Row, Typography } from 'antd'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
+import { Breadcrumb, Button as ButtonAntd, Col, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
 import { useRouter } from 'next/router'
@@ -83,6 +84,10 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
     fetchData(filter, pagination)
   }
 
+  const handleDelete = (id: any) => {
+    console.log(`handle delete ls config id: `, id)
+  }
+
   useEffect(() => {
     fetchData()
   }, [])
@@ -120,6 +125,41 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
       align: 'center',
       render: (row: any) => {
         return moment(row).format('YYYY-MM-DD HH:mm')
+      },
+    },
+    {
+      title: '',
+      dataIndex: 'id',
+      align: 'center',
+      render: (row: any) => {
+        // const ele = <><Tooltip title="คัดลอก">
+        // <ButtonAntd
+        //   icon={<CopyOutlined />}
+        //   onClick={() => {
+        //     navigator.clipboard.writeText(values.deep_link)
+        //   }}
+        // >คัดลอก</ButtonAntd></>
+        return <>
+          <Tooltip title="แก้ไข">
+            <ButtonAntd
+              icon={<EditOutlined />}
+              onClick={() => {
+                console.log("edit ls config id: ", row)
+              }}
+            ></ButtonAntd>
+          </Tooltip>
+          <Tooltip title="ลบ">
+            <ButtonAntd
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                console.log("delete ls config id: ", row)
+              }}
+              style={{
+                marginLeft: '5px'
+              }}
+            ></ButtonAntd>
+          </Tooltip>
+        </>
       },
     },
   ]

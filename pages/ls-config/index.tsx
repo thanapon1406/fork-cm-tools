@@ -145,6 +145,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
               icon={<EditOutlined />}
               onClick={() => {
                 console.log("edit ls config id: ", row)
+                Router.push(`ls-config/${row}`)
               }}
             ></ButtonAntd>
           </Tooltip>
@@ -153,6 +154,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
               icon={<DeleteOutlined />}
               onClick={() => {
                 console.log("delete ls config id: ", row)
+                handleDelete(row)
               }}
               style={{
                 marginLeft: '5px'
@@ -235,7 +237,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
           config={{
             dataTableTitle: 'รายการกำหนดค่าจัดส่ง',
             loading: _isLoading,
-            tableName: 'ls_config',
+            tableName: 'ls-config',
             tableColumns: column,
             action: ['view'],
             dataSource: dataTable,

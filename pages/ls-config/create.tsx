@@ -11,7 +11,7 @@ import { createLsConfig } from '@/services/ls-config';
 import { getBrandListV2 } from '@/services/pos-profile';
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import _, { filter, get, intersection, size } from 'lodash';
 import moment from 'moment';
 import { useRouter } from 'next/router';
@@ -267,11 +267,11 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   }
                 }
               } else if (lsType == BAHT) {
-                const lsMerchantAmount = this?.parent?.ls_merchant_amount
+                const lsPlatformAmount = this?.parent?.ls_platform_amount
                 const discountAmount = this?.parent?.discount_amount
-                if (lsMerchantAmount != undefined && discountAmount != undefined) {
+                if (lsPlatformAmount != undefined && discountAmount != undefined) {
                   if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY) {
-                    if ((Number(value) + Number(lsMerchantAmount)) != Number(discountAmount)) {
+                    if ((Number(value) + Number(lsPlatformAmount)) != Number(discountAmount)) {
                       return this.createError({
                         message: `สัดส่วน LS จะต้องมีค่ารวมกันได้ ${discountAmount}`,
                         path: 'ls_merchant_amount',
@@ -968,15 +968,6 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       logicSetupElements.push(
         logicSetup
       )
-      logicSetupElements.push(
-        <>
-          <ErrorMessage
-            component="div"
-            name="ls_logic"
-            className="validate-error"
-          />
-        </>
-      )
 
       // Logic Subsidize
       let logicSubsidize = <div key="logic_subsidize_UNSELECTED"></div>
@@ -1177,15 +1168,6 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       logicSetupElements.push(
         logicSubsidize
       )
-      logicSetupElements.push(
-        <>
-          <ErrorMessage
-            component="div"
-            name="ls_subsidize"
-            className="validate-error"
-          />
-        </>
-      )
     }
 
     // Footer
@@ -1221,11 +1203,6 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               setFieldValue("is_apply_all_brand", e.target.checked)
             }}>เข้าร่วมทุกร้านอาหาร
             </Checkbox>
-            <ErrorMessage
-              component="div"
-              name="ls_outlet"
-              className="validate-error"
-            />
           </Col>
         </Row>
         <Row gutter={24}>
@@ -1282,14 +1259,14 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 let validLogicSetup = false
                 const type = _.get(values, "type") != undefined && _.get(values, "type") != "" ? true : false
                 const typeName = _.get(values, "type") != undefined && _.get(values, "type") != "" ? _.get(values, "type") : ""
-                const order_amount = _.get(values, "order_amount") != undefined && _.get(values, "order_amount") != "" ? true : false
+                const order_amount = _.get(values, "order_amount") != undefined ? true : false
                 let discount_type = _.get(values, "discount_type") != undefined && _.get(values, "discount_type") != "" ? true : false
-                let discount_amount = _.get(values, "discount_amount") != undefined && _.get(values, "discount_amount") != "" ? true : false
-                const min_distance = _.get(values, "min_distance") != undefined && _.get(values, "min_distance") != "" ? true : false
-                const max_distance = _.get(values, "max_distance") != undefined && _.get(values, "max_distance") != "" ? true : false
+                let discount_amount = _.get(values, "discount_amount") != undefined ? true : false
+                const min_distance = _.get(values, "min_distance") != undefined ? true : false
+                const max_distance = _.get(values, "max_distance") != undefined ? true : false
                 const ls_type = _.get(values, "ls_type") != undefined && _.get(values, "ls_type") != "" ? true : false
-                const ls_platform_amount = _.get(values, "ls_platform_amount") != undefined && _.get(values, "ls_platform_amount") != "" ? true : false
-                const ls_merchant_amount = _.get(values, "ls_merchant_amount") != undefined && _.get(values, "ls_merchant_amount") != "" ? true : false
+                const ls_platform_amount = _.get(values, "ls_platform_amount") != undefined ? true : false
+                const ls_merchant_amount = _.get(values, "ls_merchant_amount") != undefined ? true : false
 
                 if (typeName == SUBSIDIZE) {
                   discount_type = true

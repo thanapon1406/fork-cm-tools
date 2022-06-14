@@ -267,11 +267,11 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   }
                 }
               } else if (lsType == BAHT) {
-                const lsMerchantAmount = this?.parent?.ls_merchant_amount
+                const lsPlatformAmount = this?.parent?.ls_platform_amount
                 const discountAmount = this?.parent?.discount_amount
-                if (lsMerchantAmount != undefined && discountAmount != undefined) {
+                if (lsPlatformAmount != undefined && discountAmount != undefined) {
                   if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY) {
-                    if ((Number(value) + Number(lsMerchantAmount)) != Number(discountAmount)) {
+                    if ((Number(value) + Number(lsPlatformAmount)) != Number(discountAmount)) {
                       return this.createError({
                         message: `สัดส่วน LS จะต้องมีค่ารวมกันได้ ${discountAmount}`,
                         path: 'ls_merchant_amount',

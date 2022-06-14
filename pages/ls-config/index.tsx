@@ -5,11 +5,11 @@ import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
 import { listLsConfig } from '@/services/ls-config'
 import { DeleteFilled, EditFilled } from '@ant-design/icons'
-import { Breadcrumb, Button as ButtonAntd, Col, Row, Tooltip, Typography } from 'antd'
+import { Breadcrumb, Button as ButtonAntd, Col, notification, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 
 const { Title } = Typography
@@ -68,6 +68,13 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
       setDataTable(data)
       setIsLoading(false)
       setFilter(filterObj)
+    } else {
+      notification.warning({
+        message: `ผิดพลาด`,
+        description: 'ไม่สามารถค้นหา LS Config ได้',
+        duration: 3,
+      })
+      setIsLoading(false)
     }
   }
 

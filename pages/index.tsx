@@ -1,7 +1,7 @@
 import Card from '@/components/Card'
 import MainLayout from '@/layout/MainLayout'
 import { getDashboardOrderCancelSummary, getDashboardOrderSummary } from '@/services/report'
-import { blue, green, grey, red, yellow } from '@ant-design/colors'
+import { blue, grey, red, yellow } from '@ant-design/colors'
 import {
   Button,
   Col,
@@ -118,13 +118,13 @@ const CancelColors = [
     color: grey[3],
     group: 4,
   },
-  {
-    id: 0,
-    name: 'Auto Cancel',
-    subString: 'Auto',
-    color: green[5],
-    group: 5,
-  },
+  // {
+  //   id: 0,
+  //   name: 'Auto Cancel',
+  //   subString: 'Auto',
+  //   color: green[5],
+  //   group: 5,
+  // },
 ]
 
 const CancelGroup = [
@@ -161,11 +161,11 @@ const CancelGroup = [
     color: grey[3],
     substringList: ['ยกเลิกโดยผู้ดูเเลระบบ'],
   },
-  {
-    name: 'ระบบ',
-    color: green[5],
-    substringList: ['Auto'],
-  },
+  // {
+  //   name: 'ระบบ',
+  //   color: green[5],
+  //   substringList: ['Auto'],
+  // },
 ]
 
 type FormInterFace = {

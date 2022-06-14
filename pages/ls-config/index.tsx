@@ -3,9 +3,18 @@ import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
-import { listLsConfig } from '@/services/ls-config'
-import { DeleteFilled, EditFilled } from '@ant-design/icons'
-import { Breadcrumb, Button as ButtonAntd, Col, notification, Row, Tooltip, Typography } from 'antd'
+import { deleteLsConfig, listLsConfig } from '@/services/ls-config'
+import { DeleteFilled, EditFilled, ExclamationCircleOutlined } from '@ant-design/icons'
+import {
+  Breadcrumb,
+  Button as ButtonAntd,
+  Col,
+  Modal,
+  notification,
+  Row,
+  Tooltip,
+  Typography,
+} from 'antd'
 import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
 import { useRouter } from 'next/router'
@@ -24,9 +33,9 @@ interface filterObject {
   keyword?: string
 }
 
-interface Props { }
+interface Props {}
 
-export default function LogisticSubsidize({ }: Props): ReactElement {
+export default function LogisticSubsidize({}: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     keyword: '',
@@ -87,8 +96,47 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
     fetchData(filter, pagination)
   }
 
-  const handleDelete = (id: any) => {
-    console.log(`handle delete ls config id: `, id)
+  const handleDelete = async (data: any) => {
+    console.log(`handle delete ls config id: `, data.id)
+    const modelContent = (
+      <>
+        คุณต้องการลบ
+        <span style={{ padding: '0 4px', color: 'red' }}>{data?.name}</span>
+        ใช่หรือไม่?
+      </>
+    )
+
+    const deleteLs = async () => {
+      const req = {
+        id: data.id,
+      }
+      const { result, success } = await deleteLsConfig(req)
+      if (success) {
+        notification.success({
+          message: 'สำเร็จ',
+          description: `ลบรายการ ${data?.name} เรียบร้อยแล้ว`,
+        })
+
+        fetchData(filter, pagination)
+      } else {
+        const { detail = '' } = result
+        if (detail === 'ALLOEDLIST_IS_MORE_THAN_ONE') {
+          notification.error({
+            message: 'แจ้งเตือน',
+            description: `กรุณาลบร้านอาหารที่ใช้งานใน LS Logistic ก่อนลบรายการนี้`,
+          })
+        }
+      }
+    }
+
+    Modal.confirm({
+      title: 'Delete',
+      icon: <ExclamationCircleOutlined />,
+      content: modelContent,
+      okText: 'ลบ',
+      cancelText: 'ยกเลิก',
+      onOk: deleteLs,
+    })
   }
 
   const resetFetchData = () => {
@@ -145,29 +193,31 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
       title: '',
       dataIndex: 'id',
       align: 'center',
-      render: (row: any) => {
-        return <>
-          <Tooltip title="แก้ไข">
-            <ButtonAntd
-              icon={<EditFilled />}
-              onClick={() => {
-                console.log("edit ls config id: ", row)
-                Router.push(`ls-config/${row}`)
-              }}
-            ></ButtonAntd>
-          </Tooltip>
-          <Tooltip title="ลบ">
-            <ButtonAntd
-              icon={<DeleteFilled />}
-              onClick={() => {
-                handleDelete(row)
-              }}
-              style={{
-                marginLeft: '5px'
-              }}
-            ></ButtonAntd>
-          </Tooltip>
-        </>
+      render: (row: any, data: any) => {
+        return (
+          <>
+            <Tooltip title="แก้ไข">
+              <ButtonAntd
+                icon={<EditFilled />}
+                onClick={() => {
+                  console.log('edit ls config id: ', row)
+                  Router.push(`ls-config/${row}`)
+                }}
+              ></ButtonAntd>
+            </Tooltip>
+            <Tooltip title="ลบ">
+              <ButtonAntd
+                icon={<DeleteFilled />}
+                onClick={() => {
+                  handleDelete(data)
+                }}
+                style={{
+                  marginLeft: '5px',
+                }}
+              ></ButtonAntd>
+            </Tooltip>
+          </>
+        )
       },
     },
   ]
@@ -181,7 +231,6 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
             <Breadcrumb.Item>LS Logic</Breadcrumb.Item>
             <Breadcrumb.Item>สร้าง LS Logic</Breadcrumb.Item>
           </Breadcrumb>
-
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}>
           <Button
@@ -189,7 +238,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
             type="primary"
             size="middle"
             onClick={() => {
-              Router.push('/ls-config/create');
+              Router.push('/ls-config/create')
             }}
           >
             สร้าง LS Logic +
@@ -214,13 +263,8 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
                 </Col>
               </Row>
               <Row gutter={24}>
-                <Col className="gutter-row" span={24} style={{ textAlign: "right" }}>
-                  <Button
-                    style={{ width: '120px' }}
-                    type="primary"
-                    size="middle"
-                    htmlType="submit"
-                  >
+                <Col className="gutter-row" span={24} style={{ textAlign: 'right' }}>
+                  <Button style={{ width: '120px' }} type="primary" size="middle" htmlType="submit">
                     ค้นหา
                   </Button>
                   <Button
@@ -255,6 +299,6 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
           }}
         />
       </Card>
-    </MainLayout >
+    </MainLayout>
   )
 }

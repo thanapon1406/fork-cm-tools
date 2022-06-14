@@ -381,7 +381,13 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       }
 
       const { success, result } = await tierPriceLocationCreate(reqCreateTierPriceLocation)
-      console.log(success, result);
+      if (success) {
+        notification.success({
+          message: `บันทึกข้อมูลสำเร็จ`,
+          description: '',
+        })
+        router.push('/config-delivery-fee');
+      }
 
     }
   }

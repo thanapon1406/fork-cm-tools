@@ -1,6 +1,6 @@
-import fetch from './fetch';
-import errorHandler from './handler/errorHandler';
-import successHandler from './handler/successHandler';
+import fetch from './fetch'
+import errorHandler from './handler/errorHandler'
+import successHandler from './handler/successHandler'
 
 export interface queryList {
   page?: number
@@ -11,16 +11,11 @@ export interface queryList {
   id?: string | string[] | undefined
 }
 
-export {
-  createLsConfig,
-  listLsConfig,
-  findLsConfig,
-  updateLsConfig
-};
+export { createLsConfig, listLsConfig, findLsConfig, updateLsConfig, deleteLsConfig }
 
 const createLsConfig = async (req: any) => {
   try {
-    const response = await fetch.post(`/api/ls-config/create`, req);
+    const response = await fetch.post(`/api/ls-config/create`, req)
     return successHandler(response)
   } catch (error) {
     return errorHandler(error)
@@ -47,9 +42,19 @@ const findLsConfig = async (option: queryList) => {
 
 const updateLsConfig = async (req: any) => {
   try {
-    const response = await fetch.post(`/api/ls-config/update`, req);
+    const response = await fetch.post(`/api/ls-config/update`, req)
     return successHandler(response)
   } catch (error) {
     return errorHandler(error)
+  }
+}
+
+const deleteLsConfig = async (option: queryList) => {
+  try {
+    console.log(`option`, option)
+    const result = await fetch.post(`/api/ls-config/delete`, option)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error, null, false)
   }
 }

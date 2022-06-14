@@ -430,7 +430,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         start_date: _.get(values, "start_date") ? _.get(values, "start_date") : "",
         end_date: _.get(values, "end_date") ? _.get(values, "end_date") : "",
         allowed_list: allowedList,
-        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : ""
+        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
 

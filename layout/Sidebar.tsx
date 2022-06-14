@@ -5,6 +5,7 @@ import {
   LayoutOutlined,
   LogoutOutlined,
   NotificationOutlined,
+  SettingOutlined,
   SolutionOutlined,
   TeamOutlined,
   UserOutlined,
@@ -146,9 +147,9 @@ export default function Sidebar({ }: Props): ReactElement {
     {
       index: 4,
       title: 'การจัดการค่าส่ง',
-      icon: <TeamOutlined />,
+      icon: <SettingOutlined />,
       key: 'logisticSubsidize',
-      link: '/userprofile',
+      link: '/',
       sub: [
         {
           title: 'Config Delivery Fee',
@@ -320,7 +321,7 @@ export default function Sidebar({ }: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={['register', 'userProfile', 'credit', 'order']}
+        defaultOpenKeys={['register', 'userProfile', 'credit', 'order', 'logisticSubsidize']}
         style={{ borderRight: 0 }}
       >
         {routingPath.map((path: MenuItem) => {

@@ -30,10 +30,6 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     keyword: '',
-    date: {
-      start: null,
-      end: null,
-    }
   }
 
   let [dataTable, setDataTable] = useState([])
@@ -55,7 +51,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
       per_page: paging.pageSize,
       ...filterObj,
     }
-    console.log(`reqBody`, reqBody)
+    // console.log(`reqBody`, reqBody)
     setIsLoading(true)
     const { result, success } = await listLsConfig(reqBody)
     if (success) {
@@ -93,6 +89,17 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
 
   const handleDelete = (id: any) => {
     console.log(`handle delete ls config id: `, id)
+  }
+
+  const resetFetchData = () => {
+    fetchData(
+      { keyword: '' },
+      {
+        total: 0,
+        current: 1,
+        pageSize: 10,
+      }
+    )
   }
 
   useEffect(() => {
@@ -139,13 +146,6 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
       dataIndex: 'id',
       align: 'center',
       render: (row: any) => {
-        // const ele = <><Tooltip title="คัดลอก">
-        // <ButtonAntd
-        //   icon={<CopyOutlined />}
-        //   onClick={() => {
-        //     navigator.clipboard.writeText(values.deep_link)
-        //   }}
-        // >คัดลอก</ButtonAntd></>
         return <>
           <Tooltip title="แก้ไข">
             <ButtonAntd
@@ -160,7 +160,6 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
             <ButtonAntd
               icon={<DeleteFilled />}
               onClick={() => {
-                console.log("delete ls config id: ", row)
                 handleDelete(row)
               }}
               style={{
@@ -229,7 +228,10 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
                     type="default"
                     size="middle"
                     htmlType="reset"
-                    onClick={() => resetForm()}
+                    onClick={() => {
+                      resetForm()
+                      resetFetchData()
+                    }}
                   >
                     เคลียร์
                   </Button>

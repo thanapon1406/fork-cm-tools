@@ -14,6 +14,7 @@ export {
   getDeliveryDetail,
   getDeliveries,
   exportDelivery,
+  getDeliveryTiers,
 }
 
 interface queryList {
@@ -164,6 +165,15 @@ const exportDelivery = async (req: any) => {
   try {
     console.log(`req`, req)
     const response = await fetch.post(`/api/rider/export-delivery`, req)
+    return successHandler(response)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const getDeliveryTiers = async (req: any) => {
+  try {
+    const response = await fetch.post(`/api/rider/delivery-tier`, req)
     return successHandler(response)
   } catch (error) {
     return errorHandler(error)

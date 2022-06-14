@@ -11,11 +11,11 @@ import { createLsConfig } from '@/services/ls-config';
 import { getBrandListV2 } from '@/services/pos-profile';
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import _, { filter, get, intersection, size } from 'lodash';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import React, { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import noImage from '../../public/asset/images/no-image-available.svg';
 const { warning } = Modal
@@ -90,114 +90,208 @@ export default function CreateLsConfig({ }: Props): ReactElement {
   }
   const [lsDetail, setLsDetail] = useState(lsInitial)
   const Schema = Yup.object().shape({
-    name: Yup.string().trim().max(255).required('ระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
-    type: Yup.string().trim().required('ระบุ LS Configure'),
-    order_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (order_amount: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (order_amount == undefined) {
-              return false
-            } else {
-              return true
-            }
+    name: Yup.string().trim().max(255).required('กรุณาระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    type: Yup.string().trim().required('กรุณาระบุ LS Configure'),
+    order_amount: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: 'ยอดสุทธิจะต้องมีค่าตั้งแต่ 0 ขึ้นไป',
+              path: 'order_amount',
+            })
+          } else {
+            return true
           }
-          return true
-        },
-        message: "ระบุยอดสุทธิ",
-      })
+        } else {
+          return this.createError({
+            message: 'กรุณาระบุยอดสุทธิ',
+            path: 'order_amount',
+          })
+        }
+      } else {
+        return true
+      }
     }),
-    min_distance: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (min_distance: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (min_distance == undefined) {
-              return false
-            } else {
-              return true
-            }
+    discount_amount: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY) {
+        const paramName = (type == CUSTOMER_PAY) ? "ส่วนลดค่าจัดส่ง" : "ค่าส่งที่ลูกค้าจะต้องจ่าย"
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: `${paramName}จะต้องมีค่าตั้งแต่ 0 ขึ้นไป`,
+              path: 'discount_amount',
+            })
+          } else {
+            return true
           }
-          return true
-        },
-        message: "ระบุระยะทาง",
-      })
+        } else {
+          return this.createError({
+            message: `กรุณาระบุ${paramName}`,
+            path: 'discount_amount',
+          })
+        }
+      } else {
+        return true
+      }
     }),
-    max_distance: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (max_distance: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (max_distance == undefined) {
-              return false
-            } else {
-              return true
-            }
+    min_distance: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: 'ระยะทางเริ่มต้นจะต้องมีค่าตั้งแต่ 0 ขึ้นไป',
+              path: 'min_distance',
+            })
+          } else {
+            return true
           }
-          return true
-        },
-        message: "ระบุระยะทาง",
-      })
-    }).when('min_distance', (min_distance: any, schema: any) => {
-      return schema.test({
-        test: (max_distance: any) => {
-          if (min_distance != undefined) {
-            if (max_distance < min_distance) {
-              return false
-            } else {
-              return true
-            }
-          }
-          return true
-        },
-        message: "ข้อมูลไม่ถูกต้อง",
-      })
+        } else {
+          return this.createError({
+            message: 'กรุณาระบุระยะทางเริ่มต้น',
+            path: 'min_distance',
+          })
+        }
+      } else {
+        return true
+      }
     }),
-    ls_platform_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (ls_platform_amount: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (ls_platform_amount == undefined) {
-              return false
-            } else {
-              return true
-            }
-          }
-          return true
-        },
-        message: "ระบุสัดส่วน LS",
-      })
-    }).when('ls_type', {
-      is: PERCENT,
-      then: Yup.number().when("ls_merchant_amount", (ls_merchant_amount: any, schema: any) => {
-        return schema.test({
-          test: (ls_platform_amount: any) => {
-            if (ls_merchant_amount != undefined && ls_platform_amount != undefined) {
-              if (Number(ls_merchant_amount) + Number(ls_platform_amount) != 100) {
-                return false
+    max_distance: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: 'ระยะทางสิ้นสุดจะต้องมีค่าตั้งแต่ 0 ขึ้นไป',
+              path: 'max_distance',
+            })
+          } else {
+            const minDistance = this?.parent?.min_distance
+            if (minDistance != undefined) {
+              if (value < minDistance) {
+                return this.createError({
+                  message: 'ระยะทางสิ้นสุดจะต้องมีค่ามากกว่าระยะทางเริ่มต้น',
+                  path: 'max_distance',
+                })
+              } else {
+                return true
               }
             } else {
               return true
             }
-
-            return true
-          },
-          message: "ต้องรวมกันได้ 100%",
-        })
-      })
+          }
+        } else {
+          return this.createError({
+            message: 'กรุณาระบุระยะทางสิ้นสุด',
+            path: 'max_distance',
+          })
+        }
+      } else {
+        return true
+      }
     }),
-    ls_merchant_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (ls_merchant_amount: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (ls_merchant_amount == undefined) {
-              return false
-            } else {
-              return true
+    ls_platform_amount: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        const paramName = "สัดส่วน LS แพลตฟอร์ม"
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: `${paramName}จะต้องมีค่าตั้งแต่ 0 ขึ้นไป`,
+              path: 'ls_platform_amount',
+            })
+          } else {
+            const lsType = this?.parent?.ls_type
+            if (lsType != undefined) {
+              if (lsType == PERCENT) {
+                const lsMerchantAmount = this?.parent?.ls_merchant_amount
+                if (lsMerchantAmount != undefined) {
+                  if ((Number(value) + Number(lsMerchantAmount)) != 100) {
+                    return this.createError({
+                      message: `สัดส่วน LS จะต้องมีค่ารวมกันได้ 100%`,
+                      path: 'ls_platform_amount',
+                    })
+                  }
+                }
+              } else if (lsType == BAHT) {
+                const lsMerchantAmount = this?.parent?.ls_merchant_amount
+                const discountAmount = this?.parent?.discount_amount
+                if (lsMerchantAmount != undefined && discountAmount != undefined) {
+                  if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY) {
+                    if ((Number(value) + Number(lsMerchantAmount)) != Number(discountAmount)) {
+                      return this.createError({
+                        message: `สัดส่วน LS จะต้องมีค่ารวมกันได้ ${discountAmount}`,
+                        path: 'ls_platform_amount',
+                      })
+                    }
+                  }
+                }
+              }
             }
           }
-          return true
-        },
-        message: "ระบุสัดส่วน LS",
-      })
+        } else {
+          return this.createError({
+            message: `กรุณาระบุ${paramName}`,
+            path: 'ls_platform_amount',
+          })
+        }
+      } else {
+        return true
+      }
+      return true
+    }),
+    ls_merchant_amount: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        const paramName = "สัดส่วน LS ร้านอาหาร"
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: `${paramName}จะต้องมีค่าตั้งแต่ 0 ขึ้นไป`,
+              path: 'ls_merchant_amount',
+            })
+          } else {
+            const lsType = this?.parent?.ls_type
+            if (lsType != undefined) {
+              if (lsType == PERCENT) {
+                const lsPlatformAmount = this?.parent?.ls_platform_amount
+                if (lsPlatformAmount != undefined) {
+                  if ((Number(value) + Number(lsPlatformAmount)) != 100) {
+                    return this.createError({
+                      message: `สัดส่วน LS จะต้องมีค่ารวมกันได้ 100%`,
+                      path: 'ls_merchant_amount',
+                    })
+                  }
+                }
+              } else if (lsType == BAHT) {
+                const lsPlatformAmount = this?.parent?.ls_platform_amount
+                const discountAmount = this?.parent?.discount_amount
+                if (lsPlatformAmount != undefined && discountAmount != undefined) {
+                  if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY) {
+                    if ((Number(value) + Number(lsPlatformAmount)) != Number(discountAmount)) {
+                      return this.createError({
+                        message: `สัดส่วน LS จะต้องมีค่ารวมกันได้ ${discountAmount}`,
+                        path: 'ls_merchant_amount',
+                      })
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          return this.createError({
+            message: `กรุณาระบุ${paramName}`,
+            path: 'ls_merchant_amount',
+          })
+        }
+      } else {
+        return true
+      }
+      return true
     }),
     campaign_time: Yup.object()
       .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
@@ -221,31 +315,6 @@ export default function CreateLsConfig({ }: Props): ReactElement {
           return false
         }
       }),
-
-    // brands: Yup.array().test('required', function (value: any) {
-    //   if (this?.parent?.is_apply_all_brand === false) {
-    //     let brandList: any = []
-    //     forEach(get(this.parent, 'brands'), (brand: any, index: any) => {
-    //       if (get(brand, 'is_selected') == true) {
-    //         if (get(brand, 'type') == 'all') {
-    //           brandList.push({ brand_id: brand?.id, outlet_ids: [0] })
-    //         } else if (size(get(brand, 'outlets')) > 0) {
-    //           brandList.push({ brand_id: brand?.id, outlet_ids: get(brand, 'outlets') })
-    //         }
-    //       }
-    //     })
-    //     if (size(brandList) > 0) {
-    //       return true
-    //     } else {
-    //       return this.createError({
-    //         message: 'กรุณาเลือกร้านอาหารที่ต้องการให้เข้าร่วม',
-    //         path: 'ls_outlet',
-    //       })
-    //     }
-    //   } else {
-    //     return true
-    //   }
-    // }),
   })
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const lsLogicsOption = [
@@ -387,6 +456,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       notification.success({
         message: `ดำเนินการสร้าง LS Config สำเร็จ`,
         description: '',
+        duration: 3,
       })
       Router.push("/ls-config")
       setDisableSubmitButton(false)
@@ -394,6 +464,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       notification.warning({
         message: `ผิดพลาด`,
         description: 'ไม่สามารถสร้าง LS Config ได้',
+        duration: 3,
       })
       setDisableSubmitButton(false)
     }
@@ -1132,11 +1203,6 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               setFieldValue("is_apply_all_brand", e.target.checked)
             }}>เข้าร่วมทุกร้านอาหาร
             </Checkbox>
-            <ErrorMessage
-              component="div"
-              name="ls_outlet"
-              className="validate-error"
-            />
           </Col>
         </Row>
         <Row gutter={24}>
@@ -1193,14 +1259,14 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 let validLogicSetup = false
                 const type = _.get(values, "type") != undefined && _.get(values, "type") != "" ? true : false
                 const typeName = _.get(values, "type") != undefined && _.get(values, "type") != "" ? _.get(values, "type") : ""
-                const order_amount = _.get(values, "order_amount") != undefined && _.get(values, "order_amount") != "" ? true : false
+                const order_amount = _.get(values, "order_amount") != undefined ? true : false
                 let discount_type = _.get(values, "discount_type") != undefined && _.get(values, "discount_type") != "" ? true : false
-                let discount_amount = _.get(values, "discount_amount") != undefined && _.get(values, "discount_amount") != "" ? true : false
-                const min_distance = _.get(values, "min_distance") != undefined && _.get(values, "min_distance") != "" ? true : false
-                const max_distance = _.get(values, "max_distance") != undefined && _.get(values, "max_distance") != "" ? true : false
+                let discount_amount = _.get(values, "discount_amount") != undefined ? true : false
+                const min_distance = _.get(values, "min_distance") != undefined ? true : false
+                const max_distance = _.get(values, "max_distance") != undefined ? true : false
                 const ls_type = _.get(values, "ls_type") != undefined && _.get(values, "ls_type") != "" ? true : false
-                const ls_platform_amount = _.get(values, "ls_platform_amount") != undefined && _.get(values, "ls_platform_amount") != "" ? true : false
-                const ls_merchant_amount = _.get(values, "ls_merchant_amount") != undefined && _.get(values, "ls_merchant_amount") != "" ? true : false
+                const ls_platform_amount = _.get(values, "ls_platform_amount") != undefined ? true : false
+                const ls_merchant_amount = _.get(values, "ls_merchant_amount") != undefined ? true : false
 
                 if (typeName == SUBSIDIZE) {
                   discount_type = true
@@ -1251,6 +1317,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   notification.warning({
                     message: `ไม่สามารถ Preview LS Summary ได้`,
                     description: 'กรุณาระบุ Logic Setup ให้ครบถ้วน',
+                    duration: 3,
                   })
                   setIsVisibleLsSummary(false)
                 }

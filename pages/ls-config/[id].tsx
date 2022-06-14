@@ -14,7 +14,7 @@ import { Field, Form, Formik } from 'formik'
 import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import noImage from '../../public/asset/images/no-image-available.svg'
 
@@ -430,7 +430,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         start_date: _.get(values, "start_date") ? _.get(values, "start_date") : "",
         end_date: _.get(values, "end_date") ? _.get(values, "end_date") : "",
         allowed_list: allowedList,
-        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : ""
+        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
 
@@ -440,6 +440,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
       notification.success({
         message: `ดำเนินการแก้ไข LS Config สำเร็จ`,
         description: '',
+        duration: 3,
       })
       Router.push("/ls-config")
       setDisableSubmitButton(false)
@@ -447,6 +448,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
       notification.warning({
         message: `ผิดพลาด`,
         description: 'ไม่สามารถแก้ไข LS Config ได้',
+        duration: 3,
       })
       setDisableSubmitButton(false)
     }
@@ -1167,6 +1169,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                   notification.warning({
                     message: `ไม่สามารถ Preview LS Summary ได้`,
                     description: 'กรุณาระบุ Logic Setup ให้ครบถ้วน',
+                    duration: 3,
                   })
                   setIsVisibleLsSummary(false)
                 }

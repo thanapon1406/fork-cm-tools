@@ -10,7 +10,7 @@ import {
   getDistrictByProvinceId,
   getProvince
 } from '@/services/pos-profile';
-import { tierPriceCreate, tierPriceList, tierPriceLocationCreate, tierPriceValidate } from '@/services/tierPrices';
+import { tierPriceList, tierPriceLocationUpdate, tierPriceUpdate, tierPriceValidate } from '@/services/tierPrices';
 import { DeleteOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Col, message, Modal, notification, Row, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
@@ -325,16 +325,26 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   }
 
   const handleSubmit = async (values: typeof initialValues) => {
-    const reqCreateTierPrice: any = {
+
+    let tier_prices: any = []
+    values.tier_prices?.forEach((element: any) => {
+      tier_prices.push({
+        min: element.min,
+        max: element.max,
+        price: element.price,
+      })
+    });
+
+    const reqUpdateTierPrice: any = {
       data: {
+        id: id,
         name: values.name,
-        tier_prices: values.tier_prices
+        tier_prices: tier_prices
       }
     }
-    const responseTierPrice = await tierPriceCreate(reqCreateTierPrice)
+    const { success, result } = await tierPriceUpdate(reqUpdateTierPrice)
 
-
-    if (responseTierPrice.result.tier_id) {
+    if (success) {
       let location_type = "province"
       let locations: any[] = []
       let location = {}
@@ -389,12 +399,18 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
 
       const reqCreateTierPriceLocation: any = {
         data: {
-          tier_id: responseTierPrice.result.tier_id,
+          tier_id: id,
           locations: locations
         }
       }
 
-      const { success, result } = await tierPriceLocationCreate(reqCreateTierPriceLocation)
+      const { success, result } = await tierPriceLocationUpdate(reqCreateTierPriceLocation)
+      if (success) {
+        notification.success({
+          message: `แก้ไขข้อมูลสำเร็จ`,
+          description: '',
+        })
+      }
 
     }
   }
@@ -411,6 +427,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     }
 
     let reqValidatetierPrice: any = {
+      tier_id: id,
       location_type: location_type,
       province_id: params.province_id,
       district_id: params.district_id || 0,
@@ -696,11 +713,11 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
             align: 'center',
             render: (text: any, record: any) => {
               return (<DeleteOutlined onClick={(e: any) => {
-                let index = _.findIndex(data, (e: any) => {
+                let index = _.findIndex(dataDefaults, (e: any) => {
                   return e.city_id == record.city_id;
                 }, 0);
-                data.splice(index, 1);
-                setMockData([...data])
+                dataDefaults.splice(index, 1);
+                setMockData([...dataDefaults])
               }} />)
             }
           }

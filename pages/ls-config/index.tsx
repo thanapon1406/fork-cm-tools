@@ -174,25 +174,25 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
 
   return (
     <MainLayout>
-      <Row>
+      <Row justify="space-around" align="middle">
         <Col span={8}>
           <Title level={4}>LS Logic</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>LS Logic</Breadcrumb.Item>
             <Breadcrumb.Item>สร้าง LS Logic</Breadcrumb.Item>
           </Breadcrumb>
-
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}>
           <Button
-            style={{ width: '150px' }}
+            style={{ width: '150px', marginTop: '31px' }}
             type="primary"
             size="middle"
             onClick={() => {
               Router.push('/ls-config/create');
             }}
+            className="confirm-button"
           >
-            สร้าง LS Logic +
+            + สร้าง LS Logic
           </Button>
         </Col>
       </Row>

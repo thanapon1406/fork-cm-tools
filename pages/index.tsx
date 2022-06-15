@@ -19,7 +19,7 @@ import HighchartsReact from 'highcharts-react-official'
 import { filter, find, get, has, size, sumBy } from 'lodash'
 import moment, { Moment } from 'moment'
 import { NextPage } from 'next'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 const { Text } = Typography
 
@@ -585,7 +585,7 @@ const Home: NextPage = () => {
               onChange={(val: any) => {
                 formik.setFieldValue('dates', val)
               }}
-              showTime={formik.values.picker_type == 'date'}
+              showTime={formik.values.picker_type == 'date' ? { format: 'HH:mm' } : false}
               picker={formik.values.picker_type}
               format={datePickerFormat}
             />

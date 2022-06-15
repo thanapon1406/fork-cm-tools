@@ -176,15 +176,15 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
     <MainLayout>
       <Row justify="space-around" align="middle">
         <Col span={8}>
-          <Title level={4}>LS Logic</Title>
+          <Title level={4}>Logistic Subsidize</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>LS Logic</Breadcrumb.Item>
-            <Breadcrumb.Item>สร้าง LS Logic</Breadcrumb.Item>
+            <Breadcrumb.Item><a onClick={() => { Router.push("/ls-config") }}>Logistic Subsidize</a></Breadcrumb.Item>
+            <Breadcrumb.Item>รายการ Logistic Subsidize</Breadcrumb.Item>
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}>
           <Button
-            style={{ width: '150px', marginTop: '31px' }}
+            style={{ width: '180px', marginTop: '31px' }}
             type="primary"
             size="middle"
             onClick={() => {
@@ -192,7 +192,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
             }}
             className="confirm-button"
           >
-            + สร้าง LS Logic
+            + สร้าง Logistic Subsidize
           </Button>
         </Col>
       </Row>

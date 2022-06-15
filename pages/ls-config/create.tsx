@@ -1548,7 +1548,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 <Col span={8}>
                   <Title level={4}>Logistic Subsidize</Title>
                   <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>Logistic Subsidize</Breadcrumb.Item>
+                    <Breadcrumb.Item><a onClick={() => { Router.push("/ls-config") }}>Logistic Subsidize</a></Breadcrumb.Item>
                     <Breadcrumb.Item>สร้าง Logistic Subsidize</Breadcrumb.Item>
                   </Breadcrumb>
                 </Col>

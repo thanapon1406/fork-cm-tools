@@ -1242,7 +1242,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                     defaultValue={values.deep_link}
                     disabled
                     addonBefore={<LinkOutlined />}
-                    placeholder={'https://www.kitchenhub-th.com/'}
+                  // placeholder={'https://www.kitchenhub-th.com/'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1270,7 +1270,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                     defaultValue={values.inapp_link}
                     disabled
                     addonBefore={<LinkOutlined />}
-                    placeholder={'khconsumer://host?outletId=1'}
+                  // placeholder={'khconsumer://host?outletId=1'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1319,10 +1319,11 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     return <div key="logic_detail">{logicDetailElements}</div>
   }
 
-  const renderFormValidation = (errors: any) => {
+  const renderFormValidation = (errors: any, touched: any) => {
     let formValidationElements: any = []
     const errorList = Object.keys(errors)
-    if (_.size(errorList) > 0) {
+    const touchedList = Object.keys(touched)
+    if ((_.size(touchedList) > 0) && (_.size(errorList) > 0)) {
       formValidationElements.push(
         <div key={`form_validation_warning_message`}>
           <Alert message={`กรุณาระบุข้อมูลภายในแบบฟอร์มให้ถูกต้อง`} type="warning" showIcon />
@@ -1350,7 +1351,8 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
             resetForm,
             setFieldValue,
             handleChange,
-            errors
+            errors,
+            touched
           }) => (
             <Form>
               <Row justify="space-around" align="middle">
@@ -1383,7 +1385,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                 </Col>
               </Row>
               {/* Form Validation */}
-              {renderFormValidation(errors)}
+              {renderFormValidation(errors, touched)}
               <Card>
                 {/* Logic Info */}
                 {renderLogicInfo(values, setFieldValue)}

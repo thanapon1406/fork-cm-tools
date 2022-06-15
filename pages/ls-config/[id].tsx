@@ -466,7 +466,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     return (<div key="logic_info">
       {/* Name */}
       < Row gutter={16} >
-        <Col className="gutter-row" span={24}>
+        <Col className="gutter-row" span={12}>
           <Field
             label={{ text: "LS Configure Name" }}
             name="name"

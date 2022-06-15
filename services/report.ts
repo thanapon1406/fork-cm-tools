@@ -138,6 +138,24 @@ export const exportPromotionTracking = async (req: any) => {
   }
 }
 
+export const getDashboardOrderSummary = async (req: any) => {
+  try {
+    const result = await fetch.post(`/api/report/dashboard-cm-tools/get-orders-summary`, req)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+export const getDashboardOrderCancelSummary = async (req: any) => {
+  try {
+    const result = await fetch.post(`/api/report/dashboard-cm-tools/get-order-cancel-summary`, req)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 const getEnv = async () => {
   try {
     const result = await fetch.get(`/api/env/get-env-rest`)

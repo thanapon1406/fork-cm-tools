@@ -157,7 +157,7 @@ export default function Sidebar({ }: Props): ReactElement {
           key: '/config-delivery-fee',
         },
         {
-          title: 'LS Logic',
+          title: 'Logistic Subsidize',
           link: '/ls-config',
           key: '/ls-config',
         },

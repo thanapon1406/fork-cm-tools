@@ -1,8 +1,7 @@
-import CustomSelect from '@/components/SelectOutlet'
-import { Col, Divider, Row } from 'antd'
-import { Field, FieldArray } from 'formik'
-import { forEach, get, isEmpty, size } from 'lodash'
-import React from 'react'
+import CustomSelect from '@/components/SelectOutlet';
+import { Checkbox, Col, Divider, Row } from 'antd';
+import { Field, FieldArray } from 'formik';
+import { forEach, get, isEmpty, size } from 'lodash';
 
 interface Props {
   setFieldValue: any;
@@ -46,8 +45,21 @@ export default function OutletSelecter({
                           type="hidden"
                           value={brand.id}
                         />
-                        <label className="control-inline fancy-checkbox">
-                          <Field
+                        {/* <label className="control-inline fancy-checkbox"> */}
+                        <Checkbox
+                          name={`brands.${index}.is_selected`}
+                          disabled={disabled}
+                          onChange={() => {
+                            let isChecked = !get(formValue, `brands.${index}.is_selected`)
+                            setFieldValue(`brands.${index}.id`, brand.id)
+                            setFieldValue(`brands.${index}.is_selected`, isChecked)
+                            if (isChecked) {
+                              setFieldValue(`brands.${index}.type`, "all")
+                              setFieldValue(`brands.${index}.outlets`, [])
+                            }
+                          }}> <span> {brand.name.th} <span className="display-none">({brand.id})</span></span>
+                        </Checkbox>
+                        {/* <Field
                             name={`brands.${index}.is_selected`}
                             type="checkbox"
                             disabled={disabled}
@@ -61,8 +73,8 @@ export default function OutletSelecter({
                               }
                             }}
                           />
-                          <span> {brand.name.th} <span className="display-none">({brand.id})</span></span>
-                        </label>
+                          <span> {brand.name.th} <span className="display-none">({brand.id})</span></span> */}
+                        {/* </label> */}
                       </div>
                       {get(formValue, `brands.${index}.is_selected`) &&
                         <div style={{ marginLeft: 20 }}>

@@ -1240,6 +1240,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                       setFieldValue("deep_link", e.target.value)
                     }}
                     defaultValue={values.deep_link}
+                    value={values.deep_link}
                     disabled
                     addonBefore={<LinkOutlined />}
                   // placeholder={'https://www.kitchenhub-th.com/'}
@@ -1268,6 +1269,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                       setFieldValue("inapp_link", e.target.value)
                     }}
                     defaultValue={values.inapp_link}
+                    value={values.inapp_link}
                     disabled
                     addonBefore={<LinkOutlined />}
                   // placeholder={'khconsumer://host?outletId=1'}

@@ -90,7 +90,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
   }
   const [lsDetail, setLsDetail] = useState(lsInitial)
   const Schema = Yup.object().shape({
-    name: Yup.string().trim().max(255).required('กรุณาระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    name: Yup.string().trim().max(255).required('กรุณาระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ฿]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
     type: Yup.string().trim().required('กรุณาระบุ LS Configure'),
     order_amount: Yup.number().test('required', function (value: any) {
       const type = this?.parent?.type
@@ -454,7 +454,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         deep_link: _.get(values, "deep_link") ? _.get(values, "deep_link") : "",
         inapp_link: _.get(values, "inapp_link") ? _.get(values, "inapp_link") : "",
         image_link: _.get(values, "image_link") ? _.get(values, "image_link") : "",
-        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : ""
+        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
     console.log("payload", payload)
@@ -1395,7 +1395,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                     }}
                     defaultValue={values.deep_link}
                     addonBefore={<LinkOutlined />}
-                    placeholder={'https://www.kitchenhub-th.com/'}
+                  // placeholder={'https://www.kitchenhub-th.com/'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1406,6 +1406,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
 
                     >คัดลอก</ButtonAntd>
                   </Tooltip>
+                  <span style={{ color: "#808080" }}>ตัวอย่าง : https://www.kitchenhub-th.com/</span>
                 </InputAntd.Group>
               </FormAntd.Item>
             </div>
@@ -1423,7 +1424,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                     }}
                     defaultValue={values.inapp_link}
                     addonBefore={<LinkOutlined />}
-                    placeholder={'khconsumer://host?outletId=1'}
+                  // placeholder={'khconsumer://host?outletId=1'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1433,6 +1434,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                       }}
                     >คัดลอก</ButtonAntd>
                   </Tooltip>
+                  <span style={{ color: "#808080" }}>ตัวอย่าง : khconsumer://host?outletId=1</span>
                 </InputAntd.Group>
               </FormAntd.Item>
             </div>
@@ -1469,10 +1471,11 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     return <div key="logic_detail">{logicDetailElements}</div>
   }
 
-  const renderFormValidation = (errors: any) => {
+  const renderFormValidation = (errors: any, touched: any) => {
     let formValidationElements: any = []
     const errorList = Object.keys(errors)
-    if (_.size(errorList) > 0) {
+    const touchedList = Object.keys(touched)
+    if ((_.size(touchedList) > 0) && (_.size(errorList) > 0)) {
       // errorList.map((el: any, index: any) => {
       //   console.log("el", el)
       //   let paramName = ""
@@ -1541,7 +1544,8 @@ export default function CreateLsConfig({ }: Props): ReactElement {
             handleChange,
             isValidating,
             isSubmitting,
-            errors
+            errors,
+            touched
           }) => (
             <Form>
               <Row justify="space-around" align="middle">
@@ -1574,7 +1578,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 </Col>
               </Row>
               {/* Form Validation */}
-              {renderFormValidation(errors)}
+              {renderFormValidation(errors, touched)}
               <Card>
                 {/* Logic Info */}
                 {renderLogicInfo(values, setFieldValue)}

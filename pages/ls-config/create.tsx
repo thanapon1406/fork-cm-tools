@@ -359,7 +359,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
   const [imageUrl, setImageUrl] = useState('')
   const [loadingImage, setloadingImage] = useState(false)
   const [lsSummaryElementParam, setlsSummaryElementParam] = useState({})
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isClickSubmit, setIsClickSubmit] = useState(false);
 
   const handleSubmit = async (values: typeof lsDetail) => {
     setDisableSubmitButton(true)
@@ -1471,11 +1471,10 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     return <div key="logic_detail">{logicDetailElements}</div>
   }
 
-  const renderFormValidation = (errors: any, touched: any) => {
+  const renderFormValidation = (errors: any) => {
     let formValidationElements: any = []
     const errorList = Object.keys(errors)
-    const touchedList = Object.keys(touched)
-    if ((_.size(touchedList) > 0) && (_.size(errorList) > 0)) {
+    if (isClickSubmit && (_.size(errorList) > 0)) {
       // errorList.map((el: any, index: any) => {
       //   console.log("el", el)
       //   let paramName = ""
@@ -1563,6 +1562,9 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                     size="middle"
                     htmlType="submit"
                     disabled={disableSubmitButton}
+                    onClick={() => {
+                      setIsClickSubmit(true)
+                    }}
                   >
                     บันทึก
                   </Button>
@@ -1578,7 +1580,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 </Col>
               </Row>
               {/* Form Validation */}
-              {renderFormValidation(errors, touched)}
+              {renderFormValidation(errors)}
               <Card>
                 {/* Logic Info */}
                 {renderLogicInfo(values, setFieldValue)}

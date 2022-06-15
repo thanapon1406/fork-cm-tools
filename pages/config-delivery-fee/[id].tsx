@@ -639,6 +639,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     setIsLoading(true)
     const request = {
       id: id,
+      include: "location",
     }
     const { result, success } = await tierPriceList(request)
     if (success && _.get(result, "data[0]")) {

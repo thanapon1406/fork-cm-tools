@@ -8,8 +8,8 @@ import OutletSelecter from '@/components/OutletSelecter'
 import MainLayout from '@/layout/MainLayout'
 import { findLsConfig, updateLsConfig } from '@/services/ls-config'
 import { getBrandListV2 } from '@/services/pos-profile'
-import { CopyOutlined } from '@ant-design/icons'
-import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
+import { CopyOutlined, LinkOutlined } from '@ant-design/icons'
+import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
 import moment from 'moment'
@@ -78,6 +78,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
   const [imageUrl, setImageUrl] = useState('')
   const [loadingImage, setloadingImage] = useState(false)
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
+  const [startDateSnapData, setstartDateSnapData] = useState(new Date())
 
   const lsLogicsOption = [
     {
@@ -172,6 +173,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         start: _.get(lsDetail, "start_date") ? moment(_.get(lsDetail, "start_date")).format("YYYY-MM-DD HH:mm") : "",
         end: _.get(lsDetail, "end_date") ? moment(_.get(lsDetail, "end_date")).format("YYYY-MM-DD HH:mm") : ""
       }
+      setstartDateSnapData(_.get(lsDetail, "start_date"))
 
       // Construct Selected Brand
       let is_apply_all_brand = false
@@ -1059,22 +1061,30 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         </Row>
         <Row gutter={24}>
           <Col className="gutter-row" span={24}>
-            < Collapse
-              accordion
-              collapsible={values.is_apply_all_brand ? 'disabled' : 'header'}
-            >
-              <Panel key="outlet_joined" header="ร้านอาหารที่เข้าร่วม">
-                <OutletSelecter
-                  handleChange={handleChange}
-                  disabled={values.is_apply_all_brand}
-                  selectedList={filterOutletSelected}
-                  formValue={values}
-                  setFieldValue={setFieldValue}
-                  userSelectedOutlet={userSelectedOutlet}
-                  brandList={brandList}
-                />
-              </Panel>
-            </Collapse >
+            {values.is_apply_all_brand ?
+              < Collapse
+                accordion
+                collapsible='disabled'
+                destroyInactivePanel={true}
+              >
+                <Panel key="all_outlet_disabled" header="ร้านอาหารที่เข้าร่วม">
+                </Panel>
+              </Collapse > :
+              < Collapse
+                accordion
+              >
+                <Panel key="outlet_joined" header="ร้านอาหารที่เข้าร่วม">
+                  <OutletSelecter
+                    handleChange={handleChange}
+                    disabled={values.is_apply_all_brand}
+                    selectedList={filterOutletSelected}
+                    formValue={values}
+                    setFieldValue={setFieldValue}
+                    userSelectedOutlet={userSelectedOutlet}
+                    brandList={brandList}
+                  />
+                </Panel>
+              </Collapse >}
           </Col>
         </Row>
       </div>
@@ -1210,6 +1220,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
               label={{ text: 'วันที่และเวลาของแคมเปญ' }}
               name="campaign_time"
               component={DateTimeRangePicker}
+              minDate={moment(startDateSnapData).format("YYYY-MM-DD HH:mm")}
               id="campaign_time"
               placeholder="วันเวลาที่ทำรายการ"
             />
@@ -1230,6 +1241,8 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                     }}
                     defaultValue={values.deep_link}
                     disabled
+                    addonBefore={<LinkOutlined />}
+                    placeholder={'https://www.kitchenhub-th.com/'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1256,6 +1269,8 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                     }}
                     defaultValue={values.inapp_link}
                     disabled
+                    addonBefore={<LinkOutlined />}
+                    placeholder={'khconsumer://host?outletId=1'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1304,6 +1319,18 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     return <div key="logic_detail">{logicDetailElements}</div>
   }
 
+  const renderFormValidation = (errors: any) => {
+    let formValidationElements: any = []
+    const errorList = Object.keys(errors)
+    if (_.size(errorList) > 0) {
+      formValidationElements.push(
+        <div key={`form_validation_warning_message`}>
+          <Alert message={`กรุณาระบุข้อมูลภายในแบบฟอร์มให้ถูกต้อง`} type="warning" showIcon />
+        </div>
+      )
+    }
+    return <div key="form_validation_warning">{formValidationElements}</div>
+  }
 
   return (
     <MainLayout>
@@ -1322,7 +1349,9 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
             values,
             resetForm,
             setFieldValue,
-            handleChange }) => (
+            handleChange,
+            errors
+          }) => (
             <Form>
               <Row justify="space-around" align="middle">
                 <Col span={8}>
@@ -1353,6 +1382,8 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                   </Button>
                 </Col>
               </Row>
+              {/* Form Validation */}
+              {renderFormValidation(errors)}
               <Card>
                 {/* Logic Info */}
                 {renderLogicInfo(values, setFieldValue)}

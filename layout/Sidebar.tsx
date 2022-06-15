@@ -281,8 +281,8 @@ export default function Sidebar({ }: Props): ReactElement {
       index: 8,
       title: 'ค่าส่งตามระยะทาง',
       icon: <CalculatorOutlined />,
-      key: 'config-delivery-fee',
-      link: 'config-delivery-fee',
+      key: '/config-delivery-fee',
+      link: '/config-delivery-fee',
       sub: [],
     }
   ]

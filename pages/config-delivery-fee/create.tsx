@@ -97,10 +97,11 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   const [allCityLocation, setAllCityLocation] = useState(false)
   const [deliveryFeeRuleValidateMessage, setDeliveryFeeRuleValidateMessage] = useState("")
   const [provinceList, setProvinceList] = useState<Array<InterfaceOption>>([])
-  const [provinceSelected, setProvinceSelected] = useState<Array<InterfaceOption>>([])
   const [cityList, setCityList] = useState<Array<InterfaceOption>>([])
   const [subDistrictList, setSubDistrictList] = useState<Array<InterfaceOption>>([])
   const [districtData, setSubDistrciData] = useState<Array<DistrictInterface>>([])
+  const [showError, setShowError] = useState(false)
+  const [showErrorResult, setShowErrorResult] = useState<any>([])
 
   let [mockData, setMockData] = useState<any>([])
   let [isLoading, setIsLoading] = useState(true)
@@ -139,6 +140,28 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     } else {
       message.error({ content: 'ไม่สามารถดึงค่าที่อยู่ได้กรุณาลองใหม่อีกครั้ง' })
     }
+  }
+
+  const renderErrorMessage = (values: any, setFieldValue: any) => {
+    let errorRow = []
+    let keyword = ""
+    for (let i = 0; i < showErrorResult.length; i++) {
+      if (_.get(showErrorResult[i], "sub_district") && showErrorResult[i].sub_district.length > 0) {
+        keyword = `-มีการระบุตำบล (${showErrorResult[i].sub_district.join(",")}) ซ้ำ`
+      } else {
+        keyword = `-มีการระบุอำเภอ${showErrorResult[i].district.name}แล้ว หากคุณต้องการเจาะจงระดับตำบล กรุณาระบุเฉพาะตำบลที่คุณต้องการเพิ่ม`
+      }
+      errorRow.push(
+        <Col span={24}>
+          {keyword}
+        </Col>
+      )
+    }
+    return (
+      <Row style={{ color: "red" }}>
+        <Col span={24}>พบพื้นที่ซ้ำซ้อนกับ config อื่น</Col>
+        {errorRow}
+      </Row>)
   }
 
   const fetchSubDistrictByProvinceId = async (proviceId: number) => {
@@ -379,12 +402,41 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       }
 
       const { success, result } = await tierPriceLocationCreate(reqCreateTierPriceLocation)
-      if (success) {
+      if (success && result.message !== "Error") {
         notification.success({
           message: `บันทึกข้อมูลสำเร็จ`,
           description: '',
         })
         router.push('/config-delivery-fee');
+      } else {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถเพิ่มพื้นที่ได้ เนื่องจากมีพื้นที่ซ้อนทับกับ config อื่น',
+        })
+      }
+      if (_.get(result, "validate[0]")) {
+        setShowError(true)
+        result.validate.forEach((element: any, index: number) => {
+          let districtData: any = _.find(locations, function (obj) {
+            if (obj.district_id == element.district) {
+              return true;
+            }
+          });
+          result.validate[index].district = districtData.district_data
+
+          let sub_districtDatas: any = []
+
+          result.validate[index].sub_district.forEach((subdistrictId: any) => {
+            let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
+              if (obj.id == subdistrictId) {
+                return true;
+              }
+            });
+            sub_districtDatas.push(sub_districtData.name)
+          });
+          result.validate[index].sub_district = sub_districtDatas
+        });
+        setShowErrorResult(result.validate)
       }
 
     }
@@ -797,9 +849,10 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                   + เพิ่มพื้นที่ใช้งาน
                 </Button>
               </Row>
+              {showError && renderErrorMessage(values, setFieldValue)}
               <Table
                 config={{
-                  dataTableTitle: 'รายการรอตรวจสอบ',
+                  dataTableTitle: 'รายการพื้นที่ใช้งานที่เพิ่ม',
                   loading: false,
                   tableName: 'config',
                   tableColumns: column,

@@ -1546,10 +1546,10 @@ export default function CreateLsConfig({ }: Props): ReactElement {
             <Form>
               <Row justify="space-around" align="middle">
                 <Col span={8}>
-                  <Title level={4}>LS Logic</Title>
+                  <Title level={4}>Logistic Subsidize</Title>
                   <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>LS Logic</Breadcrumb.Item>
-                    <Breadcrumb.Item>สร้าง LS Logic</Breadcrumb.Item>
+                    <Breadcrumb.Item>Logistic Subsidize</Breadcrumb.Item>
+                    <Breadcrumb.Item>สร้าง Logistic Subsidize</Breadcrumb.Item>
                   </Breadcrumb>
                 </Col>
                 <Col span={8} offset={8} style={{ textAlign: 'end' }}>

@@ -10,7 +10,7 @@ import { uploadImage } from '@/services/cdn';
 import { createLsConfig } from '@/services/ls-config';
 import { getBrandListV2 } from '@/services/pos-profile';
 import { CopyOutlined, LinkOutlined, PlusOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
+import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import _, { filter, get, intersection, size } from 'lodash';
 import moment from 'moment';
@@ -1309,7 +1309,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   setFieldValue("ls_outlet", outlets)
                   const is_apply_all_brand = _.get(values, "is_apply_all_brand") ? _.get(values, "is_apply_all_brand") : false
                   const outletLocations = await handleGetOutletLocations(outlets, is_apply_all_brand)
-                  console.log("outletLocations", outletLocations)
+                  // console.log("outletLocations", outletLocations)
                   let lsSummaryParam = {
                     name: _.get(values, "name") ? _.get(values, "name") : "",
                     type: _.get(values, "type") ? _.get(values, "type") : "",
@@ -1469,6 +1469,60 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     return <div key="logic_detail">{logicDetailElements}</div>
   }
 
+  const renderFormValidation = (errors: any) => {
+    let formValidationElements: any = []
+    const errorList = Object.keys(errors)
+    if (_.size(errorList) > 0) {
+      // errorList.map((el: any, index: any) => {
+      //   console.log("el", el)
+      //   let paramName = ""
+      //   switch (el) {
+      //     case "name":
+      //       paramName = "LS Configure Name"
+      //       break;
+      //     case "type":
+      //       paramName = "LS Logics"
+      //       break;
+      //     case "order_amount":
+      //       paramName = "ยอดสุทธิ"
+      //       break;
+      //     case "discount_amount":
+      //       paramName = "ส่วนลดค่าจัดส่ง"
+      //       break;
+      //     case "min_distance":
+      //       paramName = "ระยะทางจัดส่งเริ่มต้น"
+      //       break;
+      //     case "max_distance":
+      //       paramName = "ระยะทางจัดส่งสิ้นสุด"
+      //       break;
+      //     case "ls_platform_amount":
+      //       paramName = "สัดส่วน LS แพลตฟอร์ม"
+      //       break;
+      //     case "ls_merchant_amount":
+      //       paramName = "สัดส่วน LS ร้านอาหาร"
+      //       break;
+      //     case "start_date":
+      //       paramName = "วันที่และเวลาของแคมเปญเริ่มต้น"
+      //       break;
+      //     case "end_date":
+      //       paramName = "วันที่และเวลาของแคมเปญสิ้นสุด"
+      //       break;
+      //   }
+      //   formValidationElements.push(
+      //     <div key={`form_validation_warning#${index}`}>
+      //       <Alert message={`ข้อมูล ${paramName} ไม่ถูกต้อง`} type="warning" showIcon />
+      //     </div>
+      //   )
+      // })
+      formValidationElements.push(
+        <div key={`form_validation_warning_message`}>
+          <Alert message={`กรุณาระบุข้อมูลภายในแบบฟอร์มให้ถูกต้อง`} type="warning" showIcon />
+        </div>
+      )
+    }
+    return <div key="form_validation_warning">{formValidationElements}</div>
+  }
+
   return (
 
     <MainLayout>
@@ -1487,14 +1541,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
             handleChange,
             isValidating,
             isSubmitting,
-            errors }) => (
+            errors
+          }) => (
             <Form>
               <Row justify="space-around" align="middle">
                 <Col span={8}>
-                  <Title level={4}>LS Logic</Title>
+                  <Title level={4}>Logistic Subsidize</Title>
                   <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>LS Logic</Breadcrumb.Item>
-                    <Breadcrumb.Item>สร้าง LS Logic</Breadcrumb.Item>
+                    <Breadcrumb.Item><a onClick={() => { Router.push("/ls-config") }}>Logistic Subsidize</a></Breadcrumb.Item>
+                    <Breadcrumb.Item>สร้าง Logistic Subsidize</Breadcrumb.Item>
                   </Breadcrumb>
                 </Col>
                 <Col span={8} offset={8} style={{ textAlign: 'end' }}>
@@ -1518,6 +1573,8 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   </Button>
                 </Col>
               </Row>
+              {/* Form Validation */}
+              {renderFormValidation(errors)}
               <Card>
                 {/* Logic Info */}
                 {renderLogicInfo(values, setFieldValue)}

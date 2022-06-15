@@ -397,7 +397,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     let location_type: string = "province"
     if (allCityLocation) {
       location_type = "province"
-    } else if (params.district_id) {
+    } else if (params.district_id && !params.sub_district_id) {
       location_type = "district"
     } else {
       location_type = "sub_district"

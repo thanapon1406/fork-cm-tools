@@ -411,7 +411,6 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           description: '',
         })
       }
-
     }
   }
 
@@ -420,7 +419,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     let location_type: string = "province"
     if (allCityLocation) {
       location_type = "province"
-    } else if (params.district_id) {
+    } else if (params.district_id && !params.sub_district_id) {
       location_type = "district"
     } else {
       location_type = "sub_district"
@@ -536,7 +535,6 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                 }, 0);
                 //renew selected list
                 data[index].sub_district_selected = value
-
                 //check location_type
                 if (data[index].sub_district_option.length !== value.length) {
                   data[index].location_type = "sub_district"
@@ -641,6 +639,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     setIsLoading(true)
     const request = {
       id: id,
+      include: "location",
     }
     const { result, success } = await tierPriceList(request)
     if (success && _.get(result, "data[0]")) {

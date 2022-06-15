@@ -49,8 +49,6 @@ interface CityInterface {
 
 const initialValues = {
   name: '',
-  province_id: "",
-  district_id: "",
   sub_district_id: [],
   tier_prices: [
     {
@@ -726,7 +724,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     component={Select}
                     className="form-control round"
                     label={{ text: 'จังหวัด' }}
-                    placeholder="จังหวัด"
+                    placeholder="เลือกจังหวัด"
                     name="province_id"
                     selectOption={provinceList}
                   />
@@ -737,6 +735,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                       label={{ text: "ครอบคลุมพื้นที่ทั้งจังหวัด" }}
                       name="all_city"
                       component={CheckBox2}
+                      disabled={!params.province_id}
                       onChange={(e: any) => {
                         let value = e.target.checked
                         setAllCityLocation(value)
@@ -764,7 +763,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     component={Select}
                     className="form-control round"
                     label={{ text: 'เขต/อำเภอ' }}
-                    placeholder="เขต/อำเภอ"
+                    placeholder="เลือกเขต/อำเภอ"
                     name="district_id"
                     selectOption={cityList}
                   />
@@ -782,7 +781,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     mode="multiple"
                     className="form-control round"
                     label={{ text: 'แขวง/ตำบล' }}
-                    placeholder="แขวง/ตำบล"
+                    placeholder="เลือก แขวง/ตำบล ทั้งหมด"
                     name="sub_district_id"
                     selectOption={subDistrictList}
                   />

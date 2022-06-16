@@ -11,7 +11,7 @@ import {
   getProvince
 } from '@/services/pos-profile';
 import { tierPriceList, tierPriceLocationUpdate, tierPriceUpdate, tierPriceValidate } from '@/services/tierPrices';
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Col, message, Modal, notification, Row, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import _, { map } from 'lodash';
@@ -20,7 +20,7 @@ import { ReactElement, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 
 const { Title } = Typography
-const { warning } = Modal
+const { confirm } = Modal;
 
 interface Props { }
 
@@ -94,7 +94,8 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   const [allCityLocation, setAllCityLocation] = useState(false)
   const [deliveryFeeRuleValidateMessage, setDeliveryFeeRuleValidateMessage] = useState("")
   const [provinceList, setProvinceList] = useState<Array<InterfaceOption>>([])
-  const [provinceSelected, setProvinceSelected] = useState<Array<InterfaceOption>>([])
+  const [showError, setShowError] = useState(false)
+  const [showErrorResult, setShowErrorResult] = useState<any>([])
   const [cityList, setCityList] = useState<Array<InterfaceOption>>([])
   const [subDistrictList, setSubDistrictList] = useState<Array<InterfaceOption>>([])
   const [districtData, setSubDistrciData] = useState<Array<DistrictInterface>>([])
@@ -152,6 +153,8 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       message.error({ content: 'ไม่สามารถดึงค่าที่อยู่ได้กรุณาลองใหม่อีกครั้ง' })
     }
   }
+
+
 
   const fetchSubDistrictByParam = async (proviceId: number, districtId: number[] = []) => {
     let reqParam: any = { province_ids: [proviceId] }
@@ -405,13 +408,66 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       }
 
       const { success, result } = await tierPriceLocationUpdate(reqCreateTierPriceLocation)
-      if (success) {
+      if (success && result.message !== "Error") {
         notification.success({
           message: `แก้ไขข้อมูลสำเร็จ`,
           description: '',
         })
+      } else {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถเพิ่มพื้นที่ได้ เนื่องจากมีพื้นที่ซ้อนทับกับ config อื่น',
+        })
+      }
+      if (_.get(result, "validate[0]")) {
+        setShowError(true)
+        result.validate.forEach((element: any, index: number) => {
+          let districtData: any = _.find(locations, function (obj) {
+            if (obj.district_id == element.district) {
+              return true;
+            }
+          });
+          result.validate[index].district = districtData.district_data
+
+          let sub_districtDatas: any = []
+
+          if (districtData.location_type !== "district") {
+            result.validate[index].sub_district.forEach((subdistrictId: any) => {
+              let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
+                if (obj.id == subdistrictId) {
+                  return true;
+                }
+              });
+              sub_districtDatas.push(sub_districtData.name)
+            });
+          }
+          result.validate[index].sub_district = sub_districtDatas
+        });
+        setShowErrorResult(result.validate)
       }
     }
+  }
+
+  const renderErrorMessage = (values: any, setFieldValue: any) => {
+    let errorRow = []
+    let keyword = ""
+    for (let i = 0; i < showErrorResult.length; i++) {
+      if (_.get(showErrorResult[i], "sub_district") && showErrorResult[i].sub_district.length > 0) {
+        keyword = `-อำเภอ ${showErrorResult[i].district.name} มีการระบุตำบล (${showErrorResult[i].sub_district.join(",")}) ซ้ำ`
+      } else {
+        keyword = `-มีการระบุอำเภอ${showErrorResult[i].district.name}แล้ว หากคุณต้องการเจาะจงระดับตำบล กรุณาระบุเฉพาะตำบลที่คุณต้องการเพิ่ม`
+      }
+      errorRow.push(
+        <Col span={24}>
+          {keyword}
+        </Col>
+      )
+    }
+    return (
+      <Row style={{ color: "red" }}>
+        <Col span={24}>พบพื้นที่ซ้ำซ้อนกับ config อื่น</Col>
+        {errorRow}
+      </Row>)
   }
 
   const validateTierPrice = async () => {
@@ -419,7 +475,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     let location_type: string = "province"
     if (allCityLocation) {
       location_type = "province"
-    } else if (params.district_id && !params.sub_district_id) {
+    } else if ((params.district_id && !params.sub_district_id) || _.get(params, "sub_district_id", "").split(",").length == subDistrictList.length) {
       location_type = "district"
     } else {
       location_type = "sub_district"
@@ -474,7 +530,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           }
         });
 
-        if (!params.sub_district_id) {
+        if (!params.sub_district_id || _.get(params, "sub_district_id", "").split(",").length == subDistrictList.length) {
           sub_district_data = subDistrictList.map(a => a.value);
           location_type = "district"
         } else {
@@ -533,16 +589,19 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                 let index = _.findIndex(data, (e: any) => {
                   return e.city_id == city_id;
                 }, 0);
-                //renew selected list
-                data[index].sub_district_selected = value
-                //check location_type
-                if (data[index].sub_district_option.length !== value.length) {
-                  data[index].location_type = "sub_district"
+                if (value.length !== 0) {
+                  //renew selected list
+                  data[index].sub_district_selected = value
+                  //check location_type
+                  if (data[index].sub_district_option.length !== value.length) {
+                    data[index].location_type = "sub_district"
+                  } else {
+                    data[index].location_type = "district"
+                  }
+                  setMockData([...data])
                 } else {
-                  data[index].location_type = "district"
+                  showDeleteConfirm(data[index].city, index)
                 }
-
-                setMockData([...data])
               }}
               selectOption={record.sub_district_option}
               value={record.sub_district_selected}
@@ -689,17 +748,21 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                   let index = _.findIndex(dataDefaults, (e: any) => {
                     return e.city_id == city_id;
                   }, 0);
-                  //renew selected list
-                  dataDefaults[index].sub_district_selected = value
+                  if (value.length !== 0) {
+                    //renew selected list
+                    dataDefaults[index].sub_district_selected = value
 
-                  //check location_type
-                  if (dataDefaults[index].sub_district_option.length !== value.length) {
-                    dataDefaults[index].location_type = "sub_district"
-                  } else {
-                    dataDefaults[index].location_type = "district"
+                    //check location_type
+                    if (dataDefaults[index].sub_district_option.length !== value.length) {
+                      dataDefaults[index].location_type = "sub_district"
+                    } else {
+                      dataDefaults[index].location_type = "district"
+                    }
+                    setMockData([...dataDefaults])
                   }
-
-                  setMockData([...dataDefaults])
+                  else {
+                    showDeleteConfirm(dataDefaults[index].city, index)
+                  }
                 }}
                 selectOption={record.sub_district_option}
                 value={record.sub_district_selected}
@@ -726,6 +789,21 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     }
     setDeliveryFeeRuleCount(result.data[0].tier_prices.length)
   }
+
+  const showDeleteConfirm = (districtName: string, rowIndex: any) => {
+    confirm({
+      title: 'ยืนยันการลบ ตาราง',
+      icon: <ExclamationCircleOutlined />,
+      content: `คุณต้องการลบ ${districtName} ใช่ไหม`,
+      okText: 'ลบ',
+      okType: 'danger',
+      cancelText: 'ยกเลิก',
+      onOk() {
+        mockData.splice(rowIndex, 1);
+        setMockData([...mockData])
+      }
+    });
+  };
 
   const column = [
     {
@@ -837,7 +915,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     component={Select}
                     className="form-control round"
                     label={{ text: 'จังหวัด' }}
-                    placeholder="จังหวัด"
+                    placeholder="เลือกจังหวัด"
                     name="province_id"
                     selectOption={provinceList}
                   />
@@ -848,6 +926,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                       label={{ text: "ครอบคลุมพื้นที่ทั้งจังหวัด" }}
                       name="all_city"
                       component={CheckBox2}
+                      disabled={!params.province_id}
                       onChange={(e: any) => {
                         let value = e.target.checked
                         setAllCityLocation(value)
@@ -875,7 +954,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     component={Select}
                     className="form-control round"
                     label={{ text: 'เขต/อำเภอ' }}
-                    placeholder="เขต/อำเภอ"
+                    placeholder="เลือกเขต/อำเภอ"
                     name="district_id"
                     selectOption={cityList}
                   />
@@ -893,7 +972,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     mode="multiple"
                     className="form-control round"
                     label={{ text: 'แขวง/ตำบล' }}
-                    placeholder="แขวง/ตำบล"
+                    placeholder="เลือก แขวง/ตำบล ทั้งหมด"
                     name="sub_district_id"
                     selectOption={subDistrictList}
                   />
@@ -909,9 +988,10 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                   + เพิ่มพื้นที่ใช้งาน
                 </Button>
               </Row>
+              {showError && renderErrorMessage(values, setFieldValue)}
               <Table
                 config={{
-                  dataTableTitle: 'รายการรอตรวจสอบ',
+                  dataTableTitle: 'รายการพื้นที่ใช้งานที่เพิ่ม',
                   loading: false,
                   tableName: 'config',
                   tableColumns: column,

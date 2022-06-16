@@ -36,6 +36,31 @@ const tierPriceCreate = async (param: createList) => {
     const result = await fetch.post(`/api/tier-prices/create`, param)
     return successHandler(result)
   } catch (error) {
+    const { response }: any = error
+    if (response?.data?.code == 400 && response?.data?.detail == "Tier Duplicate") {
+      notification.error({
+        message: `Request error `,
+        description: "Tier name duplicate",
+      })
+      return response.data
+    }
+    return errorHandler(error)
+  }
+}
+
+const tierPriceUpdate = async (param: createList) => {
+  try {
+    const result = await fetch.post(`/api/tier-prices/update`, param)
+    return successHandler(result)
+  } catch (error) {
+    const { response }: any = error
+    if (response?.data?.code == 400 && response?.data?.detail == "Tier Duplicate") {
+      notification.error({
+        message: `Request error `,
+        description: "Tier name duplicate",
+      })
+      return response.data
+    }
     return errorHandler(error)
   }
 }
@@ -43,6 +68,15 @@ const tierPriceCreate = async (param: createList) => {
 const tierPriceLocationCreate = async (param: any) => {
   try {
     const result = await fetch.post(`/api/tier-prices/create-location`, param)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const tierPriceLocationUpdate = async (param: any) => {
+  try {
+    const result = await fetch.post(`/api/tier-prices/update-location`, param)
     return successHandler(result)
   } catch (error) {
     return errorHandler(error)
@@ -76,5 +110,5 @@ const tierPriceDelete = async (option: queryList) => {
   }
 }
 
-export { tierPriceList, tierPriceCreate, tierPriceLocationCreate, tierPriceValidate, tierPriceDelete }
+export { tierPriceList, tierPriceCreate, tierPriceUpdate, tierPriceLocationCreate, tierPriceLocationUpdate, tierPriceValidate, tierPriceDelete }
 

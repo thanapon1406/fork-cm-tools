@@ -8,13 +8,13 @@ import OutletSelecter from '@/components/OutletSelecter'
 import MainLayout from '@/layout/MainLayout'
 import { findLsConfig, updateLsConfig } from '@/services/ls-config'
 import { getBrandListV2 } from '@/services/pos-profile'
-import { CopyOutlined } from '@ant-design/icons'
-import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
+import { CopyOutlined, LinkOutlined } from '@ant-design/icons'
+import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import noImage from '../../public/asset/images/no-image-available.svg'
 
@@ -78,6 +78,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
   const [imageUrl, setImageUrl] = useState('')
   const [loadingImage, setloadingImage] = useState(false)
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
+  const [startDateSnapData, setstartDateSnapData] = useState(new Date())
 
   const lsLogicsOption = [
     {
@@ -172,6 +173,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         start: _.get(lsDetail, "start_date") ? moment(_.get(lsDetail, "start_date")).format("YYYY-MM-DD HH:mm") : "",
         end: _.get(lsDetail, "end_date") ? moment(_.get(lsDetail, "end_date")).format("YYYY-MM-DD HH:mm") : ""
       }
+      setstartDateSnapData(_.get(lsDetail, "start_date"))
 
       // Construct Selected Brand
       let is_apply_all_brand = false
@@ -430,7 +432,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         start_date: _.get(values, "start_date") ? _.get(values, "start_date") : "",
         end_date: _.get(values, "end_date") ? _.get(values, "end_date") : "",
         allowed_list: allowedList,
-        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : ""
+        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
 
@@ -440,6 +442,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
       notification.success({
         message: `ดำเนินการแก้ไข LS Config สำเร็จ`,
         description: '',
+        duration: 3,
       })
       Router.push("/ls-config")
       setDisableSubmitButton(false)
@@ -447,6 +450,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
       notification.warning({
         message: `ผิดพลาด`,
         description: 'ไม่สามารถแก้ไข LS Config ได้',
+        duration: 3,
       })
       setDisableSubmitButton(false)
     }
@@ -464,7 +468,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     return (<div key="logic_info">
       {/* Name */}
       < Row gutter={16} >
-        <Col className="gutter-row" span={24}>
+        <Col className="gutter-row" span={12}>
           <Field
             label={{ text: "LS Configure Name" }}
             name="name"
@@ -838,29 +842,6 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                ร้านอาหาร
-              </Col>
-              <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
-                <Field
-                  name="ls_merchant_amount"
-                  type="number"
-                  component={Input}
-                  className="form-control"
-                  id="ls_merchant_amount"
-                  disabled
-                />
-              </Col>
-              <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                {subsidizeTypeName}
-              </Col>
-            </Row>
-            <Row gutter={{
-              xs: 24,
-              sm: 24,
-              md: 12,
-              lg: 12
-            }}>
-              <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
                 แพลตฟอร์ม
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
@@ -877,13 +858,36 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                 {subsidizeTypeName}
               </Col>
             </Row>
+            <Row gutter={{
+              xs: 24,
+              sm: 24,
+              md: 12,
+              lg: 12
+            }}>
+              <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
+                ร้านอาหาร
+              </Col>
+              <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
+                <Field
+                  name="ls_merchant_amount"
+                  type="number"
+                  component={Input}
+                  className="form-control"
+                  id="ls_merchant_amount"
+                  disabled
+                />
+              </Col>
+              <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
+                {subsidizeTypeName}
+              </Col>
+            </Row>
           </div>
           break;
         case CUSTOMER_PAY:
           logicSubsidize = <div key="logic_subsidize_CUSTOMER_PAY">
             <Row gutter={24}>
               <Col className="gutter-row" span={24} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                <span style={{ fontSize: "15px", fontWeight: 600, marginBottom: "0.5em", lineHeight: 1.5 }}>สัดส่วน Logic Subsidize</span> <span style={{ fontWeight: 500, color: "rgb(93 93 93)" }}>* ถ้ามีการ subsidize เกินมนส่วนของการตั้งค่า LS จะต้องแคปลิมิตค่าของอีกฝั่งนึง</span>
+                <span style={{ fontSize: "15px", fontWeight: 600, marginBottom: "0.5em", lineHeight: 1.5 }}>สัดส่วน Logic Subsidize</span> <span style={{ fontWeight: 500, color: "rgb(93 93 93)" }}>* ถ้ามีการ subsidize เกินในส่วนของการตั้งค่า LS จะต้องแคปลิมิตค่าของอีกฝั่งนึง</span>
               </Col>
             </Row>
             <Row gutter={16}>
@@ -898,15 +902,15 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                ร้านอาหาร
+                แพลตฟอร์ม
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_merchant_amount"
+                  name="ls_platform_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_merchant_amount"
+                  id="ls_platform_amount"
                   disabled
                 />
               </Col>
@@ -921,15 +925,15 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                แพลตฟอร์ม
+                ร้านอาหาร
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_platform_amount"
+                  name="ls_merchant_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_platform_amount"
+                  id="ls_merchant_amount"
                   disabled
                 />
               </Col>
@@ -968,15 +972,15 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                ร้านอาหาร
+                แพลตฟอร์ม
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_merchant_amount"
+                  name="ls_platform_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_merchant_amount"
+                  id="ls_platform_amount"
                   disabled
                 />
               </Col>
@@ -991,15 +995,15 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                แพลตฟอร์ม
+                ร้านอาหาร
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_platform_amount"
+                  name="ls_merchant_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_platform_amount"
+                  id="ls_merchant_amount"
                   disabled
                 />
               </Col>
@@ -1057,22 +1061,30 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         </Row>
         <Row gutter={24}>
           <Col className="gutter-row" span={24}>
-            < Collapse
-              accordion
-              collapsible={values.is_apply_all_brand ? 'disabled' : 'header'}
-            >
-              <Panel key="outlet_joined" header="ร้านอาหารที่เข้าร่วม">
-                <OutletSelecter
-                  handleChange={handleChange}
-                  disabled={values.is_apply_all_brand}
-                  selectedList={filterOutletSelected}
-                  formValue={values}
-                  setFieldValue={setFieldValue}
-                  userSelectedOutlet={userSelectedOutlet}
-                  brandList={brandList}
-                />
-              </Panel>
-            </Collapse >
+            {values.is_apply_all_brand ?
+              < Collapse
+                accordion
+                collapsible='disabled'
+                destroyInactivePanel={true}
+              >
+                <Panel key="all_outlet_disabled" header="ร้านอาหารที่เข้าร่วม">
+                </Panel>
+              </Collapse > :
+              < Collapse
+                accordion
+              >
+                <Panel key="outlet_joined" header="ร้านอาหารที่เข้าร่วม">
+                  <OutletSelecter
+                    handleChange={handleChange}
+                    disabled={values.is_apply_all_brand}
+                    selectedList={filterOutletSelected}
+                    formValue={values}
+                    setFieldValue={setFieldValue}
+                    userSelectedOutlet={userSelectedOutlet}
+                    brandList={brandList}
+                  />
+                </Panel>
+              </Collapse >}
           </Col>
         </Row>
       </div>
@@ -1167,6 +1179,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                   notification.warning({
                     message: `ไม่สามารถ Preview LS Summary ได้`,
                     description: 'กรุณาระบุ Logic Setup ให้ครบถ้วน',
+                    duration: 3,
                   })
                   setIsVisibleLsSummary(false)
                 }
@@ -1207,6 +1220,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
               label={{ text: 'วันที่และเวลาของแคมเปญ' }}
               name="campaign_time"
               component={DateTimeRangePicker}
+              minDate={moment(startDateSnapData).format("YYYY-MM-DD HH:mm")}
               id="campaign_time"
               placeholder="วันเวลาที่ทำรายการ"
             />
@@ -1226,7 +1240,10 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                       setFieldValue("deep_link", e.target.value)
                     }}
                     defaultValue={values.deep_link}
+                    value={values.deep_link}
                     disabled
+                    addonBefore={<LinkOutlined />}
+                  // placeholder={'https://www.kitchenhub-th.com/'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1252,7 +1269,10 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                       setFieldValue("inapp_link", e.target.value)
                     }}
                     defaultValue={values.inapp_link}
+                    value={values.inapp_link}
                     disabled
+                    addonBefore={<LinkOutlined />}
+                  // placeholder={'khconsumer://host?outletId=1'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1301,6 +1321,19 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     return <div key="logic_detail">{logicDetailElements}</div>
   }
 
+  const renderFormValidation = (errors: any, touched: any) => {
+    let formValidationElements: any = []
+    const errorList = Object.keys(errors)
+    const touchedList = Object.keys(touched)
+    if ((_.size(touchedList) > 0) && (_.size(errorList) > 0)) {
+      formValidationElements.push(
+        <div key={`form_validation_warning_message`}>
+          <Alert message={`กรุณาระบุข้อมูลภายในแบบฟอร์มให้ถูกต้อง`} type="warning" showIcon />
+        </div>
+      )
+    }
+    return <div key="form_validation_warning">{formValidationElements}</div>
+  }
 
   return (
     <MainLayout>
@@ -1319,14 +1352,17 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
             values,
             resetForm,
             setFieldValue,
-            handleChange }) => (
+            handleChange,
+            errors,
+            touched
+          }) => (
             <Form>
               <Row justify="space-around" align="middle">
                 <Col span={8}>
-                  <Title level={4}>LS Logic</Title>
+                  <Title level={4}>Logistic Subsidize</Title>
                   <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>LS Logic</Breadcrumb.Item>
-                    <Breadcrumb.Item>สร้าง LS Logic</Breadcrumb.Item>
+                    <Breadcrumb.Item><a onClick={() => { Router.push("/ls-config") }}>Logistic Subsidize</a></Breadcrumb.Item>
+                    <Breadcrumb.Item>แก้ไข Logistic Subsidize</Breadcrumb.Item>
                   </Breadcrumb>
                 </Col>
                 <Col span={8} offset={8} style={{ textAlign: 'end' }}>
@@ -1350,6 +1386,8 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                   </Button>
                 </Col>
               </Row>
+              {/* Form Validation */}
+              {renderFormValidation(errors, touched)}
               <Card>
                 {/* Logic Info */}
                 {renderLogicInfo(values, setFieldValue)}

@@ -141,8 +141,8 @@ const LsSummaryComponent = ({
   const ssoId = router.query.sso_id as string
 
   const betweenArray = (x: any, y: any, min: any, max: any) => {
-    for (let i = x; i < y; i++) {
-      if (i >= min && x <= max) {
+    for (let i = x; i <= y; i++) {
+      if (i >= min && i <= max) {
         return true
       }
     }
@@ -169,7 +169,7 @@ const LsSummaryComponent = ({
       let min = parseInt(params.min_distance!)
       let max = parseInt(params.max_distance!)
       setOrderAmount(params.order_amount!)
-      setDistance(min + ' - ' + max)
+      setDistance((isNaN(min) ? 0 : min) + ' - ' + (isNaN(max) ? 0 : max))
       data?.map((value: any, key: number) => {
         array[key] = []
         value?.tier_prices?.map((tierPricesValue: any, tierPricesKey: number) => {

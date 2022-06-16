@@ -1,19 +1,32 @@
-import Button1 from '@/components/Button';
-import Card from '@/components/Card';
-import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker';
-import Input from '@/components/Form/Input';
-import MainLayout from '@/layout/MainLayout';
-import { findBanner, updateBanner } from '@/services/banner';
-import { uploadImage } from '@/services/cdn';
-import { LinkOutlined, PlusOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Input as AntdInput, Modal, notification, Radio, Row, Switch, Typography, Upload } from 'antd';
-import { Field, Form, Formik } from 'formik';
-import { omit } from 'lodash';
-import moment from 'moment';
-import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useState } from 'react';
-import * as Yup from 'yup';
-import noImage from '../../../public/asset/images/no-image-available.svg';
+import Button1 from '@/components/Button'
+import Card from '@/components/Card'
+import ExampleInternalSchema from '@/components/deeplink/exampleSchema'
+import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
+import Input from '@/components/Form/Input'
+import MainLayout from '@/layout/MainLayout'
+import { findBanner, updateBanner } from '@/services/banner'
+import { uploadImage } from '@/services/cdn'
+import { LinkOutlined, PlusOutlined } from '@ant-design/icons'
+import {
+  Breadcrumb,
+  Button,
+  Col,
+  Input as AntdInput,
+  Modal,
+  notification,
+  Radio,
+  Row,
+  Switch,
+  Typography,
+  Upload
+} from 'antd'
+import { Field, Form, Formik } from 'formik'
+import { omit } from 'lodash'
+import moment from 'moment'
+import { useRouter } from 'next/router'
+import { ReactElement, useEffect, useState } from 'react'
+import * as Yup from 'yup'
+import noImage from '../../../public/asset/images/no-image-available.svg'
 
 const { Title } = Typography
 const { warning } = Modal
@@ -34,7 +47,7 @@ interface FormInterface {
   show_date: {
     start: any
     end: any
-  },
+  }
 }
 
 const initialValuesDefault = {
@@ -73,7 +86,6 @@ export default function BannerView({ }: Props): ReactElement {
     if (id != undefined) {
       fetchDataBanner()
     }
-
   }, [id])
 
   const fetchDataBanner = async () => {
@@ -94,7 +106,7 @@ export default function BannerView({ }: Props): ReactElement {
         show_date: {
           start: moment(data.start_date).startOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
           end: moment(data.end_date).endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
-        }
+        },
       }
 
       setActive(data.status)
@@ -102,9 +114,9 @@ export default function BannerView({ }: Props): ReactElement {
       setInitialValues(dataBanner)
       setImageUrl(data.image_url)
 
-      if(data.action == 'external_url'){
+      if (data.action == 'external_url') {
         setExampleLink('* ตัวอย่าง https://www.google.com/')
-      }else if(data.action == 'internal_url'){
+      } else if (data.action == 'internal_url') {
         setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
       }
     }
@@ -118,25 +130,25 @@ export default function BannerView({ }: Props): ReactElement {
   const handleAction = (event: any) => {
     setAction(event.target.value)
 
-    if(event.target.value == 'external_url'){
+    if (event.target.value == 'external_url') {
       setExampleLink('* ตัวอย่าง https://www.google.com/')
-    }else if(event.target.value == 'internal_url'){
+    } else if (event.target.value == 'internal_url') {
       setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
     }
   }
 
   const handleChangeImage = async (info: any) => {
-    const isJPNG = info.type === 'image/jpeg';
-    const isJPG = info.type === 'image/jpg';
-    const isPNG = info.type === 'image/png';
-    const fileSize = (info.size / 1024) / 1024
+    const isJPNG = info.type === 'image/jpeg'
+    const isJPG = info.type === 'image/jpg'
+    const isPNG = info.type === 'image/png'
+    const fileSize = info.size / 1024 / 1024
 
     if (!isJPNG && !isJPG && !isPNG) {
       warning({
         title: `กรุณาเลือกรูปภาพ`,
         afterClose() {
           setImageUrl('')
-        }
+        },
       })
       return null
     }
@@ -144,8 +156,7 @@ export default function BannerView({ }: Props): ReactElement {
     if (fileSize > 1) {
       warning({
         title: `กรุณาเลือกรูปภาพขนาดไม่เกิน 1MB`,
-        afterClose() {
-        }
+        afterClose() { },
       })
       return false
     }
@@ -162,8 +173,7 @@ export default function BannerView({ }: Props): ReactElement {
     if (imageUrl == '') {
       warning({
         title: `กรุณาเลือกรูปภาพ`,
-        afterClose() {
-        }
+        afterClose() { },
       })
       return false
     }
@@ -183,8 +193,7 @@ export default function BannerView({ }: Props): ReactElement {
       if (isAction == '') {
         warning({
           title: `กรุณาเลือก Action Link`,
-          afterClose() {
-          }
+          afterClose() { },
         })
         return false
       }
@@ -200,7 +209,7 @@ export default function BannerView({ }: Props): ReactElement {
         message: `ดำเนินการอัพเดตสถานะสำเร็จ`,
         description: '',
       })
-      router.push('/content/banner');
+      router.push('/content/banner')
     } else {
       notification.error({
         message: `ไม่สามารถทำการ อัพเดตได้`,
@@ -211,7 +220,12 @@ export default function BannerView({ }: Props): ReactElement {
 
   return (
     <MainLayout>
-      <Formik enableReinitialize initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
+      <Formik
+        enableReinitialize
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+        validationSchema={Schema}
+      >
         {({ values, resetForm, setFieldValue }) => (
           <Form>
             <Row justify="space-around" align="middle">
@@ -230,7 +244,7 @@ export default function BannerView({ }: Props): ReactElement {
                       size="middle"
                       type="primary"
                       className="confirm-button"
-                      htmlType='submit'
+                      htmlType="submit"
                     >
                       บันทึก
                     </Button1>
@@ -256,7 +270,7 @@ export default function BannerView({ }: Props): ReactElement {
                     >
                       แก้ไข
                     </Button>
-                    
+
                     <Button1
                       style={{ float: 'right', marginRight: '10px' }}
                       type="default"
@@ -268,7 +282,6 @@ export default function BannerView({ }: Props): ReactElement {
                       กลับ
                     </Button1>
                   </>
-                  
                 )}
               </Col>
             </Row>
@@ -277,28 +290,32 @@ export default function BannerView({ }: Props): ReactElement {
               <Row gutter={24}>
                 <Col className="gutter-row" span={24}>
                   <Field
-                    disabled={(isEdit) ? false : true}
-                    label={{ text: "ชื่อ Banner" }}
+                    disabled={isEdit ? false : true}
+                    label={{ text: 'ชื่อ Banner' }}
                     name="name"
                     type="text"
                     component={Input}
                     rows={2}
                     className="form-control round"
-                    id="name" />
+                    id="name"
+                  />
                 </Col>
 
-                <Col className="gutter-row" span={24}
+                <Col
+                  className="gutter-row"
+                  span={24}
                   style={{
-                    borderTop: "2px solid #f2f2f2",
-                    paddingTop: "15px",
-                    paddingBottom: "15px"
-                  }}>
+                    borderTop: '2px solid #f2f2f2',
+                    paddingTop: '15px',
+                    paddingBottom: '15px',
+                  }}
+                >
                   <b>สถานะ</b>
                   <Row gutter={24}>
-                    <Col className="gutter-row" span={24} style={{ marginTop: "10px" }}>
-                      <span >
+                    <Col className="gutter-row" span={24} style={{ marginTop: '10px' }}>
+                      <span>
                         <Switch
-                          disabled={(isEdit) ? false : true}
+                          disabled={isEdit ? false : true}
                           onClick={handleStatus}
                           checkedChildren="active"
                           unCheckedChildren="inactive"
@@ -309,69 +326,89 @@ export default function BannerView({ }: Props): ReactElement {
                   </Row>
                 </Col>
 
-                <Col className="gutter-row" span={24}
+                <Col
+                  className="gutter-row"
+                  span={24}
                   style={{
-                    borderTop: "2px solid #f2f2f2",
-                    paddingTop: "15px",
-                    paddingBottom: "15px"
-                  }}>
+                    borderTop: '2px solid #f2f2f2',
+                    paddingTop: '15px',
+                    paddingBottom: '15px',
+                  }}
+                >
                   <Row gutter={24}>
                     <Col span={24}>
-                      <b>ลิงค์</b><span style={{ color: "#9999" }}> (ไม่บังคับ)</span>
+                      <b>ลิงค์</b>
+                      <span style={{ color: '#9999' }}> (ไม่บังคับ)</span>
                     </Col>
                   </Row>
 
-                  <Row gutter={24} style={{ marginTop: "5px" }}>
+                  <Row gutter={24} style={{ marginTop: '5px' }}>
                     <Col span={24}>
-                      <Radio.Group disabled={(isEdit) ? false : true} onChange={handleAction} value={isAction}>
+                      <Radio.Group
+                        disabled={isEdit ? false : true}
+                        onChange={(e) => {
+                          handleAction(e)
+                          setFieldValue('action', e.target.value)
+                        }}
+                        value={isAction}
+                      >
                         <Radio value="external_url">External</Radio>
                         <Radio value="internal_url">Internal</Radio>
                       </Radio.Group>
                     </Col>
                   </Row>
 
-                  <Row gutter={24} style={{ marginTop: "10px" }}>
-                      <AntdInput 
-                        placeholder="ลิงค์" 
-                        name="action_url"
-                        id="action_url"
-                        type="text"
-                        onChange={(e: any) => {
-                          setFieldValue('action_url', e?.target?.value)
-                        }}
-                        value={values.action_url}
-                        disabled={(isEdit) ? false : true}
-                        prefix={<LinkOutlined style={{ fontSize: "20px", color: "#4dd2ff" }} />} 
-                      />
-                      <span style={{ fontSize: "12px", color: "red" }}>{ exampleLink }</span>
+                  <Row gutter={24} style={{ marginTop: '10px' }}>
+                    <AntdInput
+                      placeholder="ลิงค์"
+                      name="action_url"
+                      id="action_url"
+                      type="text"
+                      onChange={(e: any) => {
+                        setFieldValue('action_url', e?.target?.value)
+                      }}
+                      value={values.action_url}
+                      disabled={isEdit ? false : true}
+                      prefix={<LinkOutlined style={{ fontSize: '20px', color: '#4dd2ff' }} />}
+                    />
+                    <span style={{ fontSize: '12px', color: 'red' }}>
+                      {values.action === 'external_url' ? exampleLink : <ExampleInternalSchema />}
+                    </span>
                   </Row>
                 </Col>
 
-                <Col className="gutter-row" span={12}
+                <Col
+                  className="gutter-row"
+                  span={12}
                   style={{
-                    borderTop: "2px solid #f2f2f2",
-                    paddingTop: "15px",
-                    paddingBottom: "15px"
-                  }}>
+                    borderTop: '2px solid #f2f2f2',
+                    paddingTop: '15px',
+                    paddingBottom: '15px',
+                  }}
+                >
                   <Field
-                    disabled={(isEdit) ? false : true}
-                    label={{ text: "Priority" }}
+                    disabled={isEdit ? false : true}
+                    label={{ text: 'Priority' }}
                     name="priority"
                     type="text"
                     component={Input}
                     rows={2}
                     className="form-control round"
-                    id="priority" />
+                    id="priority"
+                  />
                 </Col>
 
-                <Col className="gutter-row" span={12}
+                <Col
+                  className="gutter-row"
+                  span={12}
                   style={{
-                    borderTop: "2px solid #f2f2f2",
-                    paddingTop: "15px",
-                    paddingBottom: "15px"
-                  }}>
+                    borderTop: '2px solid #f2f2f2',
+                    paddingTop: '15px',
+                    paddingBottom: '15px',
+                  }}
+                >
                   <Field
-                    disabled={(isEdit) ? false : true}
+                    disabled={isEdit ? false : true}
                     label={{ text: 'วันเวลาแสดง Banner' }}
                     name="show_date"
                     component={DateTimeRangePicker}
@@ -382,28 +419,48 @@ export default function BannerView({ }: Props): ReactElement {
               </Row>
 
               <Row gutter={24}>
-                <Col className="gutter-row" span={24}
+                <Col
+                  className="gutter-row"
+                  span={24}
                   style={{
-                    borderTop: "2px solid #f2f2f2",
-                    paddingTop: "15px",
-                    paddingBottom: "15px"
-                  }}>
-                  <label style={{ display: "block", marginBottom: "10px" }}>อัพโหลดรูปภาพ</label>
+                    borderTop: '2px solid #f2f2f2',
+                    paddingTop: '15px',
+                    paddingBottom: '15px',
+                  }}
+                >
+                  <label style={{ display: 'block', marginBottom: '10px' }}>อัพโหลดรูปภาพ</label>
                 </Col>
 
                 <Upload
                   name="file"
-                  onRemove={e => { setImageUrl('') }}
+                  onRemove={(e) => {
+                    setImageUrl('')
+                  }}
                   beforeUpload={handleChangeImage}
                   maxCount={1}
                 >
-
-                  <Button disabled={(isEdit) ? false : true} style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูปภาพ</Button>
+                  <Button
+                    disabled={isEdit ? false : true}
+                    style={{ marginLeft: 10 }}
+                    icon={<PlusOutlined />}
+                  >
+                    เพิ่มรูปภาพ
+                  </Button>
                 </Upload>
-                <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ แนะนำ รูปภาพ ขนาด 3:1 หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png</label>
+                <label style={{ marginLeft: 10, color: 'red' }}>
+                  * หมายเหตุ แนะนำ รูปภาพ ขนาด 3:1 หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png
+                </label>
 
-                <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
-                  <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />
+                <Col
+                  className="gutter-row"
+                  span={24}
+                  style={{ marginTop: '35px', marginBottom: '20px', textAlign: 'center' }}
+                >
+                  <img
+                    style={{ width: 'auto', height: 240 }}
+                    alt="example"
+                    src={imageUrl != '' ? imageUrl : noImage.src}
+                  />
                 </Col>
               </Row>
             </Card>
@@ -413,4 +470,3 @@ export default function BannerView({ }: Props): ReactElement {
     </MainLayout>
   )
 }
-

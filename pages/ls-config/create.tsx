@@ -1006,28 +1006,6 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                ร้านอาหาร
-              </Col>
-              <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
-                <Field
-                  name="ls_merchant_amount"
-                  type="number"
-                  component={Input}
-                  className="form-control"
-                  id="ls_merchant_amount"
-                />
-              </Col>
-              <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                {subsidizeTypeName}
-              </Col>
-            </Row>
-            <Row gutter={{
-              xs: 24,
-              sm: 24,
-              md: 12,
-              lg: 12
-            }}>
-              <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
                 แพลตฟอร์ม
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
@@ -1043,13 +1021,35 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 {subsidizeTypeName}
               </Col>
             </Row>
+            <Row gutter={{
+              xs: 24,
+              sm: 24,
+              md: 12,
+              lg: 12
+            }}>
+              <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
+                ร้านอาหาร
+              </Col>
+              <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
+                <Field
+                  name="ls_merchant_amount"
+                  type="number"
+                  component={Input}
+                  className="form-control"
+                  id="ls_merchant_amount"
+                />
+              </Col>
+              <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
+                {subsidizeTypeName}
+              </Col>
+            </Row>
           </div>
           break;
         case CUSTOMER_PAY:
           logicSubsidize = <div key="logic_subsidize_CUSTOMER_PAY">
             <Row gutter={24}>
               <Col className="gutter-row" span={24} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                <span style={{ fontSize: "15px", fontWeight: 600, marginBottom: "0.5em", lineHeight: 1.5 }}>สัดส่วน Logic Subsidize</span> <span style={{ fontWeight: 500, color: "rgb(93 93 93)" }}>* ถ้ามีการ subsidize เกินมนส่วนของการตั้งค่า LS จะต้องแคปลิมิตค่าของอีกฝั่งนึง</span>
+                <span style={{ fontSize: "15px", fontWeight: 600, marginBottom: "0.5em", lineHeight: 1.5 }}>สัดส่วน Logic Subsidize</span> <span style={{ fontWeight: 500, color: "rgb(93 93 93)" }}>* ถ้ามีการ subsidize เกินในส่วนของการตั้งค่า LS จะต้องแคปลิมิตค่าของอีกฝั่งนึง</span>
               </Col>
             </Row>
             <Row gutter={16}>
@@ -1064,15 +1064,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                ร้านอาหาร
+                แพลตฟอร์ม
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_merchant_amount"
+                  name="ls_platform_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_merchant_amount"
+                  id="ls_platform_amount"
                 />
               </Col>
               <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
@@ -1086,15 +1086,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                แพลตฟอร์ม
+                ร้านอาหาร
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_platform_amount"
+                  name="ls_merchant_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_platform_amount"
+                  id="ls_merchant_amount"
                 />
               </Col>
               <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
@@ -1130,15 +1130,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                ร้านอาหาร
+                แพลตฟอร์ม
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_merchant_amount"
+                  name="ls_platform_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_merchant_amount"
+                  id="ls_platform_amount"
                 />
               </Col>
               <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
@@ -1152,15 +1152,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                แพลตฟอร์ม
+                ร้านอาหาร
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_platform_amount"
+                  name="ls_merchant_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_platform_amount"
+                  id="ls_merchant_amount"
                 />
               </Col>
               <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>

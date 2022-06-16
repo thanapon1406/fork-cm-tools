@@ -581,7 +581,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
 
                   setMockData([...data])
                 } else {
-                  showDeleteConfirm(data[index].city, index)
+                  showDeleteConfirm(data[index].city, index, data)
                 }
               }}
               selectOption={record.sub_district_option}
@@ -705,7 +705,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   }, [])
 
 
-  const showDeleteConfirm = (districtName: string, rowIndex: any) => {
+  const showDeleteConfirm = (districtName: string, rowIndex: any, data: any[] = []) => {
     confirm({
       title: 'ยืนยันการลบ ตาราง',
       icon: <ExclamationCircleOutlined />,
@@ -714,8 +714,8 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       okType: 'danger',
       cancelText: 'ยกเลิก',
       onOk() {
-        mockData.splice(rowIndex, 1);
-        setMockData([...mockData])
+        data.splice(rowIndex, 1);
+        setMockData([...data])
       }
     });
   };

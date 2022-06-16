@@ -275,6 +275,11 @@ export default function Sidebar({ }: Props): ReactElement {
           link: '/content/banner',
           key: '/content/banner',
         },
+        {
+          title: 'Logistic Subsidize',
+          link: '/content/ls/create',
+          key: '/content/ls/create',
+        },
       ],
     }
   ]

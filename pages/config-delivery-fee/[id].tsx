@@ -600,7 +600,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                   }
                   setMockData([...data])
                 } else {
-                  showDeleteConfirm(data[index].city, index)
+                  showDeleteConfirm(data[index].city, index, data)
                 }
               }}
               selectOption={record.sub_district_option}
@@ -761,7 +761,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     setMockData([...dataDefaults])
                   }
                   else {
-                    showDeleteConfirm(dataDefaults[index].city, index)
+                    showDeleteConfirm(dataDefaults[index].city, index, dataDefaults)
                   }
                 }}
                 selectOption={record.sub_district_option}
@@ -790,17 +790,17 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     setDeliveryFeeRuleCount(result.data[0].tier_prices.length)
   }
 
-  const showDeleteConfirm = (districtName: string, rowIndex: any) => {
+  const showDeleteConfirm = (districtName: string, rowIndex: any, data: any[] = []) => {
     confirm({
-      title: 'ยืนยันการลบ ตาราง',
+      title: 'ยืนยันการลบ เขต',
       icon: <ExclamationCircleOutlined />,
-      content: `คุณต้องการลบ ${districtName} ใช่ไหม`,
+      content: `คุณต้องการลบเขต ${districtName} ใช่ไหม`,
       okText: 'ลบ',
       okType: 'danger',
       cancelText: 'ยกเลิก',
       onOk() {
-        mockData.splice(rowIndex, 1);
-        setMockData([...mockData])
+        data.splice(rowIndex, 1);
+        setMockData([...data])
       }
     });
   };

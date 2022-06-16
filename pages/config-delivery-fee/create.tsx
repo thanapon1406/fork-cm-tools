@@ -10,7 +10,7 @@ import {
   getDistrictByProvinceId,
   getProvince
 } from '@/services/pos-profile';
-import { tierPriceCreate, tierPriceLocationCreate, tierPriceValidate } from '@/services/tierPrices';
+import { tierPriceCreate, tierPriceDelete, tierPriceLocationCreate, tierPriceValidate } from '@/services/tierPrices';
 import { DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Col, message, Modal, notification, Row, Typography } from 'antd';
 import { Field, Form, Formik } from 'formik';
@@ -341,7 +341,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     const responseTierPrice = await tierPriceCreate(reqCreateTierPrice)
 
 
-    if (responseTierPrice.result.tier_id) {
+    if (responseTierPrice.result.tier_id && mockData.length > 0) {
       let location_type = "province"
       let locations: any[] = []
       let location = {}
@@ -438,9 +438,14 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           }
           result.validate[index].sub_district = sub_districtDatas
         });
+        const reqCreateTierPriceDelete: any = {
+          id: responseTierPrice.result.tier_id,
+        }
+        await tierPriceDelete(reqCreateTierPriceDelete)
         setShowErrorResult(result.validate)
       }
-
+    } else if (responseTierPrice.result.tier_id) {
+      router.push('/config-delivery-fee');
     }
   }
 

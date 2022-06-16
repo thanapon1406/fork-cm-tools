@@ -177,7 +177,7 @@ export default function Merchant({ }: Props): ReactElement {
   return (
     <MainLayout>
 
-      <Title level={4}>Config Delivety Fee</Title>
+      <Title level={4}>Config Delivery Fee</Title>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>ค่าส่งตามระยะทาง</Breadcrumb.Item>
         <Breadcrumb.Item>ค่าส่งตามระยะทางทั้งหมด</Breadcrumb.Item>

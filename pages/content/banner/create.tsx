@@ -1,5 +1,5 @@
 import Card from '@/components/Card'
-import ExampleInternalSchema from '@/components/deeplink/exampleSchema'
+import ExampleInternalSchema from '@/components/deeplink/ExampleSchema'
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import MainLayout from '@/layout/MainLayout'

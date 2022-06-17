@@ -62,6 +62,10 @@ export const merchantStatus = [
     value: 'waiting',
   },
   {
+    name: 'รอยืนยันการชำระเงิน',
+    value: 'waiting_payment',
+  },
+  {
     name: 'รับออเดอร์',
     value: 'accept_order',
   },

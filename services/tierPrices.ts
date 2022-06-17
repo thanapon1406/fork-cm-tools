@@ -41,6 +41,7 @@ const tierPriceCreate = async (param: createList) => {
       notification.error({
         message: `Request error `,
         description: "Tier name duplicate",
+        duration: 3
       })
       return response.data
     }
@@ -58,6 +59,7 @@ const tierPriceUpdate = async (param: createList) => {
       notification.error({
         message: `Request error `,
         description: "Tier name duplicate",
+        duration: 3
       })
       return response.data
     }
@@ -102,6 +104,7 @@ const tierPriceDelete = async (option: queryList) => {
       notification.error({
         message: `Request error `,
         description: "กรุณา un-assign พื้นที่ location ออกจาก tier price",
+        duration: 3
       })
       return response.data
     }

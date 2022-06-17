@@ -259,7 +259,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     handleDeductDeliveryFeeRule(values, setFieldValue)
                   }}
                 >
-                  - ลบ Rule
+                  ลบ Rule
                 </Button> : null
             }
 
@@ -332,10 +332,32 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   }
 
   const handleSubmit = async (values: typeof initialValues) => {
+
+    let total_province: number = 0
+    let total_district: number = 0
+    let total_sub_district: number = 0
+    let tier_prices: any = []
+    values.tier_prices?.forEach((element: any) => {
+      tier_prices.push({
+        min: parseFloat(element.min),
+        max: parseFloat(element.max),
+        price: parseFloat(element.price),
+      })
+    });
+
+    mockData.forEach((element: any) => {
+      total_province = 1
+      total_district = total_district + 1,
+        total_sub_district = total_sub_district + element.sub_district_selected.length
+    });
+
     const reqCreateTierPrice: any = {
       data: {
         name: values.name,
-        tier_prices: values.tier_prices
+        tier_prices: tier_prices,
+        total_province: total_province,
+        total_district: total_district,
+        total_sub_district: total_sub_district
       }
     }
     const responseTierPrice = await tierPriceCreate(reqCreateTierPrice)
@@ -406,12 +428,14 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
         notification.success({
           message: `บันทึกข้อมูลสำเร็จ`,
           description: '',
+          duration: 3,
         })
         router.push('/config-delivery-fee');
       } else {
         notification.warning({
           message: `ผิดพลาด`,
           description: 'ไม่สามารถเพิ่มพื้นที่ได้ เนื่องจากมีพื้นที่ซ้อนทับกับ config อื่น',
+          duration: 3,
         })
       }
       if (_.get(result, "validate[0]")) {
@@ -475,6 +499,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       notification.warning({
         message: `ผิดพลาด`,
         description: 'ไม่สามารถเพิ่มพื้นที่ได้ เนื่องจากมีพื้นที่ซ้อนทับกับ config อื่น',
+        duration: 3,
       })
       return false
     }
@@ -774,7 +799,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                         setDeliveryFeeRuleValidate(false)
                       }}
                     >
-                      + เพิ่ม Rule
+                      เพิ่ม Rule
                     </Button>
                   </Row>
                 </Col>

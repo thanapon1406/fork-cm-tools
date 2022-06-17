@@ -1225,6 +1225,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
             <Field
               label={{ text: 'วันที่และเวลาของแคมเปญ' }}
               name="campaign_time"
+              disabled={[true, false]}
               component={DateTimeRangePicker}
               minDate={moment(startDateSnapData).format("YYYY-MM-DD HH:mm")}
               id="campaign_time"

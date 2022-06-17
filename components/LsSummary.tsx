@@ -209,10 +209,10 @@ const LsSummaryComponent = ({
               default:
                 discount = params.discount_type !== "baht" ? ((discountAmount * normal_price) / 100) : discountAmount
                 customer = normal_price - discount
-                if (params.ls_type !== "baht") {
-                  lsPlatformAmount = (lsPlatformAmount * discount) / 100
-                  lsMerchantAmount = (lsMerchantAmount * discount) / 100
-                }
+            }
+            if (params.ls_type !== "baht" && params.type !== "subsidize") {
+              lsPlatformAmount = (lsPlatformAmount * discount) / 100
+              lsMerchantAmount = (lsMerchantAmount * discount) / 100
             }
             // end find discount
           }

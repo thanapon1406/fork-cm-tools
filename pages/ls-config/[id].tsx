@@ -195,13 +195,19 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
           LsConfigDetail.brands = selectedBrands
         }
       } else {
-        is_apply_all_brand = true
+        // is_apply_all_brand = true
       }
       LsConfigDetail.is_apply_all_brand = is_apply_all_brand
 
-
       setLsDetail(LsConfigDetail)
       setIsLoading(false)
+    } else {
+      notification.warning({
+        message: `ผิดพลาด`,
+        description: 'ไม่สามารถค้นหาข้อมูล LS Config ได้',
+        duration: 3,
+      })
+      Router.push("/ls-config")
     }
   }
 

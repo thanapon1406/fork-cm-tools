@@ -329,7 +329,11 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
 
   const handleSubmit = async (values: typeof initialValues) => {
 
+    let total_province: number = 0
+    let total_district: number = 0
+    let total_sub_district: number = 0
     let tier_prices: any = []
+
     values.tier_prices?.forEach((element: any) => {
       tier_prices.push({
         min: parseFloat(element.min),
@@ -338,11 +342,20 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       })
     });
 
+    mockData.forEach((element: any) => {
+      total_province = 1
+      total_district = total_district + 1,
+        total_sub_district = total_sub_district + element.sub_district_selected.length
+    });
+
     const reqUpdateTierPrice: any = {
       data: {
         id: id,
         name: values.name,
-        tier_prices: tier_prices
+        tier_prices: tier_prices,
+        total_province: total_province,
+        total_district: total_district,
+        total_sub_district: total_sub_district
       }
     }
     const { success, result } = await tierPriceUpdate(reqUpdateTierPrice)

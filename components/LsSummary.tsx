@@ -173,7 +173,7 @@ const LsSummaryComponent = ({
       data?.map((value: any, key: number) => {
         array[key] = []
         value?.tier_prices?.map((tierPricesValue: any, tierPricesKey: number) => {
-          let is_support = betweenArray(tierPricesValue.min, tierPricesValue.max, min, max)
+          let isSupport = betweenArray(tierPricesValue.min, tierPricesValue.max, min, max)
           if (tierPricesKey > 0) {
             tierPricesValue.min = ">" + " " + tierPricesValue.min
           }
@@ -185,30 +185,30 @@ const LsSummaryComponent = ({
 
           // find discount
           let discount = 0
-          let normal_price = parseFloat(tierPricesValue.price!)
-          let customer = normal_price
+          let normalPrice = parseFloat(tierPricesValue.price!)
+          let customer = normalPrice
           let lsPlatformAmount = 0
           let lsMerchantAmount = 0
           let discountAmount = parseFloat(params.discount_amount!)
-          if (is_support) {
+          if (isSupport) {
             lsPlatformAmount = parseFloat(params.ls_platform_amount!)
             lsMerchantAmount = parseFloat(params.ls_merchant_amount!)
             switch (params.type) {
               case "subsidize":
                 if (params.ls_type !== "baht") {
-                  lsPlatformAmount = (lsPlatformAmount * normal_price) / 100
-                  lsMerchantAmount = (lsMerchantAmount * normal_price) / 100
+                  lsPlatformAmount = (lsPlatformAmount * normalPrice) / 100
+                  lsMerchantAmount = (lsMerchantAmount * normalPrice) / 100
                 }
                 discount = lsPlatformAmount + lsMerchantAmount
-                customer = normal_price - discount
+                customer = normalPrice - discount
                 break;
               case "customer_pay":
                 customer = discountAmount
-                discount = normal_price - customer
+                discount = normalPrice - customer
                 break;
               default:
-                discount = params.discount_type !== "baht" ? ((discountAmount * normal_price) / 100) : discountAmount
-                customer = normal_price - discount
+                discount = params.discount_type !== "baht" ? ((discountAmount * normalPrice) / 100) : discountAmount
+                customer = normalPrice - discount
             }
             if (params.ls_type !== "baht" && params.type !== "subsidize") {
               lsPlatformAmount = (lsPlatformAmount * discount) / 100
@@ -219,8 +219,8 @@ const LsSummaryComponent = ({
 
           array[key]?.push({
             'distance': tierPricesValue.min + " - " + tierPricesValue.max,
-            'normal_price': normal_price,
-            'is_support': is_support,
+            'normal_price': normalPrice,
+            'is_support': isSupport,
             'discount': discount,
             'ls_platform_amount': lsPlatformAmount,
             'ls_merchant_amount': lsMerchantAmount,

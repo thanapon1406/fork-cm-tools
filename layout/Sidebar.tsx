@@ -1,10 +1,11 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
 import {
-  CalculatorOutlined, FileTextOutlined,
+  FileTextOutlined,
   LayoutOutlined,
   LogoutOutlined,
   NotificationOutlined,
+  SettingOutlined,
   SolutionOutlined,
   TeamOutlined,
   UserOutlined,
@@ -14,7 +15,7 @@ import { Layout, Menu, Typography } from 'antd'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect } from 'react'
+import { ReactElement, useEffect } from 'react'
 import { useRecoilState } from 'recoil'
 import logoImg from '../public/cmt_logo.png'
 const profileColor: Array<string> = ['87d068', 'd06868', 'c068d0', '6897d0', 'cad068', 'd09d68']
@@ -145,6 +146,25 @@ export default function Sidebar({ }: Props): ReactElement {
     },
     {
       index: 4,
+      title: 'การจัดการค่าส่ง',
+      icon: <SettingOutlined />,
+      key: 'logisticSubsidize',
+      link: '/',
+      sub: [
+        {
+          title: 'Config Delivery Fee',
+          link: '/config-delivery-fee',
+          key: '/config-delivery-fee',
+        },
+        {
+          title: 'Logistic Subsidize',
+          link: '/ls-config',
+          key: '/ls-config',
+        },
+      ],
+    },
+    {
+      index: 5,
       title: 'การจัดการออเดอร์',
       icon: <FileTextOutlined />,
       key: 'order',
@@ -168,7 +188,7 @@ export default function Sidebar({ }: Props): ReactElement {
       ],
     },
     {
-      index: 5,
+      index: 6,
       title: 'การจัดการเครดิตร้านค้า',
       icon: <TeamOutlined />,
       key: 'credit',
@@ -192,7 +212,7 @@ export default function Sidebar({ }: Props): ReactElement {
       ],
     },
     {
-      index: 6,
+      index: 7,
       title: 'กระเป๋าตังค์',
       icon: <WalletOutlined />,
       key: 'wallet',
@@ -211,7 +231,7 @@ export default function Sidebar({ }: Props): ReactElement {
       ],
     },
     {
-      index: 7,
+      index: 8,
       title: 'โปรโมชั่น',
       icon: <FileTextOutlined />,
       key: 'promotion',
@@ -225,7 +245,7 @@ export default function Sidebar({ }: Props): ReactElement {
       ],
     },
     {
-      index: 7,
+      index: 9,
       title: 'Notifications',
       icon: <NotificationOutlined />,
       key: 'notifications',
@@ -239,7 +259,7 @@ export default function Sidebar({ }: Props): ReactElement {
       ],
     },
     {
-      index: 8,
+      index: 10,
       title: 'Content',
       icon: <LayoutOutlined />,
       key: 'Content',
@@ -256,14 +276,6 @@ export default function Sidebar({ }: Props): ReactElement {
           key: '/content/banner',
         },
       ],
-    },
-    {
-      index: 8,
-      title: 'ค่าส่งตามระยะทาง',
-      icon: <CalculatorOutlined />,
-      key: '/config-delivery-fee',
-      link: '/config-delivery-fee',
-      sub: [],
     }
   ]
 
@@ -301,7 +313,7 @@ export default function Sidebar({ }: Props): ReactElement {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[activePath]}
-        defaultOpenKeys={['register', 'userProfile', 'credit', 'order']}
+        defaultOpenKeys={['register', 'userProfile', 'credit', 'order', 'logisticSubsidize']}
         style={{ borderRight: 0 }}
       >
         {routingPath.map((path: MenuItem) => {

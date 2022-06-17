@@ -9,13 +9,13 @@ import MainLayout from '@/layout/MainLayout';
 import { uploadImage } from '@/services/cdn';
 import { createLsConfig } from '@/services/ls-config';
 import { getBrandListV2 } from '@/services/pos-profile';
-import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { CopyOutlined, LinkOutlined, PlusOutlined } from '@ant-design/icons';
+import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Skeleton, Tooltip, Typography, Upload } from 'antd';
+import { Field, Form, Formik } from 'formik';
 import _, { filter, get, intersection, size } from 'lodash';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import React, { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import noImage from '../../public/asset/images/no-image-available.svg';
 const { warning } = Modal
@@ -90,114 +90,215 @@ export default function CreateLsConfig({ }: Props): ReactElement {
   }
   const [lsDetail, setLsDetail] = useState(lsInitial)
   const Schema = Yup.object().shape({
-    name: Yup.string().trim().max(255).required('ระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
-    type: Yup.string().trim().required('ระบุ LS Configure'),
-    order_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (order_amount: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (order_amount == undefined) {
-              return false
-            } else {
-              return true
-            }
+    name: Yup.string().trim().max(255).required('กรุณาระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ฿]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    type: Yup.string().trim().required('กรุณาระบุ LS Configure'),
+    order_amount: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: 'จะต้องมีค่าตั้งแต่ 0 ขึ้นไป',
+              path: 'order_amount',
+            })
+          } else {
+            return true
           }
-          return true
-        },
-        message: "ระบุยอดสุทธิ",
-      })
+        } else {
+          return this.createError({
+            message: 'กรุณาระบุ',
+            path: 'order_amount',
+          })
+        }
+      } else {
+        return true
+      }
     }),
-    min_distance: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (min_distance: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (min_distance == undefined) {
-              return false
-            } else {
-              return true
-            }
+    discount_amount: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY) {
+        // const paramName = (type == CUSTOMER_PAY) ? "ส่วนลดค่าจัดส่ง" : "ค่าส่งที่ลูกค้าจะต้องจ่าย"
+        const paramName = ""
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: `${paramName}จะต้องมีค่าตั้งแต่ 0 ขึ้นไป`,
+              path: 'discount_amount',
+            })
+          } else {
+            return true
           }
-          return true
-        },
-        message: "ระบุระยะทาง",
-      })
+        } else {
+          return this.createError({
+            message: `กรุณาระบุ${paramName}`,
+            path: 'discount_amount',
+          })
+        }
+      } else {
+        return true
+      }
     }),
-    max_distance: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (max_distance: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (max_distance == undefined) {
-              return false
-            } else {
-              return true
-            }
+    min_distance: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        // const paramName = "ระยะทางเริ่มต้น"
+        const paramName = ""
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: `${paramName}จะต้องมีค่าตั้งแต่ 0 ขึ้นไป`,
+              path: 'min_distance',
+            })
+          } else {
+            return true
           }
-          return true
-        },
-        message: "ระบุระยะทาง",
-      })
-    }).when('min_distance', (min_distance: any, schema: any) => {
-      return schema.test({
-        test: (max_distance: any) => {
-          if (min_distance != undefined) {
-            if (max_distance < min_distance) {
-              return false
-            } else {
-              return true
-            }
-          }
-          return true
-        },
-        message: "ข้อมูลไม่ถูกต้อง",
-      })
+        } else {
+          return this.createError({
+            message: `กรุณาระบุ${paramName}`,
+            path: 'min_distance',
+          })
+        }
+      } else {
+        return true
+      }
     }),
-    ls_platform_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (ls_platform_amount: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (ls_platform_amount == undefined) {
-              return false
-            } else {
-              return true
-            }
-          }
-          return true
-        },
-        message: "ระบุสัดส่วน LS",
-      })
-    }).when('ls_type', {
-      is: PERCENT,
-      then: Yup.number().when("ls_merchant_amount", (ls_merchant_amount: any, schema: any) => {
-        return schema.test({
-          test: (ls_platform_amount: any) => {
-            if (ls_merchant_amount != undefined && ls_platform_amount != undefined) {
-              if (Number(ls_merchant_amount) + Number(ls_platform_amount) != 100) {
-                return false
+    max_distance: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        // const paramName = "ระยะทางสิ้นสุด"
+        const paramName = ""
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: `${paramName}จะต้องมีค่าตั้งแต่ 0 ขึ้นไป`,
+              path: 'max_distance',
+            })
+          } else {
+            const minDistance = this?.parent?.min_distance
+            if (minDistance != undefined) {
+              if (value < minDistance) {
+                return this.createError({
+                  message: 'ระยะทางสิ้นสุดจะต้องมีค่ามากกว่าระยะทางเริ่มต้น',
+                  path: 'max_distance',
+                })
+              } else {
+                return true
               }
             } else {
               return true
             }
-
-            return true
-          },
-          message: "ต้องรวมกันได้ 100%",
-        })
-      })
+          }
+        } else {
+          return this.createError({
+            message: `กรุณาระบุ${paramName}`,
+            path: 'max_distance',
+          })
+        }
+      } else {
+        return true
+      }
     }),
-    ls_merchant_amount: Yup.number().min(0, "ข้อมูลไม่ถูกต้อง").when('type', (type: any, schema: any) => {
-      return schema.test({
-        test: (ls_merchant_amount: any) => {
-          if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
-            if (ls_merchant_amount == undefined) {
-              return false
-            } else {
-              return true
+    ls_platform_amount: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        // const paramName = "สัดส่วน LS แพลตฟอร์ม"
+        const paramName = ""
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: `${paramName}จะต้องมีค่าตั้งแต่ 0 ขึ้นไป`,
+              path: 'ls_platform_amount',
+            })
+          } else {
+            const lsType = this?.parent?.ls_type
+            if (lsType != undefined) {
+              if (lsType == PERCENT) {
+                const lsMerchantAmount = this?.parent?.ls_merchant_amount
+                if (lsMerchantAmount != undefined) {
+                  if ((Number(value) + Number(lsMerchantAmount)) != 100) {
+                    return this.createError({
+                      message: `จะต้องมีค่ารวมกันได้ 100%`,
+                      path: 'ls_platform_amount',
+                    })
+                  }
+                }
+              } else if (lsType == BAHT) {
+                const lsMerchantAmount = this?.parent?.ls_merchant_amount
+                const discountAmount: any = this?.parent?.discount_amount
+                if (lsMerchantAmount != undefined && discountAmount != undefined) {
+                  if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY) {
+                    if ((Number(value) + Number(lsMerchantAmount)) < Number(discountAmount)) {
+                      return this.createError({
+                        message: `จะต้องมีค่า ${discountAmount} ขึ้นไป`,
+                        path: 'ls_platform_amount',
+                      })
+                    }
+                  }
+                }
+              }
             }
           }
-          return true
-        },
-        message: "ระบุสัดส่วน LS",
-      })
+        } else {
+          return this.createError({
+            message: `กรุณาระบุ${paramName}`,
+            path: 'ls_platform_amount',
+          })
+        }
+      } else {
+        return true
+      }
+      return true
+    }),
+    ls_merchant_amount: Yup.number().test('required', function (value: any) {
+      const type = this?.parent?.type
+      if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY || type == SUBSIDIZE) {
+        // const paramName = "สัดส่วน LS ร้านอาหาร"
+        const paramName = ""
+        if (value != undefined) {
+          if (Number(value) < 0) {
+            return this.createError({
+              message: `${paramName}จะต้องมีค่าตั้งแต่ 0 ขึ้นไป`,
+              path: 'ls_merchant_amount',
+            })
+          } else {
+            const lsType = this?.parent?.ls_type
+            if (lsType != undefined) {
+              if (lsType == PERCENT) {
+                const lsPlatformAmount = this?.parent?.ls_platform_amount
+                if (lsPlatformAmount != undefined) {
+                  if ((Number(value) + Number(lsPlatformAmount)) != 100) {
+                    return this.createError({
+                      message: `จะต้องมีค่ารวมกันได้ 100%`,
+                      path: 'ls_merchant_amount',
+                    })
+                  }
+                }
+              } else if (lsType == BAHT) {
+                const lsPlatformAmount = this?.parent?.ls_platform_amount
+                const discountAmount = this?.parent?.discount_amount
+                if (lsPlatformAmount != undefined && discountAmount != undefined) {
+                  if (type == CUSTOMER_DISCOUNT || type == CUSTOMER_PAY) {
+                    if ((Number(value) + Number(lsPlatformAmount)) < Number(discountAmount)) {
+                      return this.createError({
+                        message: `จะต้องมีค่า ${discountAmount} ขึ้นไป`,
+                        path: 'ls_merchant_amount',
+                      })
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          return this.createError({
+            message: `กรุณาระบุ${paramName}`,
+            path: 'ls_merchant_amount',
+          })
+        }
+      } else {
+        return true
+      }
+      return true
     }),
     campaign_time: Yup.object()
       .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
@@ -221,31 +322,6 @@ export default function CreateLsConfig({ }: Props): ReactElement {
           return false
         }
       }),
-
-    // brands: Yup.array().test('required', function (value: any) {
-    //   if (this?.parent?.is_apply_all_brand === false) {
-    //     let brandList: any = []
-    //     forEach(get(this.parent, 'brands'), (brand: any, index: any) => {
-    //       if (get(brand, 'is_selected') == true) {
-    //         if (get(brand, 'type') == 'all') {
-    //           brandList.push({ brand_id: brand?.id, outlet_ids: [0] })
-    //         } else if (size(get(brand, 'outlets')) > 0) {
-    //           brandList.push({ brand_id: brand?.id, outlet_ids: get(brand, 'outlets') })
-    //         }
-    //       }
-    //     })
-    //     if (size(brandList) > 0) {
-    //       return true
-    //     } else {
-    //       return this.createError({
-    //         message: 'กรุณาเลือกร้านอาหารที่ต้องการให้เข้าร่วม',
-    //         path: 'ls_outlet',
-    //       })
-    //     }
-    //   } else {
-    //     return true
-    //   }
-    // }),
   })
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const lsLogicsOption = [
@@ -283,7 +359,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
   const [imageUrl, setImageUrl] = useState('')
   const [loadingImage, setloadingImage] = useState(false)
   const [lsSummaryElementParam, setlsSummaryElementParam] = useState({})
-
+  const [isClickSubmit, setIsClickSubmit] = useState(false);
 
   const handleSubmit = async (values: typeof lsDetail) => {
     setDisableSubmitButton(true)
@@ -378,7 +454,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         deep_link: _.get(values, "deep_link") ? _.get(values, "deep_link") : "",
         inapp_link: _.get(values, "inapp_link") ? _.get(values, "inapp_link") : "",
         image_link: _.get(values, "image_link") ? _.get(values, "image_link") : "",
-        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : ""
+        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
     console.log("payload", payload)
@@ -387,6 +463,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       notification.success({
         message: `ดำเนินการสร้าง LS Config สำเร็จ`,
         description: '',
+        duration: 3,
       })
       Router.push("/ls-config")
       setDisableSubmitButton(false)
@@ -394,6 +471,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       notification.warning({
         message: `ผิดพลาด`,
         description: 'ไม่สามารถสร้าง LS Config ได้',
+        duration: 3,
       })
       setDisableSubmitButton(false)
     }
@@ -425,7 +503,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
 
     if (!isJPNG && !isJPG && !isPNG) {
       warning({
-        title: `กรุณาเลือกรูปภาพ`,
+        title: `กรุณาเลือกรูปภาพเฉพาะไฟล์ .png หรือ .jpg`,
         afterClose() {
           setImageUrl('')
         }
@@ -569,7 +647,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     return (<div key="logic_info">
       {/* Name */}
       < Row gutter={16} >
-        <Col className="gutter-row" span={24}>
+        <Col className="gutter-row" span={12}>
           <Field
             label={{ text: "LS Configure Name" }}
             name="name"
@@ -928,28 +1006,6 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                ร้านอาหาร
-              </Col>
-              <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
-                <Field
-                  name="ls_merchant_amount"
-                  type="number"
-                  component={Input}
-                  className="form-control"
-                  id="ls_merchant_amount"
-                />
-              </Col>
-              <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                {subsidizeTypeName}
-              </Col>
-            </Row>
-            <Row gutter={{
-              xs: 24,
-              sm: 24,
-              md: 12,
-              lg: 12
-            }}>
-              <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
                 แพลตฟอร์ม
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
@@ -965,13 +1021,35 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 {subsidizeTypeName}
               </Col>
             </Row>
+            <Row gutter={{
+              xs: 24,
+              sm: 24,
+              md: 12,
+              lg: 12
+            }}>
+              <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
+                ร้านอาหาร
+              </Col>
+              <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
+                <Field
+                  name="ls_merchant_amount"
+                  type="number"
+                  component={Input}
+                  className="form-control"
+                  id="ls_merchant_amount"
+                />
+              </Col>
+              <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
+                {subsidizeTypeName}
+              </Col>
+            </Row>
           </div>
           break;
         case CUSTOMER_PAY:
           logicSubsidize = <div key="logic_subsidize_CUSTOMER_PAY">
             <Row gutter={24}>
               <Col className="gutter-row" span={24} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                <span style={{ fontSize: "15px", fontWeight: 600, marginBottom: "0.5em", lineHeight: 1.5 }}>สัดส่วน Logic Subsidize</span> <span style={{ fontWeight: 500, color: "rgb(93 93 93)" }}>* ถ้ามีการ subsidize เกินมนส่วนของการตั้งค่า LS จะต้องแคปลิมิตค่าของอีกฝั่งนึง</span>
+                <span style={{ fontSize: "15px", fontWeight: 600, marginBottom: "0.5em", lineHeight: 1.5 }}>สัดส่วน Logic Subsidize</span> <span style={{ fontWeight: 500, color: "rgb(93 93 93)" }}>* ถ้ามีการ subsidize เกินในส่วนของการตั้งค่า LS จะต้องแคปลิมิตค่าของอีกฝั่งนึง</span>
               </Col>
             </Row>
             <Row gutter={16}>
@@ -986,15 +1064,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                ร้านอาหาร
+                แพลตฟอร์ม
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_merchant_amount"
+                  name="ls_platform_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_merchant_amount"
+                  id="ls_platform_amount"
                 />
               </Col>
               <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
@@ -1008,15 +1086,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                แพลตฟอร์ม
+                ร้านอาหาร
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_platform_amount"
+                  name="ls_merchant_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_platform_amount"
+                  id="ls_merchant_amount"
                 />
               </Col>
               <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
@@ -1052,15 +1130,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                ร้านอาหาร
+                แพลตฟอร์ม
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_merchant_amount"
+                  name="ls_platform_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_merchant_amount"
+                  id="ls_platform_amount"
                 />
               </Col>
               <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
@@ -1074,15 +1152,15 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               lg: 12
             }}>
               <Col className="gutter-row" xs={24} sm={5} md={4} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
-                แพลตฟอร์ม
+                ร้านอาหาร
               </Col>
               <Col className="gutter-row" xs={12} sm={5} md={4} lg={2} style={{}}>
                 <Field
-                  name="ls_platform_amount"
+                  name="ls_merchant_amount"
                   type="number"
                   component={Input}
                   className="form-control"
-                  id="ls_platform_amount"
+                  id="ls_merchant_amount"
                 />
               </Col>
               <Col className="gutter-row" xs={2} sm={2} md={2} lg={2} style={{ marginTop: "5px", marginBottom: "10px" }}>
@@ -1132,34 +1210,37 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               setFieldValue("is_apply_all_brand", e.target.checked)
             }}>เข้าร่วมทุกร้านอาหาร
             </Checkbox>
-            <ErrorMessage
-              component="div"
-              name="ls_outlet"
-              className="validate-error"
-            />
           </Col>
         </Row>
         <Row gutter={24}>
           <Col className="gutter-row" span={24}>
-            < Collapse
-              accordion
-              collapsible={values.is_apply_all_brand ? 'disabled' : 'header'}
-            >
-              <Panel key="outlet_joined" header="ร้านอาหารที่เข้าร่วม">
-                <OutletSelecter
-                  handleChange={handleChange}
-                  disabled={values.is_apply_all_brand}
-                  selectedList={filterOutletSelected}
-                  formValue={values}
-                  setFieldValue={setFieldValue}
-                  userSelectedOutlet={userSelectedOutlet}
-                  brandList={brandList}
-                />
-              </Panel>
-            </Collapse >
+            {values.is_apply_all_brand ?
+              < Collapse
+                accordion
+                collapsible='disabled'
+                destroyInactivePanel={true}
+              >
+                <Panel key="all_outlet_disabled" header="ร้านอาหารที่เข้าร่วม">
+                </Panel>
+              </Collapse > :
+              < Collapse
+                accordion
+              >
+                <Panel key="outlet_joined" header="ร้านอาหารที่เข้าร่วม">
+                  <OutletSelecter
+                    handleChange={handleChange}
+                    disabled={values.is_apply_all_brand}
+                    selectedList={filterOutletSelected}
+                    formValue={values}
+                    setFieldValue={setFieldValue}
+                    userSelectedOutlet={userSelectedOutlet}
+                    brandList={brandList}
+                  />
+                </Panel>
+              </Collapse >}
           </Col>
         </Row>
-      </div>
+      </div >
     )
 
     // Footer
@@ -1193,14 +1274,14 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 let validLogicSetup = false
                 const type = _.get(values, "type") != undefined && _.get(values, "type") != "" ? true : false
                 const typeName = _.get(values, "type") != undefined && _.get(values, "type") != "" ? _.get(values, "type") : ""
-                const order_amount = _.get(values, "order_amount") != undefined && _.get(values, "order_amount") != "" ? true : false
+                const order_amount = _.get(values, "order_amount") != undefined ? true : false
                 let discount_type = _.get(values, "discount_type") != undefined && _.get(values, "discount_type") != "" ? true : false
-                let discount_amount = _.get(values, "discount_amount") != undefined && _.get(values, "discount_amount") != "" ? true : false
-                const min_distance = _.get(values, "min_distance") != undefined && _.get(values, "min_distance") != "" ? true : false
-                const max_distance = _.get(values, "max_distance") != undefined && _.get(values, "max_distance") != "" ? true : false
+                let discount_amount = _.get(values, "discount_amount") != undefined ? true : false
+                const min_distance = _.get(values, "min_distance") != undefined ? true : false
+                const max_distance = _.get(values, "max_distance") != undefined ? true : false
                 const ls_type = _.get(values, "ls_type") != undefined && _.get(values, "ls_type") != "" ? true : false
-                const ls_platform_amount = _.get(values, "ls_platform_amount") != undefined && _.get(values, "ls_platform_amount") != "" ? true : false
-                const ls_merchant_amount = _.get(values, "ls_merchant_amount") != undefined && _.get(values, "ls_merchant_amount") != "" ? true : false
+                const ls_platform_amount = _.get(values, "ls_platform_amount") != undefined ? true : false
+                const ls_merchant_amount = _.get(values, "ls_merchant_amount") != undefined ? true : false
 
                 if (typeName == SUBSIDIZE) {
                   discount_type = true
@@ -1228,6 +1309,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   setFieldValue("ls_outlet", outlets)
                   const is_apply_all_brand = _.get(values, "is_apply_all_brand") ? _.get(values, "is_apply_all_brand") : false
                   const outletLocations = await handleGetOutletLocations(outlets, is_apply_all_brand)
+                  // console.log("outletLocations", outletLocations)
                   let lsSummaryParam = {
                     name: _.get(values, "name") ? _.get(values, "name") : "",
                     type: _.get(values, "type") ? _.get(values, "type") : "",
@@ -1251,6 +1333,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   notification.warning({
                     message: `ไม่สามารถ Preview LS Summary ได้`,
                     description: 'กรุณาระบุ Logic Setup ให้ครบถ้วน',
+                    duration: 3,
                   })
                   setIsVisibleLsSummary(false)
                 }
@@ -1291,6 +1374,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
               label={{ text: 'วันที่และเวลาของแคมเปญ' }}
               name="campaign_time"
               component={DateTimeRangePicker}
+              minDate={moment().startOf('day').format("YYYY-MM-DD HH:mm")}
               id="campaign_time"
               placeholder="วันเวลาที่ทำรายการ"
             />
@@ -1310,6 +1394,8 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                       setFieldValue("deep_link", e.target.value)
                     }}
                     defaultValue={values.deep_link}
+                    addonBefore={<LinkOutlined />}
+                  // placeholder={'https://www.kitchenhub-th.com/'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1317,8 +1403,10 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                       onClick={() => {
                         navigator.clipboard.writeText(values.deep_link)
                       }}
+
                     >คัดลอก</ButtonAntd>
                   </Tooltip>
+                  <span style={{ color: "#808080" }}>ตัวอย่าง : https://www.kitchenhub-th.com/</span>
                 </InputAntd.Group>
               </FormAntd.Item>
             </div>
@@ -1335,6 +1423,8 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                       setFieldValue("inapp_link", e.target.value)
                     }}
                     defaultValue={values.inapp_link}
+                    addonBefore={<LinkOutlined />}
+                  // placeholder={'khconsumer://host?outletId=1'}
                   />
                   <Tooltip title="คัดลอก">
                     <ButtonAntd
@@ -1344,6 +1434,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                       }}
                     >คัดลอก</ButtonAntd>
                   </Tooltip>
+                  <span style={{ color: "#808080" }}>ตัวอย่าง : khconsumer://host?outletId=1</span>
                 </InputAntd.Group>
               </FormAntd.Item>
             </div>
@@ -1352,7 +1443,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         {/* Row#3 Deep Link and In-app Link */}
         <Row key="logic_detail_row#3" gutter={24}>
           <Col className="gutter-row" span={24}>
-            <label style={{ display: "block", marginBottom: "10px" }}>อัพโหลดรูปภาพ <span style={{ color: "rgb(93, 93, 93)", fontWeight: 500 }}>(ขนาดไม่เกิน 1 MB)</span></label>
+            <label style={{ display: "block", marginBottom: "10px" }}>อัพโหลดรูปภาพ <span style={{ color: "rgb(93, 93, 93)", fontWeight: 500 }}>(ขนาดไม่เกิน 1 MB เฉพาะไฟล์ .png หรือ .jpg)</span></label>
           </Col>
 
           <Upload
@@ -1361,6 +1452,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
             onRemove={e => { setImageUrl('') }}
             beforeUpload={handleChangeImage}
             maxCount={1}
+            showUploadList={false}
           >
 
             <Button style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูป</Button>
@@ -1379,6 +1471,60 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     return <div key="logic_detail">{logicDetailElements}</div>
   }
 
+  const renderFormValidation = (errors: any) => {
+    let formValidationElements: any = []
+    const errorList = Object.keys(errors)
+    if (isClickSubmit && (_.size(errorList) > 0)) {
+      // errorList.map((el: any, index: any) => {
+      //   console.log("el", el)
+      //   let paramName = ""
+      //   switch (el) {
+      //     case "name":
+      //       paramName = "LS Configure Name"
+      //       break;
+      //     case "type":
+      //       paramName = "LS Logics"
+      //       break;
+      //     case "order_amount":
+      //       paramName = "ยอดสุทธิ"
+      //       break;
+      //     case "discount_amount":
+      //       paramName = "ส่วนลดค่าจัดส่ง"
+      //       break;
+      //     case "min_distance":
+      //       paramName = "ระยะทางจัดส่งเริ่มต้น"
+      //       break;
+      //     case "max_distance":
+      //       paramName = "ระยะทางจัดส่งสิ้นสุด"
+      //       break;
+      //     case "ls_platform_amount":
+      //       paramName = "สัดส่วน LS แพลตฟอร์ม"
+      //       break;
+      //     case "ls_merchant_amount":
+      //       paramName = "สัดส่วน LS ร้านอาหาร"
+      //       break;
+      //     case "start_date":
+      //       paramName = "วันที่และเวลาของแคมเปญเริ่มต้น"
+      //       break;
+      //     case "end_date":
+      //       paramName = "วันที่และเวลาของแคมเปญสิ้นสุด"
+      //       break;
+      //   }
+      //   formValidationElements.push(
+      //     <div key={`form_validation_warning#${index}`}>
+      //       <Alert message={`ข้อมูล ${paramName} ไม่ถูกต้อง`} type="warning" showIcon />
+      //     </div>
+      //   )
+      // })
+      formValidationElements.push(
+        <div key={`form_validation_warning_message`}>
+          <Alert message={`กรุณาระบุข้อมูลภายในแบบฟอร์มให้ถูกต้อง`} type="warning" showIcon />
+        </div>
+      )
+    }
+    return <div key="form_validation_warning">{formValidationElements}</div>
+  }
+
   return (
 
     <MainLayout>
@@ -1394,14 +1540,19 @@ export default function CreateLsConfig({ }: Props): ReactElement {
             values,
             resetForm,
             setFieldValue,
-            handleChange }) => (
+            handleChange,
+            isValidating,
+            isSubmitting,
+            errors,
+            touched
+          }) => (
             <Form>
               <Row justify="space-around" align="middle">
                 <Col span={8}>
-                  <Title level={4}>LS Logic</Title>
+                  <Title level={4}>Logistic Subsidize</Title>
                   <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>LS Logic</Breadcrumb.Item>
-                    <Breadcrumb.Item>สร้าง LS Logic</Breadcrumb.Item>
+                    <Breadcrumb.Item><a onClick={() => { Router.push("/ls-config") }}>Logistic Subsidize</a></Breadcrumb.Item>
+                    <Breadcrumb.Item>สร้าง Logistic Subsidize</Breadcrumb.Item>
                   </Breadcrumb>
                 </Col>
                 <Col span={8} offset={8} style={{ textAlign: 'end' }}>
@@ -1411,6 +1562,9 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                     size="middle"
                     htmlType="submit"
                     disabled={disableSubmitButton}
+                    onClick={() => {
+                      setIsClickSubmit(true)
+                    }}
                   >
                     บันทึก
                   </Button>
@@ -1425,6 +1579,8 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   </Button>
                 </Col>
               </Row>
+              {/* Form Validation */}
+              {renderFormValidation(errors)}
               <Card>
                 {/* Logic Info */}
                 {renderLogicInfo(values, setFieldValue)}

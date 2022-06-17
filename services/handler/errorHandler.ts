@@ -3,7 +3,7 @@ import { notification } from 'antd'
 import Router from 'next/router'
 import { logout } from '../login'
 
-const errorHandler = (error: any, emptyResult = null) => {
+const errorHandler = (error: any, emptyResult = null, isNotfy = true) => {
   const { response } = error
   if (!response) {
     return {
@@ -28,14 +28,22 @@ const errorHandler = (error: any, emptyResult = null) => {
     if (`${status}` === '404') {
       return response.data
     }
+
     notification.config({
       duration: 20,
     })
-    notification.error({
-      message: `Request error ${status}`,
-      description: errorText,
-    })
-    return response.data
+    if (isNotfy) {
+      notification.error({
+        message: `Request error ${status}`,
+        description: errorText,
+      })
+    }
+
+    return {
+      success: false,
+      result: response.data,
+      message: response?.statusText,
+    }
   } else {
     notification.config({
       duration: 20,

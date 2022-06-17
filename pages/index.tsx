@@ -16,11 +16,17 @@ import {
 import { useFormik } from 'formik'
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
+import AnnotationsFactory from "highcharts/modules/annotations"
 import { filter, find, get, has, size, sumBy } from 'lodash'
 import moment, { Moment } from 'moment'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
+
+if (typeof Highcharts === 'object') {
+  AnnotationsFactory(Highcharts);
+}
+
 const { Text } = Typography
 
 const { Title } = Typography
@@ -357,8 +363,12 @@ const Home: NextPage = () => {
     endDate: Moment,
     chartType: 'days' | 'weeks' | 'months'
   ) => {
+    type AnnotationSeriesData = {
+      y: number
+      id: string
+    }
     let chartData: any[] = []
-    let ordersData: number[] = []
+    let ordersData: AnnotationSeriesData[] = []
     let successData: number[] = []
     let cancelData: number[] = []
     let colLabels: string[] = []
@@ -373,25 +383,31 @@ const Home: NextPage = () => {
         dateData = find(data, { date: m.startOf('weeks').add(1, 'days').format('YYYY-MM-DD') })
       }
 
+      let colLabel = moment(m).format('DD/MM/YYYY')
+      if (chartType === 'days') {
+        colLabel = moment(m).format('DD/MM/YYYY')
+
+      } else if (chartType === 'weeks') {
+        colLabel = `${moment(m).startOf('weeks').format('DD/MM')} ~ ${moment(m)
+          .endOf('weeks')
+          .format('DD/MM')}`
+
+      } else if (chartType === 'months') {
+        colLabel = moment(m).format('MMM YYYY')
+      }
+
+      colLabels.push(colLabel)
+
       let totalCount = get(dateData, 'order_total') || 0
       let successCount = get(find(dateData?.group_by_status, { status: 'success' }), 'count') || 0
       let cancelCount = get(find(dateData?.group_by_status, { status: 'cancel' }), 'count') || 0
 
-      ordersData.push(totalCount)
+      ordersData.push({
+        y: totalCount,
+        id: colLabel,
+      })
       successData.push(successCount)
       cancelData.push(cancelCount)
-
-      if (chartType === 'days') {
-        colLabels.push(moment(m).format('DD/MM/YYYY'))
-      } else if (chartType === 'weeks') {
-        colLabels.push(
-          `${moment(m).startOf('weeks').format('DD/MM')} ~ ${moment(m)
-            .endOf('weeks')
-            .format('DD/MM')}`
-        )
-      } else if (chartType === 'months') {
-        colLabels.push(moment(m).format('MMM YYYY'))
-      }
     }
 
     //Total Order
@@ -642,6 +658,13 @@ const Home: NextPage = () => {
                     shared: true,
                   },
                   series: chartData,
+                  annotations: [{
+                    labels: [{
+                      useHTML: true,
+                      point: "15/06/2022",
+                      text: '15/06/2022<br/>1. แคมเปญค่าส่ง 0 บาท<br/>2.Test new Line'
+                    }]
+                  }]
                 }}
               />
             </Col>

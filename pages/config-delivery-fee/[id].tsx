@@ -255,7 +255,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     handleDeductDeliveryFeeRule(values, setFieldValue)
                   }}
                 >
-                  - ลบ Rule
+                  ลบ Rule
                 </Button> : null
             }
 
@@ -332,9 +332,9 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     let tier_prices: any = []
     values.tier_prices?.forEach((element: any) => {
       tier_prices.push({
-        min: element.min,
-        max: element.max,
-        price: element.price,
+        min: parseFloat(element.min),
+        max: parseFloat(element.max),
+        price: parseFloat(element.price),
       })
     });
 
@@ -412,11 +412,13 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
         notification.success({
           message: `แก้ไขข้อมูลสำเร็จ`,
           description: '',
+          duration: 3,
         })
       } else {
         notification.warning({
           message: `ผิดพลาด`,
           description: 'ไม่สามารถเพิ่มพื้นที่ได้ เนื่องจากมีพื้นที่ซ้อนทับกับ config อื่น',
+          duration: 3,
         })
       }
       if (_.get(result, "validate[0]")) {
@@ -886,7 +888,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                         setDeliveryFeeRuleValidate(false)
                       }}
                     >
-                      + เพิ่ม Rule
+                      เพิ่ม Rule
                     </Button>
                   </Row>
                 </Col>

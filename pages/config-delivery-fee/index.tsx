@@ -189,7 +189,7 @@ export default function Merchant({ }: Props): ReactElement {
           className="confirm-button"
           onClick={handleOpenCreate}
         >
-          + สร้างราคาค่าโดยสาร
+          สร้างราคาค่าโดยสาร
         </Button>
       </Breadcrumb>
 

@@ -75,14 +75,14 @@ const columns = [
   },
   {
     title: 'ลูกค้าจ่าย',
-    dataIndex: '',
+    dataIndex: 'customer',
     align: 'center',
-    key: '',
+    key: 'customer',
     width: '100px',
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return numberFormat(record?.is_support ? (record?.normal_price - record?.discount) : record?.normal_price)
+      return numberFormat(text)
     },
   },
   {
@@ -112,14 +112,14 @@ const columns = [
   },
   {
     title: 'เข้า Platform',
-    dataIndex: '',
+    dataIndex: 'income',
     align: 'center',
-    key: '',
+    key: 'income',
     width: '100px',
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      return numberFormat((record?.ls_platform_amount + record?.ls_merchant_amount) - record?.discount)
+      return numberFormat(text)
     },
   },
 
@@ -166,40 +166,66 @@ const LsSummaryComponent = ({
       const { data } = result
       const array: any = []
       const nameArray: any = []
-      let min = parseInt(params.min_distance!)
-      let max = parseInt(params.max_distance!)
+      let min = parseFloat(params.min_distance!)
+      let max = parseFloat(params.max_distance!)
       setOrderAmount(params.order_amount!)
       setDistance((isNaN(min) ? 0 : min) + ' - ' + (isNaN(max) ? 0 : max))
       data?.map((value: any, key: number) => {
         array[key] = []
         value?.tier_prices?.map((tierPricesValue: any, tierPricesKey: number) => {
-          let is_support = betweenArray(tierPricesValue.min, tierPricesValue.max, min, max)
+          let isSupport = betweenArray(tierPricesValue.min, tierPricesValue.max, min, max)
           if (tierPricesKey > 0) {
             tierPricesValue.min = ">" + " " + tierPricesValue.min
           }
-          // find discount type percent
-          let discount = parseInt(params.discount_amount!)
-          if (params.discount_type !== "baht") {
-            discount = (parseInt(params.discount_amount!) * parseInt(tierPricesValue.price!)) / 100
-          }
-          // end find discount type percent
 
-          // find ls type percent
-          let lsPlatformAmount = parseInt(params.ls_platform_amount!)
-          let lsMerchantAmount = parseInt(params.ls_merchant_amount!)
-          if (params.ls_type !== "baht") {
-            lsPlatformAmount = (parseInt(params.ls_platform_amount!) * discount) / 100
-            lsMerchantAmount = (parseInt(params.ls_merchant_amount!) * discount) / 100
+          // TYPE 
+          // customer_discount
+          // customer_pay
+          // subsidize
+
+          // find discount
+          let discount = 0
+          let normalPrice = parseFloat(tierPricesValue.price!)
+          let customer = normalPrice
+          let lsPlatformAmount = 0
+          let lsMerchantAmount = 0
+          let discountAmount = parseFloat(params.discount_amount!)
+          if (isSupport) {
+            lsPlatformAmount = parseFloat(params.ls_platform_amount!)
+            lsMerchantAmount = parseFloat(params.ls_merchant_amount!)
+            switch (params.type) {
+              case "subsidize":
+                if (params.ls_type !== "baht") {
+                  lsPlatformAmount = (lsPlatformAmount * normalPrice) / 100
+                  lsMerchantAmount = (lsMerchantAmount * normalPrice) / 100
+                }
+                discount = lsPlatformAmount + lsMerchantAmount
+                customer = normalPrice - discount
+                break;
+              case "customer_pay":
+                customer = discountAmount
+                discount = normalPrice - customer
+                break;
+              default:
+                discount = params.discount_type !== "baht" ? ((discountAmount * normalPrice) / 100) : discountAmount
+                customer = normalPrice - discount
+            }
+            if (params.ls_type !== "baht" && params.type !== "subsidize") {
+              lsPlatformAmount = (lsPlatformAmount * discount) / 100
+              lsMerchantAmount = (lsMerchantAmount * discount) / 100
+            }
+            // end find discount
           }
-          // end find ls type percent
 
           array[key]?.push({
             'distance': tierPricesValue.min + " - " + tierPricesValue.max,
-            'normal_price': parseInt(tierPricesValue.price!),
-            'is_support': is_support,
+            'normal_price': normalPrice,
+            'is_support': isSupport,
             'discount': discount,
             'ls_platform_amount': lsPlatformAmount,
-            'ls_merchant_amount': lsMerchantAmount
+            'ls_merchant_amount': lsMerchantAmount,
+            'customer': customer,
+            'income': (lsPlatformAmount + lsMerchantAmount) - discount
           })
         })
         nameArray?.push(value.name)

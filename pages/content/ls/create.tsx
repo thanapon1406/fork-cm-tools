@@ -1,6 +1,7 @@
 import Card from '@/components/Card'
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
+import ReactQuill from "@/components/QuilNoSSR"
 import MainLayout from '@/layout/MainLayout'
 import { uploadImage } from '@/services/cdn'
 import { PlusOutlined } from '@ant-design/icons'
@@ -17,7 +18,6 @@ import { omit } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useState } from 'react'
-import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import * as Yup from 'yup'
 import noImage from '../../../public/asset/images/no-image-available.svg'
@@ -178,6 +178,7 @@ export default function BannerCreate({ }: Props): ReactElement {
                 <Col className="gutter-row" span={24}>
                   <label style={{ display: 'block', marginBottom: '10px' }}>รายละเอียด</label>
                   <ReactQuill
+                    theme="snow"
                     value={values.description}
                     onChange={(content, delta, source, editor) => {
                       setFieldValue('description', editor.getHTML())

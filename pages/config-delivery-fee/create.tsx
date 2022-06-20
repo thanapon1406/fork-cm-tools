@@ -438,7 +438,8 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           duration: 3,
         })
       }
-      if (_.get(result, "validate[0]")) {
+
+      if (_.get(result, "validate[0]") || _.get(result, "tier_duplicate_location")) {
         setShowError(true)
         result.validate.forEach((element: any, index: number) => {
           let districtData: any = _.find(locations, function (obj) {
@@ -451,7 +452,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           let sub_districtDatas: any = []
 
           if (districtData.location_type !== "district") {
-            result.validate[index].sub_district.forEach((subdistrictId: any) => {
+            _.get(result, `validate[${index}].sub_district`, []).forEach((subdistrictId: any) => {
               let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
                 if (obj.id == subdistrictId) {
                   return true;
@@ -504,6 +505,10 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       return false
     }
 
+  }
+
+  const handleClaerlocation = () => {
+    setMockData([])
   }
 
   const handleAddlocation = async () => {
@@ -893,12 +898,20 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
               </Row>
               <Row gutter={16}>
                 <Button
-                  style={{ marginBottom: '10px', marginLeft: '10px' }}
+                  style={{ width: '120px', marginBottom: '10px', marginLeft: '10px' }}
                   size="middle"
                   disabled={!values.all_city && !params.district_id}
                   onClick={handleAddlocation}
                 >
                   + เพิ่มพื้นที่ใช้งาน
+                </Button>
+                <Button
+                  style={{ width: '120px', marginBottom: '10px', marginLeft: '10px' }}
+                  size="middle"
+                  disabled={!(mockData.length > 0)}
+                  onClick={handleClaerlocation}
+                >
+                  เคลียร์
                 </Button>
               </Row>
               {showError && renderErrorMessage(values, setFieldValue)}

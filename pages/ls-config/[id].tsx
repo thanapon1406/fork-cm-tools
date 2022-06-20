@@ -204,7 +204,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     } else {
       notification.warning({
         message: `ผิดพลาด`,
-        description: 'ไม่สามารถค้นหาข้อมูล LS Config ได้',
+        description: 'ไม่สามารถค้นหาข้อมูล Logistic Subsidize ได้',
         duration: 3,
       })
       Router.push("/ls-config")
@@ -446,18 +446,27 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     const { result, success } = await updateLsConfig(payload)
     if (success) {
       notification.success({
-        message: `ดำเนินการแก้ไข LS Config สำเร็จ`,
+        message: `ดำเนินการแก้ไข Logistic Subsidize สำเร็จ`,
         description: '',
         duration: 3,
       })
       Router.push("/ls-config")
       setDisableSubmitButton(false)
     } else {
-      notification.warning({
-        message: `ผิดพลาด`,
-        description: 'ไม่สามารถแก้ไข LS Config ได้',
-        duration: 3,
-      })
+      const { detail = '' } = result
+      if (detail === 'DUPLICATED_NAME') {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถแก้ไขชื่อ Logistic Subsidize ซ้ำได้',
+          duration: 3,
+        })
+      } else {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถแก้ไข Logistic Subsidize ได้',
+          duration: 3,
+        })
+      }
       setDisableSubmitButton(false)
     }
   }

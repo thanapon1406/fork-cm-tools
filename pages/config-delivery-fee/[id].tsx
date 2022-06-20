@@ -518,6 +518,10 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
 
   }
 
+  const handleClaerlocation = () => {
+    setMockData([])
+  }
+
   const handleAddlocation = async () => {
 
     setIsLoading(false)
@@ -995,12 +999,20 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
               </Row>
               <Row gutter={16}>
                 <Button
-                  style={{ marginBottom: '10px', marginLeft: '10px' }}
+                  style={{ width: '120px', marginBottom: '10px', marginLeft: '10px' }}
                   size="middle"
                   disabled={!values.all_city && !params.district_id}
                   onClick={handleAddlocation}
                 >
                   + เพิ่มพื้นที่ใช้งาน
+                </Button>
+                <Button
+                  style={{ width: '120px', marginBottom: '10px', marginLeft: '10px' }}
+                  size="middle"
+                  disabled={!(mockData.length > 0)}
+                  onClick={handleClaerlocation}
+                >
+                  เคลียร์
                 </Button>
               </Row>
               {showError && renderErrorMessage(values, setFieldValue)}

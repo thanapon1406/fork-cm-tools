@@ -18,7 +18,7 @@ const createLsConfig = async (req: any) => {
     const response = await fetch.post(`/api/ls-config/create`, req)
     return successHandler(response)
   } catch (error) {
-    return errorHandler(error)
+    return errorHandler(error, null, false)
   }
 }
 
@@ -36,7 +36,7 @@ const findLsConfig = async (option: queryList) => {
     const result = await fetch.post(`/api/ls-config/find`, option)
     return successHandler(result)
   } catch (error) {
-    return errorHandler(error)
+    return errorHandler(error, null, false)
   }
 }
 
@@ -45,7 +45,7 @@ const updateLsConfig = async (req: any) => {
     const response = await fetch.post(`/api/ls-config/update`, req)
     return successHandler(response)
   } catch (error) {
-    return errorHandler(error)
+    return errorHandler(error, null, false)
   }
 }
 

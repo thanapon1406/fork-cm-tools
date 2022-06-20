@@ -1,6 +1,6 @@
 import Table from '@/components/Table'
 import { Pagination } from '@/interface/dataTable'
-import { lsSummaryInterface } from '@/services/ls'
+import { lsSummaryInterface } from '@/services/ls-config'
 import { getDeliveryTiers } from '@/services/rider'
 import { Button, Card, Col, Row, Typography } from 'antd'
 import { isUndefined } from 'lodash'
@@ -224,7 +224,7 @@ const LsSummaryComponent = ({
             'discount': discount,
             'ls_platform_amount': lsPlatformAmount,
             'ls_merchant_amount': lsMerchantAmount,
-            'customer': customer,
+            'customer': customer < 0 ? 0 : customer,
             'income': (lsPlatformAmount + lsMerchantAmount) - discount
           })
         })

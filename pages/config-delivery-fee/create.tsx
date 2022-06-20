@@ -438,6 +438,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           duration: 3,
         })
       }
+
       if (_.get(result, "validate[0]") || _.get(result, "tier_duplicate_location")) {
         setShowError(true)
         result.validate.forEach((element: any, index: number) => {
@@ -451,7 +452,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           let sub_districtDatas: any = []
 
           if (districtData.location_type !== "district") {
-            result.validate[index].sub_district.forEach((subdistrictId: any) => {
+            _.get(result, "validate[index].sub_district", []).forEach((subdistrictId: any) => {
               let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
                 if (obj.id == subdistrictId) {
                   return true;

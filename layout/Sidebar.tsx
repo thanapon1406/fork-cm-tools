@@ -277,8 +277,8 @@ export default function Sidebar({ }: Props): ReactElement {
         },
         {
           title: 'Logistic Subsidize',
-          link: '/content/ls/create',
-          key: '/content/ls/create',
+          link: '/content/ls',
+          key: '/content/ls',
         },
       ],
     }

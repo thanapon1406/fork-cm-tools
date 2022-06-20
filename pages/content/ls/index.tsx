@@ -4,6 +4,7 @@ import Input from '@/components/Form/Input'
 import ReactQuill from "@/components/QuilNoSSR"
 import MainLayout from '@/layout/MainLayout'
 import { uploadImage } from '@/services/cdn'
+import { createContentLs } from '@/services/ls-config'
 import { PlusOutlined } from '@ant-design/icons'
 import {
   Breadcrumb,
@@ -23,6 +24,7 @@ import * as Yup from 'yup'
 import noImage from '../../../public/asset/images/no-image-available.svg'
 
 
+
 const { Title } = Typography
 const { warning } = Modal
 
@@ -31,8 +33,7 @@ interface Props { }
 interface FormInterface {
   name: string
   description: string
-  status: string
-  type: string
+  status: boolean
   image_url: string
   start_date?: string | null | undefined
   end_date?: string | null | undefined
@@ -40,13 +41,13 @@ interface FormInterface {
     start: any
     end: any
   }
+  code?: string
 }
 
 const initialValues: FormInterface = {
   name: '',
   description: '',
-  status: '',
-  type: 'type',
+  status: true,
   image_url: '',
   start_date: '',
   end_date: '',
@@ -54,6 +55,7 @@ const initialValues: FormInterface = {
     start: moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
     end: moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
   },
+  code: 'Logistic-Subsidize'
 }
 
 const Schema = Yup.object().shape({
@@ -124,7 +126,7 @@ export default function BannerCreate({ }: Props): ReactElement {
       return false
     }
     values.image_url = imageUrl
-    values.status = isActive
+    values.status = isActive == 'active' ? true : false
 
     if (values.show_date.start != '') {
       values.start_date = moment(values.show_date.start).format(dateFormat)
@@ -136,14 +138,16 @@ export default function BannerCreate({ }: Props): ReactElement {
     } else {
       values.end_date = null
     }
+    if (values.description != '') {
+      values.description = values.description.replaceAll('<br>', '<br/>')
+    }
 
     const dataCreate = { data: omit(values, ['show_date']) }
     console.log(dataCreate)
-    // const { success } = await createBanner(dataCreate)
-
-    // if (success) {
-    //   router.push('/content/ls/create')
-    // }
+    const { success } = await createContentLs(dataCreate)
+    if (success) {
+      router.push('/content/ls')
+    }
   }
 
   return (
@@ -173,9 +177,15 @@ export default function BannerCreate({ }: Props): ReactElement {
                     rows={2}
                     className="form-control round"
                     id="name"
+                    value={values.name}
                   />
                 </Col>
-                <Col className="gutter-row" span={24}>
+              </Row>
+              <Row gutter={24}>
+                <Col className="gutter-row" span={24}
+                  style={{
+                    paddingBottom: '20px',
+                  }}>
                   <label style={{ display: 'block', marginBottom: '10px' }}>รายละเอียด</label>
                   <ReactQuill
                     theme="snow"
@@ -198,6 +208,9 @@ export default function BannerCreate({ }: Props): ReactElement {
                     }}
                   />
                 </Col>
+              </Row>
+              <Row gutter={24}>
+
                 <Col
                   className="gutter-row"
                   span={24}
@@ -232,17 +245,43 @@ export default function BannerCreate({ }: Props): ReactElement {
                 >
                   <label style={{ display: 'block', marginBottom: '10px' }}>ตัวอย่างหน้า</label>
                 </Col>
+              </Row>
+              <Row gutter={24}>
+
                 <Col
                   className="gutter-row"
                   span={24}
                   style={{ marginTop: '35px', marginBottom: '20px', textAlign: 'center' }}
                 >
                   <img
-                    style={{ width: 'auto', height: 240 }}
+                    style={{ width: 'auto', height: 180 }}
                     alt="example"
                     src={imageUrl != '' ? imageUrl : noImage.src}
                   />
                 </Col>
+              </Row>
+              <Row gutter={24}>
+                <Col
+                  className="gutter-row"
+                  span={6} offset={6}
+                  style={{ marginBottom: '12px' }}
+                >
+                  <strong><label style={{ display: 'block', marginBottom: '10px' }}>{values.name}</label></strong>
+                </Col>
+              </Row>
+              <Row gutter={24}>
+
+                <Col
+                  className="gutter-row"
+                  span={6} offset={6}
+                  style={{ marginBottom: '20px' }}
+                >
+                  <div style={{ display: 'block', marginBottom: '10px' }} dangerouslySetInnerHTML={{ __html: values.description }} />
+                  {/* <label style={{ display: 'block', marginBottom: '10px' }}>{values.description}</label> */}
+                </Col>
+              </Row>
+              <Row gutter={24}>
+
                 <Col
                   className="gutter-row"
                   span={24}

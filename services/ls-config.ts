@@ -11,7 +11,29 @@ export interface queryList {
   id?: string | string[] | undefined
 }
 
-export { createLsConfig, listLsConfig, findLsConfig, updateLsConfig, deleteLsConfig }
+export interface lsSummaryInterface {
+  name?: string
+  type?: string
+  type_name?: string
+  order_amount?: string
+  discount_type?: string
+  discount_amount?: string
+  min_distance?: string
+  max_distance?: string
+  ls_type?: string
+  ls_platform_amount?: string
+  ls_merchant_amount?: string
+  start_date?: string
+  end_date?: string
+  province_ids?: number[]
+  district_ids?: number[]
+  sub_district_ids?: number[]
+  page?: number
+  per_page?: number
+}
+
+
+export { createLsConfig, listLsConfig, findLsConfig, updateLsConfig, deleteLsConfig, createContentLs, findContentLs }
 
 const createLsConfig = async (req: any) => {
   try {
@@ -56,5 +78,23 @@ const deleteLsConfig = async (option: queryList) => {
     return successHandler(result)
   } catch (error) {
     return errorHandler(error, null, false)
+  }
+}
+
+const createContentLs = async (req: any) => {
+  try {
+    const response = await fetch.post(`/api/content-ls/create`, req);
+    return successHandler(response)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
+const findContentLs = async (req: any) => {
+  try {
+    const response = await fetch.post(`/api/content-ls/find?code=${req}`);
+    return successHandler(response)
+  } catch (error) {
+    return errorHandler(error)
   }
 }

@@ -466,7 +466,6 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
         const reqCreateTierPriceDelete: any = {
           id: responseTierPrice.result.tier_id,
         }
-        console.log("testdelete", reqCreateTierPriceDelete);
         await tierPriceDelete(reqCreateTierPriceDelete)
         setShowErrorResult(result.validate)
       }

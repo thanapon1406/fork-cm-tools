@@ -452,7 +452,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           let sub_districtDatas: any = []
 
           if (districtData.location_type !== "district") {
-            _.get(result, "validate[index].sub_district", []).forEach((subdistrictId: any) => {
+            _.get(result, `validate[${index}].sub_district`, []).forEach((subdistrictId: any) => {
               let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
                 if (obj.id == subdistrictId) {
                   return true;

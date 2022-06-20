@@ -413,14 +413,14 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
         locations.push(location)
       });
 
-      const reqCreateTierPriceLocation: any = {
+      const requstUpdateTierPriceLocation: any = {
         data: {
           tier_id: id,
           locations: locations
         }
       }
 
-      const { success, result } = await tierPriceLocationUpdate(reqCreateTierPriceLocation)
+      const { success, result } = await tierPriceLocationUpdate(requstUpdateTierPriceLocation)
       if (success && result.message !== "Error") {
         notification.success({
           message: `แก้ไขข้อมูลสำเร็จ`,
@@ -447,7 +447,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           let sub_districtDatas: any = []
 
           if (districtData.location_type !== "district") {
-            _.get(result, "validate[index].sub_district", []).forEach((subdistrictId: any) => {
+            _.get(result, `validate[${index}].sub_district`, []).forEach((subdistrictId: any) => {
               let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
                 if (obj.id == subdistrictId) {
                   return true;

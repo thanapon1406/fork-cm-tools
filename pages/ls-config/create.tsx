@@ -460,18 +460,27 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     const { result, success } = await createLsConfig(payload)
     if (success) {
       notification.success({
-        message: `ดำเนินการสร้าง LS Config สำเร็จ`,
+        message: `ดำเนินการสร้าง Logistic Subsidize สำเร็จ`,
         description: '',
         duration: 3,
       })
       Router.push("/ls-config")
       setDisableSubmitButton(false)
     } else {
-      notification.warning({
-        message: `ผิดพลาด`,
-        description: 'ไม่สามารถสร้าง LS Config ได้',
-        duration: 3,
-      })
+      const { detail = '' } = result
+      if (detail === 'DUPLICATED_NAME') {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถสร้างชื่อ Logistic Subsidize ซ้ำได้',
+          duration: 3,
+        })
+      } else {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถสร้าง Logistic Subsidize ได้',
+          duration: 3,
+        })
+      }
       setDisableSubmitButton(false)
     }
 

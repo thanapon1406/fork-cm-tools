@@ -1,9 +1,7 @@
 import Card from '@/components/Card'
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
-import TextArea from '@/components/Form/TextArea'
 import MainLayout from '@/layout/MainLayout'
-import { createBanner } from '@/services/banner'
 import { uploadImage } from '@/services/cdn'
 import { PlusOutlined } from '@ant-design/icons'
 import {
@@ -19,6 +17,8 @@ import { omit } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useState } from 'react'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
 import * as Yup from 'yup'
 import noImage from '../../../public/asset/images/no-image-available.svg'
 
@@ -138,11 +138,12 @@ export default function BannerCreate({ }: Props): ReactElement {
     }
 
     const dataCreate = { data: omit(values, ['show_date']) }
-    const { success } = await createBanner(dataCreate)
+    console.log(dataCreate)
+    // const { success } = await createBanner(dataCreate)
 
-    if (success) {
-      router.push('/content/banner')
-    }
+    // if (success) {
+    //   router.push('/content/ls/create')
+    // }
   }
 
   return (
@@ -175,14 +176,25 @@ export default function BannerCreate({ }: Props): ReactElement {
                   />
                 </Col>
                 <Col className="gutter-row" span={24}>
-                  <Field
-                    label={{ text: 'รายละเอียด' }}
-                    name="description"
-                    type="text"
-                    component={TextArea}
-                    rows={2}
-                    className="form-control round"
-                    id="description"
+                  <label style={{ display: 'block', marginBottom: '10px' }}>รายละเอียด</label>
+                  <ReactQuill
+                    value={values.description}
+                    onChange={(content, delta, source, editor) => {
+                      setFieldValue('description', editor.getHTML())
+                    }}
+                    modules={{
+                      toolbar: [
+                        [{ header: [1, 2, false] }],
+                        ['bold', 'italic', 'underline', 'strike', 'link'],
+                        [{ color: [] }, { background: [] }, { align: [] }],
+                        [
+                          { list: 'ordered' },
+                          { list: 'bullet' },
+                          { indent: '-1' },
+                          { indent: '+1' },
+                        ],
+                      ],
+                    }}
                   />
                 </Col>
                 <Col

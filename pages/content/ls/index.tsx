@@ -195,6 +195,7 @@ export default function Ls({ }: Props): ReactElement {
         description: '',
         duration: 3,
       })
+      document.location.reload()
     } else {
       notification.warning({
         message: `ไม่สามารถดำเนินการสร้าง Content LS ได้`,

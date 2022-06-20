@@ -434,7 +434,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           duration: 3,
         })
       }
-      if (_.get(result, "validate[0]")) {
+      if (_.get(result, "validate[0]") || _.get(result, "tier_duplicate_location")) {
         setShowError(true)
         result.validate.forEach((element: any, index: number) => {
           let districtData: any = _.find(locations, function (obj) {

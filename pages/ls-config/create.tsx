@@ -212,7 +212,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
           } else {
             const lsType = this?.parent?.ls_type
             if (lsType != undefined) {
-              if (lsType == PERCENT) {
+              if (lsType == PERCENT && (type != SUBSIDIZE)) {
                 const lsMerchantAmount = this?.parent?.ls_merchant_amount
                 if (lsMerchantAmount != undefined) {
                   if ((Number(value) + Number(lsMerchantAmount)) != 100) {
@@ -263,7 +263,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
           } else {
             const lsType = this?.parent?.ls_type
             if (lsType != undefined) {
-              if (lsType == PERCENT) {
+              if (lsType == PERCENT && (type != SUBSIDIZE)) {
                 const lsPlatformAmount = this?.parent?.ls_platform_amount
                 if (lsPlatformAmount != undefined) {
                   if ((Number(value) + Number(lsPlatformAmount)) != 100) {
@@ -300,28 +300,27 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       }
       return true
     }),
-    campaign_time: Yup.object()
-      .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
-        const start = this?.parent?.campaign_time["start"]
-        const end = this?.parent?.campaign_time["end"]
-        if (start && end) {
-          return true
-        } else {
+    campaign_time: Yup.object().test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
+      const start = this?.parent?.campaign_time["start"]
+      const end = this?.parent?.campaign_time["end"]
+      if (start && end) {
+        return true
+      } else {
+        return false
+      }
+    }).test("15 days period", "วันที่และเวลาของแคมเปญควรมีระยะเวลาอย่างน้อย 15 วัน", function (value: any) {
+      const start = this?.parent?.campaign_time["start"]
+      const end = this?.parent?.campaign_time["end"]
+      if (start && end) {
+        const diffDays = moment(end).diff(moment(start), 'days')
+        if (diffDays < 15) {
           return false
         }
-      }).test("15 days period", "วันที่และเวลาของแคมเปญควรมีระยะเวลาอย่างน้อย 15 วัน", function (value: any) {
-        const start = this?.parent?.campaign_time["start"]
-        const end = this?.parent?.campaign_time["end"]
-        if (start && end) {
-          const diffDays = moment(end).diff(moment(start), 'days')
-          if (diffDays < 15) {
-            return false
-          }
-          return true
-        } else {
-          return false
-        }
-      }),
+        return true
+      } else {
+        return false
+      }
+    }),
   })
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const lsLogicsOption = [

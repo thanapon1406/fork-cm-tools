@@ -33,7 +33,7 @@ export interface lsSummaryInterface {
 }
 
 
-export { createLsConfig, listLsConfig, findLsConfig, updateLsConfig, deleteLsConfig, createContentLs, findContentLs }
+export { createLsConfig, listLsConfig, findLsConfig, updateLsConfig, deleteLsConfig, createContentLs, findContentLs, updateContentLs }
 
 const createLsConfig = async (req: any) => {
   try {
@@ -90,9 +90,18 @@ const createContentLs = async (req: any) => {
   }
 }
 
+const updateContentLs = async (req: any) => {
+  try {
+    const response = await fetch.post(`/api/content-ls/update`, req);
+    return successHandler(response)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
+
 const findContentLs = async (req: any) => {
   try {
-    const response = await fetch.post(`/api/content-ls/find?code=${req}`);
+    const response = await fetch.get(`/api/content-ls/find?code=${req}`);
     return successHandler(response)
   } catch (error) {
     return errorHandler(error)

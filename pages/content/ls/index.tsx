@@ -4,21 +4,20 @@ import Input from '@/components/Form/Input'
 import ReactQuill from "@/components/QuilNoSSR"
 import MainLayout from '@/layout/MainLayout'
 import { uploadImage } from '@/services/cdn'
-import { createContentLs } from '@/services/ls-config'
+import { createContentLs, findContentLs, updateContentLs } from '@/services/ls-config'
 import { PlusOutlined } from '@ant-design/icons'
 import {
   Breadcrumb,
   Button,
-  Col, Modal, Row,
+  Col, Modal, notification, Row,
   Switch,
   Typography,
   Upload
 } from 'antd'
 import { Field, Form, Formik } from 'formik'
-import { omit } from 'lodash'
+import _, { omit } from 'lodash'
 import moment from 'moment'
-import { useRouter } from 'next/router'
-import { ReactElement, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
 import * as Yup from 'yup'
 import noImage from '../../../public/asset/images/no-image-available.svg'
@@ -42,9 +41,11 @@ interface FormInterface {
     end: any
   }
   code?: string
+  id?: number
+  version?: string
 }
 
-const initialValues: FormInterface = {
+const initialValuesDefault: FormInterface = {
   name: '',
   description: '',
   status: true,
@@ -55,33 +56,68 @@ const initialValues: FormInterface = {
     start: moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
     end: moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
   },
-  code: 'Logistic-Subsidize'
+  code: 'Logistic-Subsidize',
+  id: 0,
+  version: 'v1.0.0'
 }
 
 const Schema = Yup.object().shape({
   name: Yup.string().trim().required('กรุณากรอกชื่อ'),
 })
 
-export default function BannerCreate({ }: Props): ReactElement {
-  const router = useRouter()
+export default function Ls({ }: Props): ReactElement {
   const [isActive, setActive] = useState('active')
   const [loadingImage, setloadingImage] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
-  const [isAction, setAction] = useState('external_url')
-  const [exampleLink, setExampleLink] = useState('')
+  const [initialValues, setInitialValues] = useState(initialValuesDefault)
+  const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
+
+  const addVersion = (version: any) => {
+    let versionSplit = version.split('.');
+    if (versionSplit.length == 3) {
+      let splitOne = _.get(versionSplit, "[1]")
+      let splitTwo = _.get(versionSplit, "[2]")
+
+      if (+splitTwo >= 30) {
+        splitOne = +splitOne + 1
+        splitTwo = 0
+      } else {
+        splitTwo = +splitTwo + 1
+      }
+
+      version = versionSplit[0] + '.' + splitOne + '.' + splitTwo
+    }
+    return version
+  }
 
   const handleStatus = (event: any) => {
     const checkStatus = isActive == 'active' ? 'inactive' : 'active'
     setActive(checkStatus)
   }
 
-  const handleAction = (event: any) => {
-    setAction(event.target.value)
+  const fetchDataContentLs = async () => {
+    const { result, success } = await findContentLs('Logistic-Subsidize')
+    if (success) {
+      const { data } = result
+      let dataContentLs: FormInterface = {
+        name: data.name,
+        description: data.description,
+        status: data.status,
+        image_url: data.image_url,
+        start_date: data.start_date,
+        end_date: data.end_date,
+        show_date: {
+          start: moment(data.start_date).startOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
+          end: moment(data.end_date).endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
+        },
+        code: 'Logistic-Subsidize',
+        id: data.id,
+        version: data.version
+      }
 
-    if (event.target.value == 'external_url') {
-      setExampleLink('* ตัวอย่าง https://www.google.com/')
-    } else if (event.target.value == 'internal_url') {
-      setExampleLink('* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer')
+      setActive(data.status ? 'active' : 'inactive')
+      setInitialValues(dataContentLs)
+      setImageUrl(data.image_url)
     }
   }
 
@@ -115,8 +151,6 @@ export default function BannerCreate({ }: Props): ReactElement {
     setImageUrl(res.upload_success.modal_pop_up)
   }
 
-  const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
-
   const handleSubmit = async (values: typeof initialValues) => {
     if (imageUrl == '') {
       warning({
@@ -143,13 +177,37 @@ export default function BannerCreate({ }: Props): ReactElement {
     }
 
     const dataCreate = { data: omit(values, ['show_date']) }
-    console.log(dataCreate)
-    const { success } = await createContentLs(dataCreate)
-    if (success) {
-      router.push('/content/ls')
+
+    let isSuccess: any
+    if (values.id == 0) {
+      const { success } = await createContentLs(dataCreate)
+      isSuccess = success
+    } else {
+      dataCreate.data.version = addVersion(dataCreate.data.version)
+      setInitialValues({ ...values, version: dataCreate.data.version })
+      const { success } = await updateContentLs(dataCreate)
+      isSuccess = success
+    }
+
+    if (isSuccess) {
+      notification.success({
+        message: `ดำเนินการสร้าง Content LS สำเร็จ`,
+        description: '',
+        duration: 3,
+      })
+    } else {
+      notification.warning({
+        message: `ไม่สามารถดำเนินการสร้าง Content LS ได้`,
+        description: 'กรุณาระบุ Content LS ให้ครบถ้วน',
+        duration: 3,
+      })
     }
   }
 
+
+  useEffect(() => {
+    fetchDataContentLs()
+  }, [])
   return (
     <MainLayout>
       <Row justify="space-around" align="middle">
@@ -164,7 +222,11 @@ export default function BannerCreate({ }: Props): ReactElement {
       </Row>
 
       <Card>
-        <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={Schema}>
+        <Formik
+          enableReinitialize
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          validationSchema={Schema}>
           {({ values, resetForm, setFieldValue }) => (
             <Form>
               <Row gutter={24}>

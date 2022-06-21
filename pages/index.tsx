@@ -14,13 +14,19 @@ import {
   Typography
 } from 'antd'
 import { useFormik } from 'formik'
-import Highcharts from 'highcharts'
+import Highcharts, { numberFormat } from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
+import AnnotationsFactory from "highcharts/modules/annotations"
 import { filter, find, get, has, size, sumBy } from 'lodash'
 import moment, { Moment } from 'moment'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
+
+if (typeof Highcharts === 'object') {
+  AnnotationsFactory(Highcharts);
+}
+
 const { Text } = Typography
 
 const { Title } = Typography
@@ -177,6 +183,12 @@ type PieDataInterface = {
   y: number
   name: string
   color: string
+}
+
+type AnnotationSeriesData = {
+  y: number
+  id?: string
+  custom_percentage?: string
 }
 
 const defaultSelDate: [Moment, Moment] = [moment().subtract(6, 'days').startOf('day'), moment()]
@@ -351,6 +363,10 @@ const Home: NextPage = () => {
     }
   }
 
+  const getPercentage = (total: number, target: number) => {
+    return numberFormat((target * 100 / total), 2)
+  }
+
   const generateChartData = (
     data: any[],
     startDate: Moment,
@@ -358,12 +374,14 @@ const Home: NextPage = () => {
     chartType: 'days' | 'weeks' | 'months'
   ) => {
     let chartData: any[] = []
-    let ordersData: number[] = []
-    let successData: number[] = []
-    let cancelData: number[] = []
+    let ordersData: AnnotationSeriesData[] = []
+    let successData: AnnotationSeriesData[] = []
+    let cancelData: AnnotationSeriesData[] = []
     let colLabels: string[] = []
     const sd = new Date(moment(startDate).toDate())
     const ed = new Date(moment(endDate).toDate())
+    let totalOrderCount = 0
+    let cancelOrderCount: number[] = []
 
     for (var m = startDate; m.isBefore(endDate); m.add(1, chartType)) {
       let dateData = find(data, { date: m.format('YYYY-MM-DD') })
@@ -373,25 +391,39 @@ const Home: NextPage = () => {
         dateData = find(data, { date: m.startOf('weeks').add(1, 'days').format('YYYY-MM-DD') })
       }
 
+      let colLabel = moment(m).format('DD/MM/YYYY')
+      if (chartType === 'days') {
+        colLabel = moment(m).format('DD/MM/YYYY')
+
+      } else if (chartType === 'weeks') {
+        colLabel = `${moment(m).startOf('weeks').format('DD/MM')} ~ ${moment(m)
+          .endOf('weeks')
+          .format('DD/MM')}`
+
+      } else if (chartType === 'months') {
+        colLabel = moment(m).format('MMM YYYY')
+      }
+
+      colLabels.push(colLabel)
+
       let totalCount = get(dateData, 'order_total') || 0
       let successCount = get(find(dateData?.group_by_status, { status: 'success' }), 'count') || 0
       let cancelCount = get(find(dateData?.group_by_status, { status: 'cancel' }), 'count') || 0
 
-      ordersData.push(totalCount)
-      successData.push(successCount)
-      cancelData.push(cancelCount)
-
-      if (chartType === 'days') {
-        colLabels.push(moment(m).format('DD/MM/YYYY'))
-      } else if (chartType === 'weeks') {
-        colLabels.push(
-          `${moment(m).startOf('weeks').format('DD/MM')} ~ ${moment(m)
-            .endOf('weeks')
-            .format('DD/MM')}`
-        )
-      } else if (chartType === 'months') {
-        colLabels.push(moment(m).format('MMM YYYY'))
-      }
+      ordersData.push({
+        y: totalCount,
+        id: colLabel,
+      })
+      successData.push({
+        y: successCount,
+        custom_percentage: ` (${getPercentage(totalCount, successCount)}%)`
+      })
+      cancelData.push({
+        y: cancelCount,
+        custom_percentage: ` (${getPercentage(totalCount, cancelCount)}%)`
+      })
+      cancelOrderCount.push(cancelCount)
+      totalOrderCount = totalCount
     }
 
     //Total Order
@@ -417,13 +449,16 @@ const Home: NextPage = () => {
       color: '#fa2b24',
     })
 
+    console.log('cancelOrderCount', cancelOrderCount)
+
     for (let c of CancelColors) {
-      let txData: number[] = generateCancelData(
+      let txData: AnnotationSeriesData[] = generateCancelData(
         data,
         new Date(sd),
         new Date(ed),
         chartType,
-        c.subString
+        c.subString,
+        cancelOrderCount,
       )
       chartData.push({
         type: 'line',
@@ -436,12 +471,13 @@ const Home: NextPage = () => {
     }
 
     for (let c of CancelGroup) {
-      let txData: number[] = generateCancelGroupData(
+      let txData: AnnotationSeriesData[] = generateCancelGroupData(
         data,
         new Date(sd),
         new Date(ed),
         chartType,
-        c.substringList
+        c.substringList,
+        cancelOrderCount
       )
       chartData.push({
         type: 'line',
@@ -461,10 +497,11 @@ const Home: NextPage = () => {
     startDate: Date,
     endDate: Date,
     chartType: 'days' | 'weeks' | 'months',
-    findString: string
+    findString: string,
+    totalCount: number[]
   ) => {
-    let result: number[] = []
-
+    let result: AnnotationSeriesData[] = []
+    let i = 0;
     for (var md = moment(startDate); md.isBefore(moment(endDate)); md.add(1, chartType)) {
       let dateData = find(data, { date: md.format('YYYY-MM-DD') })
       if (chartType == 'months') {
@@ -486,7 +523,11 @@ const Home: NextPage = () => {
         }),
         'count'
       )
-      result.push(count || 0)
+      result.push({
+        y: count || 0,
+        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`
+      })
+      i++;
     }
     return result
   }
@@ -496,10 +537,11 @@ const Home: NextPage = () => {
     startDate: Date,
     endDate: Date,
     chartType: 'days' | 'weeks' | 'months',
-    findStringList: string[]
+    findStringList: string[],
+    totalCount: number[]
   ) => {
-    let result: number[] = []
-
+    let result: AnnotationSeriesData[] = []
+    let i = 0;
     for (var md = moment(startDate); md.isBefore(moment(endDate)); md.add(1, chartType)) {
       let dateData = find(data, { date: md.format('YYYY-MM-DD') })
       if (chartType == 'months') {
@@ -519,7 +561,11 @@ const Home: NextPage = () => {
         }
       })
       let count = sumBy(list, 'count')
-      result.push(count || 0)
+      result.push({
+        y: count || 0,
+        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`
+      })
+      i++
     }
     return result
   }
@@ -606,7 +652,7 @@ const Home: NextPage = () => {
                 highcharts={Highcharts}
                 options={{
                   chart: {
-                    height: 600,
+                    height: 650,
                   },
                   title: {
                     text: '',
@@ -638,10 +684,18 @@ const Home: NextPage = () => {
                     categories: chartxAxis,
                   },
                   tooltip: {
+                    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}{point.custom_percentage}</b><br/>',
                     crosshairs: [true, true],
-                    shared: true,
+                    shared: true
                   },
                   series: chartData,
+                  // annotations: [{
+                  //   labels: [{
+                  //     useHTML: true,
+                  //     point: "15/06/2022",
+                  //     text: '15/06/2022<br/>1. แคมเปญค่าส่ง 0 บาท<br/>2.Test new Line'
+                  //   }]
+                  // }]
                 }}
               />
             </Col>

@@ -667,7 +667,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       async onOk() {
         const body: cancelOrderInterface = {
           order_no: String(order_no),
-          cancellation_id: String(0),
+          cancellation_id: String(13),
           cancellation_reason: 'ยกเลิกโดยผู้ดูเเลระบบ',
         }
         const request: requestReportInterface = {

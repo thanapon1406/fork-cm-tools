@@ -14,7 +14,7 @@ import {
   Typography
 } from 'antd'
 import { useFormik } from 'formik'
-import Highcharts from 'highcharts'
+import Highcharts, { numberFormat } from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import AnnotationsFactory from "highcharts/modules/annotations"
 import { filter, find, get, has, size, sumBy } from 'lodash'
@@ -183,6 +183,12 @@ type PieDataInterface = {
   y: number
   name: string
   color: string
+}
+
+type AnnotationSeriesData = {
+  y: number
+  id?: string
+  custom_percentage?: string
 }
 
 const defaultSelDate: [Moment, Moment] = [moment().subtract(6, 'days').startOf('day'), moment()]
@@ -357,23 +363,25 @@ const Home: NextPage = () => {
     }
   }
 
+  const getPercentage = (total: number, target: number) => {
+    return numberFormat((target * 100 / total), 2)
+  }
+
   const generateChartData = (
     data: any[],
     startDate: Moment,
     endDate: Moment,
     chartType: 'days' | 'weeks' | 'months'
   ) => {
-    type AnnotationSeriesData = {
-      y: number
-      id: string
-    }
     let chartData: any[] = []
     let ordersData: AnnotationSeriesData[] = []
-    let successData: number[] = []
-    let cancelData: number[] = []
+    let successData: AnnotationSeriesData[] = []
+    let cancelData: AnnotationSeriesData[] = []
     let colLabels: string[] = []
     const sd = new Date(moment(startDate).toDate())
     const ed = new Date(moment(endDate).toDate())
+    let totalOrderCount = 0
+    let cancelOrderCount: number[] = []
 
     for (var m = startDate; m.isBefore(endDate); m.add(1, chartType)) {
       let dateData = find(data, { date: m.format('YYYY-MM-DD') })
@@ -406,8 +414,16 @@ const Home: NextPage = () => {
         y: totalCount,
         id: colLabel,
       })
-      successData.push(successCount)
-      cancelData.push(cancelCount)
+      successData.push({
+        y: successCount,
+        custom_percentage: ` (${getPercentage(totalCount, successCount)}%)`
+      })
+      cancelData.push({
+        y: cancelCount,
+        custom_percentage: ` (${getPercentage(totalCount, cancelCount)}%)`
+      })
+      cancelOrderCount.push(cancelCount)
+      totalOrderCount = totalCount
     }
 
     //Total Order
@@ -433,13 +449,16 @@ const Home: NextPage = () => {
       color: '#fa2b24',
     })
 
+    console.log('cancelOrderCount', cancelOrderCount)
+
     for (let c of CancelColors) {
-      let txData: number[] = generateCancelData(
+      let txData: AnnotationSeriesData[] = generateCancelData(
         data,
         new Date(sd),
         new Date(ed),
         chartType,
-        c.subString
+        c.subString,
+        cancelOrderCount,
       )
       chartData.push({
         type: 'line',
@@ -452,12 +471,13 @@ const Home: NextPage = () => {
     }
 
     for (let c of CancelGroup) {
-      let txData: number[] = generateCancelGroupData(
+      let txData: AnnotationSeriesData[] = generateCancelGroupData(
         data,
         new Date(sd),
         new Date(ed),
         chartType,
-        c.substringList
+        c.substringList,
+        cancelOrderCount
       )
       chartData.push({
         type: 'line',
@@ -477,10 +497,11 @@ const Home: NextPage = () => {
     startDate: Date,
     endDate: Date,
     chartType: 'days' | 'weeks' | 'months',
-    findString: string
+    findString: string,
+    totalCount: number[]
   ) => {
-    let result: number[] = []
-
+    let result: AnnotationSeriesData[] = []
+    let i = 0;
     for (var md = moment(startDate); md.isBefore(moment(endDate)); md.add(1, chartType)) {
       let dateData = find(data, { date: md.format('YYYY-MM-DD') })
       if (chartType == 'months') {
@@ -502,7 +523,11 @@ const Home: NextPage = () => {
         }),
         'count'
       )
-      result.push(count || 0)
+      result.push({
+        y: count || 0,
+        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`
+      })
+      i++;
     }
     return result
   }
@@ -512,10 +537,11 @@ const Home: NextPage = () => {
     startDate: Date,
     endDate: Date,
     chartType: 'days' | 'weeks' | 'months',
-    findStringList: string[]
+    findStringList: string[],
+    totalCount: number[]
   ) => {
-    let result: number[] = []
-
+    let result: AnnotationSeriesData[] = []
+    let i = 0;
     for (var md = moment(startDate); md.isBefore(moment(endDate)); md.add(1, chartType)) {
       let dateData = find(data, { date: md.format('YYYY-MM-DD') })
       if (chartType == 'months') {
@@ -535,7 +561,11 @@ const Home: NextPage = () => {
         }
       })
       let count = sumBy(list, 'count')
-      result.push(count || 0)
+      result.push({
+        y: count || 0,
+        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`
+      })
+      i++
     }
     return result
   }
@@ -622,7 +652,7 @@ const Home: NextPage = () => {
                 highcharts={Highcharts}
                 options={{
                   chart: {
-                    height: 600,
+                    height: 650,
                   },
                   title: {
                     text: '',
@@ -654,17 +684,18 @@ const Home: NextPage = () => {
                     categories: chartxAxis,
                   },
                   tooltip: {
+                    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}{point.custom_percentage}</b><br/>',
                     crosshairs: [true, true],
-                    shared: true,
+                    shared: true
                   },
                   series: chartData,
-                  annotations: [{
-                    labels: [{
-                      useHTML: true,
-                      point: "15/06/2022",
-                      text: '15/06/2022<br/>1. แคมเปญค่าส่ง 0 บาท<br/>2.Test new Line'
-                    }]
-                  }]
+                  // annotations: [{
+                  //   labels: [{
+                  //     useHTML: true,
+                  //     point: "15/06/2022",
+                  //     text: '15/06/2022<br/>1. แคมเปญค่าส่ง 0 บาท<br/>2.Test new Line'
+                  //   }]
+                  // }]
                 }}
               />
             </Col>

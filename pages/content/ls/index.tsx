@@ -4,8 +4,8 @@ import Input from '@/components/Form/Input'
 import ReactQuill from "@/components/QuilNoSSR"
 import MainLayout from '@/layout/MainLayout'
 import { uploadImage } from '@/services/cdn'
-import { createContentLs, findContentLs, updateContentLs } from '@/services/ls-config'
-import { PlusOutlined } from '@ant-design/icons'
+import { createContentLs, findContentLs } from '@/services/ls-config'
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import {
   Breadcrumb,
   Button,
@@ -17,11 +17,11 @@ import {
 import { Field, Form, Formik } from 'formik'
 import _, { omit } from 'lodash'
 import moment from 'moment'
+import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
 import * as Yup from 'yup'
 import noImage from '../../../public/asset/images/no-image-available.svg'
-
 
 
 const { Title } = Typography
@@ -71,6 +71,8 @@ export default function Ls({ }: Props): ReactElement {
   const [imageUrl, setImageUrl] = useState('')
   const [initialValues, setInitialValues] = useState(initialValuesDefault)
   const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
+  const router = useRouter()
+  const [isSubmit, setIsSubmit] = useState(false)
 
   const addVersion = (version: any) => {
     let versionSplit = version.split('.');
@@ -99,11 +101,12 @@ export default function Ls({ }: Props): ReactElement {
     const { result, success } = await findContentLs('Logistic-Subsidize')
     if (success) {
       const { data } = result
+      let image = data.image_url === undefined ? '' : data.image_url
       let dataContentLs: FormInterface = {
         name: data.name,
         description: data.description,
         status: data.status,
-        image_url: data.image_url,
+        image_url: image,
         start_date: data.start_date,
         end_date: data.end_date,
         show_date: {
@@ -117,7 +120,7 @@ export default function Ls({ }: Props): ReactElement {
 
       setActive(data.status ? 'active' : 'inactive')
       setInitialValues(dataContentLs)
-      setImageUrl(data.image_url)
+      setImageUrl(image)
     }
   }
 
@@ -140,7 +143,9 @@ export default function Ls({ }: Props): ReactElement {
     if (fileSize > 1) {
       warning({
         title: `กรุณาเลือกรูปภาพขนาดไม่เกิน 1MB`,
-        afterClose() { },
+        afterClose() {
+
+        },
       })
       return false
     }
@@ -152,13 +157,7 @@ export default function Ls({ }: Props): ReactElement {
   }
 
   const handleSubmit = async (values: typeof initialValues) => {
-    if (imageUrl == '') {
-      warning({
-        title: `กรุณาเลือกรูปภาพ`,
-        afterClose() { },
-      })
-      return false
-    }
+    setIsSubmit(true)
     values.image_url = imageUrl
     values.status = isActive == 'active' ? true : false
 
@@ -178,24 +177,19 @@ export default function Ls({ }: Props): ReactElement {
 
     const dataCreate = { data: omit(values, ['show_date']) }
 
-    let isSuccess: any
-    if (values.id == 0) {
-      const { success } = await createContentLs(dataCreate)
-      isSuccess = success
-    } else {
+    if (values.id != 0) {
       dataCreate.data.version = addVersion(dataCreate.data.version)
+      dataCreate.data.id = 0
       setInitialValues({ ...values, version: dataCreate.data.version })
-      const { success } = await updateContentLs(dataCreate)
-      isSuccess = success
     }
 
-    if (isSuccess) {
+    const { success } = await createContentLs(dataCreate)
+    if (success) {
       notification.success({
         message: `ดำเนินการสร้าง Content LS สำเร็จ`,
         description: '',
         duration: 3,
       })
-      document.location.reload()
     } else {
       notification.warning({
         message: `ไม่สามารถดำเนินการสร้าง Content LS ได้`,
@@ -203,6 +197,13 @@ export default function Ls({ }: Props): ReactElement {
         duration: 3,
       })
     }
+
+    setTimeout(() => {
+      router.reload()
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      setIsSubmit(false)
+    }, 2000);
   }
 
 
@@ -247,7 +248,7 @@ export default function Ls({ }: Props): ReactElement {
               <Row gutter={24}>
                 <Col className="gutter-row" span={24}
                   style={{
-                    paddingBottom: '20px',
+                    paddingBottom: '80px',
                   }}>
                   <label style={{ display: 'block', marginBottom: '10px' }}>รายละเอียด</label>
                   <ReactQuill
@@ -256,6 +257,7 @@ export default function Ls({ }: Props): ReactElement {
                     onChange={(content, delta, source, editor) => {
                       setFieldValue('description', editor.getHTML())
                     }}
+                    style={{ height: '220px' }}
                     modules={{
                       toolbar: [
                         [{ header: [1, 2, false] }],
@@ -297,7 +299,9 @@ export default function Ls({ }: Props): ReactElement {
                   <Button style={{ marginLeft: 10 }} icon={<PlusOutlined />}>
                     เพิ่มรูปภาพ
                   </Button>
+
                 </Upload>
+                <Button onClick={() => { setImageUrl('') }} style={{ marginLeft: 10 }} icon={<DeleteOutlined />} />
                 <label style={{ marginLeft: 10, color: 'red' }}>
                   * หมายเหตุ แนะนำ รูปภาพ ขนาด 3:1 หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png
                 </label>
@@ -309,45 +313,65 @@ export default function Ls({ }: Props): ReactElement {
                   <label style={{ display: 'block', marginBottom: '10px' }}>ตัวอย่างหน้า</label>
                 </Col>
               </Row>
-              <Row gutter={24}>
-
+              {/* start layout */}
+              <Row gutter={24} align={'middle'}>
                 <Col
-                  className="gutter-row"
-                  span={24}
-                  style={{ marginTop: '35px', marginBottom: '20px', textAlign: 'center' }}
+                  span={12} offset={6}
+
                 >
-                  <img
-                    style={{ width: 'auto', height: 180 }}
-                    alt="example"
-                    src={imageUrl != '' ? imageUrl : noImage.src}
-                  />
+                  <div style={{
+                    borderTop: "2px solid #f2f2f2",
+                    paddingTop: "40px",
+                    borderLeft: "2px solid #f2f2f2",
+                    borderRight: "2px solid #f2f2f2",
+                    borderBottom: "2px solid #f2f2f2",
+                    paddingBottom: "40px",
+                    minHeight: '680px',
+                    width: '400px',
+                    padding: "10px 25px",
+                    wordBreak: 'break-all'
+                  }}>
+                    <Row gutter={24}
+                      style={{ marginTop: '0px', textAlign: 'center' }}
+                    >
+                      <Col
+                        className="gutter-row"
+                        span={24}
+                        style={{ textAlign: 'center' }}
+                      >
+                        {console.log(imageUrl)}
+                        <img
+                          style={{ width: 'auto', height: 180 }}
+                          alt="example"
+                          src={imageUrl != '' ? imageUrl : noImage.src}
+                        />
+                      </Col>
+                    </Row>
+                    <Row gutter={24}>
+                      <Col
+                        className="gutter-row"
+                        span={24}
+                        style={{ marginBottom: '20px' }}
+                      >
+                        <strong><label style={{ display: 'block', paddingTop: '20px' }}>{values.name}</label></strong>
+                      </Col>
+                    </Row>
+                    <Row gutter={24}>
+                      <Col
+                        className="gutter-row"
+                        span={24}
+                      >
+                        <div style={{ display: 'block', marginBottom: '10px' }} dangerouslySetInnerHTML={{ __html: values.description }} />
+                      </Col>
+                    </Row>
+                  </div>
                 </Col>
               </Row>
-              <Row gutter={24}>
+              {/* end */}
+              <Row gutter={24} style={{ paddingTop: '40px' }}>
                 <Col
                   className="gutter-row"
-                  span={6} offset={6}
-                  style={{ marginBottom: '12px' }}
-                >
-                  <strong><label style={{ display: 'block', marginBottom: '10px' }}>{values.name}</label></strong>
-                </Col>
-              </Row>
-              <Row gutter={24}>
-
-                <Col
-                  className="gutter-row"
-                  span={6} offset={6}
-                  style={{ marginBottom: '20px' }}
-                >
-                  <div style={{ display: 'block', marginBottom: '10px' }} dangerouslySetInnerHTML={{ __html: values.description }} />
-                  {/* <label style={{ display: 'block', marginBottom: '10px' }}>{values.description}</label> */}
-                </Col>
-              </Row>
-              <Row gutter={24}>
-
-                <Col
-                  className="gutter-row"
-                  span={24}
+                  span={12}
                   style={{
                     borderTop: '2px solid #f2f2f2',
                     paddingTop: '15px',
@@ -364,7 +388,7 @@ export default function Ls({ }: Props): ReactElement {
                 </Col>
                 <Col
                   className="gutter-row"
-                  span={24}
+                  span={12}
                   style={{
                     borderTop: '2px solid #f2f2f2',
                     paddingTop: '15px',
@@ -393,6 +417,7 @@ export default function Ls({ }: Props): ReactElement {
                     type="primary"
                     size="middle"
                     htmlType="submit"
+                    disabled={isSubmit}
                   >
                     บันทึก
                   </Button>

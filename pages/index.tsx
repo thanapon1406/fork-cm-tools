@@ -191,7 +191,7 @@ type AnnotationSeriesData = {
   custom_percentage?: string
 }
 
-const defaultSelDate: [Moment, Moment] = [moment().subtract(6, 'days').startOf('day'), moment()]
+const defaultSelDate: [Moment, Moment] = [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')]
 const defaultSelWeek: [Moment, Moment] = [
   moment().subtract(3, 'weeks').isoWeekday(2),
   moment().isoWeekday(2),
@@ -227,14 +227,6 @@ const Home: NextPage = () => {
       dates: Yup.array().min(1, 'กรุณาเลือกวัน').required('กรุณาเลือกวัน').nullable(),
     }),
   })
-
-  const randData = (numberOfLoop: number = 12) => {
-    let res = []
-    for (var i = 0; i < numberOfLoop; i++) {
-      res.push(Math.floor(Math.random() * 10000) + 1)
-    }
-    return res
-  }
 
   const fetchOrdersSummaryReport = async (values: FormInterFace) => {
     if (size(values.dates) < 2) {
@@ -392,16 +384,22 @@ const Home: NextPage = () => {
       }
 
       let colLabel = moment(m).format('DD/MM/YYYY')
+      let colId = moment(m).format('DDMMYYYY')
       if (chartType === 'days') {
         colLabel = moment(m).format('DD/MM/YYYY')
+        colId = moment(m).format('DDMMYYYY')
 
       } else if (chartType === 'weeks') {
         colLabel = `${moment(m).startOf('weeks').format('DD/MM')} ~ ${moment(m)
           .endOf('weeks')
           .format('DD/MM')}`
+        colId = `${moment(m).startOf('weeks').format('DDMM')}-${moment(m)
+          .endOf('weeks')
+          .format('DDMM')}`
 
       } else if (chartType === 'months') {
         colLabel = moment(m).format('MMM YYYY')
+        colId = moment(m).format('MMMYYYY')
       }
 
       colLabels.push(colLabel)
@@ -412,7 +410,7 @@ const Home: NextPage = () => {
 
       ordersData.push({
         y: totalCount,
-        id: colLabel,
+        id: colId,
       })
       successData.push({
         y: successCount,
@@ -448,8 +446,6 @@ const Home: NextPage = () => {
       name: 'Cancel',
       color: '#fa2b24',
     })
-
-    console.log('cancelOrderCount', cancelOrderCount)
 
     for (let c of CancelColors) {
       let txData: AnnotationSeriesData[] = generateCancelData(
@@ -487,6 +483,8 @@ const Home: NextPage = () => {
         visible: false,
       })
     }
+
+    console.log('chartData', chartData)
 
     setChartData(chartData)
     setChartxAxis(colLabels)
@@ -648,56 +646,59 @@ const Home: NextPage = () => {
         <Spin spinning={loading}>
           <Row gutter={16}>
             <Col span={24}>
-              <HighchartsReact
-                highcharts={Highcharts}
-                options={{
-                  chart: {
-                    height: 650,
-                  },
-                  title: {
-                    text: '',
-                  },
-                  lang: {
-                    thousandsSep: ',',
-                  },
-                  // plotOptions: {
-                  //   series: {
-                  //     marker: {
-                  //       enabled: false,
-                  //     },
-                  //   },
-                  // },
-                  legend: {
-                    //   layout: 'vertical',
-                    //   verticalAlign: 'middle',
-                    //   align: 'right',
-                    //   floating: false,
-                    itemMarginTop: 3,
-                    itemMarginBottom: 3,
-                  },
-                  yAxis: {
-                    title: {
-                      text: 'จำนวนออเดอร์',
+              {!loading &&
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={{
+                    chart: {
+                      height: 650,
                     },
-                  },
-                  xAxis: {
-                    categories: chartxAxis,
-                  },
-                  tooltip: {
-                    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}{point.custom_percentage}</b><br/>',
-                    crosshairs: [true, true],
-                    shared: true
-                  },
-                  series: chartData,
-                  // annotations: [{
-                  //   labels: [{
-                  //     useHTML: true,
-                  //     point: "15/06/2022",
-                  //     text: '15/06/2022<br/>1. แคมเปญค่าส่ง 0 บาท<br/>2.Test new Line'
-                  //   }]
-                  // }]
-                }}
-              />
+                    title: {
+                      text: '',
+                    },
+                    lang: {
+                      thousandsSep: ',',
+                    },
+                    // plotOptions: {
+                    //   series: {
+                    //     marker: {
+                    //       enabled: false,
+                    //     },
+                    //   },
+                    // },
+                    legend: {
+                      //   layout: 'vertical',
+                      //   verticalAlign: 'middle',
+                      //   align: 'right',
+                      //   floating: false,
+                      itemMarginTop: 3,
+                      itemMarginBottom: 3,
+                    },
+                    yAxis: {
+                      title: {
+                        text: 'จำนวนออเดอร์',
+                      },
+                    },
+                    xAxis: {
+                      categories: chartxAxis,
+                    },
+                    tooltip: {
+                      pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}{point.custom_percentage}</b><br/>',
+                      crosshairs: [true, true],
+                      shared: true
+                    },
+                    series: chartData,
+                    // annotations: [{
+                    //   labels: [{
+                    //     useHTML: true,
+                    //     point: "15/06/2022",
+                    //     text: '15/06/2022<br/>1. แคมเปญค่าส่ง 0 บาท<br/>2.Test new Line'
+                    //   }]
+                    // }]
+                  }}
+                />
+              }
+              {loading && <div style={{ minHeight: 300 }}></div>}
             </Col>
           </Row>
           <Divider />

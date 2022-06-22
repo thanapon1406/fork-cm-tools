@@ -224,7 +224,7 @@ const Home: NextPage = () => {
       handleSubmit()
     },
     validationSchema: Yup.object().shape({
-      dates: Yup.array().min(1, 'กรุณาเลือกวัน').required('กรุณาเลือกวัน').nullable(),
+      dates: Yup.array().min(1, 'กรุณาเลือก').required('กรุณาเลือก').nullable(),
     }),
   })
 

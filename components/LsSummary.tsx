@@ -222,10 +222,10 @@ const LsSummaryComponent = ({
             'normal_price': normalPrice,
             'is_support': isSupport,
             'discount': discount,
-            'ls_platform_amount': lsPlatformAmount,
-            'ls_merchant_amount': lsMerchantAmount,
+            'ls_platform_amount': lsPlatformAmount < 0 ? 0 : lsPlatformAmount,
+            'ls_merchant_amount': lsMerchantAmount < 0 ? 0 : lsMerchantAmount,
             'customer': customer < 0 ? 0 : customer,
-            'income': (discount - normalPrice) < 0 ? 0 : (discount - normalPrice)
+            'income': discount >= 0 ? (discount - normalPrice) < 0 ? 0 : (discount - normalPrice) : (discount * -1)
           })
         })
         nameArray?.push(value.name)

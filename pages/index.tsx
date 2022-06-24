@@ -1,5 +1,6 @@
 import Card from '@/components/Card'
 import MainLayout from '@/layout/MainLayout'
+import { findOutletId } from '@/services/merchant'
 import { getDashboardOrderCancelSummary, getDashboardOrderSummary } from '@/services/report'
 import { blue, grey, red, yellow } from '@ant-design/colors'
 import {
@@ -7,11 +8,8 @@ import {
   Col,
   DatePicker,
   DatePickerProps,
-  Divider,
-  Radio,
-  Row,
-  Spin,
-  Typography
+  Divider, Radio,
+  Row, Select, Spin, Typography
 } from 'antd'
 import { useFormik } from 'formik'
 import Highcharts, { numberFormat } from 'highcharts'
@@ -22,7 +20,7 @@ import moment, { Moment } from 'moment'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
-
+const { Option } = Select;
 if (typeof Highcharts === 'object') {
   AnnotationsFactory(Highcharts);
 }
@@ -176,7 +174,7 @@ const CancelGroup = [
 
 type FormInterFace = {
   picker_type: 'date' | 'week' | 'month'
-  dates: [Moment, Moment]
+  dates: [Moment, Moment],
 }
 
 type PieDataInterface = {
@@ -212,6 +210,9 @@ const Home: NextPage = () => {
   const [chartxAxis, setChartxAxis] = useState<string[] | number[]>([])
   const [cancellationPieData, setCancellationPieData] = useState<PieDataInterface[]>([])
   const [cancellationGroupPieData, setCancellationGroupPieData] = useState<PieDataInterface[]>([])
+  const [merchantTestId, setMerchantTestId] = useState([])
+  const [queryWithOutlet, setQueryWithOutlet] = useState("")
+
 
   const handleSubmit = async () => {
     await fetchOrdersSummaryReport(formik.values)
@@ -245,14 +246,25 @@ const Home: NextPage = () => {
       queryEndDate = moment(values.dates[1]).endOf('months')
     }
 
-    const { success, result } = await getDashboardOrderSummary({
+    let query = {
       brand_id: process.env.NEXT_PUBLIC_KITCHENHUB_BRAND_ID,
       start_date: moment(queryStartDate).format('YYYY-MM-DD'),
       start_time: moment(queryStartDate).format('HH:mm:ss'),
       end_date: moment(queryEndDate).format('YYYY-MM-DD'),
       end_time: moment(queryEndDate).format('HH:mm:ss'),
       date_picker_type: values.picker_type,
-    })
+      include_outlet_ids: [],
+      exclude_outlet_ids: []
+    }
+
+    if (queryWithOutlet == "include") {
+      query.include_outlet_ids = merchantTestId
+    }
+    if (queryWithOutlet == "exclude") {
+      query.exclude_outlet_ids = merchantTestId
+    }
+
+    const { success, result } = await getDashboardOrderSummary(query)
 
     if (success) {
       let { data } = result
@@ -296,13 +308,24 @@ const Home: NextPage = () => {
       queryEndDate = moment(values.dates[1]).endOf('months')
     }
 
-    const { success, result } = await getDashboardOrderCancelSummary({
+    let query = {
       brand_id: process.env.NEXT_PUBLIC_KITCHENHUB_BRAND_ID,
       start_date: moment(queryStartDate).format('YYYY-MM-DD'),
       start_time: moment(queryStartDate).format('HH:mm:ss'),
       end_date: moment(queryEndDate).format('YYYY-MM-DD'),
       end_time: moment(queryEndDate).format('HH:mm:ss'),
-    })
+      include_outlet_ids: [],
+      exclude_outlet_ids: []
+    }
+
+    if (queryWithOutlet == "include") {
+      query.include_outlet_ids = merchantTestId
+    }
+    if (queryWithOutlet == "exclude") {
+      query.exclude_outlet_ids = merchantTestId
+    }
+
+    const { success, result } = await getDashboardOrderCancelSummary(query)
     setLoading(false)
 
     if (success) {
@@ -569,6 +592,7 @@ const Home: NextPage = () => {
   }
 
   useEffect(() => {
+    fetchMerchatTestId()
     Highcharts.setOptions({
       lang: {
         decimalPoint: '.',
@@ -578,6 +602,17 @@ const Home: NextPage = () => {
     fetchOrdersSummaryReport(initialValues)
     fetchOrdersCancelSummaryReport(initialValues)
   }, [])
+
+  const fetchMerchatTestId = async () => {
+    const request = {
+      is_merchant_test: true,
+    }
+    const { result, success } = await findOutletId(request)
+    if (success) {
+      const { ids = [] } = result
+      setMerchantTestId(ids)
+    }
+  }
 
   const datePickerFormat: DatePickerProps['format'] = (value) => {
     const picker_type = formik.values.picker_type
@@ -595,6 +630,10 @@ const Home: NextPage = () => {
       return moment(value).format('YYYY-MM-DD HH:mm')
     }
   }
+
+  const handleChange = (value: string) => {
+    setQueryWithOutlet(value)
+  };
 
   return (
     <MainLayout>
@@ -625,6 +664,7 @@ const Home: NextPage = () => {
           </Col>
           <Col span={24}>
             <RangePicker
+              style={{ marginRight: '10px' }}
               value={formik.values.dates}
               onChange={(val: any) => {
                 formik.setFieldValue('dates', val)
@@ -633,6 +673,11 @@ const Home: NextPage = () => {
               picker={formik.values.picker_type}
               format={datePickerFormat}
             />
+            <Select defaultValue="" style={{ width: 120 }} onChange={handleChange}>
+              <Option value="">ทั้งหมด</Option>
+              <Option value="exclude">ร้านค้าทั่วไป</Option>
+              <Option value="include">ร้านค้าทดสอบ</Option>
+            </Select>
             <Button type="primary" onClick={handleSubmit} style={{ marginLeft: 20 }}>
               {' '}
               ค้นหา{' '}

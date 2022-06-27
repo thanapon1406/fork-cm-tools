@@ -1313,12 +1313,14 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   const errMinDistance = _.get(errors, "min_distance") ? "ระยะทางจัดส่งเรื่มต้น : " + _.get(errors, "min_distance") : ""
                   const errMaxDistance = _.get(errors, "max_distance") ? "ระยะทางจัดส่งสิ้นสุด : " + _.get(errors, "max_distance") : ""
                   const errOrderAmount = _.get(errors, "order_amount") ? "ยอดสุทธิออเดอร์ : " + _.get(errors, "order_amount") : ""
+
+                  if (errOrderAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errOrderAmount}</span></>)
                   if (errDiscountAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errDiscountAmount}</span></>)
-                  if (errLsMerchantAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errLsMerchantAmount}</span></>)
-                  if (errLsPlatformAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errLsPlatformAmount}</span></>)
                   if (errMinDistance != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errMinDistance}</span></>)
                   if (errMaxDistance != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errMaxDistance}</span></>)
-                  if (errOrderAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errOrderAmount}</span></>)
+                  if (errLsPlatformAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errLsPlatformAmount}</span></>)
+                  if (errLsMerchantAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errLsMerchantAmount}</span></>)
+
                 }
 
                 if (validLogicSetup) {

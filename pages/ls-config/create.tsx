@@ -456,7 +456,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
-    console.log("payload", payload)
+    // console.log("payload", payload)
     const { result, success } = await createLsConfig(payload)
     if (success) {
       notification.success({
@@ -1263,7 +1263,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     return <div key="logic_outlet">{logicOutletElements}</div>
   }
 
-  const renderLogicSummary = (values: any, setFieldValue: any) => {
+  const renderLogicSummary = (values: any, setFieldValue: any, errors: any, touched: any) => {
     let logicSummaryElements: any = []
     // Header
     logicSummaryElements.push(
@@ -1298,6 +1298,27 @@ export default function CreateLsConfig({ }: Props): ReactElement {
 
                 if (type && order_amount && discount_type && discount_amount && min_distance && max_distance && ls_type && ls_platform_amount && ls_merchant_amount) {
                   validLogicSetup = true
+                }
+
+                // Validate Logic Setup 2
+                let validateMessageEle: any = []
+                const typeTouch = _.get(touched, "type") ? _.get(touched, "type") : false
+                // console.log("typeTouch: ", typeTouch)
+                if (errors != {} && typeTouch) {
+                  validLogicSetup = false
+                  const discountAmountTitle = (typeName == CUSTOMER_DISCOUNT) ? "ส่วนลดค่าจัดส่ง" : (typeName == CUSTOMER_PAY) ? "ค่าส่งที่ลูกค้าจะต้องจ่าย" : ""
+                  const errDiscountAmount = _.get(errors, "discount_amount") ? discountAmountTitle + " : " + _.get(errors, "discount_amount") : ""
+                  const errLsMerchantAmount = _.get(errors, "ls_merchant_amount") ? "สัดส่วน Logic Subsidize ร้านค้า : " + _.get(errors, "ls_merchant_amount") : ""
+                  const errLsPlatformAmount = _.get(errors, "ls_platform_amount") ? "สัดส่วน Logic Subsidize แพลตฟอร์ม : " + _.get(errors, "ls_platform_amount") : ""
+                  const errMinDistance = _.get(errors, "min_distance") ? "ระยะทางจัดส่งเรื่มต้น : " + _.get(errors, "min_distance") : ""
+                  const errMaxDistance = _.get(errors, "max_distance") ? "ระยะทางจัดส่งสิ้นสุด : " + _.get(errors, "max_distance") : ""
+                  const errOrderAmount = _.get(errors, "order_amount") ? "ยอดสุทธิออเดอร์ : " + _.get(errors, "order_amount") : ""
+                  if (errDiscountAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errDiscountAmount}</span></>)
+                  if (errLsMerchantAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errLsMerchantAmount}</span></>)
+                  if (errLsPlatformAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errLsPlatformAmount}</span></>)
+                  if (errMinDistance != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errMinDistance}</span></>)
+                  if (errMaxDistance != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errMaxDistance}</span></>)
+                  if (errOrderAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errOrderAmount}</span></>)
                 }
 
                 if (validLogicSetup) {
@@ -1338,12 +1359,28 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   }
                   setlsSummaryElementParam(lsSummaryParam)
                 } else {
-                  notification.warning({
-                    message: `ไม่สามารถ Preview LS Summary ได้`,
-                    description: 'กรุณาระบุ Logic Setup ให้ครบถ้วน',
-                    duration: 3,
-                  })
-                  setIsVisibleLsSummary(false)
+                  if (_.size(validateMessageEle) > 0) {
+                    notification.warning({
+                      message: `ไม่สามารถ Preview LS Summary ได้`,
+                      description: <>กรุณาระบุ Logic Setup ให้ถูกต้อง{validateMessageEle}</>,
+                      duration: 3,
+                      style: {
+                        "width": "500px"
+                      }
+                    })
+                    setIsVisibleLsSummary(false)
+                  } else {
+                    notification.warning({
+                      message: `ไม่สามารถ Preview LS Summary ได้`,
+                      description: <>กรุณาระบุ Logic Setup ให้ครบถ้วน{validateMessageEle}</>,
+                      duration: 3,
+                      style: {
+                        "width": "500px"
+                      }
+                    })
+                    setIsVisibleLsSummary(false)
+                  }
+
                 }
               }}
             >
@@ -1600,7 +1637,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 {renderLogicOutlet(values, setFieldValue, handleChange)}
 
                 {/* Logic Summary */}
-                {renderLogicSummary(values, setFieldValue)}
+                {renderLogicSummary(values, setFieldValue, errors, touched)}
 
                 {/* Logic Detail */}
                 {renderLogicDetail(values, setFieldValue)}

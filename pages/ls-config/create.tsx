@@ -1303,8 +1303,10 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 // Validate Logic Setup 2
                 let validateMessageEle: any = []
                 const typeTouch = _.get(touched, "type") ? _.get(touched, "type") : false
+                // console.log("errors: ", errors)
                 // console.log("typeTouch: ", typeTouch)
-                if (errors != {} && typeTouch) {
+
+                if (!_.isEmpty(errors) && typeTouch) {
                   validLogicSetup = false
                   const discountAmountTitle = (typeName == CUSTOMER_DISCOUNT) ? "ส่วนลดค่าจัดส่ง" : (typeName == CUSTOMER_PAY) ? "ค่าส่งที่ลูกค้าจะต้องจ่าย" : ""
                   const errDiscountAmount = _.get(errors, "discount_amount") ? discountAmountTitle + " : " + _.get(errors, "discount_amount") : ""

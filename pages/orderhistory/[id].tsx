@@ -522,7 +522,11 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       } else if (merchant_status === Constant.COOKING) {
         respObj.status = 'กำลังปรุง'
         respObj.imagePath = '/asset/images/cook.png'
-      } else if (merchant_status === Constant.COOKED) {
+      } else if (merchant_status === Constant.CONFIRM_PAYMENT) {
+        respObj.status = 'ยืนยันการจ่ายเงิน'
+        respObj.imagePath = '/asset/images/cash.png'
+      }
+      else if (merchant_status === Constant.COOKED) {
         respObj.status = 'ปรุงสำเร็จ'
         respObj.imagePath = '/asset/images/cook.png'
       } else if (order_status === '' && rider_status === Constant.WAITING) {

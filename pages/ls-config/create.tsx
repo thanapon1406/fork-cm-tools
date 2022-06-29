@@ -80,7 +80,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     is_apply_all_brand: false,
     campaign_time: {
       start: moment().startOf('day').format("YYYY-MM-DD HH:mm"),
-      end: moment().add(15, 'd').endOf('day').format("YYYY-MM-DD HH:mm"),
+      end: moment().add(14, 'd').endOf('day').format("YYYY-MM-DD HH:mm"),
     },
     deep_link: "",
     inapp_link: "",
@@ -313,7 +313,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       const end = this?.parent?.campaign_time["end"]
       if (start && end) {
         const diffDays = moment(end).diff(moment(start), 'days')
-        if (diffDays < 15) {
+        if (diffDays < 14) {
           return false
         }
         return true
@@ -1420,7 +1420,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         <Row key="logic_detail_row#1" gutter={24}>
           <Col className="gutter-row" sm={24} xs={24}>
             <Field
-              label={{ text: 'วันที่และเวลาของแคมเปญ' }}
+              label={{ text: 'วันที่และเวลาของแคมเปญ (ระยะเวลาเริ่มต้นอย่างน้อย 15 วัน)' }}
               name="campaign_time"
               component={DateTimeRangePicker}
               minDate={moment().startOf('day').format("YYYY-MM-DD HH:mm")}

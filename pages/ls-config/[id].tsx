@@ -127,7 +127,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         const end = this?.parent?.campaign_time["end"]
         if (start && end) {
           const diffDays = moment(end).diff(moment(start), 'days')
-          if (diffDays < 15) {
+          if (diffDays < 14) {
             return false
           }
           return true
@@ -1247,7 +1247,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         <Row key="logic_detail_row#1" gutter={24}>
           <Col className="gutter-row" sm={24} xs={24}>
             <Field
-              label={{ text: 'วันที่และเวลาของแคมเปญ' }}
+              label={{ text: 'วันที่และเวลาของแคมเปญ (ระยะเวลาเริ่มต้นอย่างน้อย 15 วัน)' }}
               name="campaign_time"
               disabled={[true, false]}
               component={DateTimeRangePicker}

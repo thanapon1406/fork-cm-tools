@@ -3,6 +3,7 @@ import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
+import { retrieveToken } from '@/services/fetch/auth'
 import { deleteLsConfig, listLsConfig } from '@/services/ls-config'
 import { DeleteFilled, EditFilled, ExclamationCircleOutlined } from '@ant-design/icons'
 import {
@@ -13,9 +14,10 @@ import {
   notification,
   Row,
   Tooltip,
-  Typography,
+  Typography
 } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import jwt_decode from 'jwt-decode'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
@@ -33,9 +35,9 @@ interface filterObject {
   keyword?: string
 }
 
-interface Props {}
+interface Props { }
 
-export default function LogisticSubsidize({}: Props): ReactElement {
+export default function LogisticSubsidize({ }: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     keyword: '',
@@ -63,6 +65,8 @@ export default function LogisticSubsidize({}: Props): ReactElement {
     // console.log(`reqBody`, reqBody)
     setIsLoading(true)
     const { result, success } = await listLsConfig(reqBody)
+    console.log("result: ", result)
+    console.log("success: ", success)
     if (success) {
       const { meta, data } = result
       setPagination({
@@ -74,11 +78,17 @@ export default function LogisticSubsidize({}: Props): ReactElement {
       setIsLoading(false)
       setFilter(filterObj)
     } else {
-      notification.warning({
-        message: `ผิดพลาด`,
-        description: 'ไม่สามารถค้นหา LS Config ได้',
-        duration: 3,
-      })
+      const token: string = retrieveToken()
+      const decoded: any = jwt_decode(token)
+      const exp = decoded.exp
+      const now = Math.floor(new Date().getTime() / 1000)
+      if (now <= exp) {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถค้นหา LS Config ได้',
+          duration: 3,
+        })
+      }
       setIsLoading(false)
     }
   }

@@ -49,7 +49,7 @@ const listLsConfig = async (option: queryList) => {
     const result = await fetch.post(`/api/ls-config/list`, option)
     return successHandler(result)
   } catch (error) {
-    return errorHandler(error)
+    return errorHandler(error, null, false)
   }
 }
 

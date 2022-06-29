@@ -6,11 +6,13 @@ import Select from '@/components/Form/Select'
 import LsSummaryComponent from '@/components/LsSummary'
 import OutletSelecter from '@/components/OutletSelecter'
 import MainLayout from '@/layout/MainLayout'
+import { retrieveToken } from '@/services/fetch/auth'
 import { findLsConfig, updateLsConfig } from '@/services/ls-config'
 import { getBrandListV2 } from '@/services/pos-profile'
 import { CopyOutlined, LinkOutlined } from '@ant-design/icons'
 import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import jwt_decode from 'jwt-decode'
 import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
@@ -202,12 +204,25 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
       setLsDetail(LsConfigDetail)
       setIsLoading(false)
     } else {
-      notification.warning({
-        message: `ผิดพลาด`,
-        description: 'ไม่สามารถค้นหาข้อมูล Logistic Subsidize ได้',
-        duration: 3,
-      })
-      Router.push("/ls-config")
+      // notification.warning({
+      //   message: `ผิดพลาด`,
+      //   description: 'ไม่สามารถค้นหาข้อมูล Logistic Subsidize ได้',
+      //   duration: 3,
+      // })
+      // Router.push("/ls-config")
+
+      const token: string = retrieveToken()
+      const decoded: any = jwt_decode(token)
+      const exp = decoded.exp
+      const now = Math.floor(new Date().getTime() / 1000)
+      if (now <= exp) {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถค้นหาข้อมูล Logistic Subsidize ได้',
+          duration: 3,
+        })
+        Router.push("/ls-config")
+      }
     }
   }
 

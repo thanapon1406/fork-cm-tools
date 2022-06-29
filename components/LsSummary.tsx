@@ -132,7 +132,7 @@ const LsSummaryComponent = ({
 }: Props): ReactElement => {
   let [dataTable, setDataTable] = useState([])
   let [_isLoading, setIsLoading] = useState(true)
-  let [primeNameList, setPrimeNameList] = useState([])
+  let [tierNameList, setTierNameList] = useState([])
   let [orderAmount, setOrderAmount] = useState('')
   let [distance, setDistance] = useState('')
 
@@ -217,6 +217,19 @@ const LsSummaryComponent = ({
             // end find discount
           }
 
+          let income = 0
+          if (discount >= 0) {
+            if (params.ls_type === "baht" && params.type === "customer_discount") {
+              income = (lsMerchantAmount + lsPlatformAmount) - discount
+            } else {
+              if ((discount - normalPrice) >= 0) {
+                income = (discount - normalPrice)
+              }
+            }
+          } else {
+            income = (discount * -1)
+          }
+
           array[key]?.push({
             'distance': tierPricesValue.min + " - " + tierPricesValue.max,
             'normal_price': normalPrice,
@@ -225,13 +238,13 @@ const LsSummaryComponent = ({
             'ls_platform_amount': lsPlatformAmount < 0 ? 0 : lsPlatformAmount,
             'ls_merchant_amount': lsMerchantAmount < 0 ? 0 : lsMerchantAmount,
             'customer': customer < 0 ? 0 : customer,
-            'income': discount >= 0 ? (discount - normalPrice) < 0 ? 0 : (discount - normalPrice) : (discount * -1)
+            'income': income
           })
         })
         nameArray?.push(value.name)
       })
 
-      setPrimeNameList(nameArray)
+      setTierNameList(nameArray)
       setDataTable(array)
       setIsLoading(false)
     }
@@ -257,10 +270,10 @@ const LsSummaryComponent = ({
       <Title level={5}>ระยะทาง ({distance} กม.)</Title>
 
       {
-        primeNameList.length > 0 &&
-        primeNameList?.map((primeName: any, primeKet: number) => {
+        tierNameList.length > 0 &&
+        tierNameList?.map((tierName: any, tierKey: number) => {
           return <>
-            <Title level={5}>Prime {primeName}
+            <Title level={5}>Tier {tierName}
               {/* <Text style={{ color: '#d9d9d9' }}>(... ร้านอาหาร)</Text> */}
             </Title>
             <br />
@@ -270,7 +283,7 @@ const LsSummaryComponent = ({
                 loading: _isLoading,
                 tableName: 'lsSummary',
                 tableColumns: columns,
-                dataSource: dataTable[primeKet],
+                dataSource: dataTable[tierKey],
                 handelDataTableLoad: handelDataTableLoad,
                 pagination: false,
               }}

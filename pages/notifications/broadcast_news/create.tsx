@@ -343,6 +343,51 @@ const NotificationsBroadcastNews = (): ReactElement => {
                 </Col>
                 <Col className="gutter-row" span={8}></Col>
               </Row>
+              <Row gutter={24}>
+                <Col
+                  className="gutter-row"
+                  span={24}
+                  style={{
+                    // borderTop: '2px solid #f2f2f2',
+                    paddingTop: '15px',
+                    paddingBottom: '15px',
+                  }}
+                >
+                  <label style={{ display: 'block', marginBottom: '10px' }}>อัพโหลดรูปภาพ</label>
+                </Col>
+
+                <Upload
+                  name="file"
+                  onRemove={(e) => {
+                    setImageUrl('')
+                  }}
+                  beforeUpload={handleChangeImage}
+                  maxCount={1}
+                >
+                  <Button
+                    // disabled={isEdit ? false : true}
+                    style={{ marginLeft: 10 }}
+                    icon={<PlusOutlined />}
+                  >
+                    เพิ่มรูปภาพ
+                  </Button>
+                </Upload>
+                <label style={{ marginLeft: 10, color: 'red' }}>
+                  * หมายเหตุ แนะนำ รูปภาพ ขนาด 3:1 หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png
+                </label>
+
+                <Col
+                  className="gutter-row"
+                  span={24}
+                  style={{ marginTop: '35px', marginBottom: '20px' }}
+                >
+                  <img
+                    style={{ width: 'auto', height: 240 }}
+                    alt="example"
+                    src={imageUrl != '' ? imageUrl : noImage.src}
+                  />
+                </Col>
+              </Row>
               <Row gutter={16}>
                 <Col className="gutter-row" span={8} >
                   <Field
@@ -474,51 +519,6 @@ const NotificationsBroadcastNews = (): ReactElement => {
                       </span>
                     </Col>
                   </Row>
-                </Col>
-              </Row>
-              <Row gutter={24}>
-                <Col
-                  className="gutter-row"
-                  span={24}
-                  style={{
-                    // borderTop: '2px solid #f2f2f2',
-                    paddingTop: '15px',
-                    paddingBottom: '15px',
-                  }}
-                >
-                  <label style={{ display: 'block', marginBottom: '10px' }}>อัพโหลดรูปภาพ</label>
-                </Col>
-
-                <Upload
-                  name="file"
-                  onRemove={(e) => {
-                    setImageUrl('')
-                  }}
-                  beforeUpload={handleChangeImage}
-                  maxCount={1}
-                >
-                  <Button
-                    // disabled={isEdit ? false : true}
-                    style={{ marginLeft: 10 }}
-                    icon={<PlusOutlined />}
-                  >
-                    เพิ่มรูปภาพ
-                  </Button>
-                </Upload>
-                <label style={{ marginLeft: 10, color: 'red' }}>
-                  * หมายเหตุ แนะนำ รูปภาพ ขนาด 3:1 หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png
-                </label>
-
-                <Col
-                  className="gutter-row"
-                  span={24}
-                  style={{ marginTop: '35px', marginBottom: '20px', textAlign: 'center' }}
-                >
-                  <img
-                    style={{ width: 'auto', height: 240 }}
-                    alt="example"
-                    src={imageUrl != '' ? imageUrl : noImage.src}
-                  />
                 </Col>
               </Row>
               <Row>

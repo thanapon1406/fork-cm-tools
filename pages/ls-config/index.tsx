@@ -14,7 +14,7 @@ import {
   notification,
   Row,
   Tooltip,
-  Typography
+  Typography,
 } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import jwt_decode from 'jwt-decode'
@@ -35,9 +35,9 @@ interface filterObject {
   keyword?: string
 }
 
-interface Props { }
+interface Props {}
 
-export default function LogisticSubsidize({ }: Props): ReactElement {
+export default function LogisticSubsidize({}: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     keyword: '',
@@ -65,8 +65,8 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
     // console.log(`reqBody`, reqBody)
     setIsLoading(true)
     const { result, success } = await listLsConfig(reqBody)
-    console.log("result: ", result)
-    console.log("success: ", success)
+    console.log('result: ', result)
+    console.log('success: ', success)
     if (success) {
       const { meta, data } = result
       setPagination({
@@ -184,7 +184,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
       },
     },
     {
-      title: 'จำนวนร้านที่ใช้งาน',
+      title: 'จำนวนร้านที่เข้าร่วม',
       dataIndex: 'total_merchant_join',
       align: 'center',
       render: (row: any) => {
@@ -238,7 +238,15 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
         <Col span={8}>
           <Title level={4}>Logistic Subsidize</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item><a onClick={() => { Router.push("/ls-config") }}>Logistic Subsidize</a></Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <a
+                onClick={() => {
+                  Router.push('/ls-config')
+                }}
+              >
+                Logistic Subsidize
+              </a>
+            </Breadcrumb.Item>
             <Breadcrumb.Item>รายการ Logistic Subsidize</Breadcrumb.Item>
           </Breadcrumb>
         </Col>

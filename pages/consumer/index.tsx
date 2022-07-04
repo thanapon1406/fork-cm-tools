@@ -294,7 +294,7 @@ export default function Merchant({}: Props): ReactElement {
                 </Col>
                 <Col className="gutter-row" span={12} style={{ textAlign: 'end' }}>
                   <div className="ant-form ant-form-vertical">
-                    {pagination.total <= 1 ? (
+                    {pagination.total <= 3000 ? (
                       <Button
                         icon={<DownloadOutlined />}
                         style={{ width: '120px', marginTop: '27px', marginLeft: '10px' }}
@@ -303,7 +303,7 @@ export default function Merchant({}: Props): ReactElement {
                         htmlType="button"
                         onClick={handleexportCostomer}
                       >
-                        ดาวน์โหลด 1
+                        ดาวน์โหลด
                       </Button>
                     ) : (
                       <DownloadButton handelSubmit={handleDownloadEmailClick} />

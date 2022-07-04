@@ -317,15 +317,14 @@ export default function Ls({ }: Props): ReactElement {
               <Row gutter={24} align={'middle'}>
                 <Col
                   span={12} offset={6}
-
                 >
                   <div style={{
                     borderTop: "2px solid #f2f2f2",
-                    paddingTop: "40px",
+                    paddingTop: "40px !important",
                     borderLeft: "2px solid #f2f2f2",
                     borderRight: "2px solid #f2f2f2",
                     borderBottom: "2px solid #f2f2f2",
-                    paddingBottom: "40px",
+                    paddingBottom: "40px !important",
                     minHeight: '680px',
                     width: '400px',
                     padding: "10px 25px",
@@ -339,7 +338,6 @@ export default function Ls({ }: Props): ReactElement {
                         span={24}
                         style={{ textAlign: 'center' }}
                       >
-                        {console.log(imageUrl)}
                         <img
                           style={{ width: 'auto', height: 180 }}
                           alt="example"

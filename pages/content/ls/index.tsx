@@ -320,14 +320,12 @@ export default function Ls({ }: Props): ReactElement {
                 >
                   <div style={{
                     borderTop: "2px solid #f2f2f2",
-                    paddingTop: "40px !important",
                     borderLeft: "2px solid #f2f2f2",
                     borderRight: "2px solid #f2f2f2",
                     borderBottom: "2px solid #f2f2f2",
-                    paddingBottom: "40px !important",
                     minHeight: '680px',
                     width: '400px',
-                    padding: "10px 25px",
+                    padding: "40px 25px",
                     wordBreak: 'break-all'
                   }}>
                     <Row gutter={24}

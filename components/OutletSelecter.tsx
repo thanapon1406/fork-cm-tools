@@ -1,7 +1,10 @@
 import CustomSelect from '@/components/SelectOutlet';
-import { Checkbox, Col, Divider, Row } from 'antd';
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { Checkbox, Col, Divider, Modal, Row } from 'antd';
 import { Field, FieldArray } from 'formik';
 import { forEach, get, isEmpty, size } from 'lodash';
+
+const { confirm } = Modal;
 
 interface Props {
   setFieldValue: any;
@@ -51,14 +54,36 @@ export default function OutletSelecter({
                         <Checkbox
                           name={`brands.${index}.is_selected`}
                           disabled={disabled}
+                          checked={get(formValue, `brands.${index}.is_selected`)}
                           onChange={() => {
-                            let isChecked = !get(formValue, `brands.${index}.is_selected`)
-                            setFieldValue(`brands.${index}.id`, brand.id)
-                            setFieldValue(`brands.${index}.is_selected`, isChecked)
-                            if (isChecked) {
-                              setFieldValue(`brands.${index}.type`, "all")
-                              setFieldValue(`brands.${index}.outlets`, [])
+                            if (isEdit) {
+                              confirm({
+                                title: 'มีการเปลี่ยนแปลงจำนวนร้านค้า',
+                                icon: <ExclamationCircleOutlined />,
+                                content: `ต้องการยืนยันหรือไม่`,
+                                okText: 'ตกลง',
+                                okType: 'danger',
+                                cancelText: 'ยกเลิก',
+                                onOk() {
+                                  let isChecked = !get(formValue, `brands.${index}.is_selected`)
+                                  setFieldValue(`brands.${index}.id`, brand.id)
+                                  setFieldValue(`brands.${index}.is_selected`, isChecked)
+                                  if (isChecked) {
+                                    setFieldValue(`brands.${index}.type`, "all")
+                                    setFieldValue(`brands.${index}.outlets`, [])
+                                  }
+                                }
+                              })
+                            } else {
+                              let isChecked = !get(formValue, `brands.${index}.is_selected`)
+                              setFieldValue(`brands.${index}.id`, brand.id)
+                              setFieldValue(`brands.${index}.is_selected`, isChecked)
+                              if (isChecked) {
+                                setFieldValue(`brands.${index}.type`, "all")
+                                setFieldValue(`brands.${index}.outlets`, [])
+                              }
                             }
+
                           }}> <span> {brand.name.th} <span className="display-none">({brand.id})</span></span>
                         </Checkbox>
                         {/* <Field
@@ -90,8 +115,24 @@ export default function OutletSelecter({
                                   value="all"
                                   onChange={(e: any) => {
                                     isEdit && console.log(`brands.${index}.type`)
-                                    setFieldValue(`brands.${index}.type`, "all")
-                                    setFieldValue(`brands.${index}.outlets`, [])
+
+                                    if (isEdit) {
+                                      confirm({
+                                        title: 'มีการเปลี่ยนแปลงจำนวนร้านค้า',
+                                        icon: <ExclamationCircleOutlined />,
+                                        content: `ต้องการยืนยันหรือไม่`,
+                                        okText: 'ตกลง',
+                                        okType: 'danger',
+                                        cancelText: 'ยกเลิก',
+                                        onOk() {
+                                          setFieldValue(`brands.${index}.type`, "all")
+                                          setFieldValue(`brands.${index}.outlets`, [])
+                                        }
+                                      })
+                                    } else {
+                                      setFieldValue(`brands.${index}.type`, "all")
+                                      setFieldValue(`brands.${index}.outlets`, [])
+                                    }
                                   }}
                                 />
                                 <span>
@@ -116,8 +157,8 @@ export default function OutletSelecter({
                           <div key={`outlet${index}`} style={{ marginTop: 10 }}>
                             <Field
                               customChange={(newValue: any) => {
-                                isEdit && console.log("newValue: ", newValue)
                                 let fieldName = `brands.${index}.outlets`
+
                                 if (newValue.includes('all')) {
                                   let outletList: any = []
                                   forEach(brand.outlets, (item) => {
@@ -129,12 +170,15 @@ export default function OutletSelecter({
                                 } else {
                                   setFieldValue(fieldName, newValue)
                                 }
+
+
                               }}
                               isDisabled={disabled || (get(formValue, `brands.${index}.type`) == "all")}
                               name={`brands.${index}.outlets`}
                               key={`brands.${index}.outlets`}
                               brandId={brand.id}
                               brandList={brandList}
+                              isEdit={isEdit}
                               optionList={brand.outlets}
                               selectedList={() =>
                                 selectedList(userSelectedOutlet, brand.outlets, brand.id)

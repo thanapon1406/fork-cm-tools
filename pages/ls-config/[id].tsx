@@ -1112,6 +1112,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                     setFieldValue={setFieldValue}
                     userSelectedOutlet={userSelectedOutlet}
                     brandList={brandList}
+                    isEdit={true}
                   />
                 </Panel>
               </Collapse >}

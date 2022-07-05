@@ -11,6 +11,7 @@ interface Props {
   formValue: any;
   disabled: any;
   selectedList: any;
+  isEdit: boolean;
 }
 
 export default function OutletSelecter({
@@ -21,6 +22,7 @@ export default function OutletSelecter({
   formValue,
   disabled,
   selectedList = [],
+  isEdit,
 }: Props) {
   return (
     <Row gutter={{
@@ -87,6 +89,7 @@ export default function OutletSelecter({
                                   name={`brands.${index}.type`}
                                   value="all"
                                   onChange={(e: any) => {
+                                    isEdit && console.log(`brands.${index}.type`)
                                     setFieldValue(`brands.${index}.type`, "all")
                                     setFieldValue(`brands.${index}.outlets`, [])
                                   }}
@@ -113,6 +116,7 @@ export default function OutletSelecter({
                           <div key={`outlet${index}`} style={{ marginTop: 10 }}>
                             <Field
                               customChange={(newValue: any) => {
+                                isEdit && console.log("newValue: ", newValue)
                                 let fieldName = `brands.${index}.outlets`
                                 if (newValue.includes('all')) {
                                   let outletList: any = []

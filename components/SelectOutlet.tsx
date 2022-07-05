@@ -1,6 +1,5 @@
-import { Select } from 'antd'
-import React from 'react'
-import styled from 'styled-components'
+import { Select } from 'antd';
+import styled from 'styled-components';
 const { Option } = Select
 
 const StyledSelect = styled(Select)`
@@ -76,6 +75,7 @@ export default function CustomSelect({
     }
 
     if (typeof props.customChange == 'function') {
+      // console.log(options)
       props.customChange(newValue, options)
     }
   }

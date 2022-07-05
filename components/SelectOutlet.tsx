@@ -1,7 +1,8 @@
-import { Select } from 'antd'
-import React from 'react'
-import styled from 'styled-components'
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { Modal, Select } from 'antd';
+import styled from 'styled-components';
 const { Option } = Select
+const { confirm } = Modal;
 
 const StyledSelect = styled(Select)`
   .ant-select-selector {
@@ -21,6 +22,7 @@ interface Props {
   field: any;
   form: any;
   customChange: any;
+  isEdit: boolean;
 }
 
 export default function CustomSelect({
@@ -32,6 +34,7 @@ export default function CustomSelect({
   onChange,
   field,
   form,
+  isEdit,
   ...props
 }: Props) {
   const options = []
@@ -64,19 +67,49 @@ export default function CustomSelect({
     })
   })
 
-  function handleChange(newValue: any, options: any) {
-    if (newValue.includes('all') && newValue.length === allValue[brandId].length + 1) {
-      form.setFieldValue(field.name, [])
-    } else if (newValue.includes('all')) {
-      form.setFieldValue(field.name, allValue[brandId])
-      form.setFieldValue(`brands[${brandId}]`, `${brandId}`)
-    } else {
-      form.setFieldValue(field.name, newValue)
-      form.setFieldValue(`brands[${brandId}]`, `${brandId}`)
-    }
+  const handleChange = (isEdit: boolean) => async (newValue: any, options: any) => {
+    // console.log("isEdit: ", isEdit)
+    if (isEdit) {
+      confirm({
+        title: 'มีการเปลี่ยนแปลงจำนวนร้านค้า',
+        icon: <ExclamationCircleOutlined />,
+        content: `ต้องการยืนยันหรือไม่`,
+        okText: 'ตกลง',
+        okType: 'danger',
+        cancelText: 'ยกเลิก',
+        onOk() {
+          if (newValue.includes('all') && newValue.length === allValue[brandId].length + 1) {
+            form.setFieldValue(field.name, [])
+          } else if (newValue.includes('all')) {
+            form.setFieldValue(field.name, allValue[brandId])
+            form.setFieldValue(`brands[${brandId}]`, `${brandId}`)
+          } else {
+            form.setFieldValue(field.name, newValue)
+            form.setFieldValue(`brands[${brandId}]`, `${brandId}`)
+          }
 
-    if (typeof props.customChange == 'function') {
-      props.customChange(newValue, options)
+          if (typeof props.customChange == 'function') {
+            // console.log(options)
+            props.customChange(newValue, options)
+          }
+        }
+      })
+
+    } else {
+      if (newValue.includes('all') && newValue.length === allValue[brandId].length + 1) {
+        form.setFieldValue(field.name, [])
+      } else if (newValue.includes('all')) {
+        form.setFieldValue(field.name, allValue[brandId])
+        form.setFieldValue(`brands[${brandId}]`, `${brandId}`)
+      } else {
+        form.setFieldValue(field.name, newValue)
+        form.setFieldValue(`brands[${brandId}]`, `${brandId}`)
+      }
+
+      if (typeof props.customChange == 'function') {
+        // console.log(options)
+        props.customChange(newValue, options)
+      }
     }
   }
 
@@ -89,7 +122,7 @@ export default function CustomSelect({
         }}
         value={field.value}
         options={options}
-        onChange={handleChange}
+        onChange={handleChange(isEdit)}
         placeholder={'เลือกสาขา'}
         maxTagCount={'responsive'}
         optionLabelProp={'label'}

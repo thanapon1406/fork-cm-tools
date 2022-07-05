@@ -141,6 +141,7 @@ const LsSummaryComponent = ({
   const ssoId = router.query.sso_id as string
 
   const betweenArray = (x: any, y: any, min: any, max: any) => {
+    x += 0.1
     for (let i = x; i <= y; i++) {
       if (i >= min && i <= max) {
         return true

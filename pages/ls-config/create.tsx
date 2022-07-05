@@ -1243,6 +1243,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                     setFieldValue={setFieldValue}
                     userSelectedOutlet={userSelectedOutlet}
                     brandList={brandList}
+                    isEdit={false}
                   />
                 </Panel>
               </Collapse >}

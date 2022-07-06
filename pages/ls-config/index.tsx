@@ -192,6 +192,22 @@ export default function LogisticSubsidize({}: Props): ReactElement {
       },
     },
     {
+      title: 'วันและเวลาที่เริ่ม',
+      dataIndex: 'start_date',
+      align: 'center',
+      render: (row: any) => {
+        return moment(row).format('YYYY-MM-DD HH:mm')
+      },
+    },
+    {
+      title: 'วันและเวลาที่สิ้นสุด',
+      dataIndex: 'end_date',
+      align: 'center',
+      render: (row: any) => {
+        return moment(row).format('YYYY-MM-DD HH:mm')
+      },
+    },
+    {
       title: 'วันและเวลาที่สร้าง',
       dataIndex: 'created_at',
       align: 'center',

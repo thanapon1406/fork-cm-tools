@@ -6,11 +6,12 @@ import Select from '@/components/Form/Select'
 import LsSummaryComponent from '@/components/LsSummary'
 import OutletSelecter from '@/components/OutletSelecter'
 import MainLayout from '@/layout/MainLayout'
+import { uploadImage } from '@/services/cdn'
 import { retrieveToken } from '@/services/fetch/auth'
 import { findLsConfig, updateLsConfig } from '@/services/ls-config'
 import { getBrandListV2 } from '@/services/pos-profile'
-import { CopyOutlined, LinkOutlined } from '@ant-design/icons'
-import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
+import { CopyOutlined, LinkOutlined, PlusOutlined } from '@ant-design/icons'
+import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography, Upload } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import jwt_decode from 'jwt-decode'
 import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
@@ -81,7 +82,36 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
   const [loadingImage, setloadingImage] = useState(false)
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const [startDateSnapData, setstartDateSnapData] = useState(new Date())
+  const handleChangeImage = async (info: any) => {
+    const fileSize = (info.size / 1024) / 1024
+    const isJPNG = info.type === 'image/jpeg';
+    const isJPG = info.type === 'image/jpg';
+    const isPNG = info.type === 'image/png';
 
+    if (!isJPNG && !isJPG && !isPNG) {
+      warning({
+        title: `กรุณาเลือกรูปภาพเฉพาะไฟล์ .png หรือ .jpg`,
+        afterClose() {
+          setImageUrl('')
+        }
+      })
+      return false
+    }
+
+    if (fileSize > 1) {
+      warning({
+        title: `กรุณาเลือกรูปภาพขนาดไม่เกิน 1MB`,
+        afterClose() {
+        }
+      })
+      return false
+    }
+
+    setloadingImage(true)
+    const res = await uploadImage(info)
+    setloadingImage(false)
+    setImageUrl(res.upload_success.modal_pop_up)
+  }
   const lsLogicsOption = [
     {
       name: "เลือก LS Logics",
@@ -1112,6 +1142,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                     setFieldValue={setFieldValue}
                     userSelectedOutlet={userSelectedOutlet}
                     brandList={brandList}
+                    isEdit={true}
                   />
                 </Panel>
               </Collapse >}
@@ -1327,16 +1358,17 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
               </label>
             </Col>
 
-            {/* <Upload
-            name="file"
-            id="file"
-            onRemove={e => { setImageUrl('') }}
-            beforeUpload={handleChangeImage}
-            maxCount={1}
-          >
+            <Upload
+              name="file"
+              id="file"
+              onRemove={e => { setImageUrl('') }}
+              beforeUpload={handleChangeImage}
+              maxCount={1}
+              showUploadList={false}
+            >
 
-            <Button style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูป</Button>
-          </Upload> */}
+              <Button style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูป</Button>
+            </Upload>
 
 
             <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>

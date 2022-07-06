@@ -56,7 +56,7 @@ const initialValuesDefault: FormInterface = {
     start: moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
     end: moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
   },
-  code: 'Logistic-Subsidize',
+  code: '',
   id: 0,
   version: 'v1.0.0'
 }
@@ -73,6 +73,7 @@ export default function Ls({ }: Props): ReactElement {
   const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
   const router = useRouter()
   const [isSubmit, setIsSubmit] = useState(false)
+  const { code } = router.query
 
   const addVersion = (version: any) => {
     let versionSplit = version.split('.');
@@ -98,7 +99,7 @@ export default function Ls({ }: Props): ReactElement {
   }
 
   const fetchDataContentLs = async () => {
-    const { result, success } = await findContentLs('Logistic-Subsidize')
+    const { result, success } = await findContentLs(code)
     if (success) {
       const { data } = result
       let image = data.image_url === undefined ? '' : data.image_url
@@ -113,7 +114,7 @@ export default function Ls({ }: Props): ReactElement {
           start: moment(data.start_date).startOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
           end: moment(data.end_date).endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z'),
         },
-        code: 'Logistic-Subsidize',
+        code: typeof code === 'string' ? code : '',
         id: data.id,
         version: data.version
       }
@@ -160,6 +161,7 @@ export default function Ls({ }: Props): ReactElement {
     setIsSubmit(true)
     values.image_url = imageUrl
     values.status = isActive == 'active' ? true : false
+    values.code = typeof code === 'string' ? code : ''
 
     if (values.show_date.start != '') {
       values.start_date = moment(values.show_date.start).format(dateFormat)
@@ -208,16 +210,18 @@ export default function Ls({ }: Props): ReactElement {
 
 
   useEffect(() => {
-    fetchDataContentLs()
-  }, [])
+    if (code != undefined) {
+      fetchDataContentLs()
+    }
+  }, [code])
   return (
     <MainLayout>
       <Row justify="space-around" align="middle">
         <Col span={8}>
-          <Title level={4}>Logistic Subsidize</Title>
+          <Title level={4}>{code}</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>Content</Breadcrumb.Item>
-            <Breadcrumb.Item>Create Logistic Subsidize</Breadcrumb.Item>
+            <Breadcrumb.Item>Create {code}</Breadcrumb.Item>
           </Breadcrumb>
         </Col>
         <Col span={8} offset={8} style={{ textAlign: 'end' }}></Col>
@@ -317,18 +321,15 @@ export default function Ls({ }: Props): ReactElement {
               <Row gutter={24} align={'middle'}>
                 <Col
                   span={12} offset={6}
-
                 >
                   <div style={{
                     borderTop: "2px solid #f2f2f2",
-                    paddingTop: "40px",
                     borderLeft: "2px solid #f2f2f2",
                     borderRight: "2px solid #f2f2f2",
                     borderBottom: "2px solid #f2f2f2",
-                    paddingBottom: "40px",
                     minHeight: '680px',
                     width: '400px',
-                    padding: "10px 25px",
+                    padding: "40px 25px",
                     wordBreak: 'break-all'
                   }}>
                     <Row gutter={24}
@@ -339,7 +340,6 @@ export default function Ls({ }: Props): ReactElement {
                         span={24}
                         style={{ textAlign: 'center' }}
                       >
-                        {console.log(imageUrl)}
                         <img
                           style={{ width: 'auto', height: 180 }}
                           alt="example"

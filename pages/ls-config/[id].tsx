@@ -476,6 +476,8 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
       }
     }
 
+    values.image_link = imageUrl
+
     const payload = {
       data: {
         id: id,
@@ -483,6 +485,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         start_date: _.get(values, "start_date") ? _.get(values, "start_date") : "",
         end_date: _.get(values, "end_date") ? _.get(values, "end_date") : "",
         allowed_list: allowedList,
+        image_link: _.get(values, "image_link") ? _.get(values, "image_link") : "",
         total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
@@ -1350,34 +1353,34 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
           </Col>
         </Row>
         {/* Row#3 Deep Link and In-app Link */}
-        {imageUrl != '' ?
-          <Row key="logic_detail_row#3" gutter={24}>
-            <Col className="gutter-row" span={24}>
-              <label style={{ display: "block", marginBottom: "10px" }}>รูปภาพ
-                {/* <span style={{ color: "rgb(93, 93, 93)", fontWeight: 500 }}>(ขนาดไม่เกิน 1 MB)</span> */}
-              </label>
-            </Col>
+        {/* {imageUrl != '' ? */}
+        <Row key="logic_detail_row#3" gutter={24}>
+          <Col className="gutter-row" span={24}>
+            <label style={{ display: "block", marginBottom: "10px" }}>รูปภาพ
+              {/* <span style={{ color: "rgb(93, 93, 93)", fontWeight: 500 }}>(ขนาดไม่เกิน 1 MB)</span> */}
+            </label>
+          </Col>
 
-            <Upload
-              name="file"
-              id="file"
-              onRemove={e => { setImageUrl('') }}
-              beforeUpload={handleChangeImage}
-              maxCount={1}
-              showUploadList={false}
-            >
+          <Upload
+            name="file"
+            id="file"
+            onRemove={e => { setImageUrl('') }}
+            beforeUpload={handleChangeImage}
+            maxCount={1}
+            showUploadList={false}
+          >
 
-              <Button style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูป</Button>
-            </Upload>
+            <Button style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูป</Button>
+          </Upload>
 
 
-            <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
-              <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />
-            </Col>
+          <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
+            <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />
+          </Col>
 
-          </Row>
-          :
-          <></>}
+        </Row>
+        {/* :
+          <></>} */}
       </div>
     )
 

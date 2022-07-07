@@ -90,7 +90,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
   }
   const [lsDetail, setLsDetail] = useState(lsInitial)
   const Schema = Yup.object().shape({
-    name: Yup.string().trim().max(255).required('กรุณาระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ฿]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    name: Yup.string().trim().max(255, 'ชื่อ LS Configure ควรมีขนาดไม่เกิน 255 ตัวอักษร').required('กรุณาระบุชื่อ LS Configure'),
     type: Yup.string().trim().required('กรุณาระบุ LS Configure'),
     order_amount: Yup.number().test('required', function (value: any) {
       const type = this?.parent?.type

@@ -142,7 +142,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
   ]
 
   const Schema = Yup.object().shape({
-    name: Yup.string().trim().max(255).required('ระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    name: Yup.string().trim().max(255, 'ชื่อ LS Configure ควรมีขนาดไม่เกิน 255 ตัวอักษร').required('กรุณาระบุชื่อ LS Configure'),
     campaign_time: Yup.object()
       .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
         const start = this?.parent?.campaign_time["start"]

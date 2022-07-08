@@ -433,6 +433,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           description: '',
           duration: 3,
         })
+        router.push('/config-delivery-fee');
       } else {
         notification.warning({
           message: `ผิดพลาด`,

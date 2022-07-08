@@ -14,11 +14,12 @@ import {
   notification,
   Row,
   Tooltip,
-  Typography,
+  Typography
 } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import jwt_decode from 'jwt-decode'
 import moment from 'moment'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
@@ -35,9 +36,9 @@ interface filterObject {
   keyword?: string
 }
 
-interface Props {}
+interface Props { }
 
-export default function LogisticSubsidize({}: Props): ReactElement {
+export default function LogisticSubsidize({ }: Props): ReactElement {
   const Router = useRouter()
   const initialValues = {
     keyword: '',
@@ -187,8 +188,8 @@ export default function LogisticSubsidize({}: Props): ReactElement {
       title: 'จำนวนร้านที่เข้าร่วม',
       dataIndex: 'total_merchant_join',
       align: 'center',
-      render: (row: any) => {
-        return row ? row : 0
+      render: (row: any, record: any) => {
+        return row ? <Link href={`/ls-outlet/` + record.id}><a>{row}</a></Link> : 0
       },
     },
     {

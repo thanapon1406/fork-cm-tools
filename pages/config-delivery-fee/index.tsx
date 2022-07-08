@@ -4,11 +4,8 @@ import Input from '@/components/Form/Input'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
 import { tierPriceDelete, tierPriceList } from '@/services/tierPrices'
-import {
-  DeleteOutlined,
-  ExclamationCircleOutlined
-} from '@ant-design/icons'
-import { Breadcrumb, Col, Modal, Row, Space, Typography } from 'antd'
+import { DeleteFilled, EditFilled, ExclamationCircleOutlined } from '@ant-design/icons'
+import { Breadcrumb, Button as ButtonAntd, Col, Modal, Row, Space, Tooltip, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import moment from 'moment'
 import { useRouter } from 'next/router'
@@ -143,15 +140,26 @@ export default function Merchant({ }: Props): ReactElement {
     const viewUrl = `/${tableName}/${path}`
     return (
       <Space>
-        <Button
-          style={{ width: '40px' }}
-          type="default"
-          size="middle"
-          htmlType="button"
-          icon={<DeleteOutlined />}
-          onClick={() => showDeleteConfirm(rowData)}
-        >
-        </Button>
+        <Tooltip title="แก้ไข">
+          <ButtonAntd
+            icon={<EditFilled />}
+            onClick={() => {
+              console.log('edit ls config id: ', viewUrl)
+              router.push(viewUrl)
+            }}
+          ></ButtonAntd>
+        </Tooltip>
+        <Tooltip title="ลบ">
+          <ButtonAntd
+            icon={<DeleteFilled />}
+            onClick={() => {
+              showDeleteConfirm(rowData)
+            }}
+            style={{
+              marginLeft: '5px',
+            }}
+          ></ButtonAntd>
+        </Tooltip>
       </Space>
     )
   }

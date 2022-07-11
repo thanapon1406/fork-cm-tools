@@ -144,7 +144,7 @@ export default function Merchant({ }: Props): ReactElement {
           <ButtonAntd
             icon={<EditFilled />}
             onClick={() => {
-              console.log('edit ls config id: ', viewUrl)
+              console.log('edit tier id: ', viewUrl)
               router.push(viewUrl)
             }}
           ></ButtonAntd>

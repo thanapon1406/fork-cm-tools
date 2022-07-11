@@ -10,8 +10,8 @@ import { uploadImage } from '@/services/cdn'
 import { retrieveToken } from '@/services/fetch/auth'
 import { findLsConfig, updateLsConfig } from '@/services/ls-config'
 import { getBrandListV2 } from '@/services/pos-profile'
-import { CopyOutlined, LinkOutlined, PlusOutlined } from '@ant-design/icons'
-import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography, Upload } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
+import { Alert, Breadcrumb, Checkbox, Col, Collapse, Divider, Modal, notification, Radio, Row, Typography, Upload } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import jwt_decode from 'jwt-decode'
 import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
@@ -1292,7 +1292,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
           </Col>
         </Row>
         {/* Row#2 Deep Link and In-app Link */}
-        <Row key="logic_detail_row#2" gutter={24}>
+        {/* <Row key="logic_detail_row#2" gutter={24}>
           <Col className="gutter-row" sm={12} xs={24}>
             <div className="ant-form ant-form-vertical">
               <FormAntd.Item label={"Deep Link"}>
@@ -1351,7 +1351,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
               </FormAntd.Item>
             </div>
           </Col>
-        </Row>
+        </Row> */}
         {/* Row#3 Deep Link and In-app Link */}
         {/* {imageUrl != '' ? */}
         <Row key="logic_detail_row#3" gutter={24}>

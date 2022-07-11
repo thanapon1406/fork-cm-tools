@@ -1,18 +1,14 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
 import { retrieveToken } from '@/services/fetch/auth'
 import { listLsOulet } from '@/services/ls-outlet'
-import { EditFilled } from '@ant-design/icons'
 import {
-  Breadcrumb,
-  Button as ButtonAntd,
-  Col, notification,
-  Row,
-  Tooltip,
-  Typography
+  Breadcrumb, Col, notification,
+  Row, Typography
 } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import jwt_decode from 'jwt-decode'
@@ -28,16 +24,23 @@ interface filterObject {
   keyword?: string
   ls_config_id?: string | string[] | undefined
   outlet_id?: number
-  start_date?: string,
+  start_date?: string
   end_date?: string
+  status?: string
 }
 
 interface Props { }
 
 export default function LogisticSubsidize({ }: Props): ReactElement {
+  const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
   const Router = useRouter()
   const initialValues = {
     keyword: '',
+    status: 'active',
+    show_date: {
+      start: '',
+      end: ''
+    },
   }
   const { id } = Router.query
 
@@ -46,6 +49,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
 
   let [filter, setFilter] = useState<filterObject>({
     keyword: '',
+    status: 'active'
   })
 
   const Schema = Yup.object().shape({})
@@ -55,7 +59,6 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
     const reqBody = {
       ...filterObj,
     }
-    // console.log(`reqBody`, reqBody)
     setIsLoading(true)
     const { result, success } = await listLsOulet(reqBody)
     console.log('result: ', result)
@@ -82,9 +85,12 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
   }
 
   const handleSubmit = (values: any) => {
-    console.log(`values`, values)
     let reqFilter: filterObject = {
       keyword: values.keyword,
+      ls_config_id: id,
+      status: 'active',
+      start_date: values?.show_date?.start,
+      end_date: values?.show_date?.end
     }
     fetchData(reqFilter)
   }
@@ -96,7 +102,11 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
 
   const resetFetchData = () => {
     fetchData(
-      { keyword: '' },
+      {
+        keyword: '',
+        ls_config_id: id,
+        status: 'active',
+      },
     )
   }
 
@@ -107,32 +117,20 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
   }, [id])
 
   const column = [
-    // {
-    //   title: 'ID',
-    //   dataIndex: 'id',
-    //   align: 'center',
-    // },
     {
-      title: 'LS Configure',
-      dataIndex: 'name',
-      align: 'left',
-    },
-    {
-      title: 'จำนวนร้านที่เพิ่ม',
-      dataIndex: 'total_merchant_add',
+      title: 'Outlet ID',
+      dataIndex: 'outlet_id',
       align: 'center',
       render: (row: any) => {
-        return row ? row : 0
+        return <Link href={`/userprofile/merchant/` + row}><a>{row}</a></Link>
       },
     },
     {
-      title: 'จำนวนร้านที่เข้าร่วม',
-      dataIndex: 'total_merchant_join',
+      title: 'ร้านอาหาร',
+      dataIndex: 'outlet_name',
       align: 'center',
-      render: (row: any, record: any) => {
-        return row ? <Link href={`/ls-outlet/` + record.id}><a>{row}</a></Link> : 0
-      },
     },
+
     {
       title: 'วันและเวลาที่เริ่ม',
       dataIndex: 'start_date',
@@ -149,35 +147,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
         return moment(row).format('YYYY-MM-DD HH:mm')
       },
     },
-    {
-      title: 'วันและเวลาที่สร้าง',
-      dataIndex: 'created_at',
-      align: 'center',
-      render: (row: any) => {
-        return moment(row).format('YYYY-MM-DD HH:mm')
-      },
-    },
-    {
-      title: '',
-      dataIndex: 'id',
-      align: 'center',
-      render: (row: any, data: any) => {
-        return (
-          <>
-            <Tooltip title="แก้ไข">
-              <ButtonAntd
-                icon={<EditFilled />}
-                onClick={() => {
-                  console.log('edit ls config id: ', row)
-                  Router.push(`ls-config/${row}`)
-                }}
-              ></ButtonAntd>
-            </Tooltip>
 
-          </>
-        )
-      },
-    },
   ]
 
   return (
@@ -205,7 +175,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
           {({ values, resetForm }) => (
             <Form>
               <Row gutter={24}>
-                <Col className="gutter-row" span={24}>
+                <Col className="gutter-row" span={12}>
                   <Field
                     label={{ text: 'ค้นหา' }}
                     name="keyword"
@@ -214,6 +184,18 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
                     className="form-control round"
                     id="keyword"
                     placeholder="ค้นหา"
+                  />
+                </Col>
+                <Col
+                  className="gutter-row"
+                  span={12}
+                >
+                  <Field
+                    label={{ text: 'วันที่และเวลาเริ่ม-สิ้นสุด' }}
+                    name="show_date"
+                    component={DateTimeRangePicker}
+                    id="show_date"
+                    placeholder="show_date"
                   />
                 </Col>
               </Row>
@@ -247,7 +229,6 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
             loading: _isLoading,
             tableName: 'ls-outlet',
             tableColumns: column,
-            action: ['view'],
             dataSource: dataTable,
             handelDataTableLoad: handelDataTableLoad,
             pagination: false,

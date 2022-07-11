@@ -8,21 +8,25 @@ import {
   Col,
   DatePicker,
   DatePickerProps,
-  Divider, Radio,
-  Row, Select, Spin, Typography
+  Divider,
+  Radio,
+  Row,
+  Select,
+  Spin,
+  Typography
 } from 'antd'
 import { useFormik } from 'formik'
 import Highcharts, { numberFormat } from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
-import AnnotationsFactory from "highcharts/modules/annotations"
+import AnnotationsFactory from 'highcharts/modules/annotations'
 import { filter, find, get, has, size, sumBy } from 'lodash'
 import moment, { Moment } from 'moment'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
-const { Option } = Select;
+const { Option } = Select
 if (typeof Highcharts === 'object') {
-  AnnotationsFactory(Highcharts);
+  AnnotationsFactory(Highcharts)
 }
 
 const { Text } = Typography
@@ -60,14 +64,14 @@ const CancelColors = [
     group: 1,
   },
   {
-    id: 0,
+    id: 11,
     name: 'ลูกค้าไม่ชำระเงินภายใน 15 นาที',
     subString: 'ลูกค้าไม่ชำระเงิน',
     color: blue[6],
     group: 1,
   },
   {
-    id: 0,
+    id: 12,
     name: 'ร้านค้าไม่รับออเดอร์ภายใน 10 นาที',
     subString: 'ร้านค้าไม่รับออเดอร์',
     color: red[2],
@@ -116,18 +120,18 @@ const CancelColors = [
     group: 3,
   },
   {
-    id: 0,
+    id: 13,
     name: 'ยกเลิกโดยผู้ดูเเลระบบ',
     subString: 'ยกเลิกโดยผู้ดูเเลระบบ',
     color: grey[3],
     group: 4,
   },
   // {
-  //   id: 0,
-  //   name: 'Auto Cancel',
-  //   subString: 'Auto',
-  //   color: green[5],
-  //   group: 5,
+  //   id: 14,
+  //   name: 'ไม่มีไรเดอร์รับงาน',
+  //   subString: 'ไม่มีไรเดอร์รับงาน',
+  //   color: grey[5],
+  //   group: 4,
   // },
 ]
 
@@ -135,6 +139,7 @@ const CancelGroup = [
   {
     name: 'ลูกค้า',
     color: blue[4],
+    ids: [1, 2, 3, 4, 11],
     substringList: [
       'ฉันต้องการแก้ไขที่อยู่จัดส่ง',
       'ฉันต้องการแก้ไขรายการสั่งซื้อ',
@@ -146,6 +151,7 @@ const CancelGroup = [
   {
     name: 'ร้านค้า',
     color: red[5],
+    ids: [12, 6, 9, 5, 7, 10],
     substringList: [
       'ร้านค้าไม่รับออเดอร์',
       'ออเดอร์เยอะเกินไป',
@@ -158,11 +164,13 @@ const CancelGroup = [
   {
     name: 'ไรเดอร์',
     color: yellow[3],
+    ids: [8],
     substringList: ['ไม่มีไรเดอร์รับออเดอร์'],
   },
   {
     name: 'แอดมิน',
     color: grey[3],
+    ids: [13],
     substringList: ['ยกเลิกโดยผู้ดูเเลระบบ'],
   },
   // {
@@ -174,7 +182,7 @@ const CancelGroup = [
 
 type FormInterFace = {
   picker_type: 'date' | 'week' | 'month'
-  dates: [Moment, Moment],
+  dates: [Moment, Moment]
 }
 
 type PieDataInterface = {
@@ -189,7 +197,10 @@ type AnnotationSeriesData = {
   custom_percentage?: string
 }
 
-const defaultSelDate: [Moment, Moment] = [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')]
+const defaultSelDate: [Moment, Moment] = [
+  moment().subtract(6, 'days').startOf('day'),
+  moment().endOf('day'),
+]
 const defaultSelWeek: [Moment, Moment] = [
   moment().subtract(3, 'weeks').isoWeekday(2),
   moment().isoWeekday(2),
@@ -206,13 +217,13 @@ const initialValues: FormInterFace = {
 
 const Home: NextPage = () => {
   const [loading, setLoading] = useState<boolean>(false)
+  const [loadingChart, setLoadingChart] = useState<boolean>(false)
   const [chartData, setChartData] = useState<number[][]>([])
   const [chartxAxis, setChartxAxis] = useState<string[] | number[]>([])
   const [cancellationPieData, setCancellationPieData] = useState<PieDataInterface[]>([])
   const [cancellationGroupPieData, setCancellationGroupPieData] = useState<PieDataInterface[]>([])
   const [merchantTestId, setMerchantTestId] = useState([])
-  const [queryWithOutlet, setQueryWithOutlet] = useState("")
-
+  const [queryWithOutlet, setQueryWithOutlet] = useState('')
 
   const handleSubmit = async () => {
     await fetchOrdersSummaryReport(formik.values)
@@ -233,7 +244,7 @@ const Home: NextPage = () => {
     if (size(values.dates) < 2) {
       return
     }
-    setLoading(true)
+    setLoadingChart(true)
 
     let queryStartDate = values.dates[0]
     let queryEndDate = values.dates[1]
@@ -254,13 +265,13 @@ const Home: NextPage = () => {
       end_time: moment(queryEndDate).format('HH:mm:ss'),
       date_picker_type: values.picker_type,
       include_outlet_ids: [],
-      exclude_outlet_ids: []
+      exclude_outlet_ids: [],
     }
 
-    if (queryWithOutlet == "include") {
+    if (queryWithOutlet == 'include') {
       query.include_outlet_ids = merchantTestId
     }
-    if (queryWithOutlet == "exclude") {
+    if (queryWithOutlet == 'exclude') {
       query.exclude_outlet_ids = merchantTestId
     }
 
@@ -288,7 +299,7 @@ const Home: NextPage = () => {
       setChartData([])
     }
 
-    setLoading(false)
+    setLoadingChart(false)
   }
 
   const fetchOrdersCancelSummaryReport = async (values: FormInterFace) => {
@@ -315,13 +326,13 @@ const Home: NextPage = () => {
       end_date: moment(queryEndDate).format('YYYY-MM-DD'),
       end_time: moment(queryEndDate).format('HH:mm:ss'),
       include_outlet_ids: [],
-      exclude_outlet_ids: []
+      exclude_outlet_ids: [],
     }
 
-    if (queryWithOutlet == "include") {
+    if (queryWithOutlet == 'include') {
       query.include_outlet_ids = merchantTestId
     }
-    if (queryWithOutlet == "exclude") {
+    if (queryWithOutlet == 'exclude') {
       query.exclude_outlet_ids = merchantTestId
     }
 
@@ -379,7 +390,7 @@ const Home: NextPage = () => {
   }
 
   const getPercentage = (total: number, target: number) => {
-    return numberFormat((target * 100 / total), 2)
+    return numberFormat((target * 100) / total, 2)
   }
 
   const generateChartData = (
@@ -411,7 +422,6 @@ const Home: NextPage = () => {
       if (chartType === 'days') {
         colLabel = moment(m).format('DD/MM/YYYY')
         colId = moment(m).format('DDMMYYYY')
-
       } else if (chartType === 'weeks') {
         colLabel = `${moment(m).startOf('weeks').format('DD/MM')} ~ ${moment(m)
           .endOf('weeks')
@@ -419,7 +429,6 @@ const Home: NextPage = () => {
         colId = `${moment(m).startOf('weeks').format('DDMM')}-${moment(m)
           .endOf('weeks')
           .format('DDMM')}`
-
       } else if (chartType === 'months') {
         colLabel = moment(m).format('MMM YYYY')
         colId = moment(m).format('MMMYYYY')
@@ -437,11 +446,11 @@ const Home: NextPage = () => {
       })
       successData.push({
         y: successCount,
-        custom_percentage: ` (${getPercentage(totalCount, successCount)}%)`
+        custom_percentage: ` (${getPercentage(totalCount, successCount)}%)`,
       })
       cancelData.push({
         y: cancelCount,
-        custom_percentage: ` (${getPercentage(totalCount, cancelCount)}%)`
+        custom_percentage: ` (${getPercentage(totalCount, cancelCount)}%)`,
       })
       cancelOrderCount.push(cancelCount)
       totalOrderCount = totalCount
@@ -477,7 +486,7 @@ const Home: NextPage = () => {
         new Date(ed),
         chartType,
         c.subString,
-        cancelOrderCount,
+        cancelOrderCount
       )
       chartData.push({
         type: 'line',
@@ -522,7 +531,7 @@ const Home: NextPage = () => {
     totalCount: number[]
   ) => {
     let result: AnnotationSeriesData[] = []
-    let i = 0;
+    let i = 0
     for (var md = moment(startDate); md.isBefore(moment(endDate)); md.add(1, chartType)) {
       let dateData = find(data, { date: md.format('YYYY-MM-DD') })
       if (chartType == 'months') {
@@ -546,9 +555,9 @@ const Home: NextPage = () => {
       )
       result.push({
         y: count || 0,
-        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`
+        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`,
       })
-      i++;
+      i++
     }
     return result
   }
@@ -562,7 +571,7 @@ const Home: NextPage = () => {
     totalCount: number[]
   ) => {
     let result: AnnotationSeriesData[] = []
-    let i = 0;
+    let i = 0
     for (var md = moment(startDate); md.isBefore(moment(endDate)); md.add(1, chartType)) {
       let dateData = find(data, { date: md.format('YYYY-MM-DD') })
       if (chartType == 'months') {
@@ -584,7 +593,7 @@ const Home: NextPage = () => {
       let count = sumBy(list, 'count')
       result.push({
         y: count || 0,
-        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`
+        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`,
       })
       i++
     }
@@ -633,7 +642,7 @@ const Home: NextPage = () => {
 
   const handleChange = (value: string) => {
     setQueryWithOutlet(value)
-  };
+  }
 
   return (
     <MainLayout>
@@ -688,10 +697,10 @@ const Home: NextPage = () => {
           </Col>
         </Row>
 
-        <Spin spinning={loading}>
+        <Spin spinning={loadingChart}>
           <Row gutter={16}>
             <Col span={24}>
-              {!loading &&
+              {!loadingChart && (
                 <HighchartsReact
                   highcharts={Highcharts}
                   options={{
@@ -728,9 +737,10 @@ const Home: NextPage = () => {
                       categories: chartxAxis,
                     },
                     tooltip: {
-                      pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}{point.custom_percentage}</b><br/>',
+                      pointFormat:
+                        '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}{point.custom_percentage}</b><br/>',
                       crosshairs: [true, true],
-                      shared: true
+                      shared: true,
                     },
                     series: chartData,
                     // annotations: [{
@@ -742,11 +752,13 @@ const Home: NextPage = () => {
                     // }]
                   }}
                 />
-              }
-              {loading && <div style={{ minHeight: 300 }}></div>}
+              )}
+              {loadingChart && <div style={{ minHeight: 300 }}></div>}
             </Col>
           </Row>
-          <Divider />
+        </Spin>
+        <Divider />
+        <Spin spinning={loading}>
           <Row>
             <Col span={24}>
               <Title level={4}>สาเหตุยกเลิกออเดอร์</Title>

@@ -85,6 +85,9 @@ interface initialValues {
     price: string;
   }[];
   all_city?: boolean;
+  total_province?: number;
+  total_district?: number;
+  total_sub_district?: number;
 }
 
 export default function ConfigDeliveryCreate({ }: Props): ReactElement {
@@ -111,7 +114,10 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
         price: '',
       }
     ],
-    all_city: false
+    all_city: false,
+    total_province: 0,
+    total_district: 0,
+    total_sub_district: 0
   })
   const id = router.query.id as string
 
@@ -427,38 +433,49 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           description: '',
           duration: 3,
         })
+        router.push('/config-delivery-fee');
       } else {
         notification.warning({
           message: `ผิดพลาด`,
           description: 'ไม่สามารถเพิ่มพื้นที่ได้ เนื่องจากมีพื้นที่ซ้อนทับกับ config อื่น',
           duration: 3,
         })
-      }
-      if (_.get(result, "validate[0]") || _.get(result, "tier_duplicate_location")) {
-        setShowError(true)
-        result.validate.forEach((element: any, index: number) => {
-          let districtData: any = _.find(locations, function (obj) {
-            if (obj.district_id == element.district) {
-              return true;
-            }
-          });
-          result.validate[index].district = districtData.district_data
-
-          let sub_districtDatas: any = []
-
-          if (districtData.location_type !== "district") {
-            _.get(result, `validate[${index}].sub_district`, []).forEach((subdistrictId: any) => {
-              let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
-                if (obj.id == subdistrictId) {
-                  return true;
-                }
-              });
-              sub_districtDatas.push(sub_districtData.name)
+        if (_.get(result, "validate[0]") || _.get(result, "tier_duplicate_location")) {
+          setShowError(true)
+          result.validate.forEach((element: any, index: number) => {
+            let districtData: any = _.find(locations, function (obj) {
+              if (obj.district_id == element.district) {
+                return true;
+              }
             });
+            result.validate[index].district = districtData.district_data
+
+            let sub_districtDatas: any = []
+
+            if (districtData.location_type !== "district") {
+              _.get(result, `validate[${index}].sub_district`, []).forEach((subdistrictId: any) => {
+                let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
+                  if (obj.id == subdistrictId) {
+                    return true;
+                  }
+                });
+                sub_districtDatas.push(sub_districtData.name)
+              });
+            }
+            result.validate[index].sub_district = sub_districtDatas
+          });
+          setShowErrorResult(result.validate)
+        }
+        const reqUpdateTierPrice: any = {
+          data: {
+            id: id,
+            name: initialValues.name,
+            total_province: initialValues.total_province,
+            total_district: initialValues.total_district,
+            total_sub_district: initialValues.total_sub_district,
           }
-          result.validate[index].sub_district = sub_districtDatas
-        });
-        setShowErrorResult(result.validate)
+        }
+        await tierPriceUpdate(reqUpdateTierPrice)
       }
     }
   }
@@ -724,6 +741,9 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       setInitialValues({
         name: result.data[0].name,
         tier_prices: result.data[0].tier_prices,
+        total_district: result.data[0].total_district,
+        total_province: result.data[0].total_province,
+        total_sub_district: result.data[0].total_sub_district,
       })
       if (_.get(result, "data[0].tier_locations")) {
         const map1 = result.data[0].tier_locations.map((x: any) => x.district_id)

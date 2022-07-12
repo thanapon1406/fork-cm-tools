@@ -10,6 +10,7 @@ const ExampleInternalSchema = () => {
       <div>khconsumer://host?page=campaign&campaignId=x <span style={{ color: "#000" }}>(แสดงหน้า Coupon detail)</span></div>
       <div>khconsumer://host?page=promotion&outletId=x <span style={{ color: "#000" }}>(แสดงหน้า List โปรโมชั่นร้านค้า)</span></div>
       <div>khconsumer://host?page=promotion&outletId=x&promotionId=x <span style={{ color: "#000" }}>(แสดงหน้า Detail โปรโมชั่นร้านค้า)</span></div>
+      <div>khconsumer://host?page=ls <span style={{ color: "#000" }}>(แสดงหน้า Content Campaign LS)</span></div>
     </>
   )
 }

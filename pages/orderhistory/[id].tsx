@@ -1020,9 +1020,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             <Row gutter={16}>
                               <Col span={12} className="pull-left">
                                 <Text>
-                                  {item.credit_type === 'gross_profit'
-                                    ? 'เครดิตที่ใช้ในการรับออเดอร์'
-                                    : 'เครดิตค่าส่งไรเดอร์พาทเนอร์'}
+                                  {
+                                    (item.credit_type === 'gross_profit') ? 'เครดิตที่ใช้ในการรับออเดอร์' : (item.credit_type === 'logistics_subsidize') ? 'เครดิตของ Merchant LS' : 'เครดิตค่าส่งไรเดอร์พาทเนอร์'
+                                  }
                                 </Text>
                               </Col>
                               <Col span={12} className="pull-right">

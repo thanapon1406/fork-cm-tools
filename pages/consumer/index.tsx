@@ -1,14 +1,17 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import DownloadButton from '@/components/credit/DownloadButton'
 import DateRangePicker from '@/components/Form/DateRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
-import { consumerList } from '@/services/consumer'
+import { consumerExport, consumerList, downloadFile } from '@/services/consumer'
 import { personState } from '@/store'
-import { Breadcrumb, Col, Row, Space, Typography } from 'antd'
+import { DownloadOutlined } from '@ant-design/icons'
+import { Breadcrumb, Col, notification, Row, Space, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import { get } from 'lodash'
 import moment from 'moment'
 import React, { ReactElement, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
@@ -16,7 +19,7 @@ import * as Yup from 'yup'
 
 const { Title } = Typography
 
-interface Props { }
+interface Props {}
 
 interface Pagination {
   total: number
@@ -33,7 +36,7 @@ interface filterObject {
   update_end_date?: string
 }
 
-export default function Merchant({ }: Props): ReactElement {
+export default function Merchant({}: Props): ReactElement {
   const [userObj, setUserObj] = useRecoilState(personState)
   const initialValues = {
     keyword: '',
@@ -76,7 +79,7 @@ export default function Merchant({ }: Props): ReactElement {
       per_page: paging.pageSize,
       ...filterObj,
     }
-    console.log(`reqBody`, reqBody)
+
     setIsLoading(true)
     const { result, success } = await consumerList(reqBody)
     if (success) {
@@ -93,7 +96,6 @@ export default function Merchant({ }: Props): ReactElement {
   }
 
   const handleSubmit = (values: any) => {
-    console.log(`values`, values)
     let reqFilter: filterObject = {
       keyword: values.keyword,
       ranking: values.ranking,
@@ -137,18 +139,18 @@ export default function Merchant({ }: Props): ReactElement {
       title: 'Social login name',
       align: 'center',
       render: (_: any, row: any) => {
-        let fname = row?.social_login_first_name || ""
-        let lname = row?.social_login_last_name || ""
-        return fname + " " + lname
+        let fname = row?.social_login_first_name || ''
+        let lname = row?.social_login_last_name || ''
+        return fname + ' ' + lname
       },
     },
     {
       title: 'ชื่อและนามสกุล',
       align: 'center',
       render: (_: any, row: any) => {
-        let fname = row?.first_name || ""
-        let lname = row?.last_name || ""
-        return fname + " " + lname
+        let fname = row?.first_name || ''
+        let lname = row?.last_name || ''
+        return fname + ' ' + lname
       },
     },
     {
@@ -186,6 +188,33 @@ export default function Merchant({ }: Props): ReactElement {
     },
   ]
 
+  const handleexportCostomer = async () => {
+    const { success, result } = await consumerExport(filter)
+    if (success) {
+      console.log(`result`, result)
+      const key = get(result, 'download_url')
+      const req = {
+        key: key,
+      }
+      await downloadFile(req)
+    }
+  }
+
+  const handleDownloadEmailClick = async (value: any) => {
+    const email = get(value, 'email')
+    const _filrer = {
+      ...filter,
+      email: email,
+    }
+    const { success, result } = await consumerExport(_filrer)
+    if (success) {
+      notification.success({
+        message: `ส่งรายงานไปยังอีเมลที่ระบุใว้เรียบร้อยแล้ว`,
+        description: '',
+      })
+    }
+  }
+
   return (
     <MainLayout>
       <Title level={4}>User Consumer</Title>
@@ -208,18 +237,6 @@ export default function Merchant({ }: Props): ReactElement {
                     id="keyword"
                     placeholder="ค้นหา"
                   />
-                  <div className="ant-form ant-form-vertical">
-                    <Space>
-                      <Button
-                        style={{ width: '120px', marginTop: '31px' }}
-                        type="primary"
-                        size="middle"
-                        htmlType="submit"
-                      >
-                        ค้นหา
-                      </Button>
-                    </Space>
-                  </div>
                 </Col>
                 <Col className="gutter-row" span={6}>
                   <Field
@@ -258,6 +275,40 @@ export default function Merchant({ }: Props): ReactElement {
                     id="update_date"
                     placeholder="update_date"
                   />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={12}>
+                  <div className="ant-form ant-form-vertical">
+                    <Space>
+                      <Button
+                        style={{ width: '120px', marginTop: '31px' }}
+                        type="primary"
+                        size="middle"
+                        htmlType="submit"
+                      >
+                        ค้นหา
+                      </Button>
+                    </Space>
+                  </div>
+                </Col>
+                <Col className="gutter-row" span={12} style={{ textAlign: 'end' }}>
+                  <div className="ant-form ant-form-vertical">
+                    {pagination.total <= 3000 ? (
+                      <Button
+                        icon={<DownloadOutlined />}
+                        style={{ width: '120px', marginTop: '27px', marginLeft: '10px' }}
+                        type="primary"
+                        size="middle"
+                        htmlType="button"
+                        onClick={handleexportCostomer}
+                      >
+                        ดาวน์โหลด
+                      </Button>
+                    ) : (
+                      <DownloadButton handelSubmit={handleDownloadEmailClick} />
+                    )}
+                  </div>
                 </Col>
               </Row>
             </Form>

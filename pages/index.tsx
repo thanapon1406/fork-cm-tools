@@ -1,5 +1,6 @@
 import Card from '@/components/Card'
 import MainLayout from '@/layout/MainLayout'
+import { findOutletId } from '@/services/merchant'
 import { getDashboardOrderCancelSummary, getDashboardOrderSummary } from '@/services/report'
 import { blue, grey, red, yellow } from '@ant-design/colors'
 import {
@@ -7,20 +8,23 @@ import {
   Col,
   DatePicker,
   DatePickerProps,
-  Divider,
-  Radio,
-  Row,
-  Spin,
-  Typography
+  Divider, Radio,
+  Row, Select, Spin, Typography
 } from 'antd'
 import { useFormik } from 'formik'
-import Highcharts from 'highcharts'
+import Highcharts, { numberFormat } from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
+import AnnotationsFactory from "highcharts/modules/annotations"
 import { filter, find, get, has, size, sumBy } from 'lodash'
 import moment, { Moment } from 'moment'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
+const { Option } = Select;
+if (typeof Highcharts === 'object') {
+  AnnotationsFactory(Highcharts);
+}
+
 const { Text } = Typography
 
 const { Title } = Typography
@@ -170,7 +174,7 @@ const CancelGroup = [
 
 type FormInterFace = {
   picker_type: 'date' | 'week' | 'month'
-  dates: [Moment, Moment]
+  dates: [Moment, Moment],
 }
 
 type PieDataInterface = {
@@ -179,7 +183,13 @@ type PieDataInterface = {
   color: string
 }
 
-const defaultSelDate: [Moment, Moment] = [moment().subtract(6, 'days').startOf('day'), moment()]
+type AnnotationSeriesData = {
+  y: number
+  id?: string
+  custom_percentage?: string
+}
+
+const defaultSelDate: [Moment, Moment] = [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')]
 const defaultSelWeek: [Moment, Moment] = [
   moment().subtract(3, 'weeks').isoWeekday(2),
   moment().isoWeekday(2),
@@ -200,6 +210,9 @@ const Home: NextPage = () => {
   const [chartxAxis, setChartxAxis] = useState<string[] | number[]>([])
   const [cancellationPieData, setCancellationPieData] = useState<PieDataInterface[]>([])
   const [cancellationGroupPieData, setCancellationGroupPieData] = useState<PieDataInterface[]>([])
+  const [merchantTestId, setMerchantTestId] = useState([])
+  const [queryWithOutlet, setQueryWithOutlet] = useState("")
+
 
   const handleSubmit = async () => {
     await fetchOrdersSummaryReport(formik.values)
@@ -212,17 +225,9 @@ const Home: NextPage = () => {
       handleSubmit()
     },
     validationSchema: Yup.object().shape({
-      dates: Yup.array().min(1, 'กรุณาเลือกวัน').required('กรุณาเลือกวัน').nullable(),
+      dates: Yup.array().min(1, 'กรุณาเลือก').required('กรุณาเลือก').nullable(),
     }),
   })
-
-  const randData = (numberOfLoop: number = 12) => {
-    let res = []
-    for (var i = 0; i < numberOfLoop; i++) {
-      res.push(Math.floor(Math.random() * 10000) + 1)
-    }
-    return res
-  }
 
   const fetchOrdersSummaryReport = async (values: FormInterFace) => {
     if (size(values.dates) < 2) {
@@ -241,14 +246,25 @@ const Home: NextPage = () => {
       queryEndDate = moment(values.dates[1]).endOf('months')
     }
 
-    const { success, result } = await getDashboardOrderSummary({
+    let query = {
       brand_id: process.env.NEXT_PUBLIC_KITCHENHUB_BRAND_ID,
       start_date: moment(queryStartDate).format('YYYY-MM-DD'),
       start_time: moment(queryStartDate).format('HH:mm:ss'),
       end_date: moment(queryEndDate).format('YYYY-MM-DD'),
       end_time: moment(queryEndDate).format('HH:mm:ss'),
       date_picker_type: values.picker_type,
-    })
+      include_outlet_ids: [],
+      exclude_outlet_ids: []
+    }
+
+    if (queryWithOutlet == "include") {
+      query.include_outlet_ids = merchantTestId
+    }
+    if (queryWithOutlet == "exclude") {
+      query.exclude_outlet_ids = merchantTestId
+    }
+
+    const { success, result } = await getDashboardOrderSummary(query)
 
     if (success) {
       let { data } = result
@@ -292,13 +308,24 @@ const Home: NextPage = () => {
       queryEndDate = moment(values.dates[1]).endOf('months')
     }
 
-    const { success, result } = await getDashboardOrderCancelSummary({
+    let query = {
       brand_id: process.env.NEXT_PUBLIC_KITCHENHUB_BRAND_ID,
       start_date: moment(queryStartDate).format('YYYY-MM-DD'),
       start_time: moment(queryStartDate).format('HH:mm:ss'),
       end_date: moment(queryEndDate).format('YYYY-MM-DD'),
       end_time: moment(queryEndDate).format('HH:mm:ss'),
-    })
+      include_outlet_ids: [],
+      exclude_outlet_ids: []
+    }
+
+    if (queryWithOutlet == "include") {
+      query.include_outlet_ids = merchantTestId
+    }
+    if (queryWithOutlet == "exclude") {
+      query.exclude_outlet_ids = merchantTestId
+    }
+
+    const { success, result } = await getDashboardOrderCancelSummary(query)
     setLoading(false)
 
     if (success) {
@@ -351,6 +378,10 @@ const Home: NextPage = () => {
     }
   }
 
+  const getPercentage = (total: number, target: number) => {
+    return numberFormat((target * 100 / total), 2)
+  }
+
   const generateChartData = (
     data: any[],
     startDate: Moment,
@@ -358,12 +389,14 @@ const Home: NextPage = () => {
     chartType: 'days' | 'weeks' | 'months'
   ) => {
     let chartData: any[] = []
-    let ordersData: number[] = []
-    let successData: number[] = []
-    let cancelData: number[] = []
+    let ordersData: AnnotationSeriesData[] = []
+    let successData: AnnotationSeriesData[] = []
+    let cancelData: AnnotationSeriesData[] = []
     let colLabels: string[] = []
     const sd = new Date(moment(startDate).toDate())
     const ed = new Date(moment(endDate).toDate())
+    let totalOrderCount = 0
+    let cancelOrderCount: number[] = []
 
     for (var m = startDate; m.isBefore(endDate); m.add(1, chartType)) {
       let dateData = find(data, { date: m.format('YYYY-MM-DD') })
@@ -373,25 +406,45 @@ const Home: NextPage = () => {
         dateData = find(data, { date: m.startOf('weeks').add(1, 'days').format('YYYY-MM-DD') })
       }
 
+      let colLabel = moment(m).format('DD/MM/YYYY')
+      let colId = moment(m).format('DDMMYYYY')
+      if (chartType === 'days') {
+        colLabel = moment(m).format('DD/MM/YYYY')
+        colId = moment(m).format('DDMMYYYY')
+
+      } else if (chartType === 'weeks') {
+        colLabel = `${moment(m).startOf('weeks').format('DD/MM')} ~ ${moment(m)
+          .endOf('weeks')
+          .format('DD/MM')}`
+        colId = `${moment(m).startOf('weeks').format('DDMM')}-${moment(m)
+          .endOf('weeks')
+          .format('DDMM')}`
+
+      } else if (chartType === 'months') {
+        colLabel = moment(m).format('MMM YYYY')
+        colId = moment(m).format('MMMYYYY')
+      }
+
+      colLabels.push(colLabel)
+
       let totalCount = get(dateData, 'order_total') || 0
       let successCount = get(find(dateData?.group_by_status, { status: 'success' }), 'count') || 0
       let cancelCount = get(find(dateData?.group_by_status, { status: 'cancel' }), 'count') || 0
 
-      ordersData.push(totalCount)
-      successData.push(successCount)
-      cancelData.push(cancelCount)
-
-      if (chartType === 'days') {
-        colLabels.push(moment(m).format('DD/MM/YYYY'))
-      } else if (chartType === 'weeks') {
-        colLabels.push(
-          `${moment(m).startOf('weeks').format('DD/MM')} ~ ${moment(m)
-            .endOf('weeks')
-            .format('DD/MM')}`
-        )
-      } else if (chartType === 'months') {
-        colLabels.push(moment(m).format('MMM YYYY'))
-      }
+      ordersData.push({
+        y: totalCount,
+        id: colId,
+      })
+      successData.push({
+        y: successCount,
+        custom_percentage: ` (${getPercentage(totalCount, successCount)}%)`
+      })
+      cancelData.push({
+        y: cancelCount,
+        custom_percentage: ` (${getPercentage(totalCount, cancelCount)}%)`
+      })
+      cancelOrderCount.push(cancelCount)
+      totalOrderCount = totalCount
     }
 
     //Total Order
@@ -418,12 +471,13 @@ const Home: NextPage = () => {
     })
 
     for (let c of CancelColors) {
-      let txData: number[] = generateCancelData(
+      let txData: AnnotationSeriesData[] = generateCancelData(
         data,
         new Date(sd),
         new Date(ed),
         chartType,
-        c.subString
+        c.subString,
+        cancelOrderCount,
       )
       chartData.push({
         type: 'line',
@@ -436,12 +490,13 @@ const Home: NextPage = () => {
     }
 
     for (let c of CancelGroup) {
-      let txData: number[] = generateCancelGroupData(
+      let txData: AnnotationSeriesData[] = generateCancelGroupData(
         data,
         new Date(sd),
         new Date(ed),
         chartType,
-        c.substringList
+        c.substringList,
+        cancelOrderCount
       )
       chartData.push({
         type: 'line',
@@ -452,6 +507,8 @@ const Home: NextPage = () => {
       })
     }
 
+    console.log('chartData', chartData)
+
     setChartData(chartData)
     setChartxAxis(colLabels)
   }
@@ -461,10 +518,11 @@ const Home: NextPage = () => {
     startDate: Date,
     endDate: Date,
     chartType: 'days' | 'weeks' | 'months',
-    findString: string
+    findString: string,
+    totalCount: number[]
   ) => {
-    let result: number[] = []
-
+    let result: AnnotationSeriesData[] = []
+    let i = 0;
     for (var md = moment(startDate); md.isBefore(moment(endDate)); md.add(1, chartType)) {
       let dateData = find(data, { date: md.format('YYYY-MM-DD') })
       if (chartType == 'months') {
@@ -486,7 +544,11 @@ const Home: NextPage = () => {
         }),
         'count'
       )
-      result.push(count || 0)
+      result.push({
+        y: count || 0,
+        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`
+      })
+      i++;
     }
     return result
   }
@@ -496,10 +558,11 @@ const Home: NextPage = () => {
     startDate: Date,
     endDate: Date,
     chartType: 'days' | 'weeks' | 'months',
-    findStringList: string[]
+    findStringList: string[],
+    totalCount: number[]
   ) => {
-    let result: number[] = []
-
+    let result: AnnotationSeriesData[] = []
+    let i = 0;
     for (var md = moment(startDate); md.isBefore(moment(endDate)); md.add(1, chartType)) {
       let dateData = find(data, { date: md.format('YYYY-MM-DD') })
       if (chartType == 'months') {
@@ -519,12 +582,17 @@ const Home: NextPage = () => {
         }
       })
       let count = sumBy(list, 'count')
-      result.push(count || 0)
+      result.push({
+        y: count || 0,
+        custom_percentage: ` (${getPercentage(totalCount[i], count || 0)}%)`
+      })
+      i++
     }
     return result
   }
 
   useEffect(() => {
+    fetchMerchatTestId()
     Highcharts.setOptions({
       lang: {
         decimalPoint: '.',
@@ -534,6 +602,17 @@ const Home: NextPage = () => {
     fetchOrdersSummaryReport(initialValues)
     fetchOrdersCancelSummaryReport(initialValues)
   }, [])
+
+  const fetchMerchatTestId = async () => {
+    const request = {
+      is_merchant_test: true,
+    }
+    const { result, success } = await findOutletId(request)
+    if (success) {
+      const { ids = [] } = result
+      setMerchantTestId(ids)
+    }
+  }
 
   const datePickerFormat: DatePickerProps['format'] = (value) => {
     const picker_type = formik.values.picker_type
@@ -551,6 +630,10 @@ const Home: NextPage = () => {
       return moment(value).format('YYYY-MM-DD HH:mm')
     }
   }
+
+  const handleChange = (value: string) => {
+    setQueryWithOutlet(value)
+  };
 
   return (
     <MainLayout>
@@ -581,6 +664,7 @@ const Home: NextPage = () => {
           </Col>
           <Col span={24}>
             <RangePicker
+              style={{ marginRight: '10px' }}
               value={formik.values.dates}
               onChange={(val: any) => {
                 formik.setFieldValue('dates', val)
@@ -589,6 +673,11 @@ const Home: NextPage = () => {
               picker={formik.values.picker_type}
               format={datePickerFormat}
             />
+            <Select defaultValue="" style={{ width: 120 }} onChange={handleChange}>
+              <Option value="">ทั้งหมด</Option>
+              <Option value="exclude">ร้านค้าทั่วไป</Option>
+              <Option value="include">ร้านค้าทดสอบ</Option>
+            </Select>
             <Button type="primary" onClick={handleSubmit} style={{ marginLeft: 20 }}>
               {' '}
               ค้นหา{' '}
@@ -602,48 +691,59 @@ const Home: NextPage = () => {
         <Spin spinning={loading}>
           <Row gutter={16}>
             <Col span={24}>
-              <HighchartsReact
-                highcharts={Highcharts}
-                options={{
-                  chart: {
-                    height: 600,
-                  },
-                  title: {
-                    text: '',
-                  },
-                  lang: {
-                    thousandsSep: ',',
-                  },
-                  // plotOptions: {
-                  //   series: {
-                  //     marker: {
-                  //       enabled: false,
-                  //     },
-                  //   },
-                  // },
-                  legend: {
-                    //   layout: 'vertical',
-                    //   verticalAlign: 'middle',
-                    //   align: 'right',
-                    //   floating: false,
-                    itemMarginTop: 3,
-                    itemMarginBottom: 3,
-                  },
-                  yAxis: {
-                    title: {
-                      text: 'จำนวนออเดอร์',
+              {!loading &&
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={{
+                    chart: {
+                      height: 650,
                     },
-                  },
-                  xAxis: {
-                    categories: chartxAxis,
-                  },
-                  tooltip: {
-                    crosshairs: [true, true],
-                    shared: true,
-                  },
-                  series: chartData,
-                }}
-              />
+                    title: {
+                      text: '',
+                    },
+                    lang: {
+                      thousandsSep: ',',
+                    },
+                    // plotOptions: {
+                    //   series: {
+                    //     marker: {
+                    //       enabled: false,
+                    //     },
+                    //   },
+                    // },
+                    legend: {
+                      //   layout: 'vertical',
+                      //   verticalAlign: 'middle',
+                      //   align: 'right',
+                      //   floating: false,
+                      itemMarginTop: 3,
+                      itemMarginBottom: 3,
+                    },
+                    yAxis: {
+                      title: {
+                        text: 'จำนวนออเดอร์',
+                      },
+                    },
+                    xAxis: {
+                      categories: chartxAxis,
+                    },
+                    tooltip: {
+                      pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}{point.custom_percentage}</b><br/>',
+                      crosshairs: [true, true],
+                      shared: true
+                    },
+                    series: chartData,
+                    // annotations: [{
+                    //   labels: [{
+                    //     useHTML: true,
+                    //     point: "15/06/2022",
+                    //     text: '15/06/2022<br/>1. แคมเปญค่าส่ง 0 บาท<br/>2.Test new Line'
+                    //   }]
+                    // }]
+                  }}
+                />
+              }
+              {loading && <div style={{ minHeight: 300 }}></div>}
             </Col>
           </Row>
           <Divider />

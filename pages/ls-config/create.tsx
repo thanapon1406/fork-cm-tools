@@ -80,7 +80,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     is_apply_all_brand: false,
     campaign_time: {
       start: moment().startOf('day').format("YYYY-MM-DD HH:mm"),
-      end: moment().add(15, 'd').endOf('day').format("YYYY-MM-DD HH:mm"),
+      end: moment().add(14, 'd').endOf('day').format("YYYY-MM-DD HH:mm"),
     },
     deep_link: "",
     inapp_link: "",
@@ -90,7 +90,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
   }
   const [lsDetail, setLsDetail] = useState(lsInitial)
   const Schema = Yup.object().shape({
-    name: Yup.string().trim().max(255).required('กรุณาระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ฿]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    name: Yup.string().trim().max(255, 'ชื่อ LS Configure ควรมีขนาดไม่เกิน 255 ตัวอักษร').required('กรุณาระบุชื่อ LS Configure'),
     type: Yup.string().trim().required('กรุณาระบุ LS Configure'),
     order_amount: Yup.number().test('required', function (value: any) {
       const type = this?.parent?.type
@@ -212,7 +212,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
           } else {
             const lsType = this?.parent?.ls_type
             if (lsType != undefined) {
-              if (lsType == PERCENT) {
+              if (lsType == PERCENT && (type != SUBSIDIZE)) {
                 const lsMerchantAmount = this?.parent?.ls_merchant_amount
                 if (lsMerchantAmount != undefined) {
                   if ((Number(value) + Number(lsMerchantAmount)) != 100) {
@@ -263,7 +263,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
           } else {
             const lsType = this?.parent?.ls_type
             if (lsType != undefined) {
-              if (lsType == PERCENT) {
+              if (lsType == PERCENT && (type != SUBSIDIZE)) {
                 const lsPlatformAmount = this?.parent?.ls_platform_amount
                 if (lsPlatformAmount != undefined) {
                   if ((Number(value) + Number(lsPlatformAmount)) != 100) {
@@ -300,28 +300,27 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       }
       return true
     }),
-    campaign_time: Yup.object()
-      .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
-        const start = this?.parent?.campaign_time["start"]
-        const end = this?.parent?.campaign_time["end"]
-        if (start && end) {
-          return true
-        } else {
+    campaign_time: Yup.object().test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
+      const start = this?.parent?.campaign_time["start"]
+      const end = this?.parent?.campaign_time["end"]
+      if (start && end) {
+        return true
+      } else {
+        return false
+      }
+    }).test("15 days period", "วันที่และเวลาของแคมเปญควรมีระยะเวลาอย่างน้อย 15 วัน", function (value: any) {
+      const start = this?.parent?.campaign_time["start"]
+      const end = this?.parent?.campaign_time["end"]
+      if (start && end) {
+        const diffDays = moment(end).diff(moment(start), 'days')
+        if (diffDays < 14) {
           return false
         }
-      }).test("15 days period", "วันที่และเวลาของแคมเปญควรมีระยะเวลาอย่างน้อย 15 วัน", function (value: any) {
-        const start = this?.parent?.campaign_time["start"]
-        const end = this?.parent?.campaign_time["end"]
-        if (start && end) {
-          const diffDays = moment(end).diff(moment(start), 'days')
-          if (diffDays < 15) {
-            return false
-          }
-          return true
-        } else {
-          return false
-        }
-      }),
+        return true
+      } else {
+        return false
+      }
+    }),
   })
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const lsLogicsOption = [
@@ -457,22 +456,31 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
-    console.log("payload", payload)
+    // console.log("payload", payload)
     const { result, success } = await createLsConfig(payload)
     if (success) {
       notification.success({
-        message: `ดำเนินการสร้าง LS Config สำเร็จ`,
+        message: `ดำเนินการสร้าง Logistic Subsidize สำเร็จ`,
         description: '',
         duration: 3,
       })
       Router.push("/ls-config")
       setDisableSubmitButton(false)
     } else {
-      notification.warning({
-        message: `ผิดพลาด`,
-        description: 'ไม่สามารถสร้าง LS Config ได้',
-        duration: 3,
-      })
+      const { detail = '' } = result
+      if (detail === 'DUPLICATED_NAME') {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถสร้างชื่อ Logistic Subsidize ซ้ำได้',
+          duration: 3,
+        })
+      } else {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถสร้าง Logistic Subsidize ได้',
+          duration: 3,
+        })
+      }
       setDisableSubmitButton(false)
     }
 
@@ -1235,6 +1243,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                     setFieldValue={setFieldValue}
                     userSelectedOutlet={userSelectedOutlet}
                     brandList={brandList}
+                    isEdit={false}
                   />
                 </Panel>
               </Collapse >}
@@ -1255,7 +1264,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
     return <div key="logic_outlet">{logicOutletElements}</div>
   }
 
-  const renderLogicSummary = (values: any, setFieldValue: any) => {
+  const renderLogicSummary = (values: any, setFieldValue: any, errors: any, touched: any) => {
     let logicSummaryElements: any = []
     // Header
     logicSummaryElements.push(
@@ -1290,6 +1299,31 @@ export default function CreateLsConfig({ }: Props): ReactElement {
 
                 if (type && order_amount && discount_type && discount_amount && min_distance && max_distance && ls_type && ls_platform_amount && ls_merchant_amount) {
                   validLogicSetup = true
+                }
+
+                // Validate Logic Setup 2
+                let validateMessageEle: any = []
+                const typeTouch = _.get(touched, "type") ? _.get(touched, "type") : false
+                // console.log("errors: ", errors)
+                // console.log("typeTouch: ", typeTouch)
+
+                if (!_.isEmpty(errors) && typeTouch) {
+                  validLogicSetup = false
+                  const discountAmountTitle = (typeName == CUSTOMER_DISCOUNT) ? "ส่วนลดค่าจัดส่ง" : (typeName == CUSTOMER_PAY) ? "ค่าส่งที่ลูกค้าจะต้องจ่าย" : ""
+                  const errDiscountAmount = _.get(errors, "discount_amount") ? discountAmountTitle + " : " + _.get(errors, "discount_amount") : ""
+                  const errLsMerchantAmount = _.get(errors, "ls_merchant_amount") ? "สัดส่วน Logic Subsidize ร้านค้า : " + _.get(errors, "ls_merchant_amount") : ""
+                  const errLsPlatformAmount = _.get(errors, "ls_platform_amount") ? "สัดส่วน Logic Subsidize แพลตฟอร์ม : " + _.get(errors, "ls_platform_amount") : ""
+                  const errMinDistance = _.get(errors, "min_distance") ? "ระยะทางจัดส่งเรื่มต้น : " + _.get(errors, "min_distance") : ""
+                  const errMaxDistance = _.get(errors, "max_distance") ? "ระยะทางจัดส่งสิ้นสุด : " + _.get(errors, "max_distance") : ""
+                  const errOrderAmount = _.get(errors, "order_amount") ? "ยอดสุทธิออเดอร์ : " + _.get(errors, "order_amount") : ""
+
+                  if (errOrderAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errOrderAmount}</span></>)
+                  if (errDiscountAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errDiscountAmount}</span></>)
+                  if (errMinDistance != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errMinDistance}</span></>)
+                  if (errMaxDistance != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errMaxDistance}</span></>)
+                  if (errLsPlatformAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errLsPlatformAmount}</span></>)
+                  if (errLsMerchantAmount != "") validateMessageEle.push(<><br /><span style={{ color: "red" }}>- {errLsMerchantAmount}</span></>)
+
                 }
 
                 if (validLogicSetup) {
@@ -1330,12 +1364,28 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                   }
                   setlsSummaryElementParam(lsSummaryParam)
                 } else {
-                  notification.warning({
-                    message: `ไม่สามารถ Preview LS Summary ได้`,
-                    description: 'กรุณาระบุ Logic Setup ให้ครบถ้วน',
-                    duration: 3,
-                  })
-                  setIsVisibleLsSummary(false)
+                  if (_.size(validateMessageEle) > 0) {
+                    notification.warning({
+                      message: `ไม่สามารถ Preview LS Summary ได้`,
+                      description: <>กรุณาระบุ Logic Setup ให้ถูกต้อง{validateMessageEle}</>,
+                      duration: 3,
+                      style: {
+                        "width": "500px"
+                      }
+                    })
+                    setIsVisibleLsSummary(false)
+                  } else {
+                    notification.warning({
+                      message: `ไม่สามารถ Preview LS Summary ได้`,
+                      description: <>กรุณาระบุ Logic Setup ให้ครบถ้วน{validateMessageEle}</>,
+                      duration: 3,
+                      style: {
+                        "width": "500px"
+                      }
+                    })
+                    setIsVisibleLsSummary(false)
+                  }
+
                 }
               }}
             >
@@ -1371,7 +1421,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         <Row key="logic_detail_row#1" gutter={24}>
           <Col className="gutter-row" sm={24} xs={24}>
             <Field
-              label={{ text: 'วันที่และเวลาของแคมเปญ' }}
+              label={{ text: 'วันที่และเวลาของแคมเปญ (ระยะเวลาเริ่มต้นอย่างน้อย 15 วัน)' }}
               name="campaign_time"
               component={DateTimeRangePicker}
               minDate={moment().startOf('day').format("YYYY-MM-DD HH:mm")}
@@ -1592,7 +1642,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
                 {renderLogicOutlet(values, setFieldValue, handleChange)}
 
                 {/* Logic Summary */}
-                {renderLogicSummary(values, setFieldValue)}
+                {renderLogicSummary(values, setFieldValue, errors, touched)}
 
                 {/* Logic Detail */}
                 {renderLogicDetail(values, setFieldValue)}

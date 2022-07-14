@@ -6,11 +6,14 @@ import Select from '@/components/Form/Select'
 import LsSummaryComponent from '@/components/LsSummary'
 import OutletSelecter from '@/components/OutletSelecter'
 import MainLayout from '@/layout/MainLayout'
+import { uploadImage } from '@/services/cdn'
+import { retrieveToken } from '@/services/fetch/auth'
 import { findLsConfig, updateLsConfig } from '@/services/ls-config'
 import { getBrandListV2 } from '@/services/pos-profile'
-import { CopyOutlined, LinkOutlined } from '@ant-design/icons'
-import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography } from 'antd'
+import { CopyOutlined, LinkOutlined, PlusOutlined } from '@ant-design/icons'
+import { Alert, Breadcrumb, Button as ButtonAntd, Checkbox, Col, Collapse, Divider, Form as FormAntd, Input as InputAntd, Modal, notification, Radio, Row, Tooltip, Typography, Upload } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import jwt_decode from 'jwt-decode'
 import _, { filter, flatMap, forEach, forOwn, get, groupBy, intersection, isEmpty, isUndefined, size } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
@@ -79,7 +82,36 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
   const [loadingImage, setloadingImage] = useState(false)
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const [startDateSnapData, setstartDateSnapData] = useState(new Date())
+  const handleChangeImage = async (info: any) => {
+    const fileSize = (info.size / 1024) / 1024
+    const isJPNG = info.type === 'image/jpeg';
+    const isJPG = info.type === 'image/jpg';
+    const isPNG = info.type === 'image/png';
 
+    if (!isJPNG && !isJPG && !isPNG) {
+      warning({
+        title: `กรุณาเลือกรูปภาพเฉพาะไฟล์ .png หรือ .jpg`,
+        afterClose() {
+          setImageUrl('')
+        }
+      })
+      return false
+    }
+
+    if (fileSize > 1) {
+      warning({
+        title: `กรุณาเลือกรูปภาพขนาดไม่เกิน 1MB`,
+        afterClose() {
+        }
+      })
+      return false
+    }
+
+    setloadingImage(true)
+    const res = await uploadImage(info)
+    setloadingImage(false)
+    setImageUrl(res.upload_success.modal_pop_up)
+  }
   const lsLogicsOption = [
     {
       name: "เลือก LS Logics",
@@ -110,7 +142,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
   ]
 
   const Schema = Yup.object().shape({
-    name: Yup.string().trim().max(255).required('ระบุชื่อ LS Configure').matches(/^[A-Za-zก-๙0-9 ]+$/, "Format ของชื่อ LS Configure ไม่ถูกต้อง"),
+    name: Yup.string().trim().max(255, 'ชื่อ LS Configure ควรมีขนาดไม่เกิน 255 ตัวอักษร').required('กรุณาระบุชื่อ LS Configure'),
     campaign_time: Yup.object()
       .test("required", "กรุณาระบุวันที่และเวลาของแคมเปญ", function (value: any) {
         const start = this?.parent?.campaign_time["start"]
@@ -125,7 +157,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         const end = this?.parent?.campaign_time["end"]
         if (start && end) {
           const diffDays = moment(end).diff(moment(start), 'days')
-          if (diffDays < 15) {
+          if (diffDays < 14) {
             return false
           }
           return true
@@ -195,13 +227,32 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
           LsConfigDetail.brands = selectedBrands
         }
       } else {
-        is_apply_all_brand = true
+        // is_apply_all_brand = true
       }
       LsConfigDetail.is_apply_all_brand = is_apply_all_brand
 
-
       setLsDetail(LsConfigDetail)
       setIsLoading(false)
+    } else {
+      // notification.warning({
+      //   message: `ผิดพลาด`,
+      //   description: 'ไม่สามารถค้นหาข้อมูล Logistic Subsidize ได้',
+      //   duration: 3,
+      // })
+      // Router.push("/ls-config")
+
+      const token: string = retrieveToken()
+      const decoded: any = jwt_decode(token)
+      const exp = decoded.exp
+      const now = Math.floor(new Date().getTime() / 1000)
+      if (now <= exp) {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถค้นหาข้อมูล Logistic Subsidize ได้',
+          duration: 3,
+        })
+        Router.push("/ls-config")
+      }
     }
   }
 
@@ -425,6 +476,8 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
       }
     }
 
+    values.image_link = imageUrl
+
     const payload = {
       data: {
         id: id,
@@ -432,6 +485,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         start_date: _.get(values, "start_date") ? _.get(values, "start_date") : "",
         end_date: _.get(values, "end_date") ? _.get(values, "end_date") : "",
         allowed_list: allowedList,
+        image_link: _.get(values, "image_link") ? _.get(values, "image_link") : "",
         total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
@@ -440,18 +494,27 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     const { result, success } = await updateLsConfig(payload)
     if (success) {
       notification.success({
-        message: `ดำเนินการแก้ไข LS Config สำเร็จ`,
+        message: `ดำเนินการแก้ไข Logistic Subsidize สำเร็จ`,
         description: '',
         duration: 3,
       })
       Router.push("/ls-config")
       setDisableSubmitButton(false)
     } else {
-      notification.warning({
-        message: `ผิดพลาด`,
-        description: 'ไม่สามารถแก้ไข LS Config ได้',
-        duration: 3,
-      })
+      const { detail = '' } = result
+      if (detail === 'DUPLICATED_NAME') {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถแก้ไขชื่อ Logistic Subsidize ซ้ำได้',
+          duration: 3,
+        })
+      } else {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถแก้ไข Logistic Subsidize ได้',
+          duration: 3,
+        })
+      }
       setDisableSubmitButton(false)
     }
   }
@@ -1082,6 +1145,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                     setFieldValue={setFieldValue}
                     userSelectedOutlet={userSelectedOutlet}
                     brandList={brandList}
+                    isEdit={true}
                   />
                 </Panel>
               </Collapse >}
@@ -1217,8 +1281,9 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         <Row key="logic_detail_row#1" gutter={24}>
           <Col className="gutter-row" sm={24} xs={24}>
             <Field
-              label={{ text: 'วันที่และเวลาของแคมเปญ' }}
+              label={{ text: 'วันที่และเวลาของแคมเปญ (ระยะเวลาเริ่มต้นอย่างน้อย 15 วัน)' }}
               name="campaign_time"
+              disabled={[true, false]}
               component={DateTimeRangePicker}
               minDate={moment(startDateSnapData).format("YYYY-MM-DD HH:mm")}
               id="campaign_time"
@@ -1288,33 +1353,34 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
           </Col>
         </Row>
         {/* Row#3 Deep Link and In-app Link */}
-        {imageUrl != '' ?
-          <Row key="logic_detail_row#3" gutter={24}>
-            <Col className="gutter-row" span={24}>
-              <label style={{ display: "block", marginBottom: "10px" }}>รูปภาพ
-                {/* <span style={{ color: "rgb(93, 93, 93)", fontWeight: 500 }}>(ขนาดไม่เกิน 1 MB)</span> */}
-              </label>
-            </Col>
+        {/* {imageUrl != '' ? */}
+        <Row key="logic_detail_row#3" gutter={24}>
+          <Col className="gutter-row" span={24}>
+            <label style={{ display: "block", marginBottom: "10px" }}>รูปภาพ
+              {/* <span style={{ color: "rgb(93, 93, 93)", fontWeight: 500 }}>(ขนาดไม่เกิน 1 MB)</span> */}
+            </label>
+          </Col>
 
-            {/* <Upload
+          <Upload
             name="file"
             id="file"
             onRemove={e => { setImageUrl('') }}
             beforeUpload={handleChangeImage}
             maxCount={1}
+            showUploadList={false}
           >
 
             <Button style={{ marginLeft: 10 }} icon={<PlusOutlined />}>เพิ่มรูป</Button>
-          </Upload> */}
+          </Upload>
 
 
-            <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
-              <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />
-            </Col>
+          <Col className="gutter-row" span={24} style={{ marginTop: "35px", marginBottom: "20px", textAlign: "center" }}>
+            <img style={{ width: 'auto', height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />
+          </Col>
 
-          </Row>
-          :
-          <></>}
+        </Row>
+        {/* :
+          <></>} */}
       </div>
     )
 

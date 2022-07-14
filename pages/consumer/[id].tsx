@@ -188,8 +188,8 @@ export default function View({ }: Props): ReactElement {
           <Col className="gutter-row" span={2}>
             ที่อยู่ {index + 1}
           </Col>
-          <Col className="gutter-row" span={20}></Col>
-          <Col className="gutter-row" span={2}>
+          <Col className="gutter-row" span={18}></Col>
+          <Col className="gutter-row" span={4} style={{ textAlign: 'end' }}>
             <Image
               width={12}
               preview={false}
@@ -226,7 +226,15 @@ export default function View({ }: Props): ReactElement {
                 render={() => (
                   <div>
                     {map(values.address, (address, index) => (
-                      <Row gutter={10}>
+                      <Row gutter={10} style={{
+                        borderTop: "2px solid #f2f2f2",
+                        borderLeft: "2px solid #f2f2f2",
+                        borderRight: "2px solid #f2f2f2",
+                        borderBottom: "2px solid #f2f2f2",
+                        padding: "20px 30px",
+                        marginBottom: "20px",
+                        borderRadius: '10px'
+                      }}>
                         <Col className="gutter-row" span={8}>
                           <Field
                             label={{ text: 'ชื่อที่อยุ่' }}
@@ -241,16 +249,17 @@ export default function View({ }: Props): ReactElement {
                         </Col>
                         <Col className="gutter-row" span={8}>
                           <Field
-                            label={{ text: 'ละติจูด ลองติจูด' }}
-                            name={`address.${index}.lat_log`}
+                            label={{ text: 'ข้อมูลการติดต่อ' }}
+                            name={`address.${index}.address_contact_name`}
                             type="text"
                             component={Input}
                             className="form-control round"
-                            placeholder="ละติจูด ลองติจูด"
+                            placeholder="ข้อมูลการติดต่อ"
                             isRange={true}
                             disabled={true}
                           />
                         </Col>
+
                         <Col className="gutter-row" span={8}>
                           <Field
                             label={{ text: 'เบอร์โทรศัพท์' }}
@@ -263,6 +272,8 @@ export default function View({ }: Props): ReactElement {
                             disabled={true}
                           />
                         </Col>
+
+
                         <Col className="gutter-row" span={24}>
                           <label>{showDefaultAddress(address.default_address, index)}</label>
                           <Field
@@ -271,6 +282,30 @@ export default function View({ }: Props): ReactElement {
                             component={Input}
                             className="form-control round"
                             placeholder="ที่อยู่"
+                            isRange={true}
+                            disabled={true}
+                          />
+                        </Col>
+                        <Col className="gutter-row" span={16}>
+                          <Field
+                            label={{ text: 'รายละเอียดที่อยู่เพิ่มเติม' }}
+                            name={`address.${index}.address_note`}
+                            type="text"
+                            component={Input}
+                            className="form-control round"
+                            placeholder="รายละเอียดที่อยู่เพิ่มเติม"
+                            isRange={true}
+                            disabled={true}
+                          />
+                        </Col>
+                        <Col className="gutter-row" span={8}>
+                          <Field
+                            label={{ text: 'ละติจูด ลองติจูด' }}
+                            name={`address.${index}.lat_log`}
+                            type="text"
+                            component={Input}
+                            className="form-control round"
+                            placeholder="ละติจูด ลองติจูด"
                             isRange={true}
                             disabled={true}
                           />

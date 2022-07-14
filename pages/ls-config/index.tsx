@@ -3,6 +3,7 @@ import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
 import Table from '@/components/Table'
 import MainLayout from '@/layout/MainLayout'
+import { retrieveToken } from '@/services/fetch/auth'
 import { deleteLsConfig, listLsConfig } from '@/services/ls-config'
 import { DeleteFilled, EditFilled, ExclamationCircleOutlined } from '@ant-design/icons'
 import {
@@ -16,6 +17,7 @@ import {
   Typography,
 } from 'antd'
 import { Field, Form, Formik } from 'formik'
+import jwt_decode from 'jwt-decode'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
@@ -63,6 +65,8 @@ export default function LogisticSubsidize({}: Props): ReactElement {
     // console.log(`reqBody`, reqBody)
     setIsLoading(true)
     const { result, success } = await listLsConfig(reqBody)
+    console.log('result: ', result)
+    console.log('success: ', success)
     if (success) {
       const { meta, data } = result
       setPagination({
@@ -74,11 +78,17 @@ export default function LogisticSubsidize({}: Props): ReactElement {
       setIsLoading(false)
       setFilter(filterObj)
     } else {
-      notification.warning({
-        message: `ผิดพลาด`,
-        description: 'ไม่สามารถค้นหา LS Config ได้',
-        duration: 3,
-      })
+      const token: string = retrieveToken()
+      const decoded: any = jwt_decode(token)
+      const exp = decoded.exp
+      const now = Math.floor(new Date().getTime() / 1000)
+      if (now <= exp) {
+        notification.warning({
+          message: `ผิดพลาด`,
+          description: 'ไม่สามารถค้นหา LS Config ได้',
+          duration: 3,
+        })
+      }
       setIsLoading(false)
     }
   }
@@ -174,11 +184,27 @@ export default function LogisticSubsidize({}: Props): ReactElement {
       },
     },
     {
-      title: 'จำนวนร้านที่ใช้งาน',
+      title: 'จำนวนร้านที่เข้าร่วม',
       dataIndex: 'total_merchant_join',
       align: 'center',
       render: (row: any) => {
         return row ? row : 0
+      },
+    },
+    {
+      title: 'วันและเวลาที่เริ่ม',
+      dataIndex: 'start_date',
+      align: 'center',
+      render: (row: any) => {
+        return moment(row).format('YYYY-MM-DD HH:mm')
+      },
+    },
+    {
+      title: 'วันและเวลาที่สิ้นสุด',
+      dataIndex: 'end_date',
+      align: 'center',
+      render: (row: any) => {
+        return moment(row).format('YYYY-MM-DD HH:mm')
       },
     },
     {
@@ -228,7 +254,15 @@ export default function LogisticSubsidize({}: Props): ReactElement {
         <Col span={8}>
           <Title level={4}>Logistic Subsidize</Title>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item><a onClick={() => { Router.push("/ls-config") }}>Logistic Subsidize</a></Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <a
+                onClick={() => {
+                  Router.push('/ls-config')
+                }}
+              >
+                Logistic Subsidize
+              </a>
+            </Breadcrumb.Item>
             <Breadcrumb.Item>รายการ Logistic Subsidize</Breadcrumb.Item>
           </Breadcrumb>
         </Col>

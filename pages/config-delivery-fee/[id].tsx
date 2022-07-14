@@ -634,6 +634,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                   } else {
                     data[index].location_type = "district"
                   }
+
                   setMockData([...data])
                 } else {
                   showDeleteConfirm(data[index].city, index, data)
@@ -750,6 +751,12 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
         let subDistrict = await fetchSubDistrictByParam(0, map1)
         let dataDefault: any
         let dataDefaults: any = []
+        let location_type: string = ""
+        if (_.get(result, "data[0].tier_locations[0].location_type") == "province") {
+          setAllCityLocation(true)
+          location_type = "district"
+        }
+
         result.data[0].tier_locations.forEach((element: any) => {
           let sub_district_option: any = _.filter(subDistrict, function (obj) {
             if (obj.city == element.district_id) {
@@ -763,7 +770,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
             city: element.district_data.name,
             city_data: element.district_data,
             city_id: element.district_id,
-            location_type: element.location_type,
+            location_type: location_type || element.location_type,
             sub_district: [],
             sub_district_option: sub_district_option,
             sub_district_selected: element.sub_district_id.substring(1, element.sub_district_id.length - 1).split("|").map((str: any) => Number(str)),
@@ -790,7 +797,6 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                   if (value.length !== 0) {
                     //renew selected list
                     dataDefaults[index].sub_district_selected = value
-
                     //check location_type
                     if (dataDefaults[index].sub_district_option.length !== value.length) {
                       dataDefaults[index].location_type = "sub_district"
@@ -824,6 +830,9 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
           }
           ]
         )
+      }
+      if (_.get(result, "data[0].tier_locations[0].province_id")) {
+        await fetchCity(result.data[0].tier_locations[0].province_id)
       }
     }
     setDeliveryFeeRuleCount(result.data[0].tier_prices.length)

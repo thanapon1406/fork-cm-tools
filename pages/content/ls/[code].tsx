@@ -338,7 +338,7 @@ export default function Ls({ }: Props): ReactElement {
                         style={{ textAlign: 'center' }}
                       >
                         <img
-                          style={{ width: 'auto', height: 180 }}
+                          style={{ width: '100%', height: 180 }}
                           alt="example"
                           src={imageUrl != '' ? imageUrl : noImage.src}
                         />

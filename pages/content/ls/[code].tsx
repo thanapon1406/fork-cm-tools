@@ -1,5 +1,4 @@
 import Card from '@/components/Card'
-import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import ReactQuill from "@/components/QuilNoSSR"
 import MainLayout from '@/layout/MainLayout'
@@ -9,9 +8,7 @@ import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import {
   Breadcrumb,
   Button,
-  Col, Modal, notification, Row,
-  Switch,
-  Typography,
+  Col, Modal, notification, Row, Typography,
   Upload
 } from 'antd'
 import { Field, Form, Formik } from 'formik'
@@ -307,7 +304,7 @@ export default function Ls({ }: Props): ReactElement {
                 </Upload>
                 <Button onClick={() => { setImageUrl('') }} style={{ marginLeft: 10 }} icon={<DeleteOutlined />} />
                 <label style={{ marginLeft: 10, color: 'red' }}>
-                  * หมายเหตุ แนะนำ รูปภาพ ขนาด 3:1 หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png
+                  * แนะนำ รูปภาพ ขนาด 2:1 360x200px หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png
                 </label>
                 <Col
                   className="gutter-row"
@@ -341,7 +338,7 @@ export default function Ls({ }: Props): ReactElement {
                         style={{ textAlign: 'center' }}
                       >
                         <img
-                          style={{ width: 'auto', height: 180 }}
+                          style={{ width: '100%', height: 180 }}
                           alt="example"
                           src={imageUrl != '' ? imageUrl : noImage.src}
                         />
@@ -368,7 +365,7 @@ export default function Ls({ }: Props): ReactElement {
                 </Col>
               </Row>
               {/* end */}
-              <Row gutter={24} style={{ paddingTop: '40px' }}>
+              {/* <Row gutter={24} style={{ paddingTop: '40px' }}>
                 <Col
                   className="gutter-row"
                   span={12}
@@ -409,7 +406,7 @@ export default function Ls({ }: Props): ReactElement {
                     </Col>
                   </Row>
                 </Col>
-              </Row>
+              </Row> */}
               <Row>
                 <Col className="gutter-row" span={8}>
                   <Button

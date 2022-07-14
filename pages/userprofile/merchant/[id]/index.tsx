@@ -27,6 +27,7 @@ import {
   topupList,
   transactionList
 } from '@/services/credit'
+import { findLsOutlet } from '@/services/ls-outlet'
 import { getAccounts, outletDetail, personalData, updateOutletStatus } from '@/services/merchant'
 import { getRiderOutletDetail } from '@/services/rider'
 import { StopOutlined } from '@ant-design/icons'
@@ -35,7 +36,7 @@ import { Field, FieldArray, Form, Formik } from 'formik'
 import _, { filter } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 
 const { Title, Text } = Typography
@@ -246,6 +247,43 @@ export default function MerchantUserView({ }: Props): ReactElement {
   ]
   // end topup list
 
+  const requestJoinLsApi: Function = findLsOutlet
+  const joinLs = useFetchTable(
+    requestJoinLsApi,
+    {
+      outlet_id: id,
+      is_show_ls_config: true,
+      status: "active"
+    },
+    { isAutoFetch: false }
+  )
+  const columnJoinLs = [
+    {
+      title: 'Logistic Subsidize ที่เข้าร่วม',
+      dataIndex: 'ls_config',
+      // align: 'center',
+      render: (row: string, record: any) => {
+        return record?.ls_config?.name
+      },
+    },
+    {
+      title: 'วันที่เข้าร่วม',
+      dataIndex: 'start_date',
+      align: 'center',
+      // render: (row: string) => {
+      //   return row ? 'เติมเงิน' : 'ใช้เครดิต'
+      // },
+    },
+    {
+      title: 'วันที่สิ้นสุด',
+      dataIndex: 'end_date',
+      align: 'center',
+      // render: (row: number) => {
+      //   return formatter.format(row)
+      // },
+    },
+  ]
+
   let [userInitialValues, setUserInitialValues] = useState({
     user_name: '',
     user_id: '',
@@ -298,6 +336,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
     is_cash: false,
     is_cash_active: false,
     is_merchant_test: false,
+    is_auto_open: false,
+    is_auto_call_rider: false,
   })
 
   const Loading = useLoadingContext()
@@ -311,6 +351,11 @@ export default function MerchantUserView({ }: Props): ReactElement {
       })
       topup.handleFetchData({
         outlet_id: id,
+      })
+      joinLs.handleFetchData({
+        outlet_id: id,
+        is_show_ls_config: true,
+        status: "active"
       })
     }
   }, [id])
@@ -356,7 +401,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
         setIsLoading(false)
         const { data = [] } = userResult
         if (data[0]) {
-          const { user = {}, staff = [], brand_name = {}, is_mass = false, delivery_setting = {} } = data[0]
+          const { user = {}, staff = [], brand_name = {}, is_mass = false } = data[0]
           const {
             email = '',
             first_name = '',
@@ -421,6 +466,7 @@ export default function MerchantUserView({ }: Props): ReactElement {
             }
           })
 
+          let delivery_setting = outletData?.delivery_setting
           const type: string = is_mass ? 'single' : 'multiple'
           setOutletInitialValues({
             ...outletInitialValues,
@@ -462,7 +508,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
             is_banks: is_banks,
             is_promptpays: is_promptpays,
             is_cash_active: is_cash_active,
-            is_merchant_test: outletData?.is_merchant_test
+            is_merchant_test: outletData?.is_merchant_test,
+            is_auto_call_rider: delivery_setting?.auto_call_rider == true
           })
         }
       }
@@ -973,6 +1020,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   </Row>
                   <Row gutter={16}>
                     <Col className="gutter-row" span={6}>
+                      <Text style={{ marginTop: '12px' }}>การค้นหาคนขับโดยอัตโนมัติ : {values.is_auto_call_rider ? "เปิด" : "ปิด"}</Text>
+                      <br />
                       <Field
                         label={{ text: 'วิธีการจัดส่ง' }}
                         name="rider_type"
@@ -1266,6 +1315,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
               {_.isEmpty(values.business_times) === false && (
                 <Row gutter={16}>
                   <Col className="gutter-row" span={6}>
+                    <Text style={{ marginTop: '12px' }}>การเปิด-ปิดร้านค้าอัตโนมัติ : {values.is_auto_open ? "เปิด" : "ปิด"}</Text>
+                    <br />
                     <Text style={{ marginTop: '12px' }}>วันเวลาที่เปิดปิด</Text>
                   </Col>
                   <Col className="gutter-row" span={18}>
@@ -1385,6 +1436,26 @@ export default function MerchantUserView({ }: Props): ReactElement {
                   </Col>
                 </Row>
               )}
+
+              <Title level={5}>ข้อมูลการเข้าร่วม Logistic Subsidize</Title>
+
+              <Row gutter={16}>
+                <Col className="gutter-row" span={24}>
+                  <Table
+                    config={{
+                      loading: joinLs.isLoading,
+                      tableName: 'merchant/ls_outlet',
+                      tableColumns: columnJoinLs,
+                      dataSource: joinLs.dataTable,
+                      handelDataTableLoad: joinLs.handelDataTableChange,
+                      pagination: joinLs.pagination,
+                      isShowRowNumber: true,
+                    }}
+                  />
+                </Col>
+
+              </Row>
+
             </Form>
           )}
         </Formik>

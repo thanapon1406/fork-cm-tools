@@ -373,7 +373,7 @@ const NotificationsBroadcastNews = (): ReactElement => {
                   </Button>
                 </Upload>
                 <label style={{ marginLeft: 10, color: 'red' }}>
-                  * หมายเหตุ แนะนำ รูปภาพ ขนาด 3:1 หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png
+                  * แนะนำ รูปภาพ ขนาด 1.8:1 328x182px หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png
                 </label>
 
                 <Col

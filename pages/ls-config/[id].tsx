@@ -42,7 +42,6 @@ interface dateTime {
   start?: any | undefined;
   end?: any | undefined;
 }
-
 interface lsConfigDetail {
   id?: string
   name?: string;
@@ -79,6 +78,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
   const [userSelectedOutlet] = useState([])
   const [isVisibleLsSummary, setIsVisibleLsSummary] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
+  const [oldAllowedList, setOldAllowedList] = useState([])
   const [loadingImage, setloadingImage] = useState(false)
   const [disableSubmitButton, setDisableSubmitButton] = useState(false)
   const [startDateSnapData, setstartDateSnapData] = useState(new Date())
@@ -231,6 +231,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
       }
       LsConfigDetail.is_apply_all_brand = is_apply_all_brand
 
+      setOldAllowedList(lsDetail["allowed_list"])
       setLsDetail(LsConfigDetail)
       setIsLoading(false)
     } else {
@@ -448,6 +449,8 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     // Construct Allow List
     const lsOutlet = _.get(values, "ls_outlet") ? _.get(values, "ls_outlet") : []
     let allowedList: any = []
+    let allowedOutletList: any = []
+
     if (values.is_apply_all_brand) {
       const brandData = {
         brand_id: 0
@@ -465,6 +468,10 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
                 outlet_id: outletId
               }
               outlets.push(outletData)
+              allowedOutletList.push({
+                brand_id: brandId,
+                outlet_id: outletId
+              })
             })
           }
           const brandData = {
@@ -477,6 +484,32 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
     }
 
     values.image_link = imageUrl
+    let oldOutletList: any = []
+    oldAllowedList?.map((oldAllowed: any) => {
+      oldAllowed?.outlets?.map((item: any) => {
+        oldOutletList.push(item)
+      })
+    })
+
+    let removeOutlets: any = []
+    if (_.size(oldOutletList) > 0) {
+      oldOutletList?.map((oldOutlet: any) => {
+        if (_.size(allowedOutletList) > 0) {
+          let isFound = allowedOutletList.find((o: any) => {
+            if (oldOutlet.brand_id === o.brand_id && oldOutlet.outlet_id === o.outlet_id) {
+              return true
+            }
+          })
+
+          if (!isFound) {
+            removeOutlets.push({
+              outlet_id: oldOutlet.outlet_id,
+              brand_id: oldOutlet.brand_id
+            })
+          }
+        }
+      })
+    }
 
     const payload = {
       data: {
@@ -486,7 +519,8 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         end_date: _.get(values, "end_date") ? _.get(values, "end_date") : "",
         allowed_list: allowedList,
         image_link: _.get(values, "image_link") ? _.get(values, "image_link") : "",
-        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
+        total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0,
+        remove_outlets: removeOutlets
       }
     }
 

@@ -344,7 +344,7 @@ export default function Ls({ }: Props): ReactElement {
                         />
                       </Col>
                     </Row>
-                    <Row gutter={24}>
+                    {/* <Row gutter={24}>
                       <Col
                         className="gutter-row"
                         span={24}
@@ -352,13 +352,13 @@ export default function Ls({ }: Props): ReactElement {
                       >
                         <strong><label style={{ display: 'block', paddingTop: '20px' }}>{values.name}</label></strong>
                       </Col>
-                    </Row>
+                    </Row> */}
                     <Row gutter={24}>
                       <Col
                         className="gutter-row"
                         span={24}
                       >
-                        <div style={{ display: 'block', marginBottom: '10px' }} dangerouslySetInnerHTML={{ __html: values.description }} />
+                        <div style={{ display: 'block', marginBottom: '10px', paddingTop: '20px' }} dangerouslySetInnerHTML={{ __html: values.description }} />
                       </Col>
                     </Row>
                   </div>

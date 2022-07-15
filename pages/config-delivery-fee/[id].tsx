@@ -763,6 +763,9 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
               return true;
             }
           });
+
+          var sub_district_selected = element.sub_district_id.substring(1, element.sub_district_id.length - 1).split("|").map((str: any) => Number(str))
+
           dataDefault = {
             province: element.province_data.name,
             province_data: element.province_data,
@@ -773,7 +776,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
             location_type: location_type || element.location_type,
             sub_district: [],
             sub_district_option: sub_district_option,
-            sub_district_selected: element.sub_district_id.substring(1, element.sub_district_id.length - 1).split("|").map((str: any) => Number(str)),
+            sub_district_selected: (sub_district_selected[0] !== 0 ? sub_district_selected : []),
             name: Math.floor(Math.random() * 1000).toString()
           }
           dataDefaults.push(dataDefault)

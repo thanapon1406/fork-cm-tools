@@ -509,7 +509,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
             is_promptpays: is_promptpays,
             is_cash_active: is_cash_active,
             is_merchant_test: outletData?.is_merchant_test,
-            is_auto_call_rider: delivery_setting?.auto_call_rider == true
+            is_auto_call_rider: delivery_setting?.auto_call_rider == true,
+            is_auto_open: outletData?.is_auto_open
           })
         }
       }

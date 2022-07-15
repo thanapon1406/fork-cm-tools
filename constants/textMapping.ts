@@ -168,6 +168,7 @@ export const orderStatusMapping: any = {
   arrived: 'จัดส่งแล้ว',
   success: 'สำเร็จ',
   cancel: 'ยกเลิก',
+  prepare_order: 'รอเรียกไรเดอร์'
 }
 
 export const merchantStatusMapping: any = {

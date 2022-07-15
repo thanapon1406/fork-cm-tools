@@ -516,6 +516,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         respObj.statusEnum = Constant.CANCEL
         respObj.status = 'ยกเลิกออเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
+      } else if (
+        merchant_status === Constant.RIDER_REJECT
+      ) {
+        respObj.statusEnum = Constant.RIDER_REJECT
+        respObj.status = 'ยกเลิกไรเดอร์'
+        respObj.imagePath = '/asset/images/cancel.png'
       } else if (order_status === Constant.WAITING) {
         respObj.status = 'ออเดอร์ใหม่'
         respObj.imagePath = '/asset/images/new-order.png'

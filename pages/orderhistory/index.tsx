@@ -4,7 +4,7 @@ import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import {
-  merchantStatus,
+  autoCallRiderOption, merchantStatus,
   merchantTestOption,
   orderStatus,
   paymentChannelOption,
@@ -228,6 +228,7 @@ const OrderHistory = (): ReactElement => {
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
       exclude_outlet_ids: excludeOutletIds,
       include_outlet_ids: includeOutletIds,
+      auto_call_rider: values.auto_call_rider || ''
     })
   }
 
@@ -265,6 +266,7 @@ const OrderHistory = (): ReactElement => {
       delivery_type: 'delivery',
       exclude_outlet_ids: excludeOutletIds,
       include_outlet_ids: includeOutletIds,
+      auto_call_rider: values.auto_call_rider || ''
     }
 
     const { result, success } = await exportOrderTransaction(req)
@@ -306,17 +308,7 @@ const OrderHistory = (): ReactElement => {
                     id="order_number"
                     placeholder="เลขออเดอร์"
                   />
-
-                  <Field
-                    label={{ text: 'สถานะออเดอร์' }}
-                    name="status"
-                    component={Select}
-                    id="status"
-                    placeholder="สถานะออเดอร์"
-                    selectOption={orderStatus}
-                  />
                 </Col>
-
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ชื่อร้านค้า' }}
@@ -332,17 +324,7 @@ const OrderHistory = (): ReactElement => {
                     allowClear={true}
                     onClear={onClearMerchant}
                   />
-
-                  <Field
-                    label={{ text: 'สถานะร้านค้า' }}
-                    name="merchant_status"
-                    component={Select}
-                    id="merchant_status"
-                    placeholder="สถานะร้านค้า"
-                    selectOption={merchantStatus}
-                  />
                 </Col>
-
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ชื่อไรเดอร์' }}
@@ -358,16 +340,7 @@ const OrderHistory = (): ReactElement => {
                     allowClear={true}
                     onClear={onClearRider}
                   />
-                  <Field
-                    label={{ text: 'สถานะไรเดอร์' }}
-                    name="rider_status"
-                    component={Select}
-                    id="rider_status"
-                    placeholder="สถานะไรเดอร์"
-                    selectOption={riderStatus}
-                  />
                 </Col>
-
                 <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'ชื่อลูกค้า' }}
@@ -383,7 +356,52 @@ const OrderHistory = (): ReactElement => {
                     allowClear={true}
                     onClear={onClearCustomer}
                   />
-
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={6}>
+                  <Field
+                    label={{ text: 'การค้นหาไรเดอร์อัตโนมัติ' }}
+                    name="auto_call_rider"
+                    component={Select}
+                    id="auto_call_rider"
+                    placeholder="การค้นหาไรเดอร์อัตโนมัติ"
+                    selectOption={autoCallRiderOption}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'สถานะออเดอร์' }}
+                    name="status"
+                    component={Select}
+                    id="status"
+                    placeholder="สถานะออเดอร์"
+                    selectOption={orderStatus}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'สถานะร้านค้า' }}
+                    name="merchant_status"
+                    component={Select}
+                    id="merchant_status"
+                    placeholder="สถานะร้านค้า"
+                    selectOption={merchantStatus}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
+                    label={{ text: 'สถานะไรเดอร์' }}
+                    name="rider_status"
+                    component={Select}
+                    id="rider_status"
+                    placeholder="สถานะไรเดอร์"
+                    selectOption={riderStatus}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col className="gutter-row" span={6}>
                   <Field
                     label={{ text: 'วันเวลาที่ทำรายการ' }}
                     name="client_time"

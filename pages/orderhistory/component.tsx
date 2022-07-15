@@ -1,7 +1,6 @@
 import Table from '@/components/Table'
 import {
-  merchantStatusMapping,
-  orderStatusMapping,
+  merchantStatusMapping, merchantStatusMappingAutoCallRider, orderStatusMapping,
   paymentChannel,
   riderStatusMapping
 } from '@/constants/textMapping'
@@ -239,7 +238,7 @@ const columns = [
     render: (text: any, record: any) => {
       return (
         <Badge
-          text={merchantStatusMapping[text] || 'กำลังดำเนินการ'}
+          text={record.auto_call_rider == true ? merchantStatusMappingAutoCallRider[text] : merchantStatusMapping[text] || 'กำลังดำเนินการ'}
           status={bageStatusMapping(text)}
           size="default"
         />

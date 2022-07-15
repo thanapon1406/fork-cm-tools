@@ -9,6 +9,22 @@ export const merchantTestOption = [
   },
 ]
 
+export const autoCallRiderOption = [
+  {
+    name: 'ทั้งหมด',
+    value: '',
+  },
+  {
+    name: 'เปิด',
+    value: 'true',
+  },
+  {
+    name: 'ปิด',
+    value: 'false',
+  },
+]
+
+
 export const orderStatus = [
   {
     name: 'ทุกสถานะ',

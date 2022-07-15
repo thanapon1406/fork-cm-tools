@@ -14,7 +14,7 @@ import { isEmpty, map } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import EkycComponent from 'pages/ekyc/component'
-import { default as React, ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import OrderHistoryComponent from '../orderhistory/component'
 import CustomBadge from '../userprofile/rider/[id]/style'
 const { Title } = Typography

@@ -9,7 +9,7 @@ import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
 import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
-import { Badge, Card, TablePaginationConfig } from 'antd'
+import { Badge, Card, TablePaginationConfig, Tooltip } from 'antd'
 import { isEmpty, isNull, isUndefined } from 'lodash'
 import { default as Moment } from 'moment'
 import { useRouter } from 'next/router'
@@ -52,9 +52,14 @@ const columns = [
     key: 'outlet_name',
     width: '200px',
     wrap: true,
+    ellipsis: { showTitle: false },
     center: true,
     render: (text: any, record: any) => {
-      return record.outlet_name
+      return (
+        <Tooltip placement="topLeft" title={record.outlet_name}>
+          {record.outlet_name}
+        </Tooltip>
+      )
     },
   },
   {

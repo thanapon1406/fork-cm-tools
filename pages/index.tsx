@@ -182,7 +182,7 @@ const CancelGroup = [
 
 type FormInterFace = {
   picker_type: 'date' | 'week' | 'month'
-  dates: [Moment, Moment]
+  dates: [Moment, Moment],
 }
 
 type PieDataInterface = {

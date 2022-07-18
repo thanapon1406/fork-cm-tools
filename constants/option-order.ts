@@ -66,6 +66,10 @@ export const merchantStatus = [
     value: 'accept_order',
   },
   {
+    name: 'ยืนยันการชำระเงิน',
+    value: 'confirm_payment',
+  },
+  {
     name: 'กำลังปรุง',
     value: 'cooking',
   },

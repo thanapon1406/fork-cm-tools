@@ -185,7 +185,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
       },
     },
     {
-      title: 'จำนวนร้านที่เข้าร่วม',
+      title: 'ร้านค้าที่เข้าร่วมแคมเปญ LS',
       dataIndex: 'total_merchant_join',
       align: 'center',
       render: (row: any, record: any) => {

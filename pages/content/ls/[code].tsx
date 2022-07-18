@@ -338,13 +338,13 @@ export default function Ls({ }: Props): ReactElement {
                         style={{ textAlign: 'center' }}
                       >
                         <img
-                          style={{ width: '100%', height: 180 }}
+                          style={{ maxWidth: '100%', height: 180 }}
                           alt="example"
                           src={imageUrl != '' ? imageUrl : noImage.src}
                         />
                       </Col>
                     </Row>
-                    <Row gutter={24}>
+                    {/* <Row gutter={24}>
                       <Col
                         className="gutter-row"
                         span={24}
@@ -352,13 +352,13 @@ export default function Ls({ }: Props): ReactElement {
                       >
                         <strong><label style={{ display: 'block', paddingTop: '20px' }}>{values.name}</label></strong>
                       </Col>
-                    </Row>
+                    </Row> */}
                     <Row gutter={24}>
                       <Col
                         className="gutter-row"
                         span={24}
                       >
-                        <div style={{ display: 'block', marginBottom: '10px' }} dangerouslySetInnerHTML={{ __html: values.description }} />
+                        <div style={{ display: 'block', marginBottom: '10px', paddingTop: '20px' }} dangerouslySetInnerHTML={{ __html: values.description }} />
                       </Col>
                     </Row>
                   </div>

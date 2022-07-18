@@ -41,6 +41,7 @@ export interface requestReportInterface {
   province_id?: string
   order_status?: string
   food_type?: string
+  auto_call_rider?: string
 }
 
 export const getOrderTransaction = async (params: requestReportInterface) => {

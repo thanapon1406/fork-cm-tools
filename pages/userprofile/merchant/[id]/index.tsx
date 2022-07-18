@@ -270,17 +270,17 @@ export default function MerchantUserView({ }: Props): ReactElement {
       title: 'วันที่เข้าร่วม',
       dataIndex: 'start_date',
       align: 'center',
-      // render: (row: string) => {
-      //   return row ? 'เติมเงิน' : 'ใช้เครดิต'
-      // },
+      render: (row: any) => {
+        return row ? moment(row).format('YYYY-MM-DD') : ''
+      },
     },
     {
       title: 'วันที่สิ้นสุด',
       dataIndex: 'end_date',
       align: 'center',
-      // render: (row: number) => {
-      //   return formatter.format(row)
-      // },
+      render: (row: any) => {
+        return row ? moment(row).format('YYYY-MM-DD') : ''
+      },
     },
   ]
 
@@ -509,7 +509,8 @@ export default function MerchantUserView({ }: Props): ReactElement {
             is_promptpays: is_promptpays,
             is_cash_active: is_cash_active,
             is_merchant_test: outletData?.is_merchant_test,
-            is_auto_call_rider: delivery_setting?.auto_call_rider == true
+            is_auto_call_rider: delivery_setting?.auto_call_rider == true,
+            is_auto_open: outletData?.is_auto_open
           })
         }
       }

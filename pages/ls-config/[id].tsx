@@ -491,26 +491,26 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
       })
     })
 
-    let removeOutlets: any = []
-    if (_.size(oldOutletList) > 0) {
-      oldOutletList?.map((oldOutlet: any) => {
-        if (_.size(allowedOutletList) > 0) {
-          let isFound = allowedOutletList.find((o: any) => {
-            if (oldOutlet.brand_id === o.brand_id && oldOutlet.outlet_id === o.outlet_id) {
-              return true
-            }
-          })
+    // let removeOutlets: any = []
+    // if (_.size(oldOutletList) > 0) {
+    //   oldOutletList?.map((oldOutlet: any) => {
+    //     if (_.size(allowedOutletList) > 0) {
+    //       let isFound = allowedOutletList.find((o: any) => {
+    //         if (oldOutlet.brand_id === o.brand_id && oldOutlet.outlet_id === o.outlet_id) {
+    //           return true
+    //         }
+    //       })
 
-          if (!isFound) {
-            removeOutlets.push({
-              outlet_id: oldOutlet.outlet_id,
-              brand_id: oldOutlet.brand_id
-            })
-          }
-        }
-      })
-    }
-
+    //       if (!isFound) {
+    //         removeOutlets.push({
+    //           outlet_id: oldOutlet.outlet_id,
+    //           brand_id: oldOutlet.brand_id
+    //         })
+    //       }
+    //     }
+    //   })
+    // }
+    // console.log("removeOutlets: ", removeOutlets)
     const payload = {
       data: {
         id: id,
@@ -520,7 +520,7 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
         allowed_list: allowedList,
         image_link: _.get(values, "image_link") ? _.get(values, "image_link") : "",
         total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0,
-        remove_outlets: removeOutlets
+        // remove_outlets: removeOutlets
       }
     }
 

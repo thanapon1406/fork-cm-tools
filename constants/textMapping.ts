@@ -200,5 +200,5 @@ export const merchantStatusMappingAutoCallRider: any = {
   cooked: 'ปรุงสำเร็จ',
   success: 'สำเร็จ',
   cancel: 'ยกเลิก',
-  rider_reject: 'ไม่มีไรเดอร์รับงาน'
+  rider_reject: 'ยกเลิก'
 }

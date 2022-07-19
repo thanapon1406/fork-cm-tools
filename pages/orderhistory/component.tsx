@@ -21,13 +21,7 @@ interface Props {
 }
 
 const bageStatusMapping = (text: string) => {
-  const status =
-    text !== 'success' && text !== 'cancel'
-      ? 'processing'
-      : text === 'success'
-        ? 'success'
-        : 'error'
-
+  const status = (text === 'rider_reject') ? 'error' : (text !== 'success' && text !== 'cancel') ? 'processing' : (text === 'success') ? 'success' : 'error'
   return status
 }
 
@@ -236,6 +230,8 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
+      console.log(record);
+      console.log(record.auto_call_rider);
       return (
         <Badge
           text={record.auto_call_rider == true ? merchantStatusMappingAutoCallRider[text] : merchantStatusMapping[text] || 'กำลังดำเนินการ'}

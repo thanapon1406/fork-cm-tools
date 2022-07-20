@@ -141,7 +141,7 @@ const LsSummaryComponent = ({
   const ssoId = router.query.sso_id as string
 
   const betweenArray = (x: any, y: any, min: any, max: any) => {
-    if (x == 0 && min < 1 && min != 0) {
+    if (x === 0 && min % 1 !== 0) {
       x = min
     } else {
       x += 0.1

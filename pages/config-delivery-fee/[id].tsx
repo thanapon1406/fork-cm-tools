@@ -738,14 +738,16 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       include: "location",
     }
     const { result, success } = await tierPriceList(request)
+    let setInitial: initialValues = {}
     if (success && _.get(result, "data[0]")) {
-      setInitialValues({
+      setInitial = {
         name: result.data[0].name,
         tier_prices: result.data[0].tier_prices,
         total_district: result.data[0].total_district,
         total_province: result.data[0].total_province,
         total_sub_district: result.data[0].total_sub_district,
-      })
+      }
+
       if (_.get(result, "data[0].tier_locations")) {
         const map1 = result.data[0].tier_locations.map((x: any) => x.district_id)
         let subDistrict = await fetchSubDistrictByParam(0, map1)
@@ -754,6 +756,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
         let location_type: string = ""
         if (_.get(result, "data[0].tier_locations[0].location_type") == "province") {
           setAllCityLocation(true)
+          setInitial.all_city = true
           location_type = "district"
         }
 
@@ -835,9 +838,12 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
         )
       }
       if (_.get(result, "data[0].tier_locations[0].province_id")) {
+        setInitial.province_id = result.data[0].tier_locations[0].province_id
+        setParams({ sub_district_id: undefined, district_id: undefined, province_id: String(result.data[0].tier_locations[0].province_id) })
         await fetchCity(result.data[0].tier_locations[0].province_id)
       }
     }
+    setInitialValues(setInitial)
     setDeliveryFeeRuleCount(result.data[0].tier_prices.length)
   }
 
@@ -958,6 +964,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
 
                         if (setFieldValue) {
                           setFieldValue("province_id", value)
+                          setFieldValue("all_city", false)
                           setFieldValue('district_id', null)
                           setFieldValue('sub_district_id', [])
                         }

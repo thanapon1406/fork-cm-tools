@@ -415,6 +415,15 @@ export default function UpdateLsConfig({ }: Props): ReactElement {
 
   const handleSubmit = async (values: any) => {
     setDisableSubmitButton(true)
+    const type = values["type"]
+    if (type == CUSTOMER_PAY) {
+      values.discount_type = BAHT
+      values.ls_type = PERCENT
+    } else if (type == SUBSIDIZE) {
+      values.discount_type = ""
+      values.discount_amount = 0
+    }
+
     // console.log("update ls config: ", values)
     // Construct Outlets
     let outlets = []

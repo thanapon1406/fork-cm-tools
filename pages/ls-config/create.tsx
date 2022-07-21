@@ -368,6 +368,7 @@ export default function CreateLsConfig({ }: Props): ReactElement {
       values.ls_type = PERCENT
     } else if (type == SUBSIDIZE) {
       values.discount_type = ""
+      values.discount_amount = 0
     }
 
     // Construct Outlets

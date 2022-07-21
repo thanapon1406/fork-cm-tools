@@ -144,7 +144,7 @@ export default function LogisticSubsidize({ }: Props): ReactElement {
       dataIndex: 'end_date',
       align: 'center',
       render: (row: any) => {
-        return moment(row).format('YYYY-MM-DD HH:mm')
+        return row !== undefined ? moment(row).format('YYYY-MM-DD HH:mm') : "-"
       },
     },
 

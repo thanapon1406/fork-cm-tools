@@ -362,14 +362,6 @@ export default function CreateLsConfig({ }: Props): ReactElement {
 
   const handleSubmit = async (values: typeof lsDetail) => {
     setDisableSubmitButton(true)
-    const type = values["type"]
-    if (type == CUSTOMER_PAY) {
-      values.discount_type = BAHT
-      values.ls_type = PERCENT
-    } else if (type == SUBSIDIZE) {
-      values.discount_type = ""
-      values.discount_amount = 0
-    }
 
     // Construct Outlets
     let outlets = []
@@ -457,6 +449,16 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         total_merchant_add: _.get(outletLocationDetail, "total_merchant_add") ? _.get(outletLocationDetail, "total_merchant_add") : 0
       }
     }
+
+    const type = values["type"]
+    if (type == CUSTOMER_PAY) {
+      payload.data.discount_type = BAHT
+      payload.data.ls_type = PERCENT
+    } else if (type == SUBSIDIZE) {
+      delete payload.data.discount_type
+      delete payload.data.discount_amount
+    }
+
     // console.log("payload", payload)
     const { result, success } = await createLsConfig(payload)
     if (success) {

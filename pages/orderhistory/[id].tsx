@@ -523,8 +523,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         respObj.status = 'ยกเลิกไรเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
       } else if (order_status === Constant.WAITING) {
-        respObj.status = 'ออเดอร์ใหม่'
-        respObj.imagePath = '/asset/images/new-order.png'
+        if (orderHistoryData?.remark == "RIDER_REJECTED") {
+          respObj.status = 'รอร้านค้าเรียกไรเดอร์ใหม่'
+          respObj.imagePath = '/asset/images/delivery.png'
+        } else {
+          respObj.status = 'ออเดอร์ใหม่'
+          respObj.imagePath = '/asset/images/new-order.png'
+        }
       } else if (merchant_status === Constant.COOKING) {
         respObj.status = 'กำลังปรุง'
         respObj.imagePath = '/asset/images/cook.png'

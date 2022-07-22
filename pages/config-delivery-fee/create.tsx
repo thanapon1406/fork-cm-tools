@@ -47,18 +47,16 @@ interface CityInterface {
   name_en: string
 }
 
-const initialValues = {
-  name: '',
-  sub_district_id: [],
-  tier_prices: [
-    {
-      min: 0,
-      max: '',
-      price: '',
-    }
-  ],
-  hub_ids: [],
-  all_city: false
+interface initialValues {
+  name: string;
+  sub_district_id: never[];
+  tier_prices: {
+    min: number;
+    max: string;
+    price: string;
+  }[];
+  hub_ids: never[];
+  all_city: boolean;
 }
 
 const Schema = Yup.object().shape({
@@ -102,6 +100,19 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   const [districtData, setSubDistrciData] = useState<Array<DistrictInterface>>([])
   const [showError, setShowError] = useState(false)
   const [showErrorResult, setShowErrorResult] = useState<any>([])
+  let [initialValues, setInitialValues] = useState<initialValues>({
+    name: '',
+    sub_district_id: [],
+    tier_prices: [
+      {
+        min: 0,
+        max: '',
+        price: '',
+      }
+    ],
+    hub_ids: [],
+    all_city: false
+  })
 
   let [mockData, setMockData] = useState<any>([])
   let [isLoading, setIsLoading] = useState(true)
@@ -145,21 +156,30 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
   const renderErrorMessage = (values: any, setFieldValue: any) => {
     let errorRow = []
     let keyword = ""
-    for (let i = 0; i < showErrorResult.length; i++) {
-      if (_.get(showErrorResult[i], "sub_district") && showErrorResult[i].sub_district.length > 0) {
-        keyword = `-อำเภอ ${showErrorResult[i].district.name} มีการระบุตำบล (${showErrorResult[i].sub_district.join(",")}) ซ้ำ`
-      } else {
-        keyword = `-มีการระบุอำเภอ${showErrorResult[i].district.name}แล้ว หากคุณต้องการเจาะจงระดับตำบล กรุณาระบุเฉพาะตำบลที่คุณต้องการเพิ่ม`
+    if (showErrorResult.length > 0) {
+      for (let i = 0; i < showErrorResult.length; i++) {
+        if (_.get(showErrorResult[i], "sub_district") && showErrorResult[i].sub_district.length > 0) {
+          keyword = `-อำเภอ ${showErrorResult[i].district.name} มีการระบุตำบล (${showErrorResult[i].sub_district.join(",")}) ซ้ำ`
+        } else {
+          keyword = `-มีการระบุอำเภอ${showErrorResult[i].district.name}แล้ว หากคุณต้องการเจาะจงระดับตำบล กรุณาระบุเฉพาะตำบลที่คุณต้องการเพิ่ม`
+        }
+        errorRow.push(
+          <Col span={24}>
+            {keyword}
+          </Col>
+        )
       }
+    } else {
       errorRow.push(
         <Col span={24}>
-          {keyword}
+          {`กรุณาเลือกพื้นที่`}
         </Col>
       )
     }
+
     return (
       <Row style={{ color: "red" }}>
-        <Col span={24}>พบพื้นที่ซ้ำซ้อนกับ config อื่น</Col>
+        {showErrorResult.length > 0 && <Col span={24}>พบพื้นที่ซ้ำซ้อนกับ config อื่น</Col>}
         {errorRow}
       </Row>)
   }
@@ -350,127 +370,130 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
       total_district = total_district + 1,
         total_sub_district = total_sub_district + element.sub_district_selected.length
     });
-
-    const reqCreateTierPrice: any = {
-      data: {
-        name: values.name,
-        tier_prices: tier_prices,
-        total_province: total_province,
-        total_district: total_district,
-        total_sub_district: total_sub_district
-      }
-    }
-    const responseTierPrice = await tierPriceCreate(reqCreateTierPrice)
-
-
-    if (responseTierPrice.result.tier_id && mockData.length > 0) {
-      let location_type = "province"
-      let locations: any[] = []
-      let location = {}
-      let sub_districts: any[] = []
-      let sub_district: any
-
-      let checkSubDistrict = _.find(mockData, function (obj) {
-        if ("sub_district" == obj.location_type) {
-          return true;
-        }
-      });
-
-      mockData.forEach((data: any) => {
-
-        //sub_district_data
-        data.sub_district_selected.forEach((element: any) => {
-          sub_district = _.find(data.sub_district_option, function (obj) {
-            if (element == obj.value) {
-              return true;
-            }
-          });
-          sub_districts.push(
-            {
-              id: sub_district.value,
-              name: sub_district.name
-            }
-          )
-        });
-
-        //location_type
-        if (cityList.length !== mockData.length || (cityList.length == mockData.length && checkSubDistrict) || checkSubDistrict) {
-          location_type = data.location_type
-        }
-
-        location = {
-          location_type: location_type,
-          province_id: data.province_id,
-          province_data: {
-            id: data.province_data.value,
-            name: data.province_data.name
-          },
-          district_id: data.city_id,
-          district_data: {
-            id: data.city_data.value,
-            name: data.city_data.name
-          },
-          sub_district_id: `|${data.sub_district_selected.join("|")}|`,
-          sub_districts: sub_districts
-        }
-        locations.push(location)
-      });
-
-      const reqCreateTierPriceLocation: any = {
+    if (mockData.length == 0) {
+      setShowError(true)
+      setShowErrorResult([])
+    } else {
+      const reqCreateTierPrice: any = {
         data: {
-          tier_id: responseTierPrice.result.tier_id,
-          locations: locations
+          name: values.name,
+          tier_prices: tier_prices,
+          total_province: total_province,
+          total_district: total_district,
+          total_sub_district: total_sub_district
         }
       }
+      const responseTierPrice = await tierPriceCreate(reqCreateTierPrice)
 
-      const { success, result } = await tierPriceLocationCreate(reqCreateTierPriceLocation)
-      if (success && result.message !== "Error") {
-        notification.success({
-          message: `บันทึกข้อมูลสำเร็จ`,
-          description: '',
-          duration: 3,
-        })
-        router.push('/config-delivery-fee');
-      } else {
-        notification.warning({
-          message: `ผิดพลาด`,
-          description: 'ไม่สามารถเพิ่มพื้นที่ได้ เนื่องจากมีพื้นที่ซ้อนทับกับ config อื่น',
-          duration: 3,
-        })
-      }
+      if (responseTierPrice.result.tier_id && mockData.length > 0) {
+        let location_type = "province"
+        let locations: any[] = []
+        let location = {}
+        let sub_districts: any[] = []
+        let sub_district: any
 
-      if (_.get(result, "validate[0]") || _.get(result, "tier_duplicate_location")) {
-        setShowError(true)
-        result.validate.forEach((element: any, index: number) => {
-          let districtData: any = _.find(locations, function (obj) {
-            if (obj.district_id == element.district) {
-              return true;
-            }
-          });
-          result.validate[index].district = districtData.district_data
-
-          let sub_districtDatas: any = []
-
-          if (districtData.location_type !== "district") {
-            _.get(result, `validate[${index}].sub_district`, []).forEach((subdistrictId: any) => {
-              let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
-                if (obj.id == subdistrictId) {
-                  return true;
-                }
-              });
-              sub_districtDatas.push(sub_districtData.name)
-            });
+        let checkSubDistrict = _.find(mockData, function (obj) {
+          if ("sub_district" == obj.location_type) {
+            return true;
           }
-          result.validate[index].sub_district = sub_districtDatas
         });
-        const reqCreateTierPriceDelete: any = {
-          id: responseTierPrice.result.tier_id,
+
+        mockData.forEach((data: any) => {
+
+          //sub_district_data
+          data.sub_district_selected.forEach((element: any) => {
+            sub_district = _.find(data.sub_district_option, function (obj) {
+              if (element == obj.value) {
+                return true;
+              }
+            });
+            sub_districts.push(
+              {
+                id: sub_district.value,
+                name: sub_district.name
+              }
+            )
+          });
+
+          //location_type
+          if (cityList.length !== mockData.length || (cityList.length == mockData.length && checkSubDistrict) || checkSubDistrict) {
+            location_type = data.location_type
+          }
+
+          location = {
+            location_type: location_type,
+            province_id: data.province_id,
+            province_data: {
+              id: data.province_data.value,
+              name: data.province_data.name
+            },
+            district_id: data.city_id,
+            district_data: {
+              id: data.city_data.value,
+              name: data.city_data.name
+            },
+            sub_district_id: `|${data.sub_district_selected.join("|")}|`,
+            sub_districts: sub_districts
+          }
+          locations.push(location)
+        });
+
+        const reqCreateTierPriceLocation: any = {
+          data: {
+            tier_id: responseTierPrice.result.tier_id,
+            locations: locations
+          }
         }
-        await tierPriceDelete(reqCreateTierPriceDelete)
-        setShowErrorResult(result.validate)
+
+        const { success, result } = await tierPriceLocationCreate(reqCreateTierPriceLocation)
+        if (success && result.message !== "Error") {
+          notification.success({
+            message: `บันทึกข้อมูลสำเร็จ`,
+            description: '',
+            duration: 3,
+          })
+          router.push('/config-delivery-fee');
+        } else {
+          notification.warning({
+            message: `ผิดพลาด`,
+            description: 'ไม่สามารถเพิ่มพื้นที่ได้ เนื่องจากมีพื้นที่ซ้อนทับกับ config อื่น',
+            duration: 3,
+          })
+        }
+
+        if (_.get(result, "validate[0]") || _.get(result, "tier_duplicate_location")) {
+          setShowError(true)
+          result.validate.forEach((element: any, index: number) => {
+            let districtData: any = _.find(locations, function (obj) {
+              if (obj.district_id == element.district) {
+                return true;
+              }
+            });
+            result.validate[index].district = districtData.district_data
+
+            let sub_districtDatas: any = []
+
+            if (districtData.location_type !== "district") {
+              _.get(result, `validate[${index}].sub_district`, []).forEach((subdistrictId: any) => {
+                let sub_districtData: any = _.find(districtData.sub_districts, function (obj) {
+                  if (obj.id == subdistrictId) {
+                    return true;
+                  }
+                });
+                sub_districtDatas.push(sub_districtData.name)
+              });
+            }
+            result.validate[index].sub_district = sub_districtDatas
+          });
+          const reqCreateTierPriceDelete: any = {
+            id: responseTierPrice.result.tier_id,
+          }
+          await tierPriceDelete(reqCreateTierPriceDelete)
+          setShowErrorResult(result.validate)
+        }
+      } else if (responseTierPrice.result.tier_id) {
+        router.push('/config-delivery-fee');
       }
-    } else if (responseTierPrice.result.tier_id) {
-      router.push('/config-delivery-fee');
     }
   }
 
@@ -518,7 +541,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
     let data: any = []
     let location_type: string = ""
     let newData: any
-
+    setShowError(false)
     if (await validateTierPrice()) {
       if (allCityLocation) {
         const allCityData = await allCity()
@@ -616,7 +639,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
               }}
               selectOption={record.sub_district_option}
               value={record.sub_district_selected}
-              name={record.name}
+              name={`location[${record.city_id}]`}
             />)
           },
         }, {
@@ -660,6 +683,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                 max: '',
                 price: '',
               })
+
               setFieldValue("tier_prices", deliveryFeeValue)
               setDeliveryFeeRuleValidate(false)
             }

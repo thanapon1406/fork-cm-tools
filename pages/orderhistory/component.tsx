@@ -12,7 +12,7 @@ import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
 import { CheckCircleTwoTone } from '@ant-design/icons'
 import { Badge, Card, TablePaginationConfig, Tooltip } from 'antd'
-import { isEmpty, isNull, isUndefined } from 'lodash'
+import { get, isEmpty, isNull, isUndefined } from 'lodash'
 import { default as Moment } from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
@@ -215,19 +215,22 @@ const columns = [
   },
   {
     title: 'โปร LS',
-    dataIndex: 'ls_config',
+    dataIndex: 'ls_id',
     align: 'center',
-    key: 'ls_config',
+    key: 'ls_id',
     width: '100px',
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
+      const lsName = get(record, 'ls_name')
       return (
-        <>
-          <Tooltip title="กรณีที่ออเดอร์ไม่มีการใช้โปรฯ LS" placement="rightTop">
-            <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: '19px' }} />
-          </Tooltip>
-        </>
+        text > 0 && (
+          <>
+            <Tooltip title={lsName} placement="rightTop">
+              <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: '19px' }} />
+            </Tooltip>
+          </>
+        )
       )
     },
   },

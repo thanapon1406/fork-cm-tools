@@ -473,6 +473,23 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           )
         }
       }
+    } else if (orderStatusHistoryData.current_status_info.rider_status === Constant.WAITING) {
+      if (orderStatusHistoryData?.event == "MERCHANT_LIMIT_ACCEP_ORDER") {
+        return (
+          <>
+            <div>
+              <div>
+                ร้านค้าไม่รับออเดอร์ภายใน 4.30 นาที
+              </div>
+              <div>
+                ยกเลิกโดย system
+              </div>
+              <div>{Moment(orderStatusHistoryData?.created_at).format(Constant.DATE_FORMAT)}</div>
+            </div>
+          </>
+        )
+      }
+
     } else {
       return Moment(orderStatusHistoryData.created_at).format(Constant.DATE_FORMAT)
     }
@@ -526,6 +543,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         if (orderHistoryData?.event == "RIDER_REJECTED") {
           respObj.status = 'รอร้านค้าเรียกไรเดอร์ใหม่'
           respObj.imagePath = '/asset/images/delivery.png'
+        } else if (orderHistoryData?.event == "MERCHANT_LIMIT_ACCEP_ORDER") {
+          respObj.statusEnum = Constant.CANCEL
+          respObj.status = 'ยกเลิกไรเดอร์'
+          respObj.imagePath = '/asset/images/cancel_rider.png'
         } else {
           respObj.status = 'ออเดอร์ใหม่'
           respObj.imagePath = '/asset/images/new-order.png'

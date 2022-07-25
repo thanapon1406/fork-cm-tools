@@ -18,7 +18,8 @@ export interface OrderStatusHistoryDetail {
     {
       path: string
     }
-  ]
+  ],
+  event: string
 }
 
 interface StatusInfo {

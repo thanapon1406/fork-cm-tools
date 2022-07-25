@@ -10,7 +10,7 @@ import {
   paymentChannelOption,
   riderPartnerTypeOption,
   riderStatus,
-  riderTypeOption
+  riderTypeOption,
 } from '@/constants/option-order'
 import { SelectOption } from '@/interface/common'
 import { CustomerDetail } from '@/interface/customer'
@@ -57,7 +57,7 @@ const initialValues = {
   branch_id: null,
   merchant_overall_status: null,
   merchant_status: null,
-  merchant_test: null
+  merchant_test: null,
 }
 
 const OrderHistory = (): ReactElement => {

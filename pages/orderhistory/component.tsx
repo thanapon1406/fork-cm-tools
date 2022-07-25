@@ -3,13 +3,14 @@ import {
   merchantStatusMapping,
   orderStatusMapping,
   paymentChannel,
-  riderStatusMapping
+  riderStatusMapping,
 } from '@/constants/textMapping'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
 import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
-import { Badge, Card, TablePaginationConfig } from 'antd'
+import { CheckCircleTwoTone } from '@ant-design/icons'
+import { Badge, Card, TablePaginationConfig, Tooltip } from 'antd'
 import { isEmpty, isNull, isUndefined } from 'lodash'
 import { default as Moment } from 'moment'
 import { useRouter } from 'next/router'
@@ -26,8 +27,8 @@ const bageStatusMapping = (text: string) => {
     text !== 'success' && text !== 'cancel'
       ? 'processing'
       : text === 'success'
-        ? 'success'
-        : 'error'
+      ? 'success'
+      : 'error'
 
   return status
 }
@@ -203,6 +204,24 @@ const columns = [
     center: true,
     render: (text: any, record: any) => {
       return Moment(text).format('YYYY-MM-DD HH:mm:ss')
+    },
+  },
+  {
+    title: 'โปร LS',
+    dataIndex: 'ls_config',
+    align: 'center',
+    key: 'ls_config',
+    width: '100px',
+    wrap: true,
+    center: true,
+    render: (text: any, record: any) => {
+      return (
+        <>
+          <Tooltip title="กรณีที่ออเดอร์ไม่มีการใช้โปรฯ LS" placement="rightTop">
+            <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: '19px' }} />
+          </Tooltip>
+        </>
+      )
     },
   },
   {

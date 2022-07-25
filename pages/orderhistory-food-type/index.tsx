@@ -18,6 +18,7 @@ import moment from 'moment'
 import React, { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 
+
 const { Title } = Typography
 
 interface Props { }
@@ -67,6 +68,7 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
   const [districtList, setDistrictList] = useState<Array<InterfaceOption>>([])
   const [productTypeList, setProductTypeList] = useState<Array<InterfaceOption>>([])
   const [districtData, setDistrciData] = useState<Array<DistrictInterface>>([])
+  const kitchenhubBrandId = process.env.NEXT_PUBLIC_KITCHENHUB_BRAND_ID
 
   const initialValues = {
     delivery_type: 'delivery',
@@ -331,6 +333,7 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
 
                         console.log("value: ", value)
                         console.log("params: ", params)
+                        var brandId: number = +kitchenhubBrandId!;
                         const { result, success } = await exportOrderWithProductByEmail({
                           email: value.emails,
                           start_date: params.startdate,
@@ -339,7 +342,8 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
                           province_id: params.province_id,
                           district_id: params.district_id,
                           sub_district_id: params.sub_district_id,
-                          product_type: params.food_type
+                          product_type: params.food_type,
+                          kitchenhub_brand_id: brandId
                         }
                         )
                         if (success) {
@@ -357,7 +361,6 @@ export default function OrderHistoryFoodType({ }: Props): ReactElement {
           )}
         </Formik>
       </Card>
-
     </MainLayout>
   )
 }

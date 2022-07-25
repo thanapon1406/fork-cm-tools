@@ -516,16 +516,28 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         respObj.statusEnum = Constant.CANCEL
         respObj.status = 'ยกเลิกออเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
+      } else if (
+        merchant_status === Constant.RIDER_REJECT
+      ) {
+        respObj.statusEnum = Constant.RIDER_REJECT
+        respObj.status = 'ยกเลิกไรเดอร์'
+        respObj.imagePath = '/asset/images/cancel.png'
       } else if (order_status === Constant.WAITING) {
-        respObj.status = 'ออเดอร์ใหม่'
-        respObj.imagePath = '/asset/images/new-order.png'
+        if (orderHistoryData?.event == "RIDER_REJECTED") {
+          respObj.status = 'รอร้านค้าเรียกไรเดอร์ใหม่'
+          respObj.imagePath = '/asset/images/delivery.png'
+        } else {
+          respObj.status = 'ออเดอร์ใหม่'
+          respObj.imagePath = '/asset/images/new-order.png'
+        }
       } else if (merchant_status === Constant.COOKING) {
         respObj.status = 'กำลังปรุง'
         respObj.imagePath = '/asset/images/cook.png'
       } else if (merchant_status === Constant.CONFIRM_PAYMENT) {
         respObj.status = 'ยืนยันการจ่ายเงิน'
         respObj.imagePath = '/asset/images/cash.png'
-      } else if (merchant_status === Constant.COOKED) {
+      }
+      else if (merchant_status === Constant.COOKED) {
         respObj.status = 'ปรุงสำเร็จ'
         respObj.imagePath = '/asset/images/cook.png'
       } else if (order_status === '' && rider_status === Constant.WAITING) {
@@ -670,7 +682,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       async onOk() {
         const body: cancelOrderInterface = {
           order_no: String(order_no),
-          cancellation_id: String(0),
+          cancellation_id: String(13),
           cancellation_reason: 'ยกเลิกโดยผู้ดูเเลระบบ',
         }
         const request: requestReportInterface = {
@@ -1019,9 +1031,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             <Row gutter={16}>
                               <Col span={12} className="pull-left">
                                 <Text>
-                                  {item.credit_type === 'gross_profit'
-                                    ? 'เครดิตที่ใช้ในการรับออเดอร์'
-                                    : 'เครดิตค่าส่งไรเดอร์พาทเนอร์'}
+                                  {
+                                    (item.credit_type === 'gross_profit') ? 'เครดิตที่ใช้ในการรับออเดอร์' : (item.credit_type === 'logistics_subsidize') ? 'เครดิตของ Merchant LS' : 'เครดิตค่าส่งไรเดอร์พาทเนอร์'
+                                  }
                                 </Text>
                               </Col>
                               <Col span={12} className="pull-right">

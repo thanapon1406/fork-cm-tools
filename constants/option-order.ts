@@ -9,6 +9,22 @@ export const merchantTestOption = [
   },
 ]
 
+export const autoCallRiderOption = [
+  {
+    name: 'ทั้งหมด',
+    value: '',
+  },
+  {
+    name: 'เปิด',
+    value: 'true',
+  },
+  {
+    name: 'ปิด',
+    value: 'false',
+  },
+]
+
+
 export const orderStatus = [
   {
     name: 'ทุกสถานะ',
@@ -64,6 +80,10 @@ export const merchantStatus = [
   {
     name: 'รับออเดอร์',
     value: 'accept_order',
+  },
+  {
+    name: 'ยืนยันการชำระเงิน',
+    value: 'confirm_payment',
   },
   {
     name: 'กำลังปรุง',

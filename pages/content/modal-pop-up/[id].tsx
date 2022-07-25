@@ -1,5 +1,5 @@
-
 import Button1 from '@/components/Button'
+import ExampleInternalSchema from '@/components/deeplink/ExampleSchema'
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
@@ -8,19 +8,31 @@ import MainLayout from '@/layout/MainLayout'
 import { uploadImage } from '@/services/cdn'
 import { getModalPopUp, updateModalPopUp } from '@/services/modalPopUp'
 import { UploadOutlined } from '@ant-design/icons'
-import { Breadcrumb, Button, Card, Col, Modal, notification, Radio, Row, Space, Switch, Typography, Upload } from 'antd'
+import {
+  Breadcrumb,
+  Button,
+  Card,
+  Col,
+  Modal,
+  notification,
+  Radio,
+  Row,
+  Space,
+  Switch,
+  Typography,
+  Upload
+} from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { omit } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
-import { default as React, ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import { SketchPicker } from 'react-color'
 import * as Yup from 'yup'
 import noImage from '../../../public/asset/images/no-image-available.svg'
 const { Title } = Typography
 interface Props { }
 const { warning } = Modal
-
 
 export default function View({ }: Props): ReactElement {
   // const [brandObject, setBrandState] = useRecoilState(brandState)
@@ -35,15 +47,15 @@ export default function View({ }: Props): ReactElement {
   const [typeModal, setTypeModal] = useState(1)
 
   const handleSetTypeModal = (event: any) => {
-    setColorButton1("#ffffff")
-    setTextColorButton1("#000000")
-    setColorButton2("#ffffff")
-    setTextColorButton2("#000000")
+    setColorButton1('#ffffff')
+    setTextColorButton1('#000000')
+    setColorButton2('#ffffff')
+    setTextColorButton2('#000000')
     setTypeModal(event)
   }
 
-  const [textColorButton1, setTextColorButton1] = useState("#000000");
-  const [colorButton1, setColorButton1] = useState("#ffffff");
+  const [textColorButton1, setTextColorButton1] = useState('#000000')
+  const [colorButton1, setColorButton1] = useState('#ffffff')
 
   const handleTextColorButton1 = (event: any) => {
     setTextColorButton1(event.hex)
@@ -52,8 +64,8 @@ export default function View({ }: Props): ReactElement {
     setColorButton1(event.hex)
   }
 
-  const [textColorButton2, setTextColorButton2] = useState("#000000");
-  const [colorButton2, setColorButton2] = useState("#ffffff");
+  const [textColorButton2, setTextColorButton2] = useState('#000000')
+  const [colorButton2, setColorButton2] = useState('#ffffff')
   const handleTextColorButton2 = (event: any) => {
     setTextColorButton2(event.hex)
   }
@@ -66,7 +78,7 @@ export default function View({ }: Props): ReactElement {
     text_color: '',
     background_color: '',
     action_url: '',
-    action_type: ''
+    action_type: '',
   }
 
   const button2 = {
@@ -74,11 +86,10 @@ export default function View({ }: Props): ReactElement {
     text_color: '',
     background_color: '',
     action_url: '',
-    action_type: ''
+    action_type: '',
   }
 
   const dateFormat = 'YYYY-MM-DDTHH:mm:ss.000Z'
-
 
   let [initialValues, setInitialValues] = useState({
     id: 0,
@@ -94,11 +105,11 @@ export default function View({ }: Props): ReactElement {
     end_date: '',
     content: {
       text: '',
-      title: ''
+      title: '',
     },
     show_date: {
       start: '',
-      end: ''
+      end: '',
     },
     buttons: [],
     textButton1: '',
@@ -106,7 +117,7 @@ export default function View({ }: Props): ReactElement {
     actionType1: '',
     textButton2: '',
     actionButton2: '',
-    actionType2: ''
+    actionType2: '',
   })
 
   useEffect(() => {
@@ -138,12 +149,12 @@ export default function View({ }: Props): ReactElement {
         end_date: data.end_date,
         show_date: {
           start: data.start_date,
-          end: data.end_date
+          end: data.end_date,
         },
         content: {
           text: data?.content?.text,
-          title: data?.content?.title
-        }
+          title: data?.content?.title,
+        },
       }
 
       if (data.type > 2) {
@@ -169,8 +180,7 @@ export default function View({ }: Props): ReactElement {
     if (imageUrl == '') {
       warning({
         title: `กรุณาเลือกรูปภาพ`,
-        afterClose() {
-        }
+        afterClose() { },
       })
       return null
     }
@@ -206,7 +216,16 @@ export default function View({ }: Props): ReactElement {
       values.buttons[0] = button1
       values.buttons[1] = button2
     }
-    const value = omit(values, ['show_date'], ['textButton1'], ['actionButton1'], ['actionType1'], ['textButton2'], ['actionButton2'], ['actionType2']);
+    const value = omit(
+      values,
+      ['show_date'],
+      ['textButton1'],
+      ['actionButton1'],
+      ['actionType1'],
+      ['textButton2'],
+      ['actionButton2'],
+      ['actionType2']
+    )
     console.log(value)
 
     const { result, success } = await updateModalPopUp(value)
@@ -215,7 +234,7 @@ export default function View({ }: Props): ReactElement {
         message: `ดำเนินการอัพเดตสถานะสำเร็จ`,
         description: '',
       })
-      router.push('/content/modal-pop-up');
+      router.push('/content/modal-pop-up')
     } else {
       notification.error({
         message: `ไม่สามารถทำการ อัพเดตได้`,
@@ -236,8 +255,8 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={16}>
             <Col className="gutter-row" span={8}>
               <Field
-                disabled={(isEdit) ? false : true}
-                label={{ text: "ชื่อเรื่อง" }}
+                disabled={isEdit ? false : true}
+                label={{ text: 'ชื่อเรื่อง' }}
                 name="content.title"
                 type="text"
                 component={Input}
@@ -246,11 +265,11 @@ export default function View({ }: Props): ReactElement {
                 id="content.title"
                 validate={(value: string) => {
                   if (type > 2) {
-                    if (value == "") {
-                      return "กรุณากรอกชื่อเรื่อง"
+                    if (value == '') {
+                      return 'กรุณากรอกชื่อเรื่อง'
                     }
                     if (value.length > 255) {
-                      return "ชื่อเรื่องความยาวเกิน 255 ตัวอักษร"
+                      return 'ชื่อเรื่องความยาวเกิน 255 ตัวอักษร'
                     }
                   }
                 }}
@@ -258,10 +277,10 @@ export default function View({ }: Props): ReactElement {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col className="gutter-row" span={8} >
+            <Col className="gutter-row" span={8}>
               <Field
-                disabled={(isEdit) ? false : true}
-                label={{ text: "รายละเอียด" }}
+                disabled={isEdit ? false : true}
+                label={{ text: 'รายละเอียด' }}
                 name="content.text"
                 type="text"
                 component={TextArea}
@@ -270,7 +289,7 @@ export default function View({ }: Props): ReactElement {
                 validate={(value: string) => {
                   if (type > 2) {
                     if (value.length > 255) {
-                      return "รายละเอียดความยาวเกิน 255 ตัวอักษร"
+                      return 'รายละเอียดความยาวเกิน 255 ตัวอักษร'
                     }
                   }
                 }}
@@ -289,8 +308,8 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={24}>
             <Col className="gutter-row" span={8}>
               <Field
-                disabled={(isEdit) ? false : true}
-                label={{ text: "คำบนปุ่ม" }}
+                disabled={isEdit ? false : true}
+                label={{ text: 'คำบนปุ่ม' }}
                 name="textButton1"
                 type="text"
                 component={Input}
@@ -303,8 +322,8 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={[16, 16]}>
             <Col className="gutter-row" span={12}>
               <Field
-                disabled={(isEdit) ? false : true}
-                label={{ text: "Action ของปุ่ม" }}
+                disabled={isEdit ? false : true}
+                label={{ text: 'Action ของปุ่ม' }}
                 name="actionButton1"
                 type="text"
                 component={Input}
@@ -313,17 +332,23 @@ export default function View({ }: Props): ReactElement {
                 id="actionButton1"
                 validate={(value: string) => {
                   if (values.actionType1 != '') {
-                    if (value == "") {
-                      return "กรุณากรอก Action ของปุ่ม 1"
+                    if (value == '') {
+                      return 'กรุณากรอก Action ของปุ่ม 1'
                     }
                   }
                 }}
               />
-              <label style={{ marginBottom: 10, color: 'red' }}>{values.actionType1 == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.actionType1 == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
+              <label style={{ marginBottom: 10, color: 'red' }}>
+                {values.actionType1 == 'external_url'
+                  ? '* ตัวอย่าง https://www.google.com/'
+                  : values.actionType1 == 'internal_url'
+                    ? <ExampleInternalSchema />
+                    : ''}
+              </label>
             </Col>
-            <Col className="gutter-row" span={12} >
+            <Col className="gutter-row" span={12}>
               <Field
-                disabled={(isEdit) ? false : true}
+                disabled={isEdit ? false : true}
                 label={{ text: 'Action type ของปุ่ม' }}
                 name="actionType1"
                 component={Select}
@@ -348,11 +373,19 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={16} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม</label>
-              <SketchPicker disableAlpha={true} color={colorButton1} onChangeComplete={handleColorButton1} />
+              <SketchPicker
+                disableAlpha={true}
+                color={colorButton1}
+                onChangeComplete={handleColorButton1}
+              />
             </Col>
             <Col className="gutter-row" span={8}>
               <label>สีคำของปุ่ม</label>
-              <SketchPicker disableAlpha={true} color={textColorButton1} onChangeComplete={handleTextColorButton1} />
+              <SketchPicker
+                disableAlpha={true}
+                color={textColorButton1}
+                onChangeComplete={handleTextColorButton1}
+              />
             </Col>
           </Row>
         </>
@@ -364,8 +397,8 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={24}>
             <Col className="gutter-row" span={8}>
               <Field
-                disabled={(isEdit) ? false : true}
-                label={{ text: "คำบนปุ่ม 1" }}
+                disabled={isEdit ? false : true}
+                label={{ text: 'คำบนปุ่ม 1' }}
                 name="textButton1"
                 type="text"
                 component={Input}
@@ -378,8 +411,8 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={[16, 16]}>
             <Col className="gutter-row" span={12}>
               <Field
-                disabled={(isEdit) ? false : true}
-                label={{ text: "Action ของปุ่ม 1" }}
+                disabled={isEdit ? false : true}
+                label={{ text: 'Action ของปุ่ม 1' }}
                 name="actionButton1"
                 type="text"
                 component={Input}
@@ -388,17 +421,23 @@ export default function View({ }: Props): ReactElement {
                 id="actionButton1"
                 validate={(value: string) => {
                   if (values.actionType1 != '') {
-                    if (value == "") {
-                      return "กรุณากรอก Action ของปุ่ม 1"
+                    if (value == '') {
+                      return 'กรุณากรอก Action ของปุ่ม 1'
                     }
                   }
                 }}
               />
-              <label style={{ marginBottom: 10, color: 'red' }}>{values.actionType1 == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.actionType1 == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
+              <label style={{ marginBottom: 10, color: 'red' }}>
+                {values.actionType1 == 'external_url'
+                  ? '* ตัวอย่าง https://www.google.com/'
+                  : values.actionType1 == 'internal_url'
+                    ? <ExampleInternalSchema />
+                    : ''}
+              </label>
             </Col>
-            <Col className="gutter-row" span={12} >
+            <Col className="gutter-row" span={12}>
               <Field
-                disabled={(isEdit) ? false : true}
+                disabled={isEdit ? false : true}
                 label={{ text: 'Action type ของปุ่ม 1' }}
                 name="actionType1"
                 component={Select}
@@ -423,18 +462,26 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={16} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม 1</label>
-              <SketchPicker disableAlpha={true} color={colorButton1} onChangeComplete={handleColorButton1} />
+              <SketchPicker
+                disableAlpha={true}
+                color={colorButton1}
+                onChangeComplete={handleColorButton1}
+              />
             </Col>
             <Col className="gutter-row" span={8}>
               <label>สีคำของปุ่ม 1</label>
-              <SketchPicker disableAlpha={true} color={textColorButton1} onChangeComplete={handleTextColorButton1} />
+              <SketchPicker
+                disableAlpha={true}
+                color={textColorButton1}
+                onChangeComplete={handleTextColorButton1}
+              />
             </Col>
           </Row>
           <Row gutter={24} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <Field
-                disabled={(isEdit) ? false : true}
-                label={{ text: "คำบนปุ่ม 2" }}
+                disabled={isEdit ? false : true}
+                label={{ text: 'คำบนปุ่ม 2' }}
                 name="textButton2"
                 type="text"
                 component={Input}
@@ -447,8 +494,8 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={[16, 16]}>
             <Col className="gutter-row" span={12}>
               <Field
-                disabled={(isEdit) ? false : true}
-                label={{ text: "Action ของปุ่ม 2" }}
+                disabled={isEdit ? false : true}
+                label={{ text: 'Action ของปุ่ม 2' }}
                 name="actionButton2"
                 type="text"
                 component={Input}
@@ -457,17 +504,23 @@ export default function View({ }: Props): ReactElement {
                 id="actionButton2"
                 validate={(value: string) => {
                   if (values.actionType2 != '') {
-                    if (value == "") {
-                      return "กรุณากรอก Action ของปุ่ม 2"
+                    if (value == '') {
+                      return 'กรุณากรอก Action ของปุ่ม 2'
                     }
                   }
                 }}
               />
-              <label style={{ marginBottom: 10, color: 'red' }}>{values.actionType2 == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.actionType2 == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
+              <label style={{ marginBottom: 10, color: 'red' }}>
+                {values.actionType2 == 'external_url'
+                  ? '* ตัวอย่าง https://www.google.com/'
+                  : values.actionType2 == 'internal_url'
+                    ? <ExampleInternalSchema />
+                    : ''}
+              </label>
             </Col>
-            <Col className="gutter-row" span={12} >
+            <Col className="gutter-row" span={12}>
               <Field
-                disabled={(isEdit) ? false : true}
+                disabled={isEdit ? false : true}
                 label={{ text: 'Action type ของปุ่ม 2' }}
                 name="actionType2"
                 component={Select}
@@ -492,11 +545,19 @@ export default function View({ }: Props): ReactElement {
           <Row gutter={16} style={{ marginTop: 20 }}>
             <Col className="gutter-row" span={8}>
               <label>สีปุ่ม 2</label>
-              <SketchPicker disableAlpha={true} color={colorButton2} onChangeComplete={handleColorButton2} />
+              <SketchPicker
+                disableAlpha={true}
+                color={colorButton2}
+                onChangeComplete={handleColorButton2}
+              />
             </Col>
             <Col className="gutter-row" span={8}>
               <label>สีคำของปุ่ม 2</label>
-              <SketchPicker disableAlpha={true} color={textColorButton2} onChangeComplete={handleTextColorButton2} />
+              <SketchPicker
+                disableAlpha={true}
+                color={textColorButton2}
+                onChangeComplete={handleTextColorButton2}
+              />
             </Col>
           </Row>
         </>
@@ -505,15 +566,14 @@ export default function View({ }: Props): ReactElement {
   }
 
   const handleChangeImage = async (info: any) => {
-    const isJPNG = info.type === 'image/jpeg';
-    const isJPG = info.type === 'image/jpg';
-    const isPNG = info.type === 'image/png';
+    const isJPNG = info.type === 'image/jpeg'
+    const isJPG = info.type === 'image/jpg'
+    const isPNG = info.type === 'image/png'
 
     if (!isJPNG && !isJPG && !isPNG) {
       warning({
         title: `ไฟล์รูปภาพที่เลือกไม่ถูกต้อง`,
-        afterClose() {
-        }
+        afterClose() { },
       })
       return null
     }
@@ -521,26 +581,34 @@ export default function View({ }: Props): ReactElement {
     const res = await uploadImage(info)
     setloadingImage(false)
     setImageUrl(res.upload_success.modal_pop_up)
-  };
+  }
 
   const Schema = Yup.object().shape({
     app_id: Yup.string().trim().required('กรุณาเลือกแอพที่ต้องการส่ง'),
     name: Yup.string().trim().required('กรุณากรอกชื่อ modal pop up'),
-    textButton1: Yup.string().when("type", {
+    textButton1: Yup.string().when('type', {
       is: (v: number) => v > 2,
-      then: Yup.string().required("กรุณากรอกคำบนปุ่ม"),
+      then: Yup.string().required('กรุณากรอกคำบนปุ่ม'),
     }),
-    textButton2: Yup.string().when("type", {
+    textButton2: Yup.string().when('type', {
       is: (v: number) => v > 3,
-      then: Yup.string().required("กรุณากรอกคำบนปุ่ม"),
-    })
+      then: Yup.string().required('กรุณากรอกคำบนปุ่ม'),
+    }),
   })
 
   return (
     <MainLayout>
       {!_isLoading && (
         <>
-          <Formik enableReinitialize={true} initialValues={initialValues} validationSchema={Schema} onSubmit={handleSubmit} validateOnBlur validateOnChange validateOnMount>
+          <Formik
+            enableReinitialize={true}
+            initialValues={initialValues}
+            validationSchema={Schema}
+            onSubmit={handleSubmit}
+            validateOnBlur
+            validateOnChange
+            validateOnMount
+          >
             {({ values, resetForm, setFieldValue }: any) => (
               <Form>
                 <Row gutter={16}>
@@ -560,7 +628,7 @@ export default function View({ }: Props): ReactElement {
                           size="middle"
                           type="primary"
                           className="confirm-button"
-                          htmlType='submit'
+                          htmlType="submit"
                         >
                           บันทึก
                         </Button1>
@@ -604,8 +672,8 @@ export default function View({ }: Props): ReactElement {
                   <Row gutter={24}>
                     <Col className="gutter-row" span={8}>
                       <Field
-                        disabled={(isEdit) ? false : true}
-                        label={{ text: "ชื่อ modal pop up" }}
+                        disabled={isEdit ? false : true}
+                        label={{ text: 'ชื่อ modal pop up' }}
                         name="name"
                         type="text"
                         component={Input}
@@ -614,9 +682,9 @@ export default function View({ }: Props): ReactElement {
                         id="name"
                       />
                     </Col>
-                    <Col className="gutter-row" span={8} >
+                    <Col className="gutter-row" span={8}>
                       <Field
-                        disabled={(isEdit) ? false : true}
+                        disabled={isEdit ? false : true}
                         label={{ text: 'แอพที่ต้องการส่ง' }}
                         name="app_id"
                         component={Select}
@@ -644,37 +712,56 @@ export default function View({ }: Props): ReactElement {
                     <label>รูปภาพ : </label>
                     <Upload
                       name="file"
-                      onRemove={e => { setImageUrl('') }}
+                      onRemove={(e) => {
+                        setImageUrl('')
+                      }}
                       beforeUpload={handleChangeImage}
                     >
-                      <Button disabled={(isEdit) ? false : true} style={{ marginLeft: 10 }} icon={<UploadOutlined />}>เลือกรูป</Button>
+                      <Button
+                        disabled={isEdit ? false : true}
+                        style={{ marginLeft: 10 }}
+                        icon={<UploadOutlined />}
+                      >
+                        เลือกรูป
+                      </Button>
                     </Upload>
                     {values.type < 3 ? (
-                      <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ แนะนำ รูปภาพ ขนาด 9:16 1080x1920px และไฟล์ jpeg,jpg,png</label>
+                      <label style={{ marginLeft: 10, color: 'red' }}>
+                        * หมายเหตุ แนะนำ รูปภาพ ขนาด 9:16 1080x1920px และไฟล์ jpeg,jpg,png
+                      </label>
                     ) : (
-                      <label style={{ marginLeft: 10, color: 'red' }}>* หมายเหตุ  แนะนำ รูปภาพ ขนาด 1:1 1080x1080px และไฟล์ jpeg,jpg,png</label>
+                      <label style={{ marginLeft: 10, color: 'red' }}>
+                        * หมายเหตุ แนะนำ รูปภาพ ขนาด 1:1 1080x1080px และไฟล์ jpeg,jpg,png
+                      </label>
                     )}
                   </Row>
                   <Row gutter={16} style={{ marginTop: 20 }}>
-                    <Col className="gutter-row" span={24} >
-                      <Radio.Group name="type"
-                        disabled={(isEdit) ? false : true}
+                    <Col className="gutter-row" span={24}>
+                      <Radio.Group
+                        name="type"
+                        disabled={isEdit ? false : true}
                         defaultValue={values.type}
                         value={values.type}
-                        onChange={e => {
-                          setFieldValue("type", e.target.value)
+                        onChange={(e) => {
+                          setFieldValue('type', e.target.value)
                           handleSetTypeModal(e.target.value)
-                        }}>
-                        <Space direction='vertical'>
+                        }}
+                      >
+                        <Space direction="vertical">
                           <Row gutter={24}>
                             <Col className="gutter-row" span={6}>
-                              <Radio name="type" value={1} >
+                              <Radio name="type" value={1}>
                                 <Card
                                   hoverable
                                   style={{ width: 240, height: 240, borderRadius: '50%' }}
-                                  cover={<img style={{ width: 240, height: 240, borderRadius: '50%' }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
-                                >
-                                </Card>
+                                  cover={
+                                    <img
+                                      style={{ width: 240, height: 240, borderRadius: '50%' }}
+                                      alt="example"
+                                      src={imageUrl != '' ? imageUrl : noImage.src}
+                                    />
+                                  }
+                                ></Card>
                               </Radio>
                             </Col>
                             <Col className="gutter-row" span={6}>
@@ -682,9 +769,14 @@ export default function View({ }: Props): ReactElement {
                                 <Card
                                   hoverable
                                   style={{ width: 240, height: 240 }}
-                                  cover={<img style={{ width: 240, height: 240 }} alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
-                                >
-                                </Card>
+                                  cover={
+                                    <img
+                                      style={{ width: 240, height: 240 }}
+                                      alt="example"
+                                      src={imageUrl != '' ? imageUrl : noImage.src}
+                                    />
+                                  }
+                                ></Card>
                               </Radio>
                             </Col>
                             <Col className="gutter-row" span={6}>
@@ -692,11 +784,29 @@ export default function View({ }: Props): ReactElement {
                                 <Card
                                   hoverable
                                   style={{ width: 240 }}
-                                  cover={<img alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
+                                  cover={
+                                    <img
+                                      alt="example"
+                                      src={imageUrl != '' ? imageUrl : noImage.src}
+                                    />
+                                  }
                                 >
-                                  <p>{values.content.title == "" ? "ชื่อเรื่อง" : values.content.title}</p>
-                                  <p>{values.content.text == "" ? "รายละเอียด" : values.content.text}</p>
-                                  <Button style={{ backgroundColor: colorButton1, color: textColorButton1 }}>{values.textButton1 == "" ? "ปุ่ม 1" : values.textButton1}</Button>
+                                  <p>
+                                    {values.content.title == ''
+                                      ? 'ชื่อเรื่อง'
+                                      : values.content.title}
+                                  </p>
+                                  <p>
+                                    {values.content.text == '' ? 'รายละเอียด' : values.content.text}
+                                  </p>
+                                  <Button
+                                    style={{
+                                      backgroundColor: colorButton1,
+                                      color: textColorButton1,
+                                    }}
+                                  >
+                                    {values.textButton1 == '' ? 'ปุ่ม 1' : values.textButton1}
+                                  </Button>
                                 </Card>
                               </Radio>
                             </Col>
@@ -705,13 +815,44 @@ export default function View({ }: Props): ReactElement {
                                 <Card
                                   hoverable
                                   style={{ width: 240 }}
-                                  cover={<img alt="example" src={imageUrl != '' ? imageUrl : noImage.src} />}
+                                  cover={
+                                    <img
+                                      alt="example"
+                                      src={imageUrl != '' ? imageUrl : noImage.src}
+                                    />
+                                  }
                                 >
-                                  <p>{values.content.title == "" ? "ชื่อเรื่อง" : values.content.title}</p>
-                                  <p>{values.content.text == "" ? "รายละเอียด" : values.content.text}</p>
-                                  <div style={{ display: 'flex', flexDirection: "row", justifyContent: "space-between" }}>
-                                    <Button style={{ backgroundColor: colorButton1, color: textColorButton1 }}>{values.textButton1 == "" ? "ปุ่ม 1" : values.textButton1}</Button>
-                                    <Button style={{ backgroundColor: colorButton2, color: textColorButton2 }}>{values.textButton2 == "" ? "ปุ่ม 2" : values.textButton2}</Button>
+                                  <p>
+                                    {values.content.title == ''
+                                      ? 'ชื่อเรื่อง'
+                                      : values.content.title}
+                                  </p>
+                                  <p>
+                                    {values.content.text == '' ? 'รายละเอียด' : values.content.text}
+                                  </p>
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      flexDirection: 'row',
+                                      justifyContent: 'space-between',
+                                    }}
+                                  >
+                                    <Button
+                                      style={{
+                                        backgroundColor: colorButton1,
+                                        color: textColorButton1,
+                                      }}
+                                    >
+                                      {values.textButton1 == '' ? 'ปุ่ม 1' : values.textButton1}
+                                    </Button>
+                                    <Button
+                                      style={{
+                                        backgroundColor: colorButton2,
+                                        color: textColorButton2,
+                                      }}
+                                    >
+                                      {values.textButton2 == '' ? 'ปุ่ม 2' : values.textButton2}
+                                    </Button>
                                   </div>
                                 </Card>
                               </Radio>
@@ -724,8 +865,8 @@ export default function View({ }: Props): ReactElement {
                   <Row gutter={[16, 16]} style={{ marginTop: 20, marginBottom: 20 }}>
                     <Col className="gutter-row" span={12}>
                       <Field
-                        disabled={(isEdit) ? false : true}
-                        label={{ text: "image action url" }}
+                        disabled={isEdit ? false : true}
+                        label={{ text: 'image action url' }}
                         name="image_action_url"
                         type="text"
                         component={Input}
@@ -734,17 +875,23 @@ export default function View({ }: Props): ReactElement {
                         id="image_action_url"
                         validate={(value: string) => {
                           if (values.image_action_type != '') {
-                            if (value == "") {
-                              return "กรุณากรอก image action url"
+                            if (value == '') {
+                              return 'กรุณากรอก image action url'
                             }
                           }
                         }}
                       />
-                      <label style={{ marginBottom: 10, color: 'red' }}>{values.image_action_type == "external_url" ? "* ตัวอย่าง https://www.google.com/" : values.image_action_type == "internal_url" ? "* ตัวอย่าง khconsumer://host?outletId=xxx&productId=xxxx&app=consumer" : ""}</label>
+                      <label style={{ marginBottom: 10, color: 'red' }}>
+                        {values.image_action_type == 'external_url'
+                          ? '* ตัวอย่าง https://www.google.com/'
+                          : values.image_action_type == 'internal_url'
+                            ? <ExampleInternalSchema />
+                            : ''}
+                      </label>
                     </Col>
-                    <Col className="gutter-row" span={12} >
+                    <Col className="gutter-row" span={12}>
                       <Field
-                        disabled={(isEdit) ? false : true}
+                        disabled={isEdit ? false : true}
                         label={{ text: 'image action type' }}
                         name="image_action_type"
                         component={Select}
@@ -768,14 +915,14 @@ export default function View({ }: Props): ReactElement {
                   </Row>
                   {renderTitle(values.type)}
                   {renderButtons(values)}
-                  <Row gutter={16} >
+                  <Row gutter={16}>
                     <Col className="gutter-row" span={16}>
                       สถานะ
                       <Row gutter={16}>
-                        <Col className="gutter-row" span={16} style={{ marginTop: "10px" }}>
-                          <span >
+                        <Col className="gutter-row" span={16} style={{ marginTop: '10px' }}>
+                          <span>
                             <Switch
-                              disabled={(isEdit) ? false : true}
+                              disabled={isEdit ? false : true}
                               onClick={handleStatus}
                               checkedChildren="active"
                               unCheckedChildren="inactive"
@@ -789,8 +936,8 @@ export default function View({ }: Props): ReactElement {
                   <Row gutter={16} style={{ marginTop: 20 }}>
                     <Col className="gutter-row" span={8}>
                       <Field
-                        disabled={(isEdit) ? false : true}
-                        label={{ text: "priority" }}
+                        disabled={isEdit ? false : true}
+                        label={{ text: 'priority' }}
                         name="priority"
                         type="number"
                         component={Input}
@@ -801,7 +948,7 @@ export default function View({ }: Props): ReactElement {
                     </Col>
                     <Col className="gutter-row" span={8}>
                       <Field
-                        disabled={(isEdit) ? false : true}
+                        disabled={isEdit ? false : true}
                         label={{ text: 'วันเวลาแสดง Modal Popup' }}
                         name="show_date"
                         component={DateTimeRangePicker}
@@ -815,9 +962,7 @@ export default function View({ }: Props): ReactElement {
             )}
           </Formik>
         </>
-      )
-      }
-
-    </MainLayout >
+      )}
+    </MainLayout>
   )
 }

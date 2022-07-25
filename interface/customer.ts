@@ -13,4 +13,6 @@ export interface Address {
   address_name: string
   latitude: string
   longitude: string
+  address_contact_name: string
+  address_note: string
 }

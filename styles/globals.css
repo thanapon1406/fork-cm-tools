@@ -5,14 +5,16 @@
   height: 32px;
   margin: 16px;
 }
+
 .site-layout .site-layout-background {
   background: #fff;
 }
+
 [data-theme='dark'] .site-layout .site-layout-background {
   background: #141414;
 }
 
-.ant-table-tbody > tr > td {
+.ant-table-tbody>tr>td {
   height: 5px;
   padding: 6px !important;
 }
@@ -68,4 +70,14 @@
 
 .center {
   text-align: center;
+}
+
+.validate-error {
+  color: red !important;
+  font-size: 12px;
+  text-align: left;
+}
+
+thead>tr>th.ant-table-cell {
+  font-weight: bold;
 }

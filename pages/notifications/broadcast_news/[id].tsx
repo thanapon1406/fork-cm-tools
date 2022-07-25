@@ -7,8 +7,9 @@ import Select from '@/components/Form/Select';
 import TextArea from '@/components/Form/TextArea';
 import MainLayout from '@/layout/MainLayout';
 import { getBroadcastNew, requestBroadcastNewInterface, updateBroadcastNew } from '@/services/broadcastNews';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Divider, Modal, Radio, Row, Switch, Typography } from 'antd';
+import { uploadImage } from '@/services/cdn';
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, Divider, Modal, Radio, Row, Switch, Typography, Upload } from 'antd';
 import { Field, Form, Formik } from 'formik';
 import _, { range } from 'lodash';
 import moment, { Moment } from "moment";
@@ -16,8 +17,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useState } from 'react';
 import * as Yup from 'yup';
+import noImage from '../../../public/asset/images/no-image-available.svg';
+
 const { Title, Text } = Typography
-const { confirm } = Modal
+const { confirm, warning } = Modal
 
 const EditBroadcastNew = (): ReactElement => {
   const router = useRouter()
@@ -30,6 +33,8 @@ const EditBroadcastNew = (): ReactElement => {
   const [isShedule, setSchedule] = useState(true)
   const [placeholderLink, setPlaceholderLink] = useState('ลิงค์')
   const [isLink, setIsLink] = useState(true)
+  const [imageUrl, setImageUrl] = useState('')
+  const [loadingImage, setloadingImage] = useState(false)
   let [initialValues, setInitialValues] = useState({
     app_type: '',
     news_type_id: '',
@@ -45,12 +50,14 @@ const EditBroadcastNew = (): ReactElement => {
     status: '',
     button_name: '',
     link_type: '',
-    link: ''
+    link: '',
+    image_url: ''
   })
 
 
 
   const handleSubmit = (values: typeof initialValues) => {
+    values.image_url = imageUrl
     let scheduleAt = values.schedule_at
 
     if (scheduleAt == "") {
@@ -77,8 +84,8 @@ const EditBroadcastNew = (): ReactElement => {
           link_type: String(values.link_type),
           link: String(values.link),
           active_status: isActive,
-          send_now: isShedule
-
+          send_now: isShedule,
+          image_url: String(values.image_url)
         }
 
         const { result, success } = await updateBroadcastNew(data)
@@ -150,6 +157,36 @@ const EditBroadcastNew = (): ReactElement => {
     })
   })
 
+  const handleChangeImage = async (info: any) => {
+    const isJPNG = info.type === 'image/jpeg'
+    const isJPG = info.type === 'image/jpg'
+    const isPNG = info.type === 'image/png'
+    const fileSize = info.size / 1024 / 1024
+
+    if (!isJPNG && !isJPG && !isPNG) {
+      warning({
+        title: `กรุณาเลือกรูปภาพ`,
+        afterClose() {
+          setImageUrl('')
+        },
+      })
+      return null
+    }
+
+    if (fileSize > 1) {
+      warning({
+        title: `กรุณาเลือกรูปภาพขนาดไม่เกิน 1MB`,
+        afterClose() { },
+      })
+      return false
+    }
+
+    setloadingImage(true)
+    const res = await uploadImage(info)
+    setloadingImage(false)
+    setImageUrl(res.upload_success.modal_pop_up)
+  }
+
   const disabledDate = (d: Moment) => {
     if (!d) {
       return false;
@@ -214,11 +251,14 @@ const EditBroadcastNew = (): ReactElement => {
         msg_app: _.get(data, "msg_app") ? _.get(data, "msg_app") : false,
         push_noti: _.get(data, "push_noti") ? _.get(data, "push_noti") : false,
         link_type: _.get(data, "link_type") ? _.get(data, "link_type") : "",
-        link: _.get(data, "link") ? _.get(data, "link") : ""
+        link: _.get(data, "link") ? _.get(data, "link") : "",
+        image_url: _.get(data, "image_url") ? _.get(data, "image_url") : "",
       }
       setInitialValues(objData)
       setSchedule(data.send_now)
-
+      if (data.image_url !== "" && data.image_url !== undefined) {
+        setImageUrl(data.image_url)
+      }
       setActive(data.active_status)
       if (data.status !== "submit") {
         setIsdone(true)
@@ -407,6 +447,51 @@ const EditBroadcastNew = (): ReactElement => {
                   />
                 </Col>
                 <Col className="gutter-row" span={8}></Col>
+              </Row>
+              <Row gutter={24}>
+                <Col
+                  className="gutter-row"
+                  span={24}
+                  style={{
+                    // borderTop: '2px solid #f2f2f2',
+                    paddingTop: '15px',
+                    paddingBottom: '15px',
+                  }}
+                >
+                  <label style={{ display: 'block', marginBottom: '10px' }}>อัพโหลดรูปภาพ</label>
+                </Col>
+
+                <Upload
+                  name="file"
+                  onRemove={(e) => {
+                    setImageUrl('')
+                  }}
+                  beforeUpload={handleChangeImage}
+                  maxCount={1}
+                >
+                  <Button
+                    disabled={isEdit ? false : true}
+                    style={{ marginLeft: 10 }}
+                    icon={<PlusOutlined />}
+                  >
+                    เพิ่มรูปภาพ
+                  </Button>
+                </Upload>
+                <label style={{ marginLeft: 10, color: 'red' }}>
+                  * แนะนำ รูปภาพ ขนาด 1.8:1 328x182px หรือขนาดไม่เกิน 1 MB และไฟล์ jpeg,jpg,png
+                </label>
+
+                <Col
+                  className="gutter-row"
+                  span={24}
+                  style={{ marginTop: '35px', marginBottom: '20px' }}
+                >
+                  <img
+                    style={{ width: 'auto', height: 240 }}
+                    alt="example"
+                    src={imageUrl != '' ? imageUrl : noImage.src}
+                  />
+                </Col>
               </Row>
               <Row gutter={16}>
                 <Col className="gutter-row" span={8} >

@@ -1,4 +1,7 @@
+import axios from 'axios'
+import FileSaver from 'file-saver'
 import fetch from './fetch'
+import { retrieveToken } from './fetch/auth'
 import errorHandler from './handler/errorHandler'
 import successHandler from './handler/successHandler'
 export interface queryList {
@@ -40,7 +43,6 @@ const consumerUpdate = async (option: update) => {
   }
 }
 
-
 const consumerBan = async (option: update) => {
   try {
     const result = await fetch.post(`/api/consumer/ban`, option)
@@ -59,5 +61,38 @@ const getCustomer = async (params: queryList) => {
   }
 }
 
-export { consumerList, consumerUpdate, getCustomer, consumerBan }
+const consumerExport = async (option: queryList) => {
+  try {
+    const result = await fetch.post(`/api/consumer/export-consumer`, option)
+    return successHandler(result)
+  } catch (error) {
+    return errorHandler(error)
+  }
+}
 
+const downloadFile = async (body: any) => {
+  try {
+    const POS_WAPI = process.env.NEXT_PUBLIC_POS_WAPI
+    const token = retrieveToken()
+
+    const result = await axios({
+      url: POS_WAPI + '/report-service/customer-download-report',
+      method: 'POST',
+      responseType: 'blob',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: body,
+    })
+    const header = result.headers['content-disposition']
+    const parts = header?.split(';')
+    const filename = parts[1].split('=')[1]
+    FileSaver.saveAs(result.data, decodeURIComponent(filename))
+    return result
+  } catch (error) {
+    console.log(`error`, error)
+    return errorHandler(error)
+  }
+}
+
+export { consumerList, consumerUpdate, getCustomer, consumerBan, consumerExport, downloadFile }

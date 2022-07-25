@@ -1,6 +1,7 @@
 import Table from '@/components/Table'
 import {
   merchantStatusMapping,
+  merchantStatusMappingAutoCallRider,
   orderStatusMapping,
   paymentChannel,
   riderStatusMapping,
@@ -24,12 +25,13 @@ interface Props {
 
 const bageStatusMapping = (text: string) => {
   const status =
-    text !== 'success' && text !== 'cancel'
+    text === 'rider_reject'
+      ? 'error'
+      : text !== 'success' && text !== 'cancel'
       ? 'processing'
       : text === 'success'
       ? 'success'
       : 'error'
-
   return status
 }
 
@@ -53,9 +55,14 @@ const columns = [
     key: 'outlet_name',
     width: '200px',
     wrap: true,
+    ellipsis: { showTitle: false },
     center: true,
     render: (text: any, record: any) => {
-      return record.outlet_name
+      return (
+        <Tooltip placement="topLeft" title={record.outlet_name}>
+          {record.outlet_name}
+        </Tooltip>
+      )
     },
   },
   {
@@ -251,9 +258,15 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
+      console.log(record)
+      console.log(record.auto_call_rider)
       return (
         <Badge
-          text={merchantStatusMapping[text] || 'กำลังดำเนินการ'}
+          text={
+            record.auto_call_rider == true
+              ? merchantStatusMappingAutoCallRider[text]
+              : merchantStatusMapping[text] || 'กำลังดำเนินการ'
+          }
           status={bageStatusMapping(text)}
           size="default"
         />

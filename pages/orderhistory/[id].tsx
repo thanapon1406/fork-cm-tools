@@ -397,7 +397,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             </div>
             <div>
               ยกเลิกโดย{' '}
-              {orderData?.cancelled_by?.app_name || determineAppId(orderData?.cancelled_by?.app_id)}
+              {orderData?.cancelled_by?.first_name === "System" ? orderData?.cancelled_by?.first_name : orderData?.cancelled_by?.app_name || determineAppId(orderData?.cancelled_by?.app_id)}
             </div>
             <div>{Moment(orderData?.cancelled_at).format(Constant.DATE_FORMAT)}</div>
           </div>

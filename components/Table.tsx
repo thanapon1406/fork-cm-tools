@@ -6,7 +6,7 @@ import {
   DownloadOutlined,
   EditOutlined,
   EllipsisOutlined,
-  EyeOutlined
+  EyeOutlined,
 } from '@ant-design/icons'
 import {
   Button,
@@ -16,7 +16,7 @@ import {
   PageHeader,
   Row,
   Table as Tables,
-  TablePaginationConfig
+  TablePaginationConfig,
 } from 'antd'
 import lodash, { get } from 'lodash'
 import Link from 'next/link'
@@ -80,8 +80,8 @@ export default function Table({ config }: Props): ReactElement {
       // Router.push()
       return `/${tableName}/${path}`
     }
-    const Edit = () => { }
-    const Delete = () => { }
+    const Edit = () => {}
+    const Delete = () => {}
     const actionElement = (rowData: any) => (
       <Menu style={{ border: 'none' }}>
         {action.map((action) => {
@@ -137,6 +137,7 @@ export default function Table({ config }: Props): ReactElement {
         {
           title: '',
           dataIndex: 'action',
+          width: '100px',
           render: (rows: any, rowData: any) => {
             const { id } = rowData
             if (action.length === 1) {

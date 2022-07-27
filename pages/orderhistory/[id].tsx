@@ -488,8 +488,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             </div>
           </>
         )
+      } else {
+        return Moment(orderStatusHistoryData.created_at).format(Constant.DATE_FORMAT)
       }
-
     } else {
       return Moment(orderStatusHistoryData.created_at).format(Constant.DATE_FORMAT)
     }

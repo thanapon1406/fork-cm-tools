@@ -168,9 +168,9 @@ export default function CreateLsConfig({ }: Props): ReactElement {
         // const paramName = "ระยะทางสิ้นสุด"
         const paramName = ""
         if (value != undefined) {
-          if (Number(value) < 0) {
+          if (Number(value) <= 0) {
             return this.createError({
-              message: `${paramName}จะต้องมีค่าตั้งแต่ 0 ขึ้นไป`,
+              message: `${paramName}จะต้องมีค่ามากกว่า 0 ขึ้นไป`,
               path: 'max_distance',
             })
           } else {

@@ -961,7 +961,7 @@ export default function ConfigDeliveryCreate({ }: Props): ReactElement {
                     onChange={
                       async (value: number) => {
                         setParams({ ...params, sub_district_id: undefined, district_id: undefined, province_id: String(value) })
-
+                        setAllCityLocation(false)
                         if (setFieldValue) {
                           setFieldValue("province_id", value)
                           setFieldValue("all_city", false)

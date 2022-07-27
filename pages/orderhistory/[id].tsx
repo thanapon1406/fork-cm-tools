@@ -13,10 +13,15 @@ import {
   cancelOrder,
   cancelOrderInterface,
   findOrdersStatusHistory,
-  orderStatusInterface
+  orderStatusInterface,
 } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
-import { cancelRider, getDeliveryDetail, getRiderDetail, requestDeliveriesInterface } from '@/services/rider'
+import {
+  cancelRider,
+  getDeliveryDetail,
+  getRiderDetail,
+  requestDeliveriesInterface,
+} from '@/services/rider'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
@@ -29,7 +34,6 @@ import { ReactElement, useEffect, useState } from 'react'
 import { determineAppId, numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
 import mapIcon from '../../public/maplocation.png'
-
 
 const { confirm } = Modal
 const { Title, Text } = Typography
@@ -71,7 +75,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     outlet_longitude: '',
     outlet_phone: '',
     app_client_merchant: '',
-    device_merchant: ''
+    device_merchant: '',
   })
 
   let [customerInitialValues, setCustomerInitialValues] = useState({
@@ -151,9 +155,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         }
         var partnerOrderId = '-'
         var partnerName = '-'
-        if (!isUndefined(data.rider_type) && !isEmpty(data.rider_type) && data.rider_type === "partner") {
+        if (
+          !isUndefined(data.rider_type) &&
+          !isEmpty(data.rider_type) &&
+          data.rider_type === 'partner'
+        ) {
           const requestDeliveries: requestDeliveriesInterface = {
-            order_no: String(params.order_number)
+            order_no: String(params.order_number),
           }
           const { success, result } = await getDeliveryDetail(requestDeliveries)
           if (success) {
@@ -197,8 +205,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (!isUndefined(rider_remark)) {
             riderRemark = rider_remark
           }
-
-
 
           setRiderInitialValues({
             rider_name: riderName || '-',
@@ -448,9 +454,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (all_tracking_link != '') {
             dataMap = (
               <div>
-                <Link
-                  href={all_tracking_link}
-                >
+                <Link href={all_tracking_link}>
                   <a target="_blank" style={{ color: '#000000', textDecoration: 'underline' }}>
                     {data.current_rider_info.first_name + ' '}
                     {data.current_rider_info?.last_name ? data.current_rider_info?.last_name : ''}
@@ -516,14 +520,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         respObj.statusEnum = Constant.CANCEL
         respObj.status = 'ยกเลิกออเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
-      } else if (
-        merchant_status === Constant.RIDER_REJECT
-      ) {
+      } else if (merchant_status === Constant.RIDER_REJECT) {
         respObj.statusEnum = Constant.RIDER_REJECT
         respObj.status = 'ยกเลิกไรเดอร์'
         respObj.imagePath = '/asset/images/cancel.png'
       } else if (order_status === Constant.WAITING) {
-        if (orderHistoryData?.event == "RIDER_REJECTED") {
+        if (orderHistoryData?.event == 'RIDER_REJECTED') {
           respObj.status = 'รอร้านค้าเรียกไรเดอร์ใหม่'
           respObj.imagePath = '/asset/images/delivery.png'
         } else {
@@ -536,8 +538,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
       } else if (merchant_status === Constant.CONFIRM_PAYMENT) {
         respObj.status = 'ยืนยันการจ่ายเงิน'
         respObj.imagePath = '/asset/images/cash.png'
-      }
-      else if (merchant_status === Constant.COOKED) {
+      } else if (merchant_status === Constant.COOKED) {
         respObj.status = 'ปรุงสำเร็จ'
         respObj.imagePath = '/asset/images/cook.png'
       } else if (order_status === '' && rider_status === Constant.WAITING) {
@@ -553,13 +554,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-            Constant.LALAMOVE.toLowerCase()
+              Constant.LALAMOVE.toLowerCase()
           ) {
             partnerName = ' (LLM)'
           } else if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-            Constant.PANDAGO.toLowerCase()
+              Constant.PANDAGO.toLowerCase()
           ) {
             partnerName = ' (PANDAGO)'
           }
@@ -809,7 +810,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -956,10 +957,128 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       )
                     })}
                   </div>
-
                   <div>
                     <br />
                     <Row>
+                      <Col span={13} />
+                      <Col span={10}>
+                        <Row gutter={16}>
+                          <Col span={12} className="pull-left">
+                            <Text>ค่าอาหาร </Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>฿{numberFormat(orderData?.total_amount || 0)}</Text>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col span={20} className="pull-left">
+                            <Text style={{ marginRight: '8px' }}>ส่วนลด</Text>
+                            <Text>{orderData?.coupon_code || '-'}</Text>
+                          </Col>
+                          <Col span={4} className="pull-right">
+                            <Text>฿{numberFormat(orderData?.discount_amount || 0)}</Text>
+                          </Col>
+                        </Row>
+                        <Row gutter={16}>
+                          <Col span={12} className="pull-left">
+                            <Text>ภาษีมูลค่าเพิ่ม (vat 7%)</Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>฿{numberFormat(orderData?.total_vat || 0)}</Text>
+                          </Col>
+                        </Row>
+                        <Row gutter={16}>
+                          <Col span={12} className="pull-left">
+                            <Title style={{ fontWeight: 'bold' }} level={5}>
+                              รวมค่าอาหาร{' '}
+                            </Title>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Title style={{ fontWeight: 'bold' }} level={5}>
+                              ฿{numberFormat(orderData?.total_amount || 0)}
+                            </Title>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </div>
+                  <Divider />
+                  <div>
+                    <br />
+                    <Row>
+                      <Col span={13} />
+                      <Col span={10}>
+                        <Row>
+                          <Col span={12} className="pull-left">
+                            <Text>ค่าส่ง</Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            {orderData?.total_fee_before_ls !== 0 ? (
+                              <Text>฿{numberFormat(orderData?.total_fee_before_ls || 0)}</Text>
+                            ) : (
+                              <Text>฿{numberFormat(orderData?.delivery_fee || 0)}</Text>
+                            )}
+                          </Col>
+                        </Row>
+                        {orderData?.ls_id !== 0 && (
+                          <>
+                            <Row>
+                              <Col span={18} className="pull-left">
+                                <Text style={{ color: '#990000' }}>{orderData?.ls_name}</Text>
+                              </Col>
+                              <Col span={6} className="pull-right">
+                                <Text style={{ color: '#990000' }}>
+                                  - ฿
+                                  {numberFormat(
+                                    (orderData?.merchant_ls || 0) + (orderData?.platform_ls || 0)
+                                  )}
+                                </Text>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col span={16} className="pull-right">
+                                <Text style={{ color: '#96989C', fontSize: '11px' }}>
+                                  Merchant LS
+                                </Text>
+                              </Col>
+                              <Col span={8} className="pull-right">
+                                <Text style={{ color: '#96989C', fontSize: '11px' }}>
+                                  ฿{numberFormat(orderData?.merchant_ls || 0)}
+                                </Text>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col span={16} className="pull-right">
+                                <Text style={{ color: '#96989C', fontSize: '11px' }}>
+                                  Platform LS
+                                </Text>
+                              </Col>
+                              <Col span={8} className="pull-right">
+                                <Text style={{ color: '#96989C', fontSize: '11px' }}>
+                                  ฿{numberFormat(orderData?.merchant_ls || 0)}
+                                </Text>
+                              </Col>
+                            </Row>
+                          </>
+                        )}
+                        <Row>
+                          <Col span={12} className="pull-left">
+                            <Title style={{ fontWeight: 'bold' }} level={5}>
+                              รวมค่าส่ง
+                            </Title>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Title style={{ fontWeight: 'bold' }} level={5}>
+                              ฿{numberFormat(orderData?.delivery_fee || 0)}
+                            </Title>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </div>
+                  <div>
+                    <br />
+                    {/* <Row>
                       <Col span={13} />
                       <Col span={10}>
                         <Row gutter={16}>
@@ -1004,17 +1123,21 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                           </Col>
                         </Row>
                       </Col>
-                    </Row>
+                    </Row> */}
                     <Divider />
                     <Row>
                       <Col span={13} />
                       <Col span={10}>
                         <Row gutter={16}>
                           <Col span={12} className="pull-left">
-                            <Title level={5}>รวมมูลค่าสินค้า</Title>
+                            <Title style={{ color: '#2B7A9B', fontWeight: 'bold' }} level={5}>
+                              ราคาสุทธิ
+                            </Title>
                           </Col>
                           <Col span={12} className="pull-right">
-                            <Title level={5}>฿{numberFormat(orderData?.total || 0)}</Title>
+                            <Title style={{ color: '#2B7A9B', fontWeight: 'bold' }} level={5}>
+                              ฿{numberFormat(orderData?.total || 0)}
+                            </Title>
                           </Col>
                         </Row>
                       </Col>
@@ -1031,9 +1154,11 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             <Row gutter={16}>
                               <Col span={12} className="pull-left">
                                 <Text>
-                                  {
-                                    (item.credit_type === 'gross_profit') ? 'เครดิตที่ใช้ในการรับออเดอร์' : (item.credit_type === 'logistics_subsidize') ? 'เครดิตของ Merchant LS' : 'เครดิตค่าส่งไรเดอร์พาทเนอร์'
-                                  }
+                                  {item.credit_type === 'gross_profit'
+                                    ? 'เครดิตที่ใช้ในการรับออเดอร์'
+                                    : item.credit_type === 'logistics_subsidize'
+                                    ? 'เครดิตของ Merchant LS'
+                                    : 'เครดิตค่าส่งไรเดอร์พาทเนอร์'}
                                 </Text>
                               </Col>
                               <Col span={12} className="pull-right">
@@ -1046,6 +1171,29 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         </Row>
                       )
                     })}
+                    {orderData?.platform_ls_income !== 0 && (
+                      <>
+                        <Divider />
+                        <Row>
+                          <Col span={13} />
+                          <Col span={10}>
+                            <Text style={{ color: '#96989C' }}>หมายเหตุ</Text>
+                            <Row gutter={16}>
+                              <Col span={12} className="pull-left">
+                                <Title style={{ color: '#0FB034', fontWeight: 'bold' }} level={5}>
+                                  ส่วนเกินเข้า platform
+                                </Title>
+                              </Col>
+                              <Col span={12} className="pull-right">
+                                <Title style={{ color: '#2B7A9B', fontWeight: 'bold' }} level={5}>
+                                  ฿{numberFormat(orderData?.platform_ls_income || 0)}
+                                </Title>
+                              </Col>
+                            </Row>
+                          </Col>
+                        </Row>
+                      </>
+                    )}
 
                     <br />
                   </div>
@@ -1272,7 +1420,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1380,7 +1528,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1517,7 +1665,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1549,7 +1697,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     disabled={true}
                   />
                 </Col>
-
               </Row>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -1590,7 +1737,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     disabled={true}
                   />
                 </Col>
-
               </Row>
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>

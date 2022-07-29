@@ -1,15 +1,18 @@
 import Table from '@/components/Table'
 import {
-  merchantStatusMapping, merchantStatusMappingAutoCallRider, orderStatusMapping,
+  merchantStatusMapping,
+  merchantStatusMappingAutoCallRider,
+  orderStatusMapping,
   paymentChannel,
-  riderStatusMapping
+  riderStatusMapping,
 } from '@/constants/textMapping'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
 import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
+import { CheckCircleTwoTone } from '@ant-design/icons'
 import { Badge, Card, TablePaginationConfig, Tooltip } from 'antd'
-import { isEmpty, isNull, isUndefined } from 'lodash'
+import { get, isEmpty, isNull, isUndefined } from 'lodash'
 import { default as Moment } from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
@@ -21,7 +24,14 @@ interface Props {
 }
 
 const bageStatusMapping = (text: string) => {
-  const status = (text === 'rider_reject') ? 'error' : (text !== 'success' && text !== 'cancel') ? 'processing' : (text === 'success') ? 'success' : 'error'
+  const status =
+    text === 'rider_reject'
+      ? 'error'
+      : text !== 'success' && text !== 'cancel'
+      ? 'processing'
+      : text === 'success'
+      ? 'success'
+      : 'error'
   return status
 }
 
@@ -204,6 +214,27 @@ const columns = [
     },
   },
   {
+    title: 'โปร LS',
+    dataIndex: 'ls_id',
+    align: 'center',
+    key: 'ls_id',
+    width: '100px',
+    wrap: true,
+    center: true,
+    render: (text: any, record: any) => {
+      const lsName = get(record, 'ls_name')
+      return (
+        text > 0 && (
+          <>
+            <Tooltip title={lsName} placement="rightTop">
+              <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: '19px' }} />
+            </Tooltip>
+          </>
+        )
+      )
+    },
+  },
+  {
     title: 'สถานะ order',
     dataIndex: 'status',
     align: 'center',
@@ -230,11 +261,15 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      console.log(record);
-      console.log(record.auto_call_rider);
+      console.log(record)
+      console.log(record.auto_call_rider)
       return (
         <Badge
-          text={record.auto_call_rider == true ? merchantStatusMappingAutoCallRider[text] : merchantStatusMapping[text] || 'กำลังดำเนินการ'}
+          text={
+            record.auto_call_rider == true
+              ? merchantStatusMappingAutoCallRider[text]
+              : merchantStatusMapping[text] || 'กำลังดำเนินการ'
+          }
           status={bageStatusMapping(text)}
           size="default"
         />

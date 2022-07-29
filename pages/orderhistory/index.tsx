@@ -4,13 +4,14 @@ import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
 import Select from '@/components/Form/Select'
 import {
-  autoCallRiderOption, merchantStatus,
+  autoCallRiderOption,
+  merchantStatus,
   merchantTestOption,
   orderStatus,
   paymentChannelOption,
   riderPartnerTypeOption,
   riderStatus,
-  riderTypeOption
+  riderTypeOption,
 } from '@/constants/option-order'
 import { SelectOption } from '@/interface/common'
 import { CustomerDetail } from '@/interface/customer'
@@ -18,6 +19,7 @@ import { Pagination } from '@/interface/dataTable'
 import { OutletDetail } from '@/interface/outlet'
 import { RiderDetail } from '@/interface/rider'
 import MainLayout from '@/layout/MainLayout'
+import { listLsConfig } from '@/services/ls-config'
 import { findOutletId, outletListById } from '@/services/merchant'
 import { downloadFile, exportOrderTransaction, requestReportInterface } from '@/services/report'
 import { getRider } from '@/services/rider'
@@ -57,7 +59,7 @@ const initialValues = {
   branch_id: null,
   merchant_overall_status: null,
   merchant_status: null,
-  merchant_test: null
+  merchant_test: null,
 }
 
 const OrderHistory = (): ReactElement => {
@@ -65,6 +67,7 @@ const OrderHistory = (): ReactElement => {
   const [customerDropDown, setCustomerDropDown] = useState<Array<SelectOption>>([])
   const [merchantDropDown, setMerchantDropDown] = useState<Array<SelectOption>>([])
   const [riderDropDown, setRiderDropDown] = useState<Array<SelectOption>>([])
+  const [lsConfigDropDown, setLsConfigDropDown] = useState<Array<SelectOption>>([])
 
   let [pagination, setPagination] = useState<Pagination>({
     total: 0,
@@ -91,6 +94,7 @@ const OrderHistory = (): ReactElement => {
   const onSearchCustomerDebounce = debounce(async (message) => await fetchCustomer(message), 800)
   const onSearchMerchantDebounce = debounce(async (message) => await fetchMerchant(message), 800)
   const onSearchRiderDebounce = debounce(async (message) => await fetchRider(message), 800)
+  const onSearchLsconfigDebounce = debounce(async (message) => await fetchLsConfig(message), 800)
 
   const fetchCustomer = async (message: any) => {
     if (!isEmpty(message)) {
@@ -181,6 +185,30 @@ const OrderHistory = (): ReactElement => {
     }
   }
 
+  const fetchLsConfig = async (message: any) => {
+    if (!isEmpty(message)) {
+      const request = {
+        keyword: message,
+        page: 1,
+        per_page: 100,
+      }
+
+      const { result, success } = await listLsConfig(request)
+      if (success) {
+        const { meta, data } = result
+        let uniqData = uniqWith(data, isEqual)
+
+        let lsData = map<any, SelectOption>(uniqData, function (item: any) {
+          return { name: item.name, value: String(item.id) }
+        })
+
+        setLsConfigDropDown(lsData)
+      }
+    } else {
+      setLsConfigDropDown([])
+    }
+  }
+
   const onClearCustomer = () => {
     setCustomerDropDown([])
   }
@@ -191,6 +219,10 @@ const OrderHistory = (): ReactElement => {
 
   const onClearRider = () => {
     setMerchantDropDown([])
+  }
+
+  const onClearLsConfig = () => {
+    setLsConfigDropDown([])
   }
 
   const manageParam = (values: any) => {
@@ -228,7 +260,8 @@ const OrderHistory = (): ReactElement => {
       endtime: endDate ? moment(endDate).format('HH:mm:ss') : '',
       exclude_outlet_ids: excludeOutletIds,
       include_outlet_ids: includeOutletIds,
-      auto_call_rider: values.auto_call_rider || ''
+      auto_call_rider: values.auto_call_rider || '',
+      ls_id: values.ls_config_id || '',
     })
   }
 
@@ -242,6 +275,9 @@ const OrderHistory = (): ReactElement => {
     } else if (get(values, 'merchant_test') === false) {
       excludeOutletIds = merchantTestId // is_merchant_test = false
     }
+
+    console.log(`values`, values)
+
     const req: object = {
       sort_by: 'ClientTime',
       sort_type: 'asc',
@@ -266,7 +302,8 @@ const OrderHistory = (): ReactElement => {
       delivery_type: 'delivery',
       exclude_outlet_ids: excludeOutletIds,
       include_outlet_ids: includeOutletIds,
-      auto_call_rider: values.auto_call_rider || ''
+      auto_call_rider: values.auto_call_rider || '',
+      ls_id: values.ls_config_id || '',
     }
 
     const { result, success } = await exportOrderTransaction(req)
@@ -403,13 +440,28 @@ const OrderHistory = (): ReactElement => {
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
                   <Field
+                    label={{ text: 'แพคเกจโปรฯ Ls' }}
+                    name="ls_config_id"
+                    component={Select}
+                    id="ls_config_id"
+                    placeholder="แพคเกจโปร Ls"
+                    showSearch
+                    showArrow={false}
+                    onSearch={onSearchLsconfigDebounce}
+                    selectOption={lsConfigDropDown}
+                    filterOption={false}
+                    allowClear={true}
+                    onClear={onClearLsConfig}
+                  />
+                </Col>
+                <Col className="gutter-row" span={6}>
+                  <Field
                     label={{ text: 'วันเวลาที่ทำรายการ' }}
                     name="client_time"
                     component={DateTimeRangePicker}
                     id="client_time"
                     placeholder="วันเวลาที่ทำรายการ"
                   />
-
                 </Col>
                 <Col span={6}>
                   <Field

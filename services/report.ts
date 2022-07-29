@@ -42,6 +42,7 @@ export interface requestReportInterface {
   order_status?: string
   food_type?: string
   auto_call_rider?: string
+  ls_id?: string
 }
 
 export const getOrderTransaction = async (params: requestReportInterface) => {

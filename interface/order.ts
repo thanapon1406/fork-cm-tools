@@ -92,6 +92,13 @@ export interface OrderDetail {
   cancellation_remark: string
   cancelled_at: Date
   cancelled_by: CommonInfo
+  ls_id: number
+  ls_name: string
+  platform_ls: number
+  merchant_ls: number
+  delivery_raw_fee: number
+  total_fee_before_ls: number
+  platform_ls_income: number
 }
 
 interface CommonInfo {

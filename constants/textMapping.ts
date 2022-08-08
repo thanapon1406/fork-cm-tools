@@ -170,15 +170,6 @@ export const orderStatusMapping: any = {
   cancel: 'ยกเลิก',
 }
 
-export const merchantStatusMapping: any = {
-  waiting: 'รอรับออเดอร์',
-  accept_order: 'รับออเดอร์',
-  cooking: 'กำลังปรุง',
-  cooked: 'ปรุงสำเร็จ',
-  success: 'สำเร็จ',
-  cancel: 'ยกเลิก',
-}
-
 export const riderStatusMapping: any = {
   waiting: 'รอเรียกไรเดอร์',
   assigning: 'กำลังเรียกไรเดอร์',
@@ -191,14 +182,46 @@ export const riderStatusMapping: any = {
   cancel: 'ยกเลิก',
 }
 
-export const merchantStatusMappingAutoCallRider: any = {
+export const merchantStatusMappingAutoCash: any = {
   prepare_order: 'รอรับออเดอร์',
+  rider_reject: 'ยกเลิก',
+  consumer_reject: 'ยกเลิกโดยลูกค้า',
+  waiting: 'รอรับออเดอร์',
+  accept_order: 'รับออเดอร์',
+  cancel: 'ยกเลิก',
+  cooking: 'กำลังปรุง',
+  cooked: 'ปรุงสำเร็จ',
+  success: 'สำเร็จ'
+}
+
+export const merchantStatusMappingAutoTransfer: any = {
+  prepare_order: 'รอรับออเดอร์',
+  rider_reject: 'ยกเลิก',
+  consumer_reject: 'ยกเลิกโดยลูกค้า',
   waiting: 'รอยืนยันการชำระเงิน',
   accept_order: 'รับออเดอร์',
+  cancel: 'ยกเลิก',
   confirm_payment: 'ยืนยันการชำระเงิน',
   cooking: 'กำลังปรุง',
   cooked: 'ปรุงสำเร็จ',
   success: 'สำเร็จ',
+}
+
+export const merchantStatusMappingCloseCash: any = {
+  waiting: 'รอรับออเดอร์',
+  accept_order: 'รับออเดอร์',
   cancel: 'ยกเลิก',
-  rider_reject: 'ยกเลิก'
+  cooking: 'กำลังปรุง',
+  cooked: 'ปรุงสำเร็จ',
+  success: 'สำเร็จ',
+}
+
+export const merchantStatusMappingCloseTransfer: any = {
+  waiting: 'รอรับออเดอร์',
+  accept_order: 'รับออเดอร์',
+  cancel: 'ยกเลิก',
+  confirm_payment: 'ยืนยันการชำระเงิน',
+  cooking: 'กำลังปรุง',
+  cooked: 'ปรุงสำเร็จ',
+  success: 'สำเร็จ',
 }

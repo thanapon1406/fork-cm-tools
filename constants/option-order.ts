@@ -78,6 +78,10 @@ export const merchantStatus = [
     value: 'waiting',
   },
   {
+    name: 'รอรับออเดอร์ Auto Call Rider',
+    value: 'prepare_order',
+  },
+  {
     name: 'รับออเดอร์',
     value: 'accept_order',
   },
@@ -100,6 +104,14 @@ export const merchantStatus = [
   {
     name: 'ยกเลิก',
     value: 'cancel',
+  },
+  {
+    name: 'ยกเลิกโดยไรเดอร์',
+    value: 'rider_reject',
+  },
+  {
+    name: 'ยกเลิกโดยลูกค้า',
+    value: 'consumer_reject',
   },
 ]
 

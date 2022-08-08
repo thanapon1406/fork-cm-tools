@@ -1,10 +1,8 @@
 import Table from '@/components/Table'
 import {
-  merchantStatusMapping,
-  merchantStatusMappingAutoCallRider,
-  orderStatusMapping,
+  merchantStatusMappingAutoCash, merchantStatusMappingAutoTransfer, merchantStatusMappingCloseCash, merchantStatusMappingCloseTransfer, orderStatusMapping,
   paymentChannel,
-  riderStatusMapping,
+  riderStatusMapping
 } from '@/constants/textMapping'
 import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
@@ -24,15 +22,13 @@ interface Props {
 }
 
 const bageStatusMapping = (text: string) => {
-  const status =
-    text === 'rider_reject'
-      ? 'error'
-      : text !== 'success' && text !== 'cancel'
-      ? 'processing'
-      : text === 'success'
-      ? 'success'
-      : 'error'
-  return status
+  if (text === 'consumer_reject' || text === 'rider_reject' || text === 'cancel') {
+    return 'error'
+  }
+  if (text === 'success') {
+    return 'success'
+  }
+  return 'processing'
 }
 
 const columns = [
@@ -263,17 +259,45 @@ const columns = [
     render: (text: any, record: any) => {
       console.log(record)
       console.log(record.auto_call_rider)
-      return (
-        <Badge
-          text={
-            record.auto_call_rider == true
-              ? merchantStatusMappingAutoCallRider[text]
-              : merchantStatusMapping[text] || 'กำลังดำเนินการ'
-          }
-          status={bageStatusMapping(text)}
-          size="default"
-        />
-      )
+      console.log(record.payment_channel)
+      if (record.auto_call_rider == true && record.payment_channel == "PAYMENT_CASH") {
+        //open auto call rider and payment cash
+        return (
+          <Badge
+            text={merchantStatusMappingAutoCash[text] || 'กำลังดำเนินการ'}
+            status={bageStatusMapping(text)}
+            size="default"
+          />
+        )
+      } else if (record.auto_call_rider == true && record.payment_channel != "PAYMENT_CASH") {
+        //open auto call rider and payment transfer
+        return (
+          <Badge
+            text={merchantStatusMappingAutoTransfer[text] || 'กำลังดำเนินการ'}
+            status={bageStatusMapping(text)}
+            size="default"
+          />
+        )
+      }
+      else if (record.auto_call_rider == false && record.payment_channel == "PAYMENT_CASH") {
+        //close auto call rider and payment cash
+        return (
+          <Badge
+            text={merchantStatusMappingCloseCash[text] || 'กำลังดำเนินการ'}
+            status={bageStatusMapping(text)}
+            size="default"
+          />
+        )
+      } else if (record.auto_call_rider == false && record.payment_channel != "PAYMENT_CASH") {
+        //close auto call rider and payment transfer
+        return (
+          <Badge
+            text={merchantStatusMappingCloseTransfer[text] || 'กำลังดำเนินการ'}
+            status={bageStatusMapping(text)}
+            size="default"
+          />
+        )
+      }
     },
   },
   {

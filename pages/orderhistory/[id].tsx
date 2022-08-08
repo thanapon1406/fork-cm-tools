@@ -33,6 +33,7 @@ import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { determineAppId, numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
+import promotionImg from '../../public/asset/icon/promotions.png'
 import mapIcon from '../../public/maplocation.png'
 
 const { confirm } = Modal
@@ -1045,6 +1046,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                           <>
                             <Row>
                               <Col span={18} className="pull-left">
+                                <img
+                                  style={{ marginRight: '10px', width: '20px' }}
+                                  src={promotionImg.src}
+                                />
                                 <Text style={{ color: '#990000' }}>{orderData?.ls_name}</Text>
                               </Col>
                               <Col span={6} className="pull-right">

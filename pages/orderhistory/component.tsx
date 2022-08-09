@@ -1,6 +1,6 @@
 import Table from '@/components/Table'
 import {
-  merchantStatusMappingAutoCash, merchantStatusMappingAutoTransfer, merchantStatusMappingCloseCash, merchantStatusMappingCloseTransfer, orderStatusMapping,
+  merchantStatusMapping, merchantStatusMappingCash, orderStatusMapping,
   paymentChannel,
   riderStatusMapping
 } from '@/constants/textMapping'
@@ -257,42 +257,18 @@ const columns = [
     wrap: true,
     center: true,
     render: (text: any, record: any) => {
-      console.log(record)
-      console.log(record.auto_call_rider)
-      console.log(record.payment_channel)
-      if (record.auto_call_rider == true && record.payment_channel == "PAYMENT_CASH") {
-        //open auto call rider and payment cash
+      if (record.payment_channel == "PAYMENT_CASH") {
         return (
           <Badge
-            text={merchantStatusMappingAutoCash[text] || 'กำลังดำเนินการ'}
+            text={merchantStatusMappingCash[text] || 'กำลังดำเนินการ'}
             status={bageStatusMapping(text)}
             size="default"
           />
         )
-      } else if (record.auto_call_rider == true && record.payment_channel != "PAYMENT_CASH") {
-        //open auto call rider and payment transfer
+      } else {
         return (
           <Badge
-            text={merchantStatusMappingAutoTransfer[text] || 'กำลังดำเนินการ'}
-            status={bageStatusMapping(text)}
-            size="default"
-          />
-        )
-      }
-      else if (record.auto_call_rider == false && record.payment_channel == "PAYMENT_CASH") {
-        //close auto call rider and payment cash
-        return (
-          <Badge
-            text={merchantStatusMappingCloseCash[text] || 'กำลังดำเนินการ'}
-            status={bageStatusMapping(text)}
-            size="default"
-          />
-        )
-      } else if (record.auto_call_rider == false && record.payment_channel != "PAYMENT_CASH") {
-        //close auto call rider and payment transfer
-        return (
-          <Badge
-            text={merchantStatusMappingCloseTransfer[text] || 'กำลังดำเนินการ'}
+            text={merchantStatusMapping[text] || 'กำลังดำเนินการ'}
             status={bageStatusMapping(text)}
             size="default"
           />

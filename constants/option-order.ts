@@ -78,7 +78,7 @@ export const merchantStatus = [
     value: 'waiting',
   },
   {
-    name: 'รอรับออเดอร์ Auto Call Rider',
+    name: 'เตรียมรับออเดอร์',
     value: 'prepare_order',
   },
   {
@@ -106,7 +106,7 @@ export const merchantStatus = [
     value: 'cancel',
   },
   {
-    name: 'ยกเลิกโดยไรเดอร์',
+    name: 'ยกเลิก (ไรเดอร์ไม่รับงาน)',
     value: 'rider_reject',
   },
   {

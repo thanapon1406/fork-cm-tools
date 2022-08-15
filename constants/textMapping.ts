@@ -168,6 +168,8 @@ export const orderStatusMapping: any = {
   arrived: 'จัดส่งแล้ว',
   success: 'สำเร็จ',
   cancel: 'ยกเลิก',
+  assigning: 'กำลังค้นหาคนขับ',
+  assigned: 'คนขับกำลังไปที่ร้าน',
 }
 
 export const riderStatusMapping: any = {

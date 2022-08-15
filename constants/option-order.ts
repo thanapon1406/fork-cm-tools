@@ -59,6 +59,14 @@ export const orderStatus = [
     value: 'arrived',
   },
   {
+    name: 'กำลังค้นหาคนขับ',
+    value: 'assigning',
+  },
+  {
+    name: 'คนขับกำลังไปที่ร้าน',
+    value: 'assigned',
+  },
+  {
     name: 'สำเร็จ',
     value: 'success',
   },
@@ -137,7 +145,7 @@ export const riderStatus = [
     value: 'going_merchant',
   },
   {
-    name: 'รับอาหารแล้ว',
+    name: 'รอรับอาหาร',
     value: 'picking_up',
   },
   {

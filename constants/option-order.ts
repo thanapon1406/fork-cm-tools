@@ -82,7 +82,7 @@ export const merchantStatus = [
     value: '',
   },
   {
-    name: 'รอรับออเดอร์',
+    name: 'รอรับออเดอร์และรอยืนยันการชำระเงิน',
     value: 'waiting',
   },
   {

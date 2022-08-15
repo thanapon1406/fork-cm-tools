@@ -16,7 +16,7 @@ import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 
 const { Title } = Typography
@@ -102,10 +102,9 @@ export default function MerchantCredit({ }: Props): ReactElement {
     }
   }
 
-  const filterRequest: filterObject = {}
+  const filterRequest: filterObject = { is_all_status: true }
   const requestApi: Function = creditTransaction
-  const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } =
-    useFetchTable(requestApi, filterRequest)
+  const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } = useFetchTable(requestApi, filterRequest)
 
   const Schema = Yup.object().shape({})
 

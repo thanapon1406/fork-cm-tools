@@ -17,7 +17,7 @@ import { Field, Form, Formik } from 'formik'
 import { get } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 
 const { Text, Title } = Typography
@@ -71,16 +71,14 @@ export default function CreditTransaction({ }: Props): ReactElement {
 
   const filterRequest: filterObject = {}
   const requestApi: Function = transactionList
-  const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } =
-    useFetchTable(requestApi, filterRequest, {
-      isAutoFetch: false,
-    })
+  const { isLoading, dataTable, handelDataTableChange, handleFetchData, pagination } = useFetchTable(requestApi, filterRequest, {
+    isAutoFetch: false,
+  })
 
   useEffect(() => {
     handleFetchData({
       is_preload_credit: true,
-      gl_type: 'credit',
-      status: 'success',
+      gl_type: 'credit'
     })
     initFilterDate()
   }, [])

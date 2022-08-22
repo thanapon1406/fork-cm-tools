@@ -9,7 +9,8 @@ import {
   SolutionOutlined,
   TeamOutlined,
   UserOutlined,
-  WalletOutlined
+  WalletOutlined,
+  CommentOutlined
 } from '@ant-design/icons'
 import { Layout, Menu, Typography } from 'antd'
 import Image from 'next/image'
@@ -286,7 +287,21 @@ export default function Sidebar({ }: Props): ReactElement {
           key: '/content/ls/Consumer-Logistic-Subsidize',
         },
       ],
-    }
+    },
+    {
+      index: 11,
+      title: 'Chat',
+      icon: <CommentOutlined />,
+      key: 'chat',
+      link: '/chat',
+      sub: [
+        {
+          title: 'Chat History',
+          link: '/chat',
+          key: '/chat',
+        },
+      ],
+    },
   ]
 
   return (

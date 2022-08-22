@@ -7,6 +7,7 @@ import { RecoilRoot } from 'recoil'
 import '../styles/app.less'
 import '../styles/globals.css'
 import '../styles/nprogress.css'
+import '../styles/chat.css'
 
 Router.events.on('routeChangeStart', nProgress.start)
 Router.events.on('routeChangeError', nProgress.done)

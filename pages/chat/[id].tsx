@@ -61,15 +61,17 @@ const ChatDetail: NextPage = () => {
     const response = await findAllRoom(reqBodyFindRoom)
     if (response.success) {
       console.log('resultRoom ', response.result)
-      const data = response.result.data[0]
-      console.log('data:  ', data)
-      setdetailInitialValues({
-        order_id: data.room_key,
-        outlet_name: data.outlet_name,
-        profile_name: data.profile_name,
-        tel: data.tel || '-',
-      })
-      setIsLoading(false)
+      if (response.result.data[0]) {
+        const data = response.result.data[0]
+        console.log('data:  ', data)
+        setdetailInitialValues({
+          order_id: String(id),
+          outlet_name: data.outlet_name,
+          profile_name: data.profile_name,
+          tel: data.tel || '-',
+        })
+        setIsLoading(false)
+      }
     }
 
     const { success, result } = await findMessageHistory(reqBody)

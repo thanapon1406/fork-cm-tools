@@ -22,7 +22,7 @@ import {
   getRiderDetail,
   requestDeliveriesInterface,
 } from '@/services/rider'
-import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { ExclamationCircleOutlined, MessageOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
 import { Field, Form, Formik } from 'formik'
 import { forEach, get, isEmpty, isUndefined, map, size } from 'lodash'
@@ -861,6 +861,19 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                     id="device"
                     disabled={true}
                   />
+                </Col>
+                <Col
+                  className="gutter-row"
+                  span={3}
+                  style={{ display: 'flex', alignItems: 'center' }}
+                >
+                  <Button
+                    onClick={() => {
+                      router.push(`/chat/${orderInitialValues.order_no}`)
+                    }}
+                  >
+                    <MessageOutlined /> Chat
+                  </Button>
                 </Col>
               </Row>
 

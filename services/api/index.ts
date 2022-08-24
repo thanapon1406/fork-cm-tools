@@ -3,6 +3,7 @@ import _ from 'lodash'
 const host = process.env.POS_GRPC_API
 const host_rest = process.env.POS_WAPI
 const host_sso = process.env.POS_APP_SSO
+const host_chat = process.env.POS_CHAT
 
 const axiosInstance = axios.create({
   baseURL: host,
@@ -16,6 +17,11 @@ const axiosRestInstance = axios.create({
 
 const axiosSsoInstance = axios.create({
   baseURL: host_sso,
+  timeout: 30000,
+})
+
+const axiosChatInstance = axios.create({
+  baseURL: host_chat,
   timeout: 30000,
 })
 
@@ -116,6 +122,16 @@ const postServerSideSso = async (url: string, body = {}, headers = {}) => {
   return await axiosSsoInstance.post(url, _body, options)
 }
 
+const postServerSideChat = async (url: string, body = {}, headers = {}) => {
+  const options = {
+    headers: {
+      Authorization: _.get(headers, 'authorization'),
+    },
+  }
+  let _body = _.pickBy(body, _.identity)
+  return await axiosChatInstance.post(url, _body, options)
+}
+
 const apiFetch = {
   get: getServerSide,
   post: postServerSide,
@@ -127,6 +143,7 @@ const apiFetch = {
   deleteRest: deleteServerSideRest,
   postSso: postServerSideSso,
   postRaw: postRawServerSide,
+  postChat: postServerSideChat,
 }
 
 export default apiFetch

@@ -1,6 +1,8 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Input from '@/components/Form/Input'
+import Select from '@/components/Form/Select'
 import Table from '@/components/Table'
 import { SelectOption } from '@/interface/common'
 import { CustomerDetail } from '@/interface/customer'
@@ -10,17 +12,13 @@ import MainLayout from '@/layout/MainLayout'
 import { findAllRoom } from '@/services/chat-history'
 import { consumerList } from '@/services/consumer'
 import { outletListById } from '@/services/merchant'
-import { EyeOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Row, Typography } from 'antd'
-import Select from '@/components/Form/Select'
 import { Field, Form, Formik } from 'formik'
-import { debounce, isEmpty, isEqual, map, trim, uniqWith } from 'lodash'
+import { debounce, isEmpty, isEqual, map, uniqWith } from 'lodash'
 import moment from 'moment'
 import { NextPage } from 'next'
-import router from 'next/router'
 import { useEffect, useState } from 'react'
 import { RecoilRoot } from 'recoil'
-import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 
 const { Title } = Typography
 
@@ -78,11 +76,13 @@ const Chat: NextPage = () => {
       title: 'ชื่อร้านค้า',
       dataIndex: 'outlet_name',
       align: 'center',
+      width: 300,
     },
     {
       title: 'ชื่อลูกค้า',
       dataIndex: 'profile_name',
       align: 'center',
+      width: 300,
     },
     {
       title: 'เบอร์โทรศัพท์',
@@ -115,7 +115,7 @@ const Chat: NextPage = () => {
     },
   ]
 
-  const getMappingPath = (rowData:any ) => {
+  const getMappingPath = (rowData: any) => {
     return `${rowData.room_key}`
   }
 

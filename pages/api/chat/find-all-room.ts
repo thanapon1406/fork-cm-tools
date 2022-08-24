@@ -9,7 +9,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const { data, status } = await ServerFetch.postChat(url, body, headers)
       res.status(status).send(data)
     } catch (e: any) {
-      //  console.log(e)
       res.status(e.response?.status || 500).json(e.response?.data)
     }
   } else {

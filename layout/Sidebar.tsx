@@ -1,6 +1,7 @@
 import { findUser, logout } from '@/services/login'
 import { personState } from '@/store'
 import {
+  CommentOutlined,
   FileTextOutlined,
   LayoutOutlined,
   LogoutOutlined,
@@ -10,7 +11,6 @@ import {
   TeamOutlined,
   UserOutlined,
   WalletOutlined,
-  CommentOutlined
 } from '@ant-design/icons'
 import { Layout, Menu, Typography } from 'antd'
 import Image from 'next/image'
@@ -23,7 +23,7 @@ const profileColor: Array<string> = ['87d068', 'd06868', 'c068d0', '6897d0', 'ca
 const { Text } = Typography
 const { Sider } = Layout
 const { SubMenu } = Menu
-interface Props { }
+interface Props {}
 
 interface MenuItem {
   index: number
@@ -40,7 +40,7 @@ interface SubMenuItem {
   title: string
 }
 
-export default function Sidebar({ }: Props): ReactElement {
+export default function Sidebar({}: Props): ReactElement {
   const Router = useRouter()
   const [userObject, setUserState] = useRecoilState(personState)
   const { asPath, pathname, query } = Router
@@ -56,7 +56,7 @@ export default function Sidebar({ }: Props): ReactElement {
     Router.replace('/login')
   }
 
-  useEffect(() => { }, [])
+  useEffect(() => {}, [])
 
   const findUserData = async () => {
     const { result = {}, success = false } = await findUser()
@@ -296,7 +296,7 @@ export default function Sidebar({ }: Props): ReactElement {
       link: '/chat',
       sub: [
         {
-          title: 'Chat History',
+          title: 'ประวัติการสนทนา',
           link: '/chat',
           key: '/chat',
         },

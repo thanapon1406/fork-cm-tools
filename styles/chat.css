@@ -2,7 +2,7 @@
   justify-content: center;
   align-items: center;
   color: white;
-  background-color: rgb(121, 121, 121);
+  background-color: rgb(83, 83, 83);
   padding: 1rem;
   /* margin: 0.5rem 1rem; */
   border-radius: 10px;
@@ -14,7 +14,7 @@
 #messages li.right .message_detail {
   
   color: white;
-  background-color: rgb(51, 205, 51);
+  background-color: rgb(55, 75, 255);
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 0;
 }
@@ -35,11 +35,11 @@
   height: 20px;
   width: 100px;
   border-radius: 10px;
-  background-color: rgb(51, 205, 51);
+  background-color: rgb(55, 75, 255);
 }
 .consumer{
   height: 20px;
   width: 100px;
   border-radius: 10px;
-  background-color: rgb(121, 121, 121);
+  background-color: rgb(83, 83, 83);
 }

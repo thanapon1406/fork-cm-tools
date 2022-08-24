@@ -11,7 +11,7 @@ import { findAllRoom } from '@/services/chat-history'
 import { consumerList } from '@/services/consumer'
 import { outletListById } from '@/services/merchant'
 import { EyeOutlined } from '@ant-design/icons'
-import { Col, Row } from 'antd'
+import { Breadcrumb, Col, Row, Typography } from 'antd'
 import Select from '@/components/Form/Select'
 import { Field, Form, Formik } from 'formik'
 import { debounce, isEmpty, isEqual, map, trim, uniqWith } from 'lodash'
@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react'
 import { RecoilRoot } from 'recoil'
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 
-interface Props {}
+const { Title } = Typography
 
 interface filterObject {
   order_id?: string
@@ -31,7 +31,6 @@ interface filterObject {
   tel?: string
   order_created_at?: any
   message_created_at?: any
-  
 }
 
 interface Pagination {
@@ -50,14 +49,14 @@ const Chat: NextPage = () => {
     outlet_id: '',
     profile_id: '',
     tel: '',
-    order_created_at:{
+    order_created_at: {
       order_created_at_start: null,
       order_created_at_end: null,
     },
-    message_created_at:{
+    message_created_at: {
       message_created_at_start: null,
       message_created_at_end: null,
-    }
+    },
   })
   let [pagination, setPagination] = useState<Pagination>({
     total: 0,
@@ -95,9 +94,9 @@ const Chat: NextPage = () => {
       dataIndex: 'order_created_at',
       align: 'center',
       render: (row: any) => {
-        if(row){
+        if (row) {
           return moment(row).format('YYYY-MM-DD HH:mm')
-        }else{
+        } else {
           return '-'
         }
       },
@@ -107,31 +106,18 @@ const Chat: NextPage = () => {
       dataIndex: 'message_created_at',
       align: 'center',
       render: (row: any) => {
-        if(row){
+        if (row) {
           return moment(row).format('YYYY-MM-DD HH:mm')
-        }else{
+        } else {
           return '-'
         }
       },
     },
-    {
-      title: 'action',
-      align: 'center',
-      render: (_: any, row: any) => {
-        let path = row.room_key
-        return (
-          <Button
-            icon={<EyeOutlined />}
-            onClick={() => {
-              router.push(`/chat/${path}`)
-            }}
-          >
-            ดูรายละเอียด
-          </Button>
-        )
-      },
-    },
   ]
+
+  const getMappingPath = (rowData:any ) => {
+    return `${rowData.room_key}`
+  }
 
   type FormInterface = {
     order_id: string
@@ -174,14 +160,14 @@ const Chat: NextPage = () => {
       outlet_id: values.outlet_id,
       profile_id: values.profile_id,
       tel: values.tel,
-      order_created_at:{
-        start: values.order_created_at.start ,
-        end: values.order_created_at.end ,
+      order_created_at: {
+        start: values.order_created_at.start,
+        end: values.order_created_at.end,
       },
-      message_created_at:{
-        start: values.message_created_at.start ,
-        end: values.message_created_at.end ,
-      }
+      message_created_at: {
+        start: values.message_created_at.start,
+        end: values.message_created_at.end,
+      },
     }
     fetchData(reqFilter, pagination)
   }
@@ -190,9 +176,9 @@ const Chat: NextPage = () => {
     const reqBody = {
       page: paging.current,
       per_page: paging.pageSize,
-      data:{
+      data: {
         ...filterObj,
-      }
+      },
     }
     setIsLoading(true)
     console.log('req  ', reqBody)
@@ -276,6 +262,11 @@ const Chat: NextPage = () => {
   return (
     <RecoilRoot>
       <MainLayout>
+        <Title level={4}>Chat</Title>
+        <Breadcrumb style={{ margin: '16px 0' }}>
+          <Breadcrumb.Item>Chat</Breadcrumb.Item>
+          <Breadcrumb.Item>ออเดอร์ทั้งหมด</Breadcrumb.Item>
+        </Breadcrumb>
         <Formik initialValues={initialValues} onSubmit={handleSubmit}>
           {({ values, resetForm, setValues }) => (
             <Form>
@@ -367,11 +358,11 @@ const Chat: NextPage = () => {
                     tel: '',
                     order_created_at: {
                       start: null,
-                      end: null
+                      end: null,
                     },
                     message_created_at: {
                       start: null,
-                      end: null
+                      end: null,
                     },
                   })
                 }}
@@ -388,8 +379,10 @@ const Chat: NextPage = () => {
             config={{
               dataTableTitle: 'ออเดอร์ทั้งหมด',
               loading: _isLoading,
-              tableName: 'cm-tools/room',
+              tableName: 'chat',
               tableColumns: column,
+              action: ['view'],
+              mappingPath: getMappingPath,
               dataSource: dataTable,
               handelDataTableLoad: handelDataTableLoad,
               pagination: pagination,

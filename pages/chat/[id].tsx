@@ -70,8 +70,8 @@ const ChatDetail: NextPage = () => {
           profile_name: data.profile_name,
           tel: data.tel || '-',
         })
-        setIsLoading(false)
       }
+      setIsLoading(false)
     }
 
     const { success, result } = await findMessageHistory(reqBody)

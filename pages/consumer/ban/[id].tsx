@@ -103,13 +103,13 @@ export default function BanConsumer({ }: Props): ReactElement {
     const { result, success } = await consumerBan(update)
     if (success) {
       notification.success({
-        message: `ดำเนินการแบนสำเร็จ`,
+        message: `ดำเนินการสำเร็จ`,
         description: '',
       })
-      router.reload()
+      router.push('/consumer/' + id)
     } else {
       notification.error({
-        message: `ไม่สามารถทำการ แบนได้`,
+        message: `ไม่สามารถทำรายการได้`,
         description: '',
       })
     }
@@ -121,7 +121,7 @@ export default function BanConsumer({ }: Props): ReactElement {
       icon: <ExclamationCircleOutlined />,
       okText: "ยืนยัน",
       cancelText: "ยกเลิก",
-      okButtonProps: { style: { background: !ban ? `#EB5757` : `#28A745`, borderColor: !ban ? `#EB5757` : `#28A745` } },
+      okButtonProps: { style: { background: !ban ? `#28A745` : `#EB5757`, borderColor: !ban ? `#28A745` : `#EB5757` } },
       async onOk() {
         handleSubmit(values, ban)
       },

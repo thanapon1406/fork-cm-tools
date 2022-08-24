@@ -59,6 +59,14 @@ export const orderStatus = [
     value: 'arrived',
   },
   {
+    name: 'กำลังค้นหาคนขับ',
+    value: 'assigning',
+  },
+  {
+    name: 'คนขับกำลังไปที่ร้าน',
+    value: 'assigned',
+  },
+  {
     name: 'สำเร็จ',
     value: 'success',
   },
@@ -74,11 +82,11 @@ export const merchantStatus = [
     value: '',
   },
   {
-    name: 'รอรับออเดอร์',
+    name: 'รอรับออเดอร์และรอยืนยันการชำระเงิน',
     value: 'waiting',
   },
   {
-    name: 'รอรับออเดอร์ Auto Call Rider',
+    name: 'เตรียมรับออเดอร์',
     value: 'prepare_order',
   },
   {
@@ -106,7 +114,7 @@ export const merchantStatus = [
     value: 'cancel',
   },
   {
-    name: 'ยกเลิกโดยไรเดอร์',
+    name: 'ยกเลิก (ไรเดอร์ไม่รับงาน)',
     value: 'rider_reject',
   },
   {
@@ -137,7 +145,7 @@ export const riderStatus = [
     value: 'going_merchant',
   },
   {
-    name: 'รับอาหารแล้ว',
+    name: 'รอรับอาหาร',
     value: 'picking_up',
   },
   {

@@ -33,6 +33,7 @@ import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { determineAppId, numberFormat } from 'utils/helpers'
 import * as Yup from 'yup'
+import promotionImg from '../../public/asset/icon/promotions.png'
 import mapIcon from '../../public/maplocation.png'
 
 const { confirm } = Modal
@@ -403,7 +404,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
             </div>
             <div>
               ยกเลิกโดย{' '}
-              {orderData?.cancelled_by?.first_name === "System" ? orderData?.cancelled_by?.first_name : orderData?.cancelled_by?.app_name || determineAppId(orderData?.cancelled_by?.app_id)}
+              {orderData?.cancelled_by?.first_name === 'System'
+                ? orderData?.cancelled_by?.first_name
+                : orderData?.cancelled_by?.app_name ||
+                  determineAppId(orderData?.cancelled_by?.app_id)}
             </div>
             <div>{Moment(orderData?.cancelled_at).format(Constant.DATE_FORMAT)}</div>
           </div>
@@ -478,16 +482,12 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         }
       }
     } else if (orderStatusHistoryData.current_status_info.rider_status === Constant.WAITING) {
-      if (orderStatusHistoryData?.event == "MERCHANT_LIMIT_ACCEP_ORDER") {
+      if (orderStatusHistoryData?.event == 'MERCHANT_LIMIT_ACCEP_ORDER') {
         return (
           <>
             <div>
-              <div>
-                ร้านค้าไม่รับออเดอร์ภายใน 4.30 นาที
-              </div>
-              <div>
-                ยกเลิกโดย system
-              </div>
+              <div>ร้านค้าไม่รับออเดอร์ภายใน 4.30 นาที</div>
+              <div>ยกเลิกโดย system</div>
               <div>{Moment(orderStatusHistoryData?.created_at).format(Constant.DATE_FORMAT)}</div>
             </div>
           </>
@@ -546,7 +546,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         if (orderHistoryData?.event == 'RIDER_REJECTED') {
           respObj.status = 'รอร้านค้าเรียกไรเดอร์ใหม่'
           respObj.imagePath = '/asset/images/delivery.png'
-        } else if (orderHistoryData?.event == "MERCHANT_LIMIT_ACCEP_ORDER") {
+        } else if (orderHistoryData?.event == 'MERCHANT_LIMIT_ACCEP_ORDER') {
           respObj.statusEnum = Constant.CANCEL
           respObj.status = 'ยกเลิกไรเดอร์'
           respObj.imagePath = '/asset/images/cancel_rider.png'
@@ -1046,6 +1046,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                           <>
                             <Row>
                               <Col span={18} className="pull-left">
+                                <img
+                                  style={{ marginRight: '10px', width: '20px' }}
+                                  src={promotionImg.src}
+                                />
                                 <Text style={{ color: '#990000' }}>{orderData?.ls_name}</Text>
                               </Col>
                               <Col span={6} className="pull-right">
@@ -1077,7 +1081,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                               </Col>
                               <Col span={8} className="pull-right">
                                 <Text style={{ color: '#96989C', fontSize: '11px' }}>
-                                  ฿{numberFormat(orderData?.merchant_ls || 0)}
+                                  ฿{numberFormat(orderData?.platform_ls || 0)}
                                 </Text>
                               </Col>
                             </Row>
@@ -1180,7 +1184,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                     ? 'เครดิตที่ใช้ในการรับออเดอร์'
                                     : item.credit_type === 'logistics_subsidize'
                                     ? 'เครดิตของ Merchant LS'
-                                    : 'เครดิตค่าส่งไรเดอร์พาทเนอร์'}
+                                    : 'เครดิตค่าส่ง(ลูกค้าจ่าย)'}
                                 </Text>
                               </Col>
                               <Col span={12} className="pull-right">
@@ -1207,7 +1211,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                 </Title>
                               </Col>
                               <Col span={12} className="pull-right">
-                                <Title style={{ color: '#2B7A9B', fontWeight: 'bold' }} level={5}>
+                                <Title style={{ color: '#0FB034', fontWeight: 'bold' }} level={5}>
                                   ฿{numberFormat(orderData?.platform_ls_income || 0)}
                                 </Title>
                               </Col>

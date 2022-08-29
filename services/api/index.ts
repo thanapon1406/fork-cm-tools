@@ -129,6 +129,7 @@ const postServerSideChat = async (url: string, body = {}, headers = {}) => {
     },
   }
   let _body = _.pickBy(body, _.identity)
+  console.log(`host_chat`, host_chat)
   return await axiosChatInstance.post(url, _body, options)
 }
 

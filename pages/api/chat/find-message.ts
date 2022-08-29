@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, headers, body } = req
+  console.log(`req`, req)
   if (method === 'POST') {
     try {
       const url: string = '/api/v1/chat/findAll'

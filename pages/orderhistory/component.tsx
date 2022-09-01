@@ -8,7 +8,7 @@ import { Pagination, ScrollTable } from '@/interface/dataTable'
 import { OrderDetail } from '@/interface/order'
 import { metaReportPagination } from '@/interface/pagination'
 import { getOrderTransaction, requestReportInterface } from '@/services/report'
-import { CheckCircleTwoTone } from '@ant-design/icons'
+import { CheckCircleTwoTone, InfoCircleOutlined } from '@ant-design/icons'
 import { Badge, Card, TablePaginationConfig, Tooltip } from 'antd'
 import { get, isEmpty, isNull, isUndefined } from 'lodash'
 import { default as Moment } from 'moment'
@@ -130,7 +130,7 @@ const columns = [
     width: '150px',
   },
   {
-    title: 'ราคา',
+    title: 'ราคาสุทธิ',
     dataIndex: 'total',
     align: 'center',
     key: 'total',
@@ -154,7 +154,7 @@ const columns = [
     },
   },
   {
-    title: 'ค่าจัดส่ง',
+    title: 'ค่าจัดส่งที่ลูกค้าจ่ายจริง',
     dataIndex: 'delivery_fee',
     align: 'center',
     key: 'delivery_fee',
@@ -166,7 +166,7 @@ const columns = [
     },
   },
   {
-    title: 'ค่าจัดส่งจริง',
+    title: 'ค่าจัดส่งที่พาร์ทเนอร์เรียกเก็บ',
     dataIndex: 'delivery_raw_fee',
     align: 'center',
     key: 'delivery_raw_fee',
@@ -182,7 +182,12 @@ const columns = [
     },
   },
   {
-    title: 'ค่าจัดส่งส่วนเกิน',
+    title: (<>
+      ค่าจัดส่งส่วนเกิน
+      <Tooltip placement="bottom" title={"ค่าจัดส่งที่พาร์ทเนอร์เรียกเก็บ หักด้วยของค่าจัดส่งที่ลูกค้าจ่ายจริง"}>
+        <InfoCircleOutlined style={{ paddingLeft: "2px" }} />
+      </Tooltip>
+    </>),
     dataIndex: 'difference_delivery_fee',
     align: 'center',
     key: 'difference_delivery_fee',
@@ -196,6 +201,22 @@ const columns = [
         return numberFormat(0)
       }
     },
+  },
+  {
+    title: 'ค่าจัดส่ง Tier Price',
+    dataIndex: 'total_fee_before_ls',
+    align: 'center',
+    key: 'total_fee_before_ls',
+    width: '100px',
+    wrap: true,
+    center: true,
+    render: (text: any, record: any) => {
+      if (record.rider_type === "partner") {
+        return numberFormat(record.total_fee_before_ls)
+      } else {
+        return numberFormat(record.delivery_fee)
+      }
+    }
   },
   {
     title: 'เวลา',

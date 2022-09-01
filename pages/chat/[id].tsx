@@ -49,6 +49,7 @@ const ChatDetail: NextPage = () => {
       },
       page: paging.current,
       per_page: paging.pageSize,
+      on: 'cm-tool',
     }
     setIsLoading(true)
     const reqBodyFindRoom = {

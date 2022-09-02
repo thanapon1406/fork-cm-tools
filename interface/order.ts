@@ -11,6 +11,7 @@ export interface OrderDetail {
   status: string
   merchant_status: string
 
+  rider_fee_extra: number
   rider_info: {
     id: string
     first_name: string

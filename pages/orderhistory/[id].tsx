@@ -13,14 +13,14 @@ import {
   cancelOrder,
   cancelOrderInterface,
   findOrdersStatusHistory,
-  orderStatusInterface
+  orderStatusInterface,
 } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
 import {
   cancelRider,
   getDeliveryDetail,
   getRiderDetail,
-  requestDeliveriesInterface
+  requestDeliveriesInterface,
 } from '@/services/rider'
 import { ExclamationCircleOutlined, MessageOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
@@ -407,7 +407,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
               {orderData?.cancelled_by?.first_name === 'System'
                 ? orderData?.cancelled_by?.first_name
                 : orderData?.cancelled_by?.app_name ||
-                determineAppId(orderData?.cancelled_by?.app_id)}
+                  determineAppId(orderData?.cancelled_by?.app_id)}
             </div>
             <div>{Moment(orderData?.cancelled_at).format(Constant.DATE_FORMAT)}</div>
           </div>
@@ -576,13 +576,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-            Constant.LALAMOVE.toLowerCase()
+              Constant.LALAMOVE.toLowerCase()
           ) {
             partnerName = ' (LLM)'
           } else if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-            Constant.PANDAGO.toLowerCase()
+              Constant.PANDAGO.toLowerCase()
           ) {
             partnerName = ' (PANDAGO)'
           }
@@ -780,9 +780,9 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
   const differentPayShop = (delivery_fee: number, rider_fee_extra: number) => {
     let different = rider_fee_extra - delivery_fee
     if (different < 0) {
-      return "฿" + numberFormat(0)
+      return '฿' + numberFormat(0)
     }
-    return "-฿" + numberFormat(different)
+    return '-฿' + numberFormat(different)
   }
 
   useEffect(() => {
@@ -799,6 +799,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isOrderStatus])
+
+  const isBeforLs = (lsValue: number) => {
+    if (lsValue > 0) {
+      return true
+    }
+    return false
+  }
 
   return (
     <MainLayout isLoading={isLoading}>
@@ -840,7 +847,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1053,13 +1060,21 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                       <Col span={10}>
                         <Row>
                           <Col span={12} className="pull-left">
-                            <Text>ค่าจัดส่ง Tier Price
-                              ({orderData?.rider_type === "partner" ? "Partner" : "Outlet"})
+                            <Text>
+                              ค่าจัดส่ง Tier Price (
+                              {orderData?.rider_type === 'partner' ? 'Partner' : 'Outlet'})
                             </Text>
                           </Col>
                           <Col span={12} className="pull-right">
                             {orderData?.total_fee_before_ls !== 0 ? (
-                              <Text>฿{numberFormat(orderData?.total_fee_before_ls || 0)}</Text>
+                              <Text>
+                                ฿
+                                {isBeforLs(
+                                  (orderData?.merchant_ls || 0) + (orderData?.platform_ls || 0)
+                                )
+                                  ? numberFormat(orderData?.total_fee_before_ls || 0)
+                                  : numberFormat(orderData?.delivery_fee || 0)}
+                              </Text>
                             ) : (
                               <Text>฿{numberFormat(orderData?.delivery_fee || 0)}</Text>
                             )}
@@ -1116,7 +1131,10 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                               <Text> ร้านค้าชำระส่วนต่าง (ใช้ไรเดอร์พาร์ทเนอร์)</Text>
                             </Col>
                             <Col span={12} className="pull-right" style={{ color: 'red' }}>
-                              {differentPayShop(orderData?.delivery_fee || 0, orderData?.rider_fee_extra || 0)}
+                              {differentPayShop(
+                                orderData?.delivery_fee || 0,
+                                orderData?.rider_fee_extra || 0
+                              )}
                             </Col>
                           </Row>
                         )}
@@ -1132,7 +1150,6 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                             </Title>
                           </Col>
                         </Row>
-
                       </Col>
                     </Row>
                   </div>
@@ -1217,8 +1234,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                   {item.credit_type === 'gross_profit'
                                     ? 'เครดิตที่ใช้ในการรับออเดอร์'
                                     : item.credit_type === 'logistics_subsidize'
-                                      ? 'เครดิตของ Merchant LS'
-                                      : 'เครดิตค่าส่ง(ลูกค้าจ่าย)'}
+                                    ? 'เครดิตของ Merchant LS'
+                                    : 'เครดิตค่าส่ง(ลูกค้าจ่าย)'}
                                 </Text>
                               </Col>
                               <Col span={12} className="pull-right">
@@ -1237,13 +1254,14 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         <Col span={10}>
                           <Row gutter={16}>
                             <Col span={12} className="pull-left">
-                              <Text>
-                                เครดิตค่างส่ง(เพิ่มเติม)
-                              </Text>
+                              <Text>เครดิตค่างส่ง(เพิ่มเติม)</Text>
                             </Col>
                             <Col span={12} className="pull-right">
                               <Text strong style={{ color: 'red' }}>
-                                {differentPayShop(orderData?.delivery_fee || 0, orderData?.rider_fee_extra || 0)}
+                                {differentPayShop(
+                                  orderData?.delivery_fee || 0,
+                                  orderData?.rider_fee_extra || 0
+                                )}
                               </Text>
                             </Col>
                           </Row>
@@ -1499,7 +1517,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1607,7 +1625,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1744,7 +1762,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => { }}
+          onSubmit={() => {}}
           validationSchema={Schema}
         >
           {(values) => (

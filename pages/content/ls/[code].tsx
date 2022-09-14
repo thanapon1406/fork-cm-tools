@@ -255,21 +255,22 @@ export default function Ls({ }: Props): ReactElement {
                   <ReactQuill
                     theme="snow"
                     value={values.description}
-                    onChange={(content, delta, source, editor) => {
-                      setFieldValue('description', editor.getHTML())
-                    }}
-                    style={{ height: '220px' }}
-                    modules={{
-                      toolbar: [
-                        [{ header: [1, 2, false] }],
-                        ['bold', 'italic', 'underline', 'strike', 'link'],
-                        [{ color: [] }, { background: [] }, { align: [] }],
-                        [
-                          { list: 'ordered' },
-                          { list: 'bullet' },
-                          { indent: '-1' },
-                          { indent: '+1' },
-                        ],
+                      onChange={(content, delta, source, editor) => {
+                        setFieldValue('description', editor.getHTML())
+                      }}
+                      style={{ height: '220px' }}
+                      modules={{
+                        toolbar: [
+                          // [{ header: [1, 2, false] }],
+                          [{ font: [] }, { size: [] }],
+                          ['bold', 'italic', 'underline', 'strike', 'link'],
+                          [{ color: [] }, { background: [] }, { align: [] }],
+                          [
+                            { list: 'ordered' },
+                            { list: 'bullet' },
+                            { indent: '-1' },
+                            { indent: '+1' },
+                          ],
                       ],
                     }}
                   />

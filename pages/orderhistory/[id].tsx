@@ -1062,7 +1062,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                           </Col>
                           <Col span={12} className="pull-right">
                             <Title style={{ fontWeight: 'bold' }} level={5}>
-                              ฿{sumTotalOrder(orderData)}
+                              ฿{numberFormat(sumTotalOrder(orderData) || 0)}
                             </Title>
                           </Col>
                         </Row>

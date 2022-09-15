@@ -13,14 +13,14 @@ import {
   cancelOrder,
   cancelOrderInterface,
   findOrdersStatusHistory,
-  orderStatusInterface,
+  orderStatusInterface
 } from '@/services/order'
 import { findOrder, requestReportInterface } from '@/services/report'
 import {
   cancelRider,
   getDeliveryDetail,
   getRiderDetail,
-  requestDeliveriesInterface,
+  requestDeliveriesInterface
 } from '@/services/rider'
 import { ExclamationCircleOutlined, MessageOutlined } from '@ant-design/icons'
 import { Breadcrumb, Col, Divider, Image, Modal, Row, Steps, Typography } from 'antd'
@@ -407,7 +407,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
               {orderData?.cancelled_by?.first_name === 'System'
                 ? orderData?.cancelled_by?.first_name
                 : orderData?.cancelled_by?.app_name ||
-                  determineAppId(orderData?.cancelled_by?.app_id)}
+                determineAppId(orderData?.cancelled_by?.app_id)}
             </div>
             <div>{Moment(orderData?.cancelled_at).format(Constant.DATE_FORMAT)}</div>
           </div>
@@ -576,13 +576,13 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
           if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-              Constant.LALAMOVE.toLowerCase()
+            Constant.LALAMOVE.toLowerCase()
           ) {
             partnerName = ' (LLM)'
           } else if (
             orderHistoryData?.current_rider_info?.partner_name &&
             orderHistoryData?.current_rider_info?.partner_name.toLowerCase() ===
-              Constant.PANDAGO.toLowerCase()
+            Constant.PANDAGO.toLowerCase()
           ) {
             partnerName = ' (PANDAGO)'
           }
@@ -807,6 +807,15 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
     return false
   }
 
+  const sumTotalOrder = (order: OrderDetail | undefined) => {
+    const total_amount = order?.total_amount || 0
+    const discount_amount = order?.discount_amount || 0
+    const total_vat = order?.total_vat || 0
+    const product_discount = order?.product_discount || 0
+    const sum = total_amount - (discount_amount + total_vat + product_discount)
+    return sum
+  }
+
   return (
     <MainLayout isLoading={isLoading}>
       <Row justify="space-around" align="middle">
@@ -847,7 +856,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={orderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1039,13 +1048,21 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                         </Row>
                         <Row gutter={16}>
                           <Col span={12} className="pull-left">
+                            <Text>โปรโมชันร้านอาหาร</Text>
+                          </Col>
+                          <Col span={12} className="pull-right">
+                            <Text>฿{numberFormat(orderData?.product_discount || 0)}</Text>
+                          </Col>
+                        </Row>
+                        <Row gutter={16}>
+                          <Col span={12} className="pull-left">
                             <Title style={{ fontWeight: 'bold' }} level={5}>
                               รวมค่าอาหาร{' '}
                             </Title>
                           </Col>
                           <Col span={12} className="pull-right">
                             <Title style={{ fontWeight: 'bold' }} level={5}>
-                              ฿{numberFormat(orderData?.total_amount || 0)}
+                              ฿{sumTotalOrder(orderData)}
                             </Title>
                           </Col>
                         </Row>
@@ -1093,9 +1110,11 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                               <Col span={6} className="pull-right">
                                 <Text style={{ color: '#990000' }}>
                                   - ฿
-                                  {numberFormat(
-                                    (orderData?.merchant_ls || 0) + (orderData?.platform_ls || 0)
-                                  )}
+                                  {
+                                    (orderData?.total_fee_before_ls || 0) > ((orderData?.merchant_ls || 0) + (orderData?.platform_ls || 0)) ?
+                                      numberFormat(
+                                        (orderData?.merchant_ls || 0) + (orderData?.platform_ls || 0)
+                                      ) : numberFormat((orderData?.total_fee_before_ls || 0))}
                                 </Text>
                               </Col>
                             </Row>
@@ -1234,8 +1253,8 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
                                   {item.credit_type === 'gross_profit'
                                     ? 'เครดิตที่ใช้ในการรับออเดอร์'
                                     : item.credit_type === 'logistics_subsidize'
-                                    ? 'เครดิตของ Merchant LS'
-                                    : 'เครดิตค่าส่ง(ลูกค้าจ่าย)'}
+                                      ? 'เครดิตของ Merchant LS'
+                                      : 'เครดิตค่าส่ง(ลูกค้าจ่าย)'}
                                 </Text>
                               </Col>
                               <Col span={12} className="pull-right">
@@ -1517,7 +1536,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={outletInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1625,7 +1644,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={customerInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (
@@ -1762,7 +1781,7 @@ const OrderDetails = ({ payload, tableHeader, isPagination = false }: Props): Re
         <Formik
           enableReinitialize={true}
           initialValues={riderInitialValues}
-          onSubmit={() => {}}
+          onSubmit={() => { }}
           validationSchema={Schema}
         >
           {(values) => (

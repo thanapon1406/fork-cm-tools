@@ -1,6 +1,5 @@
 import Card from '@/components/Card'
 import Input from '@/components/Form/Input'
-import ReactQuill from "@/components/QuilNoSSR"
 import MainLayout from '@/layout/MainLayout'
 import { uploadImage } from '@/services/cdn'
 import { createContentLs, findContentLs } from '@/services/ls-config'
@@ -15,12 +14,11 @@ import { Field, Form, Formik } from 'formik'
 import _, { omit } from 'lodash'
 import moment from 'moment'
 import { useRouter } from 'next/router'
+import 'quill/dist/quill.snow.css'
 import { ReactElement, useEffect, useState } from 'react'
-import 'react-quill/dist/quill.snow.css'
+import { useQuill } from 'react-quilljs'
 import * as Yup from 'yup'
 import noImage from '../../../public/asset/images/no-image-available.svg'
-
-
 const { Title } = Typography
 const { warning } = Modal
 
@@ -71,6 +69,27 @@ export default function Ls({ }: Props): ReactElement {
   const router = useRouter()
   const [isSubmit, setIsSubmit] = useState(false)
   const { code } = router.query
+  const [isFetchFirstTime, setIsFetchFirstTime] = useState(false)
+
+  const theme = 'snow';
+  // const fontFamilyArr = ['impact', 'courier', 'comic']
+  const fontSize = ["8px", "9px", "10px", "11px", "12px", "14px", "18px", "24px", "30px", "36px", "48px", "60px", "72px", "96px"]
+  const modules = {
+    magicUrl: true,
+    toolbar: [
+      [{ size: fontSize }],
+      ['bold', 'italic', 'underline', 'strike', 'link'],
+      [{ color: [] }, { background: [] }, { align: [] }],
+      [
+        { list: 'ordered' },
+        { list: 'bullet' },
+        { indent: '-1' },
+        { indent: '+1' },
+      ],
+    ],
+  };
+  const placeholder = '';
+  const { quill, quillRef, Quill } = useQuill({ theme, modules, placeholder });
 
   const addVersion = (version: any) => {
     let versionSplit = version.split('.');
@@ -118,6 +137,8 @@ export default function Ls({ }: Props): ReactElement {
 
       setActive(data.status ? 'active' : 'inactive')
       setInitialValues(dataContentLs)
+      setIsFetchFirstTime(true)
+      quill?.clipboard?.dangerouslyPasteHTML(data.description)
       setImageUrl(image)
     }
   }
@@ -211,6 +232,48 @@ export default function Ls({ }: Props): ReactElement {
       fetchDataContentLs()
     }
   }, [code])
+
+  // Quill 
+
+  if (Quill && !quill) {
+    const MagicUrl = require('quill-magic-url').default;
+    Quill.register('modules/magicUrl', MagicUrl);
+
+    Quill.register(Quill.import("attributors/style/direction"), true);
+    Quill.register(Quill.import("attributors/style/align"), true);
+
+    const Size = Quill.import("attributors/style/size");
+    Size.whitelist = fontSize;
+    Quill.register(Size, true);
+
+    // const Font = Quill.import('formats/font');
+    // Font.whitelist = fontFamilyArr;
+    // Quill.register(Font, true);
+  }
+  useEffect(() => {
+    if (quill) {
+      quill.on('text-change', (delta, oldDelta, source) => {
+        // console.log('Text change!');
+        // console.log(quill.getText()); // Get text only
+        // console.log(quill.getContents()); // Get delta contents
+        // console.log(quill.root.innerHTML); // Get innerHTML using quill
+        // console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef
+
+        if (isFetchFirstTime) {
+          setInitialValues({
+            ...initialValues,
+            description: quillRef.current.firstChild.innerHTML
+          })
+        }
+      });
+    }
+
+  }, [quill, isFetchFirstTime]);
+
+  const onchangeTest = async (setFieldValue: any) => {
+
+  }
+  // end Quill
   return (
     <MainLayout>
       <Row justify="space-around" align="middle">
@@ -252,28 +315,30 @@ export default function Ls({ }: Props): ReactElement {
                     paddingBottom: '80px',
                   }}>
                   <label style={{ display: 'block', marginBottom: '10px' }}>รายละเอียด</label>
-                  <ReactQuill
+                  <div ref={quillRef} style={{ height: '220px' }} />
+
+                  {/* <ReactQuill
                     theme="snow"
                     value={values.description}
-                      onChange={(content, delta, source, editor) => {
-                        setFieldValue('description', editor.getHTML())
-                      }}
-                      style={{ height: '220px' }}
-                      modules={{
-                        toolbar: [
-                          // [{ header: [1, 2, false] }],
-                          [{ font: [] }, { size: [] }],
-                          ['bold', 'italic', 'underline', 'strike', 'link'],
-                          [{ color: [] }, { background: [] }, { align: [] }],
-                          [
-                            { list: 'ordered' },
-                            { list: 'bullet' },
-                            { indent: '-1' },
-                            { indent: '+1' },
-                          ],
+                    onChange={(content, delta, source, editor) => {
+                      setFieldValue('description', editor.getHTML())
+                    }}
+                    style={{ height: '220px' }}
+                    modules={{
+                      toolbar: [
+                        // [{ header: [1, 2, false] }],
+                        [{ font: [] }, { size: [] }],
+                        ['bold', 'italic', 'underline', 'strike', 'link'],
+                        [{ color: [] }, { background: [] }, { align: [] }],
+                        [
+                          { list: 'ordered' },
+                          { list: 'bullet' },
+                          { indent: '-1' },
+                          { indent: '+1' },
+                        ],
                       ],
                     }}
-                  />
+                  /> */}
                 </Col>
               </Row>
               <Row gutter={24}>

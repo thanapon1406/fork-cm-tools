@@ -81,3 +81,8 @@
 thead>tr>th.ant-table-cell {
   font-weight: bold;
 }
+
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value]::before {
+  content: attr(data-value) !important;
+}

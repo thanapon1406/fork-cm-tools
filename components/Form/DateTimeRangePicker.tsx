@@ -2,7 +2,7 @@ import { DatePicker as DatePickers, Form, Typography } from "antd";
 import { ErrorMessage } from "formik";
 import { get } from "lodash";
 import moment, { Moment } from "moment";
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 import { FormikProps } from "./props";
 const { RangePicker } = DatePickers;
 const { Text } = Typography;
@@ -20,6 +20,7 @@ interface Props extends FormikProps {
   minDate?: Moment;
   maxDate?: Moment;
   disabled?: boolean;
+  onChange?: any;
 }
 
 export default function DateTimeRangePicker({
@@ -73,9 +74,12 @@ export default function DateTimeRangePicker({
           value={defaultValue}
           style={{ width: "100%" }}
           name={field.name}
-          onChange={handleChange}
           onCalendarChange={handleChange}
           disabledDate={disabledDate}
+          onChange={(e: any, dateS: any) => {
+            handleChange(e, dateS);
+            (typeof props.onChange == "function") && props.onChange(e, dateS)
+          }}
         />
 
         <Text type="danger">

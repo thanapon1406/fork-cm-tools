@@ -16,6 +16,7 @@ import moment from 'moment'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
+import { mapDateTH } from '../../utils/helpers'
 const { Title } = Typography
 const { warning } = Modal
 
@@ -26,7 +27,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
   let [_isLoading, setIsLoading] = useState(true)
   const [initialValues, setInitialValues] = useState({
     status: 'open',
-    reason: 'ปิดเพื่อปรับปรุงระบบ',
+    reason: 'ขอแจ้งปิดเพื่อปรับปรุงระบบชั่วคราว',
     message: '',
     brand_id: process.env.NEXT_PUBLIC_KITCHENHUB_BRAND_ID,
     start_date: '',
@@ -84,7 +85,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
       let d = {
         ...initialValues,
         status: data.status,
-        reason: data.reason ? data.reason : "ปิดเพื่อปรับปรุงระบบ",
+        reason: data.reason ? data.reason : "ขอแจ้งปิดเพื่อปรับปรุงระบบชั่วคราว",
         message: data.message,
         start_date: data.start_date,
         end_date: data.end_date,
@@ -142,6 +143,15 @@ const BannerModalPopUpCreate = (): ReactElement => {
                         setFieldValue('status', e.target.value)
                         e.target.value == "period" ? setEditDateTime(false) : setEditDateTime(true)
                         e.target.value == "open" ? setEditReason(true) : setEditReason(false)
+                        if (e.target.value == "period") {
+                          const timeFrom = moment(values.start_date).format('HH:mm')
+                          const timeTo = moment(values.end_date).format('HH:mm')
+                          setFieldValue('message', `เพื่อเพิ่มประสิทธิภาพในการให้บริการ<br>ในวันที่ ${mapDateTH(values.start_date)} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(values.start_date)} ถึง ${timeTo} น.`)
+                        } else if (e.target.value == "close") {
+                          setFieldValue('message', `เพื่อเพิ่มประสิทธิภาพในการให้บริการ`)
+                        } else if (e.target.value == "open") {
+                          setFieldValue('message', ``)
+                        }
                       }}
                     >
                       <Space direction="vertical">
@@ -160,6 +170,12 @@ const BannerModalPopUpCreate = (): ReactElement => {
                           <Col className="gutter-row">
                             <Field
                               name="show_date"
+                              onChange={(e: any, date: any) => {
+                                const timeFrom = moment(date[0]).format('HH:mm')
+                                const timeTo = moment(date[1]).format('HH:mm')
+
+                                setFieldValue('message', `เพื่อเพิ่มประสิทธิภาพในการให้บริการ<br>ในวันที่ ${mapDateTH(date[0])} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(date[1])} ถึง ${timeTo} น.`)
+                              }}
                               component={DateTimeRangePicker}
                               disabled={editDateTime}
                               id="show_date"
@@ -177,20 +193,26 @@ const BannerModalPopUpCreate = (): ReactElement => {
                         label={{ text: 'เหตุผลที่ปิดระบบ' }}
                         name="reason"
                         component={Select}
+                        onChange={(e: any) => {
+                          setFieldValue('reason', e)
+                          // if (values.status == "close") {
+                          //   setFieldValue('message', `เพื่อเพิ่มประสิทธิภาพในการให้บริการ`)
+                          // }
+                        }}
                         id="reason"
                         disabled={editReason}
                         selectOption={[
                           {
                             name: 'ปิดเพื่อปรับปรุงระบบ',
-                            value: "ปิดเพื่อปรับปรุงระบบ",
+                            value: "ขอแจ้งปิดเพื่อปรับปรุงระบบชั่วคราว",
                           },
                           {
                             name: 'ปิดเพื่ออัพเดทเวอร์ชั่น',
-                            value: "ปิดเพื่ออัพเดทเวอร์ชั่น",
+                            value: "ขอแจ้งปิดเพื่ออัพเดทเวอร์ชัน",
                           },
                           {
                             name: 'ปิดระบบถาวร',
-                            value: "ปิดระบบถาวร",
+                            value: "ขอแจ้งปิดระบบถาวร",
                           },
                         ]}
                       />

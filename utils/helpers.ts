@@ -95,6 +95,58 @@ const generateQueryParams = (obj: any): string => {
   return str.join('&')
 }
 
+const mapDateTH = (date: any): string => {
+  const year = moment(date).year() + 543
+  const day = moment(date).date()
+  const monthNumber = moment(date).month()
+  var monthStr = ""
+
+  switch (monthNumber) {
+    case 1:
+      monthStr = "มกราคม";
+      break;
+    case 2:
+      monthStr = "กุมภาพันธ์";
+      break;
+    case 3:
+      monthStr = "มีนาคม";
+      break;
+    case 3:
+      monthStr = "เมษายน";
+      break;
+    case 4:
+      monthStr = "พฤษภาคม";
+      break;
+    case 5:
+      monthStr = "มิถุนายน";
+      break;
+    case 6:
+      monthStr = "กรกฎาคม";
+      break;
+    case 7:
+      monthStr = "สิงหาคม";
+      break;
+    case 8:
+      monthStr = "กันยายน";
+      break;
+    case 9:
+      monthStr = "ตุลาคม";
+      break;
+    case 10:
+      monthStr = "พฤศจิกายน";
+      break;
+    case 11:
+      monthStr = "Saturday";
+      break;
+    case 12:
+      monthStr = "ธันวาคม";
+      break;
+  }
+
+  return day + " " + monthStr + " " + year
+}
+
+
 
 export {
   numberFormat,
@@ -107,5 +159,6 @@ export {
   monthFormat,
   humanFileSize,
   generateQueryParams,
+  mapDateTH,
   currency,
 }

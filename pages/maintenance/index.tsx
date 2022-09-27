@@ -146,9 +146,9 @@ const BannerModalPopUpCreate = (): ReactElement => {
                         if (e.target.value == "period") {
                           const timeFrom = moment(values.start_date).format('HH:mm')
                           const timeTo = moment(values.end_date).format('HH:mm')
-                          setFieldValue('message', `เพื่อเพิ่มประสิทธิภาพในการให้บริการ<br>ในวันที่ ${mapDateTH(values.start_date)} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(values.start_date)} ถึง ${timeTo} น.`)
+                          setFieldValue('message', `<p class=\"ql-align-center\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ<br>ในวันที่ ${mapDateTH(values.start_date)} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(values.start_date)} ถึง ${timeTo} น.</p>`)
                         } else if (e.target.value == "close") {
-                          setFieldValue('message', `เพื่อเพิ่มประสิทธิภาพในการให้บริการ`)
+                          setFieldValue('message', `<p class=\"ql-align-center\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</p>`)
                         } else if (e.target.value == "open") {
                           setFieldValue('message', ``)
                         }
@@ -174,7 +174,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
                                 const timeFrom = moment(date[0]).format('HH:mm')
                                 const timeTo = moment(date[1]).format('HH:mm')
 
-                                setFieldValue('message', `เพื่อเพิ่มประสิทธิภาพในการให้บริการ<br>ในวันที่ ${mapDateTH(date[0])} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(date[1])} ถึง ${timeTo} น.`)
+                                setFieldValue('message', `<p class=\"ql-align-center\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ<br>ในวันที่ ${mapDateTH(date[0])} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(date[1])} ถึง ${timeTo} น.</p>`)
                               }}
                               component={DateTimeRangePicker}
                               disabled={editDateTime}
@@ -195,9 +195,6 @@ const BannerModalPopUpCreate = (): ReactElement => {
                         component={Select}
                         onChange={(e: any) => {
                           setFieldValue('reason', e)
-                          // if (values.status == "close") {
-                          //   setFieldValue('message', `เพื่อเพิ่มประสิทธิภาพในการให้บริการ`)
-                          // }
                         }}
                         id="reason"
                         disabled={editReason}

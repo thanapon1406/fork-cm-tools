@@ -198,7 +198,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
                         if (e.target.value == "period") {
                           const timeFrom = moment(values.start_date).format('HH:mm')
                           const timeTo = moment(values.end_date).format('HH:mm')
-                          setMessage(`<p style=\"text-align: center;\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</p><p style=\"text-align: center;\">ในวันที่ ${mapDateTH(values.start_date)} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(values.end_date)} ถึง ${timeTo} น.</p>`)
+                          setMessage(`<p style=\"text-align: center;\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</p><p style=\"text-align: center;\">ในวันที่ ${mapDateTH(values.start_date)} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(values.end_date)} เวลา ${timeTo} น.</p>`)
                         } else if (e.target.value == "close") {
                           setMessage(`<p style=\"text-align: center;\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</p>`)
                         } else if (e.target.value == "open") {
@@ -225,7 +225,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
                               onChange={(e: any, date: any) => {
                                 const timeFrom = moment(date[0]).format('HH:mm')
                                 const timeTo = moment(date[1]).format('HH:mm')
-                                setMessage(`<p style=\"text-align: center;\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</p><p style=\"text-align: center;\">ในวันที่ ${mapDateTH(date[0])} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(date[1])} ถึง ${timeTo} น.</p>`)
+                                setMessage(`<p style=\"text-align: center;\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</p><p style=\"text-align: center;\">ในวันที่ ${mapDateTH(date[0])} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(date[1])} เวลา ${timeTo} น.</p>`)
                               }}
                               component={DateTimeRangePicker}
                               disabled={editDateTime}

@@ -27,7 +27,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
     magicUrl: true,
     toolbar: [
       [{ size: fontSize }],
-      ['bold', 'italic', 'underline', 'strike', 'link'],
+      ['bold', 'italic', 'underline', 'strike'],
       [{ color: [] }, { background: [] }, { align: [] }],
       [
         { list: 'ordered' },

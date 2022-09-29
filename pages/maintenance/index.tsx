@@ -1,6 +1,5 @@
 import DateTimeRangePicker from '@/components/Form/DateTimeRangePicker'
 import Select from '@/components/Form/Select'
-import ReactQuill from "@/components/QuilNoSSR"
 import MainLayout from '@/layout/MainLayout'
 import { createMaintenance, getMaintenance } from '@/services/maintenance'
 import {
@@ -13,18 +12,38 @@ import {
 import { Field, Form, Formik } from 'formik'
 import { omit } from 'lodash'
 import moment from 'moment'
-import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
+import { useQuill } from 'react-quilljs'
 import { mapDateTH } from '../../utils/helpers'
 const { Title } = Typography
 const { warning } = Modal
+const theme = 'snow';
 
 const BannerModalPopUpCreate = (): ReactElement => {
-  const router = useRouter()
+  const theme = 'snow';
+  const fontSize = ["8px", "9px", "10px", "11px", "12px", "14px", "18px", "24px", "30px", "36px", "48px", "60px", "72px", "96px"]
+  const modules = {
+    magicUrl: true,
+    toolbar: [
+      [{ size: fontSize }],
+      ['bold', 'italic', 'underline', 'strike', 'link'],
+      [{ color: [] }, { background: [] }, { align: [] }],
+      [
+        { list: 'ordered' },
+        { list: 'bullet' },
+        { indent: '-1' },
+        { indent: '+1' },
+      ],
+    ],
+  };
+  const placeholder = '';
+  const { quill, quillRef, Quill } = useQuill({ theme, modules, placeholder });
+
   const [editDateTime, setEditDateTime] = useState(true)
   const [editReason, setEditReason] = useState(true)
   let [_isLoading, setIsLoading] = useState(true)
+
   const [initialValues, setInitialValues] = useState({
     status: 'open',
     reason: 'ขอแจ้งปิดเพื่อปรับปรุงระบบชั่วคราว',
@@ -64,6 +83,17 @@ const BannerModalPopUpCreate = (): ReactElement => {
       value.end_date = moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss.000Z')
     }
 
+    value.message = quillRef.current.firstChild.innerHTML
+    if (quillRef.current.innerText.length > 255) {
+      notification.error({
+        message: `บันทึกข้อมูลไม่สำเร็จ`,
+        description: 'ข้อความที่แสดง มีความยาวเกินที่กำหนด',
+        duration: 3,
+      })
+      return null
+    }
+
+
     const { result, success } = await createMaintenance({ data: value })
     if (success) {
       notification.success({
@@ -101,9 +131,31 @@ const BannerModalPopUpCreate = (): ReactElement => {
     setIsLoading(false)
   }
 
+  const setMessage = (str: string) => {
+    quillRef.current.firstChild.innerHTML = str
+  }
+
+  useEffect(() => {
+    if (quillRef.current) {
+      setMessage(initialValues.message)
+    }
+  }, [quill])
+
   useEffect(() => {
     getMaintenanceData()
   }, [])
+
+  if (Quill && !quill) {
+    const MagicUrl = require('quill-magic-url').default;
+    Quill.register('modules/magicUrl', MagicUrl);
+
+    Quill.register(Quill.import("attributors/style/direction"), true);
+    Quill.register(Quill.import("attributors/style/align"), true);
+
+    const Size = Quill.import("attributors/style/size");
+    Size.whitelist = fontSize;
+    Quill.register(Size, true);
+  }
 
   return (
     <MainLayout>
@@ -146,11 +198,11 @@ const BannerModalPopUpCreate = (): ReactElement => {
                         if (e.target.value == "period") {
                           const timeFrom = moment(values.start_date).format('HH:mm')
                           const timeTo = moment(values.end_date).format('HH:mm')
-                          setFieldValue('message', `<div style="text-align:center;">เพื่อเพิ่มประสิทธิภาพในการให้บริการ<br>ในวันที่ ${mapDateTH(values.start_date)} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(values.start_date)} ถึง ${timeTo} น.</div>`)
+                          setMessage(`<p style=\"text-align: center;\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</p><p style=\"text-align: center;\">ในวันที่ ${mapDateTH(values.start_date)} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(values.end_date)} ถึง ${timeTo} น.</p>`)
                         } else if (e.target.value == "close") {
-                          setFieldValue('message', `<div style="text-align:center;">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</div>`)
+                          setMessage(`<p style=\"text-align: center;\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</p>`)
                         } else if (e.target.value == "open") {
-                          setFieldValue('message', ``)
+                          setMessage(``)
                         }
                       }}
                     >
@@ -173,8 +225,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
                               onChange={(e: any, date: any) => {
                                 const timeFrom = moment(date[0]).format('HH:mm')
                                 const timeTo = moment(date[1]).format('HH:mm')
-
-                                setFieldValue('message', `<div style="text-align:center;">เพื่อเพิ่มประสิทธิภาพในการให้บริการ<br>ในวันที่ ${mapDateTH(date[0])} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(date[1])} ถึง ${timeTo} น.</div>`)
+                                setMessage(`<p style=\"text-align: center;\">เพื่อเพิ่มประสิทธิภาพในการให้บริการ</p><p style=\"text-align: center;\">ในวันที่ ${mapDateTH(date[0])} ช่วงเวลา ${timeFrom} น. - ${mapDateTH(date[1])} ถึง ${timeTo} น.</p>`)
                               }}
                               component={DateTimeRangePicker}
                               disabled={editDateTime}
@@ -204,8 +255,8 @@ const BannerModalPopUpCreate = (): ReactElement => {
                             value: "ขอแจ้งปิดเพื่อปรับปรุงระบบชั่วคราว",
                           },
                           {
-                            name: 'ปิดเพื่ออัพเดทเวอร์ชั่น',
-                            value: "ขอแจ้งปิดเพื่ออัพเดทเวอร์ชัน",
+                            name: 'ปิดเพื่ออัปเดตเวอร์ชัน',
+                            value: "ขอแจ้งปิดเพื่อปิดอัปเดตเวอร์ชัน",
                           },
                           {
                             name: 'ปิดระบบถาวร',
@@ -219,28 +270,7 @@ const BannerModalPopUpCreate = (): ReactElement => {
                         paddingBottom: '80px',
                       }}>
                       <label style={{ display: 'block', marginBottom: '10px' }}>ข้อความที่แสดงบนแอปฯ</label>
-                      <ReactQuill
-                        readOnly={editReason}
-                        theme="snow"
-                        value={values.message}
-                        onChange={(content, delta, source, editor) => {
-                          setFieldValue('message', editor.getHTML())
-                        }}
-                        style={{ height: '220px' }}
-                        modules={{
-                          toolbar: [
-                            [{ header: [1, 2, false] }],
-                            ['bold', 'italic', 'underline', 'strike', 'link'],
-                            [{ color: [] }, { background: [] }],
-                            [
-                              { list: 'ordered' },
-                              { list: 'bullet' },
-                              { indent: '-1' },
-                              { indent: '+1' },
-                            ],
-                          ],
-                        }}
-                      />
+                      <div ref={quillRef} style={{ height: '220px' }} />
                     </Col>
                   </Row>
                 </Card>
